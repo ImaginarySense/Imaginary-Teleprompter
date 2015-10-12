@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<!--
+	Teleprompter
+	Copyright (C) 2015 Imaginary Films LLC, Victor Ortiz <va2ron1@gmail.com>, Javier Cordero <javier.cordero@upr.edu>
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<html>
+  <head>
+		<meta content="text/html; charset=windows-1252" http-equiv="content-type">
+		<title>Output | Teleprompter by Imaginary Films</title>
+		<link href="favicon.ico" rel="icon" type="image/x-icon" />
+		<script src="js/jquery.min.js"></script>
+		<style>
+			#fadeMeTop {
+				opacity:    0.5;
+				background: #000;
+				width:      100%;
+				height:     40%;
+				z-index:    10;
+				top:        0;
+				left:       0;
+				position:   fixed;
+			}
+			#fadeMeBottom {
+				opacity:    0.5;
+				background: #000;
+				width:      100%;
+				height:     40%;
+				z-index:    10;
+				bottom:     0;
+				left:       0;
+				position:   fixed;
+			}
+		</style>
+		<link rel="stylesheet" href="ckeditor/contents.css">
+		<link rel="stylesheet" href="css/prompterstyle.css">
+  </head>
+  <body style="overflow: hidden" onload="init()">
+		<div id="fadeMeTop"></div>
+		<div id="fadeMeBottom"></div>
+		<div id="scroll-wrapper" class="block cke_editable" style="position: absolute; width: 98%; text-align: center; margin: 0px; padding: 0px;"></div>
+		<script>
+		var flipH = false;
+		var flipV = false;
+		var limit = 20;
+
+		var wrapper = document.getElementById('scroll-wrapper');
+		var obj = JSON.parse(localStorage.getItem('data'));
+		wrapper.innerHTML = decodeURIComponent(obj['html']);
+
+		var offset = 1;
+		function leftArrowPressed()
+		{
+			if ( offset>limit*-1 )
+				offset-=1;
+		}
+
+		function rightArrowPressed()
+		{
+		   if ( offset<limit )
+				offset+=1;
+		}
+
+		function doScroll()
+		{
+			$( ".block" ).animate({ "top": "-=" +offset + "px" }, 40,function() {doScroll();});
+		}
+
+		document.onkeydown = function(evt) {
+			evt = evt || window.event;
+			switch (evt.keyCode) {
+				case 37: // Left
+				case 38: // Up
+				case 87: // W
+				case 65: // A
+					if( flipV )
+						rightArrowPressed();
+					else
+						leftArrowPressed();
+					break;
+				case 39: // Right
+				case 40: // Down
+				case 83: // S
+				case 68: // D
+					if( flipV )
+						leftArrowPressed();
+					else
+						rightArrowPressed();
+					break;
+			}
+		};
+
+		function init()
+		{
+			// Local variables
+			var promptStyle = false;
+			var focus = 0;
+
+			// Get JSON values from local storage
+			flipH = obj['data']['flipH'];
+			flipV = obj['data']['flipV'];
+			focus = obj['data']['focus'];
+			promptStyle = obj['data']['prompterStyle'];
+
+			if (flipH)
+			{
+				// Flip Horizontally
+				wrapper.style.MozTransform = "scaleX(-1)";
+				wrapper.style.OTransform = "scaleX(-1)";
+				wrapper.style.webkitTransform = "scaleX(-1)";
+				wrapper.style.transform = "scaleX(-1)";
+				wrapper.style.filter = "FlipH";
+				wrapper.style.msFilter = "FlipH";
+			}
+			if (flipV)
+			{
+				// Flip Vertically
+				wrapper.style.mozTransform = "scaleY(-1)";
+				wrapper.style.oTransform = "scaleY(-1)";
+				wrapper.style.webkitTransform = "scaleY(-1)";
+				wrapper.style.transform = "scaleY(-1)";
+				wrapper.style.filter = "FlipV";
+				wrapper.style.msFilter = "FlipV";
+				
+				// Invert scroll direction
+				$('.block').css('bottom', $(window).height());
+				offset *= -1;
+				
+				// If focus is top or bottom, change fader positions.
+				if ( focus==1 )
+				{
+					document.getElementById("fadeMeTop").style.height = '80%';  
+					document.getElementById("fadeMeBottom").style.height = '0%';
+				}
+				else if ( focus==2 )
+				{
+					document.getElementById("fadeMeTop").style.height = '10%';  
+					document.getElementById("fadeMeBottom").style.height = '70%';
+				}
+
+			}
+			else // If no vertical flip
+			{
+				// Normal scroll direction
+				$('.block').css('top', $(window).height());
+				
+				// If focus is top or bottom, change fader positions.
+				if ( focus==1 )
+				{
+					document.getElementById("fadeMeTop").style.height = '0%';  
+					document.getElementById("fadeMeBottom").style.height = '80%';
+				}
+				else if ( focus==2 )
+				{
+					document.getElementById("fadeMeTop").style.height = '70%';  
+					document.getElementById("fadeMeBottom").style.height = '10%';
+				}
+			}
+
+			// Set Teleprompter Style
+			if ( promptStyle )
+			{
+				document.body.style.background = '#FFF';
+				document.body.style.color = '#000';	
+			}
+
+			// Begin scroll
+			doScroll();
+		}
+
+		</script>
+  </body>
+</html>

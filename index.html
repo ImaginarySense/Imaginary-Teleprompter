@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<!--
+    Teleprompter!
+    Copyright (C) 2015 Imaginary Films LLC, Victor Ortiz <va2ron1@gmail.com>, Javier Cordero <javier.cordero@upr.edu>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Teleprompter</title>
+    <link  rel="icon" href="favicon.ico" type="image/x-icon" />
+    <script src="ckeditor/ckeditor.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <style class="anchorjs"></style><link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/docs.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <form>
+      <!-- Header -->
+      <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+        <div class="container">
+          <div class="navbar-header">
+            <!--
+            <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#bs-navbar" aria-controls="bs-navbar" aria-expanded="false">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            -->
+            <a href="http://imaginary.tech/teleprompter" class="navbar-brand"><img src="img/logo.png" alt="Teleprompter" style="height:20px;"></a>
+          </div>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="" onclick="submitTeleprompter(); return false;" style="font-size: 1.4em"><strong>Prompt It!</strong></a></li>
+          </ul>
+        </div>
+      </header>
+
+      <!-- Custom controls -->
+      <div class="bs-docs-header" id="content" tabindex="-1">
+        <div class="container">
+          <div class='row'>
+            <div class='col-md-3'>
+              <label for="basic-url">Flip Horizontally</label>
+              <select class="form-control" id="flipH" name="flipH">
+                <option value="0" selected="selected">Don't filp</option>
+                <option value="1">Flip it</option>
+              </select>
+            </div>
+            <div class='col-md-3'>
+              <label for="basic-url">Flip Vertically</label>
+              <select class="form-control" id="flipV" name="flipV">
+                <option value="0" selected="selected">Don't filp</option>
+                <option value="1">Flip it</option>
+              </select>
+            </div>
+            <div class='col-md-3'>
+              <label for="basic-url">Prompter style</label>
+              <select class="form-control" id="prompterStyle" name="prompterStyle" onchange="OnChange(this.form.prompterStyle);">
+                <option value="0" selected="selected">Blackboard</option>
+                <option value="1">Whiteboard</option>
+              </select>
+            </div>
+            <div class='col-md-3'>
+              <label for="basic-url">Focus</label>
+              <select class="form-control" id="focus" name="focus">
+                <option value="1">Top</option>
+                <option value="0" selected="selected">Middle</option>
+                <option value="2">Bottom</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="container bs-docs-container" style="width:100%;">
+        <div class="row">
+          <div class="col-md-12" role="main" style="padding-right: 0px; padding-left: 0px;">
+            <div class="bs-docs-section">
+              <div id="CKEditor">
+                <textarea name="editor1" id="teleprompterdata">
+                  <h1>Welcome to Teleprompter!</h1>
+                  <p>Start writing your script plz.</p>
+                </textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- Footer -->
+    <footer class="bs-docs-footer finalFooter" role="contentinfo">
+      <div class="container">
+        
+        <p style="color:#FFF;">&copy; <a href="http://imaginary.tech">Imaginary Films LLC</a></p>
+        
+        <p>Created by <a href="https://twitter.com/Va2ron1" target="_blank">Victor Ortiz</a> and <a href="https://www.facebook.com/javicorper" target="_blank">Javier Cordero</a>.</p>
+        
+        <p>Code licensed under <a rel="license" href="LICENSE" target="_blank">GPL3</a>, assets under <a rel="license" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.</p>
+        
+        <ul class="bs-docs-footer-links">
+          <li>Currently v1.0</li>
+          <!--
+          <li>&middot;</li>
+          <li><a href="downloads">Download</a></li>
+          -->
+          <li>&middot;</li>
+          <li><a target="_blank" href="https://github.com/javiercordero/Teleprompter.git">Source</a></li>
+          <!--
+          <li>&middot;</li>
+          <li><a target="_blank" href="support">Support</a></li>
+          <li>&middot;</li>
+          <li><a target="_blank" href="releases">Releases</a></li>
+          -->
+          <li>&middot;</li>
+          <li><a target="_blank" href="http://imaginary.tech/software/teleprompter">About</a></li>
+        </ul>
+      </div>
+    </footer>
+    <script>
+      // Instance CKEditor
+      CKEDITOR.replace( 'teleprompterdata');
+      
+      function submitTeleprompter()
+      {
+        // Get html from CKEditor
+        var htmldata = CKEDITOR.instances.teleprompterdata.getData();
+        
+        // Get remaining form data
+        var data = '{ "data": {"flipV":'+$( "#flipV" ).val()+',"flipH":'+$( "#flipH" ).val()+',"prompterStyle":'+$( "#prompterStyle" ).val()+',"focus":'+$( "#focus" ).val()+'},"html" : "' + encodeURIComponent(htmldata) + '"}';
+        
+        // Store data locally for prompter to use
+        localStorage.setItem('data', data);
+        
+        var newwindow = window.open("teleprompter.html",'TelePrompter Output','height=' + screen.height +',width=' + screen.width);
+        if (window.focus)
+          newwindow.focus();
+      }
+
+      // On change Prompter Style
+      function OnChange(prompterStyle)
+      {
+        var selection = prompterStyle.selectedIndex
+        
+        if ( selection )
+        {
+          document.getElementsByTagName('iframe')[0].contentWindow.document.body.style.background="#FFF";
+          document.getElementsByTagName('iframe')[0].contentWindow.document.body.style.color="#000";
+        }
+        else
+        {
+          document.getElementsByTagName('iframe')[0].contentWindow.document.body.style.background="#333";
+          document.getElementsByTagName('iframe')[0].contentWindow.document.body.style.color = '#FFF'; 
+        }
+      }
+
+    </script>
+  </body>
+</html>
