@@ -1,5 +1,81 @@
-.cke_editable
-{
-	font-size: 54px;
-	line-height: 1.6;
+body {
+	margin: 0px;
+	padding: 0px;
+}
+
+#overlay {
+	opacity:    0.5;
+	top:        0px;
+	left:       0px;
+	width:		100%;
+	height:		100%;
+	position:	fixed;
+	margin:		0px;
+	padding:	0px;
+	border:		0px solid;
+}
+
+.overlayBg {
+	background: #000;
+}
+
+#overlayFocus {
+	height:		1.8em;
+}
+
+#scroll_wrapper {
+	height: 100vh;
+	width: 100%;
+	top: 0px;
+	left: 0px;
+	margin: 0px;
+	padding: 0px;
+	position: absolute;
+	overflow: auto;
+}
+
+#text_block {
+	z-index:    -10;
+	width: 84%;
+	left: 8%;
+	margin: 0px;
+	padding: 0px;
+	padding-top: 100vh;
+	padding-bottom: 100vh;
+	position: absolute;
+	overflow: hidden;
+	/* The following lines change the anchor point to the middle of the screen */
+	/*top: -50%;
+	-ms-transform: translate(0, 50%);
+	-webkit-transform: translate(0, 50%);
+	transform: translate(0, 50%); */
+}
+
+
+
+// To be put in use
+.arrow-right {
+	width: 0; 
+	height: 0; 
+	border-top: 60px solid transparent;
+	border-bottom: 60px solid transparent;
+	border-left: 60px solid #6F5481;
+	right: 0px;
+	top:50%;
+	bottom:50%;
+	/*float: left;
+	vertical-align: middle;*/
+}
+
+.arrow-left {
+	width: 0; 
+	height: 0; 
+	border-top: 60px solid transparent;
+	border-bottom: 60px solid transparent; 
+	border-right:60px solid #6F5481;
+	left: 0px;
+	top:50%;
+	bottom:50%;
+	/*float: right;
+	vertical-align: middle;*/
 }

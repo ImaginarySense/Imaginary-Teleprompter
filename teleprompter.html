@@ -22,85 +22,114 @@
 		<title>Output | Teleprompter by Imaginary Films</title>
 		<link href="favicon.ico" rel="icon" type="image/x-icon" />
 		<script src="js/jquery.min.js"></script>
-		<style>
-			#fadeMeTop {
-				opacity:    0.5;
-				background: #000;
-				width:      100%;
-				height:     40%;
-				z-index:    10;
-				top:        0;
-				left:       0;
-				position:   fixed;
-			}
-			#fadeMeBottom {
-				opacity:    0.5;
-				background: #000;
-				width:      100%;
-				height:     40%;
-				z-index:    10;
-				bottom:     0;
-				left:       0;
-				position:   fixed;
-			}
-		</style>
 		<link rel="stylesheet" href="ckeditor/contents.css">
 		<link rel="stylesheet" href="css/prompterstyle.css">
   </head>
-  <body style="overflow: hidden" onload="init()">
-		<div id="fadeMeTop"></div>
-		<div id="fadeMeBottom"></div>
-		<div id="scroll-wrapper" class="block cke_editable" style="position: absolute; width: 98%; text-align: center; margin: 0px; padding: 0px;"></div>
+  <body onload="init()">
+		<!--
+		-->
+		<table border="0" cellpadding="0" cellspacing="0" id="overlay" class="cke_editable">
+	    <tbody>
+			<tr id="overlayTop" class="overlayBg">
+				<td>
+	    		</td>
+	    	</tr>
+			<tr id="overlayFocus">
+				<td>
+					<div id="arrow"></div>
+				</td>
+			</tr>
+	        <tr id="overlayBottom" class="overlayBg">
+				<td>
+				</td>
+			</tr>
+	    </tbody>
+	    </table>
+		
+		<div id="scroll_wrapper">
+			<div id="text_block" class="cke_editable"></div>
+		</div>
+		
 		<script>
 		var flipH = false;
 		var flipV = false;
-		var limit = 20;
-
-		var wrapper = document.getElementById('scroll-wrapper');
-		var obj = JSON.parse(localStorage.getItem('data'));
-		wrapper.innerHTML = decodeURIComponent(obj['html']);
-
+		var limit = 40;
 		var offset = 1;
-		function leftArrowPressed()
+		var wrapper = $('#scroll_wrapper');
+		var wrapperById = document.getElementById('scroll_wrapper'); 
+		var prompt = document.getElementById('text_block');
+		// Parse values from localStorage
+		var obj = JSON.parse(localStorage.getItem('data'));
+		prompt.innerHTML = decodeURIComponent(obj['html']);
+
+		function negSpeed()
 		{
 			if ( offset>limit*-1 )
 				offset-=1;
 		}
 
-		function rightArrowPressed()
+		function posSpeed()
 		{
 		   if ( offset<limit )
 				offset+=1;
 		}
-
+		
 		function doScroll()
 		{
-			$( ".block" ).animate({ "top": "-=" +offset + "px" }, 40,function() {doScroll();});
-		}
+			wrapper.animate({ scrollTop: "+=" + offset }, { duration: 50, complete: function(){
+					window.setTimeout( doScroll, 0 );
+				}
+		});}
 
-		document.onkeydown = function(evt) {
+		document.onkeydown = function(evt)
+		{
+			// Prevent arrow and spacebar scroll bug.
+			if([32, 37, 38, 39, 40].indexOf(evt.keyCode) > -1)
+        		evt.preventDefault();
+
+			// Change speed toward intended direction.
 			evt = evt || window.event;
-			switch (evt.keyCode) {
+			switch (evt.keyCode)
+			{
 				case 37: // Left
 				case 38: // Up
 				case 87: // W
 				case 65: // A
 					if( flipV )
-						rightArrowPressed();
+						posSpeed();
 					else
-						leftArrowPressed();
+						negSpeed();
 					break;
 				case 39: // Right
 				case 40: // Down
 				case 83: // S
 				case 68: // D
 					if( flipV )
-						leftArrowPressed();
+						negSpeed();
 					else
-						rightArrowPressed();
+						posSpeed();
 					break;
 			}
-		};
+		}
+
+		// Reset speed to 0 when reaching end points.
+		wrapper.scroll(function()
+		{
+			var currPos = wrapper.scrollTop();
+			if( currPos <= 0 || currPos + wrapperById.clientHeight == prompt.clientHeight-1 )
+				offset=0;
+		});
+
+		$(document).on("pagecreate",function()
+		{
+			wrapper.on("scrollstart",function(){
+				wrapper.stop();
+			});
+
+			wrapper.on("scrollstop",function(){
+				window.setTimeout( doScroll, 1000 );
+			});
+		});
 
 		function init()
 		{
@@ -117,66 +146,62 @@
 			if (flipH)
 			{
 				// Flip Horizontally
-				wrapper.style.MozTransform = "scaleX(-1)";
-				wrapper.style.OTransform = "scaleX(-1)";
-				wrapper.style.webkitTransform = "scaleX(-1)";
-				wrapper.style.transform = "scaleX(-1)";
-				wrapper.style.filter = "FlipH";
-				wrapper.style.msFilter = "FlipH";
+				prompt.style.MozTransform = "scaleX(-1)";
+				prompt.style.OTransform = "scaleX(-1)";
+				prompt.style.webkitTransform = "scaleX(-1)";
+				prompt.style.transform = "scaleX(-1)";
+				prompt.style.filter = "FlipH";
+				prompt.style.msFilter = "FlipH";
 			}
 			if (flipV)
 			{
 				// Flip Vertically
-				wrapper.style.mozTransform = "scaleY(-1)";
-				wrapper.style.oTransform = "scaleY(-1)";
-				wrapper.style.webkitTransform = "scaleY(-1)";
-				wrapper.style.transform = "scaleY(-1)";
-				wrapper.style.filter = "FlipV";
-				wrapper.style.msFilter = "FlipV";
+				prompt.style.mozTransform = "scaleY(-1)";
+				prompt.style.oTransform = "scaleY(-1)";
+				prompt.style.webkitTransform = "scaleY(-1)";
+				prompt.style.transform = "scaleY(-1)";
+				prompt.style.filter = "FlipV";
+				prompt.style.msFilter = "FlipV";
 				
-				// Invert scroll direction
-				$('.block').css('bottom', $(window).height());
+				// Start scroll at inverted top
+				wrapper.scrollTop( prompt.offsetHeight );
+				
+				// Reverse initial speed
 				offset *= -1;
 				
-				// If focus is top or bottom, change fader positions.
+				// If focus is top or bottom, change overlay positions
 				if ( focus==1 )
-				{
-					document.getElementById("fadeMeTop").style.height = '80%';  
-					document.getElementById("fadeMeBottom").style.height = '0%';
-				}
+					document.getElementById("overlayBottom").style.height = '0%';
 				else if ( focus==2 )
-				{
-					document.getElementById("fadeMeTop").style.height = '10%';  
-					document.getElementById("fadeMeBottom").style.height = '70%';
-				}
-
+					document.getElementById("overlayTop").style.height = '10%';
 			}
 			else // If no vertical flip
 			{
-				// Normal scroll direction
-				$('.block').css('top', $(window).height());
-				
-				// If focus is top or bottom, change fader positions.
+				// If focus is top or bottom, change overlay positions.
 				if ( focus==1 )
-				{
-					document.getElementById("fadeMeTop").style.height = '0%';  
-					document.getElementById("fadeMeBottom").style.height = '80%';
-				}
+					document.getElementById("overlayTop").style.height = '0%';  
 				else if ( focus==2 )
-				{
-					document.getElementById("fadeMeTop").style.height = '70%';  
-					document.getElementById("fadeMeBottom").style.height = '10%';
-				}
+					document.getElementById("overlayBottom").style.height = '10%';
 			}
 
 			// Set Teleprompter Style
-			if ( promptStyle )
+			var overBgs = document.getElementsByClassName('overlayBg');
+			switch( promptStyle )
 			{
-				document.body.style.background = '#FFF';
-				document.body.style.color = '#000';	
+				case 1 :
+					document.body.style.background = '#FFF';
+					document.body.style.color = '#000';
+					for(i=0; i<overBgs.length; i++)
+						overBgs[i].style.backgroundColor = '#BBB';
+					break;
+				default :
+					document.body.style.background = '#272822';
+					document.body.style.color = '#FFF';
+					for(i=0; i<overBgs.length; i++)
+						overBgs[i].style.backgroundColor = '#000';
 			}
-
-			// Begin scroll
+			
+			// Start scrolling
 			doScroll();
 		}
 

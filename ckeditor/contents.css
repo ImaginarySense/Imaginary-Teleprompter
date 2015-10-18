@@ -7,21 +7,21 @@ body
 {
 	/* Font */
 	font-family: sans-serif, Arial, Verdana, "Trebuchet MS";
-	font-size: 12px;
+	font-size: 14px;
 
 	/* Text color */
 	color: #fff;
 
 	/* Remove the background color to make it transparent */
-	background-color: #333;
-
+	background-color: #272822;
+	text-align: center;
 	margin: 20px;
 }
 
 .cke_editable
 {
-	font-size: 22px;
-	line-height: 1.6;
+	font-size: 4.5vw;
+	line-height: 1.2;
 }
 
 blockquote
@@ -64,7 +64,7 @@ ol,ul,dl
 h1,h2,h3,h4,h5,h6
 {
 	font-weight: normal;
-	line-height: 1.2;
+	line-height: 0;
 }
 
 hr
