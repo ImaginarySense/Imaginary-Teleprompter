@@ -61,6 +61,9 @@
 		// Parse values from localStorage
 		var obj = JSON.parse(localStorage.getItem('data'));
 		prompt.innerHTML = decodeURIComponent(obj['html']);
+		
+		//timeout
+		var timeout;
 
 		function negSpeed()
 		{
@@ -120,16 +123,13 @@
 				offset=0;
 		});
 
-		$(document).on("pagecreate",function()
-		{
-			wrapper.on("scrollstart",function(){
-				wrapper.stop();
-			});
-
-			wrapper.on("scrollstop",function(){
-				window.setTimeout( doScroll, 1000 );
-			});
-		});
+		$(window).bind('mousewheel', function(event) {
+            		wrapper.stop();
+            		if(timeout){
+                		window.clearTimeout(timeout);
+            		}
+            		timeout = window.setTimeout( doScroll, 1000 );
+        	});
 
 		function init()
 		{
