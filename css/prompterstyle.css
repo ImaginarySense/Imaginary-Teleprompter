@@ -31,11 +31,11 @@ body {
 	margin: 0px;
 	padding: 0px;
 	position: absolute;
-	overflow: auto;
+	overflow: auto; // fixed for no scrolls
 }
 
 #text_block {
-	z-index:    -10;
+	z-index: -10;
 	width: 84%;
 	left: 8%;
 	margin: 0px;
@@ -43,15 +43,15 @@ body {
 	padding-top: 100vh;
 	padding-bottom: 100vh;
 	position: absolute;
-	overflow: hidden;
+	/*overflow: hidden;*/
+
 	/* The following lines change the anchor point to the middle of the screen */
+	/* They don't work with variable top and bottom padding. */
 	/*top: -50%;
 	-ms-transform: translate(0, 50%);
 	-webkit-transform: translate(0, 50%);
 	transform: translate(0, 50%); */
 }
-
-
 
 // To be put in use
 .arrow-right {

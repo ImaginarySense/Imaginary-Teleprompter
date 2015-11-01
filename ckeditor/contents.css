@@ -22,6 +22,14 @@ body
 {
 	font-size: 4.5vw;
 	line-height: 1.2;
+	padding: 0 0 0 0;
+	margin: 0 0 0 0 ;
+}
+
+p
+{
+	margin: 0 0 0 0 ;
+	padding: 0 0 0 0;
 }
 
 blockquote
@@ -64,8 +72,10 @@ ol,ul,dl
 h1,h2,h3,h4,h5,h6
 {
 	font-weight: normal;
-	line-height: 0;
-}
+	line-height: 1.2;
+	padding: 0 0 0 0;
+	margin: 0 0 0 0 ;
+}}
 
 hr
 {

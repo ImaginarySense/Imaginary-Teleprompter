@@ -1,0 +1,21 @@
+CHANGELOG
+
+v1.2a
+Added Play and Pause on pressing spacebar
+Fix Vertical flip scroll not starting
+Fix top focus not loading on all browsers
+InProgress Multi monitor support
+InProgress Pause on touchscreen
+
+v1.1
+Fix: Added pause at scroll
+
+v1.1a
+Changed to scroll based animation
+Added set speed to 0 when end is reached.
+
+v1.0
+Initial commit.
+
+v0.9
+Initial Local Hack Day @UPRM release.

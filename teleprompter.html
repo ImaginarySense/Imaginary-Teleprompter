@@ -22,12 +22,11 @@
 		<title>Output | Teleprompter by Imaginary Films</title>
 		<link href="favicon.ico" rel="icon" type="image/x-icon" />
 		<script src="js/jquery.min.js"></script>
+		<script src="js/pep.min.js"></script>
 		<link rel="stylesheet" href="ckeditor/contents.css">
 		<link rel="stylesheet" href="css/prompterstyle.css">
   </head>
   <body onload="init()">
-		<!--
-		-->
 		<table border="0" cellpadding="0" cellspacing="0" id="overlay" class="cke_editable">
 	    <tbody>
 			<tr id="overlayTop" class="overlayBg">
@@ -47,49 +46,59 @@
 	    </table>
 		
 		<div id="scroll_wrapper">
-			<div id="text_block" class="cke_editable"></div>
+			<div id="text_block" class="cke_editable" touch-action="pan-y"></div>
 		</div>
 		
 		<script>
+		var play = false;
 		var flipH = false;
 		var flipV = false;
-		var limit = 40;
-		var offset = 1;
+		//p Find ways to make scrolling units equivalent across all screen heights...
+		var unit = 1; //prompt.clientHeight/300; //'1vh';
+		var speed = unit; // initial speed
+		var sensitivity = 1.8;
+		var limit = 40/sensitivity;
 		var wrapper = $('#scroll_wrapper');
-		var wrapperById = document.getElementById('scroll_wrapper'); 
+		var wrapperById = document.getElementById('scroll_wrapper');
 		var prompt = document.getElementById('text_block');
 		// Parse values from localStorage
 		var obj = JSON.parse(localStorage.getItem('data'));
 		prompt.innerHTML = decodeURIComponent(obj['html']);
-		
-		//timeout
-		var timeout;
+		var timeoutStat;
 
 		function negSpeed()
 		{
-			if ( offset>limit*-1 )
-				offset-=1;
+			if ( speed>limit*-1 )
+				speed-=unit;
 		}
 
 		function posSpeed()
 		{
-		   if ( offset<limit )
-				offset+=1;
+		   if ( speed<limit )
+				speed+=unit;
 		}
 		
 		function doScroll()
 		{
-			wrapper.animate({ scrollTop: "+=" + offset }, { duration: 50, complete: function(){
+			wrapper.animate({ scrollTop: "+=" + speed }, { duration: 50-Math.abs(speed*sensitivity), complete: function() {
 					window.setTimeout( doScroll, 0 );
 				}
 		});}
 
+		function togglePlay()
+		{
+			play = !play;
+			if ( play )
+				doScroll();
+			else
+			{
+				wrapper.stop();
+				//wrapper.stop();
+			}
+		}
+
 		document.onkeydown = function(evt)
 		{
-			// Prevent arrow and spacebar scroll bug.
-			if([32, 37, 38, 39, 40].indexOf(evt.keyCode) > -1)
-        		evt.preventDefault();
-
 			// Change speed toward intended direction.
 			evt = evt || window.event;
 			switch (evt.keyCode)
@@ -112,24 +121,46 @@
 					else
 						posSpeed();
 					break;
+				case 32: // Spacebar
+					togglePlay();
+					break;
+				/*
+				default:
+					if ( char in arrayOfAnchors )
+						scrollTop( getAnchor(char).pos - wrapperById.clientHeight/2 );
+				*/
 			}
+
+			// Prevent arrow and spacebar scroll bug.
+			if([32, 37, 38, 39, 40].indexOf(evt.keyCode) > -1)
+        		evt.preventDefault();
 		}
 
-		// Reset speed to 0 when reaching end points.
+		// Reset speed to 0 when reaching Top or Bottom.
 		wrapper.scroll(function()
 		{
 			var currPos = wrapper.scrollTop();
-			if( currPos <= 0 || currPos + wrapperById.clientHeight == prompt.clientHeight-1 )
-				offset=0;
+			if( currPos == 0 || currPos + wrapperById.clientHeight == prompt.clientHeight )
+				speed=0;
 		});
 
-		$(window).bind('mousewheel', function(event) {
-            		wrapper.stop();
-            		if(timeout){
-                		window.clearTimeout(timeout);
-            		}
-            		timeout = window.setTimeout( doScroll, 1000 );
-        	});
+		function timeout( event )
+		{
+    		wrapper.stop();
+    		play = false;
+    		if(timeoutStat) {
+        		window.clearTimeout(timeoutStat);
+    		}
+    		timeoutStat = window.setTimeout( togglePlay, 1000 );
+		}
+
+		$(window).bind('wheel', timeout);
+		//wrapper.bind('scrollBar', timeout);  //p 
+
+		$("#text_block").on("pointermove", function(event) {
+  			console.log("pointer in action");
+  			//timeout();
+		});
 
 		function init()
 		{
@@ -138,8 +169,22 @@
 			var focus = 0;
 
 			// Get JSON values from local storage
-			flipH = obj['data']['flipH'];
-			flipV = obj['data']['flipV'];
+			var flip = obj['data']['secondary'];
+			console.log(flip);
+			switch( flip )
+			{
+				case 2:
+					flipH = true;
+					break;
+				case 3:
+					flipV = true;
+					break;
+				case 4:
+					flipH = true;
+					flipV = true;
+					break;
+			}
+
 			focus = obj['data']['focus'];
 			promptStyle = obj['data']['prompterStyle'];
 
@@ -156,32 +201,33 @@
 			if (flipV)
 			{
 				// Flip Vertically
-				prompt.style.mozTransform = "scaleY(-1)";
-				prompt.style.oTransform = "scaleY(-1)";
+				prompt.style.MozTransform = "scaleY(-1)";
+				prompt.style.OTransform = "scaleY(-1)";
 				prompt.style.webkitTransform = "scaleY(-1)";
 				prompt.style.transform = "scaleY(-1)";
 				prompt.style.filter = "FlipV";
 				prompt.style.msFilter = "FlipV";
 				
+				//b Asynchronism bug. If onload browser hasn't set dom height, scrollTop waits and speed is set to 0, also sometimes incorrect scroll is set.
 				// Start scroll at inverted top
-				wrapper.scrollTop( prompt.offsetHeight );
-				
-				// Reverse initial speed
-				offset *= -1;
+				wrapper.scrollTop( prompt.offsetHeight-wrapperById.clientHeight-30 );
 				
 				// If focus is top or bottom, change overlay positions
 				if ( focus==1 )
-					document.getElementById("overlayBottom").style.height = '0%';
+					document.getElementById("overlayBottom").style.height = '1vh';
 				else if ( focus==2 )
 					document.getElementById("overlayTop").style.height = '10%';
+			
+				// Reverse initial speed
+				speed *= -1;
 			}
 			else // If no vertical flip
 			{
 				// If focus is top or bottom, change overlay positions.
 				if ( focus==1 )
-					document.getElementById("overlayTop").style.height = '0%';  
+					document.getElementById("overlayTop").style.height = '10%';
 				else if ( focus==2 )
-					document.getElementById("overlayBottom").style.height = '10%';
+					document.getElementById("overlayBottom").style.height = '1vh';
 			}
 
 			// Set Teleprompter Style
@@ -202,9 +248,9 @@
 			}
 			
 			// Start scrolling
-			doScroll();
+			togglePlay();
 		}
-
+		
 		</script>
-  </body>
+    </body>
 </html>
