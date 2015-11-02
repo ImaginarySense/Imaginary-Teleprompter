@@ -104,7 +104,7 @@
           </div>
         </div>
       </div>
-      <div class="container bs-docs-container" style="width:100%;">
+      <div id="editor" class="container bs-docs-container" style="width:100%;">
         <div class="row">
           <div class="col-md-12" role="main" style="padding-right: 0px; padding-left: 0px;">
             <div class="bs-docs-section">
@@ -119,11 +119,8 @@
         </div>
       </div>
     </form>
-    <div id="framecontainer" style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index:10; visibility: hidden;">
-      <iframe id="frameprompt" src="about:blank" style="top: 0px; left: 0px; width: 100%; height: 100%;"></iframe>
-    </div>
     <!-- Footer -->
-    <footer class="bs-docs-footer finalFooter" role="contentinfo">
+    <footer id="footer" class="bs-docs-footer finalFooter" role="contentinfo">
       <div class="container">
         
         <p style="color:#FFF;">&copy; <a href="http://imaginary.tech">Imaginary Films LLC</a></p>
@@ -151,6 +148,9 @@
         </ul>
       </div>
     </footer>
+    <div id="framecontainer" style="position: relative; top: 0px; left: 0px; width: 100%; height: 100%; z-index:10; display: none;">
+      <iframe id="frameprompt" src="about:blank" style="top: 0px; left: 0px; width: 100%; height: 100%;"></iframe>
+    </div>
     <script>
       // Instance CKEditor
       CKEDITOR.replace( 'teleprompterdata');
@@ -202,7 +202,13 @@
         // "Primary"
         if ( $("#primary").val()>0 )
         {
-          document.getElementById("framecontainer").style.visibility = "visible";
+          // Hide stuff
+          document.getElementById("content").style.display = "none";
+          document.getElementById("editor").style.display = "none";
+          document.getElementById("footer").style.display = "none";
+          // Show prompter frame
+          document.getElementById("framecontainer").style.display = "block";
+          // Load teleprompter
           document.getElementById("frameprompt").src = "teleprompter.html";
         }
 

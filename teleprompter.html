@@ -91,10 +91,29 @@
 			if ( play )
 				doScroll();
 			else
-			{
 				wrapper.stop();
-				//wrapper.stop();
+		}
+
+		function inIframe () {
+		    try {
+		        return window.self !== window.top;
+		    } catch (e) {
+		        return true;
+		    }
+		}
+
+		function returnToEditor()
+		{
+			if ( inIframe() )
+			{
+				$('#content', parent.document).css({"display":"block"});
+				$('#editor', parent.document).css({"display":"block"});
+				$('#footer', parent.document).css({"display":"block"});
+				$('#framecontainer', parent.document).css({"display":"none"});
+				this.document.location.href = "about:blank";
 			}
+			else
+				window.close();
 		}
 
 		document.onkeydown = function(evt)
@@ -123,6 +142,9 @@
 					break;
 				case 32: // Spacebar
 					togglePlay();
+					break;
+				case 27:
+					returnToEditor();
 					break;
 				/*
 				default:
