@@ -68,8 +68,7 @@
     var timeoutStat;
 
     function negSpeed() {
-      // Compare speed and limit then multiply by -1 to invert the boolean value
-        if (speed > limit * -1)
+        if (limit > speed)
             speed -= unit;
     }
 
