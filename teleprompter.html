@@ -47,231 +47,201 @@
         <div id="text_block" class="cke_editable" touch-action="pan-y"></div>
     </div>
     <script>
-    (function () {
-    //Encapsulate the code in an anonymous function to not fill the global object. (Window)
-    //JavaSript Strict
-    "use strict";
-    var play = false;
-    var flipH = false;
-    var flipV = false;
-    //p Find ways to make scrolling units equivalent across all screen heights...
-    var unit = 1; //prompt.clientHeight/300; //'1vh';
-    var speed = unit; // initial speed
-    var sensitivity = 1.8;
-    var limit = 40 / sensitivity;
-    var wrapper = $('#scroll_wrapper');
-    var wrapperById = document.getElementById('scroll_wrapper');
-    var prompt = document.getElementById('text_block');
-    // Parse values from localStorage
-    var obj = JSON.parse(localStorage.getItem('data'));
-    prompt.innerHTML = decodeURIComponent(obj.html);
-    var timeoutStat;
+        (function() {
+            //Encapsulate the code in an anonymous function to not fill the global object. (Window)
+            //JavaSript Strict
+            "use strict";
+            var play = false;
+            var flipH = false;
+            var flipV = false;
+            //p Find ways to make scrolling units equivalent across all screen heights...
+            var unit = 1; //prompt.clientHeight/300; //'1vh';
+            var speed = unit; // initial speed
+            var sensitivity = 1.8;
+            var limit = 40 / sensitivity;
+            var wrapper = $('#scroll_wrapper');
+            var wrapperById = document.getElementById('scroll_wrapper');
+            var prompt = document.getElementById('text_block');
+            // Parse values from localStorage
+            var obj = JSON.parse(localStorage.getItem('data'));
+            prompt.innerHTML = decodeURIComponent(obj.html);
+            var timeoutStat;
 
-    function negSpeed() {
-        if (limit > speed)
-            speed -= unit;
-    }
-
-    function posSpeed() {
-        if (speed < limit)
-            speed += unit;
-    }
-
-    function doScroll() {
-        wrapper.animate({
-            scrollTop: "+=" + speed
-        }, {
-            duration: 50 - Math.abs(speed * sensitivity),
-            complete: function() {
-                window.setTimeout(doScroll, 0);
+            function negSpeed() {
+                if (limit > speed) speed -= unit;
             }
-        });
-    }
 
-    function togglePlay() {
-        play = !play;
-        if (play)
-            doScroll();
-        else
-            wrapper.stop();
-    }
+            function posSpeed() {
+                if (speed < limit) speed += unit;
+            }
 
-    function inIframe() {
-        try {
-            return window.self !== window.top;
-        } catch (e) {
-            return true;
-        }
-    }
+            function doScroll() {
+                wrapper.animate({
+                    scrollTop: "+=" + speed
+                }, {
+                    duration: 50 - Math.abs(speed * sensitivity),
+                    complete: function() {
+                        window.setTimeout(doScroll, 0);
+                    }
+                });
+            }
 
-    function returnToEditor() {
-        if (inIframe()) {
-            $('#content', parent.document).css({
-                "display": "block"
-            });
-            $('#editor', parent.document).css({
-                "display": "block"
-            });
-            $('#footer', parent.document).css({
-                "display": "block"
-            });
-            $('#framecontainer', parent.document).css({
-                "display": "none"
-            });
-            this.document.location.href = "about:blank";
-        } else
-            window.close();
-    }
+            function togglePlay() {
+                play = !play;
+                if (play) doScroll();
+                else wrapper.stop();
+            }
 
-    document.onkeydown = function(evt) {
-        // Change speed toward intended direction.
-        evt = evt || window.event;
-        switch (evt.keyCode) {
-            case 37: // Left
-            case 38: // Up
-            case 87: // W
-            case 65: // A
-                if (flipV)
-                    posSpeed();
-                else
-                    negSpeed();
-                break;
-            case 39: // Right
-            case 40: // Down
-            case 83: // S
-            case 68: // D
-                if (flipV)
-                    negSpeed();
-                else
-                    posSpeed();
-                break;
-            case 32: // Spacebar
+            function inIframe() {
+                try {
+                    return window.self !== window.top;
+                } catch (e) {
+                    return true;
+                }
+            }
+
+            function returnToEditor() {
+                if (inIframe()) {
+                    $('#content', parent.document).css({
+                        "display": "block"
+                    });
+                    $('#editor', parent.document).css({
+                        "display": "block"
+                    });
+                    $('#footer', parent.document).css({
+                        "display": "block"
+                    });
+                    $('#framecontainer', parent.document).css({
+                        "display": "none"
+                    });
+                    this.document.location.href = "about:blank";
+                } else window.close();
+            }
+            document.onkeydown = function(evt) {
+                // Change speed toward intended direction.
+                evt = evt || window.event;
+                switch (evt.keyCode) {
+                    case 37: // Left
+                    case 38: // Up
+                    case 87: // W
+                    case 65: // A
+                        if (flipV) posSpeed();
+                        else negSpeed();
+                        break;
+                    case 39: // Right
+                    case 40: // Down
+                    case 83: // S
+                    case 68: // D
+                        if (flipV) negSpeed();
+                        else posSpeed();
+                        break;
+                    case 32: // Spacebar
+                        togglePlay();
+                        break;
+                    case 27:
+                        returnToEditor();
+                        break;
+                        /*
+                        default:
+                        	if ( char in arrayOfAnchors )
+                        		scrollTop( getAnchor(char).pos - wrapperById.clientHeight/2 );
+                        */
+                }
+                // Prevent arrow and spacebar scroll bug.
+                if ([32, 37, 38, 39, 40].indexOf(evt.keyCode) > -1) evt.preventDefault();
+            };
+            // Reset speed to 0 when reaching Top or Bottom.
+            wrapper.scroll(function() {
+                var currPos = wrapper.scrollTop();
+                if (currPos === 0 || currPos + wrapperById.clientHeight == prompt.clientHeight) speed = 0;
+            });
+
+            function timeout(event) {
+                wrapper.stop();
+                play = false;
+                if (timeoutStat) {
+                    window.clearTimeout(timeoutStat);
+                }
+                timeoutStat = window.setTimeout(togglePlay, 1000);
+            }
+            $(window).bind('wheel', timeout);
+            //wrapper.bind('scrollBar', timeout);  //p 
+            $("#text_block").on("pointermove", function(event) {
+                console.log("pointer in action");
+                //timeout();
+            });
+
+            function init() {
+                // Local variables (All variables in javascript are function scope not block scope)
+                var promptStyle = false;
+                var focus = 0;
+                var i = 0;
+                var overBgs = document.getElementsByClassName('overlayBg');
+                // Get JSON values from local storage
+                var flip = obj.data.secondary;
+                console.log(flip);
+                switch (flip) {
+                    case 2:
+                        flipH = true;
+                        break;
+                    case 3:
+                        flipV = true;
+                        break;
+                    case 4:
+                        flipH = true;
+                        flipV = true;
+                        break;
+                }
+                focus = obj.data.focus;
+                promptStyle = obj.data.prompterStyle;
+                if (flipH) {
+                    // Flip Horizontally
+                    prompt.style.MozTransform = "scaleX(-1)";
+                    prompt.style.OTransform = "scaleX(-1)";
+                    prompt.style.webkitTransform = "scaleX(-1)";
+                    prompt.style.transform = "scaleX(-1)";
+                    prompt.style.filter = "FlipH";
+                    prompt.style.msFilter = "FlipH";
+                }
+                if (flipV) {
+                    // Flip Vertically
+                    prompt.style.MozTransform = "scaleY(-1)";
+                    prompt.style.OTransform = "scaleY(-1)";
+                    prompt.style.webkitTransform = "scaleY(-1)";
+                    prompt.style.transform = "scaleY(-1)";
+                    prompt.style.filter = "FlipV";
+                    prompt.style.msFilter = "FlipV";
+                    //b Asynchronism bug. If onload browser hasn't set dom height, scrollTop waits and speed is set to 0, also sometimes incorrect scroll is set.
+                    // Start scroll at inverted top
+                    wrapper.scrollTop(prompt.offsetHeight - wrapperById.clientHeight - 30);
+                    // If focus is top or bottom, change overlay positions
+                    if (focus == 1) document.getElementById("overlayBottom").style.height = '1vh';
+                    else if (focus == 2) document.getElementById("overlayTop").style.height = '10%';
+                    // Reverse initial speed
+                    speed *= -1;
+                } else // If no vertical flip
+                {
+                    // If focus is top or bottom, change overlay positions.
+                    if (focus == 1) document.getElementById("overlayTop").style.height = '10%';
+                    else if (focus == 2) document.getElementById("overlayBottom").style.height = '1vh';
+                }
+                // Set Teleprompter Style
+                switch (promptStyle) {
+                    case 1:
+                        document.body.style.background = '#FFF';
+                        document.body.style.color = '#000';
+                        for (i = 0; i < overBgs.length; i++) overBgs[i].style.backgroundColor = '#BBB';
+                        break;
+                    default:
+                        document.body.style.background = '#272822';
+                        document.body.style.color = '#FFF';
+                        for (i = 0; i < overBgs.length; i++) overBgs[i].style.backgroundColor = '#000';
+                }
+                // Start scrolling
                 togglePlay();
-                break;
-            case 27:
-                returnToEditor();
-                break;
-                /*
-                default:
-                	if ( char in arrayOfAnchors )
-                		scrollTop( getAnchor(char).pos - wrapperById.clientHeight/2 );
-                */
-        }
-
-        // Prevent arrow and spacebar scroll bug.
-        if ([32, 37, 38, 39, 40].indexOf(evt.keyCode) > -1)
-            evt.preventDefault();
-    };
-
-    // Reset speed to 0 when reaching Top or Bottom.
-    wrapper.scroll(function() {
-        var currPos = wrapper.scrollTop();
-        if (currPos === 0 || currPos + wrapperById.clientHeight == prompt.clientHeight)
-            speed = 0;
-    });
-
-    function timeout(event) {
-        wrapper.stop();
-        play = false;
-        if (timeoutStat) {
-            window.clearTimeout(timeoutStat);
-        }
-        timeoutStat = window.setTimeout(togglePlay, 1000);
-    }
-
-    $(window).bind('wheel', timeout);
-    //wrapper.bind('scrollBar', timeout);  //p 
-
-    $("#text_block").on("pointermove", function(event) {
-        console.log("pointer in action");
-        //timeout();
-    });
-
-    function init() {
-        // Local variables (All variables in javascript are function scope not block scope)
-        var promptStyle = false;
-        var focus = 0;
-        var i = 0;
-        var overBgs = document.getElementsByClassName('overlayBg');
-
-        // Get JSON values from local storage
-        var flip = obj.data.secondary;
-        console.log(flip);
-        switch (flip) {
-            case 2:
-                flipH = true;
-                break;
-            case 3:
-                flipV = true;
-                break;
-            case 4:
-                flipH = true;
-                flipV = true;
-                break;
-        }
-
-        focus = obj.data.focus;
-        promptStyle = obj.data.prompterStyle;
-
-        if (flipH) {
-            // Flip Horizontally
-            prompt.style.MozTransform = "scaleX(-1)";
-            prompt.style.OTransform = "scaleX(-1)";
-            prompt.style.webkitTransform = "scaleX(-1)";
-            prompt.style.transform = "scaleX(-1)";
-            prompt.style.filter = "FlipH";
-            prompt.style.msFilter = "FlipH";
-        }
-        if (flipV) {
-            // Flip Vertically
-            prompt.style.MozTransform = "scaleY(-1)";
-            prompt.style.OTransform = "scaleY(-1)";
-            prompt.style.webkitTransform = "scaleY(-1)";
-            prompt.style.transform = "scaleY(-1)";
-            prompt.style.filter = "FlipV";
-            prompt.style.msFilter = "FlipV";
-
-            //b Asynchronism bug. If onload browser hasn't set dom height, scrollTop waits and speed is set to 0, also sometimes incorrect scroll is set.
-            // Start scroll at inverted top
-            wrapper.scrollTop(prompt.offsetHeight - wrapperById.clientHeight - 30);
-
-            // If focus is top or bottom, change overlay positions
-            if (focus == 1)
-                document.getElementById("overlayBottom").style.height = '1vh';
-            else if (focus == 2)
-                document.getElementById("overlayTop").style.height = '10%';
-
-            // Reverse initial speed
-            speed *= -1;
-        } else // If no vertical flip
-        {
-            // If focus is top or bottom, change overlay positions.
-            if (focus == 1)
-                document.getElementById("overlayTop").style.height = '10%';
-            else if (focus == 2)
-                document.getElementById("overlayBottom").style.height = '1vh';
-        }
-
-        // Set Teleprompter Style
-        switch (promptStyle) {
-            case 1:
-                document.body.style.background = '#FFF';
-                document.body.style.color = '#000';
-                for (i = 0; i < overBgs.length; i++)
-                    overBgs[i].style.backgroundColor = '#BBB';
-                break;
-            default:
-                document.body.style.background = '#272822';
-                document.body.style.color = '#FFF';
-                for (i = 0; i < overBgs.length; i++)
-                    overBgs[i].style.backgroundColor = '#000';
-        }
-
-        // Start scrolling
-        togglePlay();
-    }
-    document.body.onload = init();
-}());
+            }
+            document.body.onload = init();
+        }());
     </script>
 </body>
 
