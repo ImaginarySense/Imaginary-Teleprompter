@@ -6,4 +6,4 @@ The most complete and free professional teleprompter app on the web.
 *  Victor Ortiz <va2ron1@gmail.com>
 *  Keyvan Pérez <keyvanperez2@gmail.com>
 
-##License [GPL3](https://github.com/javiercordero/Teleprompter/blob/master/LICENSE)
+##License: [GPL3](https://github.com/javiercordero/Teleprompter/blob/master/LICENSE)
