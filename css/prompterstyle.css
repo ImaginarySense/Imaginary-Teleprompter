@@ -48,9 +48,11 @@ body {
 	/* The following lines change the anchor point to the middle of the screen */
 	/* They don't work with variable top and bottom padding. */
 	/*top: -50%;
-	-ms-transform: translate(0, 50%);
+	-moz-transform: translate(0%,50%);
 	-webkit-transform: translate(0, 50%);
-	transform: translate(0, 50%); */
+    -o-transform: scaleY(-.5);
+	transform: translate(0, 50%);
+	-ms-transform: translate(0, 50%);*/
 }
 
 // To be put in use

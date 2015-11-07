@@ -54,7 +54,7 @@
             var play = false;
             var flipH = false;
             var flipV = false;
-            //p Find ways to make scrolling units equivalent across all screen heights...
+            //dev Find ways to make scrolling units equivalent across all screen heights...
             var unit = 1; //prompt.clientHeight/300; //'1vh';
             var speed = unit; // initial speed
             var sensitivity = 1.8;
@@ -76,9 +76,7 @@
             }
 
             function doScroll() {
-                wrapper.animate({
-                    scrollTop: "+=" + speed
-                }, {
+                wrapper.animate({ scrollTop: "+="+speed }, {
                     duration: 50 - Math.abs(speed * sensitivity),
                     complete: function() {
                         window.setTimeout(doScroll, 0);
@@ -164,68 +162,68 @@
                 }
                 timeoutStat = window.setTimeout(togglePlay, 1000);
             }
+            // Bind wheel to timeout
             $(window).bind('wheel', timeout);
-            //wrapper.bind('scrollBar', timeout);  //p 
+            // Bind scrolls to timeout
             $("#text_block").on("pointermove", function(event) {
                 console.log("pointer in action");
-                //timeout();
+                timeout();
             });
 
             function init() {
                 // Local variables (All variables in javascript are function scope not block scope)
-                var promptStyle = false;
+                var promptStyle = 0;
                 var focus = 0;
-                var i = 0;
-                var overBgs = document.getElementsByClassName('overlayBg');
+                var overBgs = $('.overlayBg');
                 // Get JSON values from local storage
                 var flip = obj.data.secondary;
+                var sx = 1;
+                var sy = 1;
                 console.log(flip);
                 switch (flip) {
                     case 2:
                         flipH = true;
+                        sx=-1;
                         break;
                     case 3:
                         flipV = true;
+                        sy=-1;
                         break;
                     case 4:
                         flipH = true;
                         flipV = true;
+                        sx=-1;
+                        sy=-1;
                         break;
                 }
                 focus = obj.data.focus;
                 promptStyle = obj.data.prompterStyle;
-                if (flipH) {
-                    // Flip Horizontally
-                    prompt.style.MozTransform = "scaleX(-1)";
-                    prompt.style.OTransform = "scaleX(-1)";
-                    prompt.style.webkitTransform = "scaleX(-1)";
-                    prompt.style.transform = "scaleX(-1)";
-                    prompt.style.filter = "FlipH";
-                    prompt.style.msFilter = "FlipH";
+
+                // Flip prompt
+                if (flipH||flipV)
+                {
+                    prompt.style.MozTransform = "matrix("+sx+", 0, 0, "+sy+", 0, 0)";
+                    prompt.style.OTransform = "matrix("+sx+", 0, 0, "+sy+", 0, 0)";
+                    prompt.style.webkitTransform = "matrix("+sx+", 0, 0, "+sy+", 0, 0)";
+                    prompt.style.transform = "matrix("+sx+", 0, 0, "+sy+", 0, 0)";
                 }
                 if (flipV) {
-                    // Flip Vertically
-                    prompt.style.MozTransform = "scaleY(-1)";
-                    prompt.style.OTransform = "scaleY(-1)";
-                    prompt.style.webkitTransform = "scaleY(-1)";
-                    prompt.style.transform = "scaleY(-1)";
-                    prompt.style.filter = "FlipV";
-                    prompt.style.msFilter = "FlipV";
-                    //b Asynchronism bug. If onload browser hasn't set dom height, scrollTop waits and speed is set to 0, also sometimes incorrect scroll is set.
                     // Start scroll at inverted top
                     wrapper.scrollTop(prompt.offsetHeight - wrapperById.clientHeight - 30);
+                    
                     // If focus is top or bottom, change overlay positions
                     if (focus == 1) document.getElementById("overlayBottom").style.height = '1vh';
-                    else if (focus == 2) document.getElementById("overlayTop").style.height = '10%';
+                    else if (focus == 2) document.getElementById("overlayTop").style.display = 'none';
                     // Reverse initial speed
                     speed *= -1;
                 } else // If no vertical flip
                 {
                     // If focus is top or bottom, change overlay positions.
-                    if (focus == 1) document.getElementById("overlayTop").style.height = '10%';
+                    if (focus == 1) document.getElementById("overlayTop").style.display = 'none';
                     else if (focus == 2) document.getElementById("overlayBottom").style.height = '1vh';
                 }
                 // Set Teleprompter Style
+                var i = 0;
                 switch (promptStyle) {
                     case 1:
                         document.body.style.background = '#FFF';
