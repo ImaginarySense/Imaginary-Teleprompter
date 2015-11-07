@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
 	Teleprompter
-	Copyright (C) 2015 Imaginary Films LLC, Victor Ortiz <va2ron1@gmail.com>, Javier Cordero <javier.cordero@upr.edu>
+	Copyright (C) 2015 Imaginary Films LLC and contributors
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -25,9 +25,11 @@
     <script src="js/jquery.min.js"></script>
     <script src="js/pep.min.js"></script>
     <link rel="stylesheet" href="ckeditor/contents.css">
-    <link rel="stylesheet" href="css/prompterstyle.css"> </head>
+    <link rel="stylesheet" href="css/prompterstyle.css">
+</head>
 
 <body>
+    <div id="pointerArea" touch-action="none"></div>
     <table border="0" cellpadding="0" cellspacing="0" id="overlay" class="cke_editable">
         <tbody>
             <tr id="overlayTop" class="overlayBg">
@@ -44,7 +46,7 @@
         </tbody>
     </table>
     <div id="scroll_wrapper">
-        <div id="text_block" class="cke_editable" touch-action="pan-y"></div>
+        <div id="text_block" class="cke_editable"></div>
     </div>
     <script>
         (function() {
@@ -52,16 +54,17 @@
             //JavaSript Strict
             "use strict";
             var play = false;
-            var flipH = false;
-            var flipV = false;
-            //dev Find ways to make scrolling units equivalent across all screen heights...
-            var unit = 1; //prompt.clientHeight/300; //'1vh';
-            var speed = unit; // initial speed
-            var sensitivity = 1.8;
-            var limit = 40 / sensitivity;
+            var flipH = 0;
+            var flipV = 0;
+            // Object identifiers
             var wrapper = $('#scroll_wrapper');
             var wrapperById = document.getElementById('scroll_wrapper');
             var prompt = document.getElementById('text_block');
+            // Set speed controls
+            var unit = prompt.clientHeight/1600;
+            var speed = unit; // initial speed
+            var sensitivity = 1.84;
+            var limit = 40/sensitivity;
             // Parse values from localStorage
             var obj = JSON.parse(localStorage.getItem('data'));
             prompt.innerHTML = decodeURIComponent(obj.html);
@@ -76,18 +79,21 @@
             }
 
             function doScroll() {
-                wrapper.animate({ scrollTop: "+="+speed }, {
+                wrapper.animate({scrollTop:"+="+speed}, {
                     duration: 50 - Math.abs(speed * sensitivity),
-                    complete: function() {
-                        window.setTimeout(doScroll, 0);
-                    }
+                    complete:  doScroll
                 });
             }
 
             function togglePlay() {
                 play = !play;
                 if (play) doScroll();
-                else wrapper.stop();
+                else
+                {
+                    // Not a good practice but as of 2015 we can't implement workers for all platforms due to security limitations. Calling wrapper.stop() twice prevents multithreading bug since animate() can be preempted.
+                    wrapper.stop();
+                    wrapper.stop();
+                }
             }
 
             function inIframe() {
@@ -97,6 +103,89 @@
                     return true;
                 }
             }
+
+            function moveToAnchor( h )
+            {
+                // If anchor exists...
+                if ($("#"+h).length>0)
+                {
+                    // Pause animation
+                    togglePlay();
+                    // Save the URL without hash.
+                    var url = location.href;
+                    // Go to the target element.
+                    location.href = '#'+h;
+                    // Change url back
+                    history.replaceState(null,null,url);
+                    // Scroll anchor to center 
+                    wrapper.scrollTop(wrapper.scrollTop()-wrapperById.clientHeight/2);
+                    // Resume animation
+                    togglePlay();
+                }
+            }
+
+            document.onkeydown = function(evt) {
+                // Change speed toward intended direction.
+                evt = evt || window.event;
+                switch (evt.keyCode) {
+                    case 39: // Right
+                    case 40: // Down
+                    case 83: // S
+                    case 68: // D
+                        if (flipV) negSpeed();
+                        else posSpeed();
+                        break;
+                    case 37: // Left
+                    case 38: // Up
+                    case 87: // W
+                    case 65: // A
+                        if (flipV) posSpeed();
+                        else negSpeed();
+                        break;
+                    case 32: // Spacebar
+                        togglePlay();
+                        break;
+                    case 27: // ESC
+                        returnToEditor();
+                        break;
+                    case 190: // Dot
+                    case 110: // Decimal point
+                        //dev: Load interface to search for custom anchor.
+                        break;
+                    default:
+                        // If pressed numbers from 0 to 9 in and out of numpad.
+                        if ([48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,103,104,105].indexOf(evt.keyCode) > -1 )
+                                moveToAnchor( evt.keyCode-48 )
+                            else
+                                moveToAnchor( evt.keyCode-96 )
+                }
+                // Prevent arrow and spacebar scroll bug.
+                if ([32, 37, 38, 39, 40].indexOf(evt.keyCode) > -1) evt.preventDefault();
+            };
+            // Reset speed to 0 when reaching Top or Bottom.
+            wrapper.scroll(function() {
+                var currPos = wrapper.scrollTop();
+                if (currPos === 0 || currPos + wrapperById.clientHeight == prompt.clientHeight) speed = 0;
+            });
+
+            function timeout(event) {
+                // ALWAYS stop animation here.
+                wrapper.stop();
+                play = false;
+                // If waiting, clear and reset.
+                if (timeoutStat) {
+                    window.clearTimeout(timeoutStat);
+                }
+                // Set: Wait one second before resuming animation
+                timeoutStat = window.setTimeout(togglePlay, 1000);
+            }
+            // Bind wheel to timeout
+            $(window).bind('wheel', timeout);
+            // Bind scrolls to timeout
+            $("#text_block").on("pointermove", function(event) {
+                //console.log("pointer in action");
+                timeout();
+            });
 
             function returnToEditor() {
                 if (inIframe()) {
@@ -115,85 +204,26 @@
                     this.document.location.href = "about:blank";
                 } else window.close();
             }
-            document.onkeydown = function(evt) {
-                // Change speed toward intended direction.
-                evt = evt || window.event;
-                switch (evt.keyCode) {
-                    case 37: // Left
-                    case 38: // Up
-                    case 87: // W
-                    case 65: // A
-                        if (flipV) posSpeed();
-                        else negSpeed();
-                        break;
-                    case 39: // Right
-                    case 40: // Down
-                    case 83: // S
-                    case 68: // D
-                        if (flipV) negSpeed();
-                        else posSpeed();
-                        break;
-                    case 32: // Spacebar
-                        togglePlay();
-                        break;
-                    case 27:
-                        returnToEditor();
-                        break;
-                        /*
-                        default:
-                        	if ( char in arrayOfAnchors )
-                        		scrollTop( getAnchor(char).pos - wrapperById.clientHeight/2 );
-                        */
-                }
-                // Prevent arrow and spacebar scroll bug.
-                if ([32, 37, 38, 39, 40].indexOf(evt.keyCode) > -1) evt.preventDefault();
-            };
-            // Reset speed to 0 when reaching Top or Bottom.
-            wrapper.scroll(function() {
-                var currPos = wrapper.scrollTop();
-                if (currPos === 0 || currPos + wrapperById.clientHeight == prompt.clientHeight) speed = 0;
-            });
-
-            function timeout(event) {
-                wrapper.stop();
-                play = false;
-                if (timeoutStat) {
-                    window.clearTimeout(timeoutStat);
-                }
-                timeoutStat = window.setTimeout(togglePlay, 1000);
-            }
-            // Bind wheel to timeout
-            $(window).bind('wheel', timeout);
-            // Bind scrolls to timeout
-            $("#text_block").on("pointermove", function(event) {
-                console.log("pointer in action");
-                timeout();
-            });
 
             function init() {
                 // Local variables (All variables in javascript are function scope not block scope)
                 var promptStyle = 0;
                 var focus = 0;
+                var i = 0;
                 var overBgs = $('.overlayBg');
                 // Get JSON values from local storage
                 var flip = obj.data.secondary;
-                var sx = 1;
-                var sy = 1;
-                console.log(flip);
+                // Flips are used to indicate both boolean action and scale values
                 switch (flip) {
                     case 2:
-                        flipH = true;
-                        sx=-1;
+                        flipH = -2;
                         break;
                     case 3:
-                        flipV = true;
-                        sy=-1;
+                        flipV = -2;
                         break;
                     case 4:
-                        flipH = true;
-                        flipV = true;
-                        sx=-1;
-                        sy=-1;
+                        flipH = -2;
+                        flipV = -2;
                         break;
                 }
                 focus = obj.data.focus;
@@ -202,10 +232,11 @@
                 // Flip prompt
                 if (flipH||flipV)
                 {
-                    prompt.style.MozTransform = "matrix("+sx+", 0, 0, "+sy+", 0, 0)";
-                    prompt.style.OTransform = "matrix("+sx+", 0, 0, "+sy+", 0, 0)";
-                    prompt.style.webkitTransform = "matrix("+sx+", 0, 0, "+sy+", 0, 0)";
-                    prompt.style.transform = "matrix("+sx+", 0, 0, "+sy+", 0, 0)";
+                    prompt.style.MozTransform = "matrix("+(flipH+1)+", 0, 0, "+(flipV+1)+", 0, 0)";
+                    prompt.style.OTransform = "matrix("+(flipH+1)+", 0, 0, "+(flipV+1)+", 0, 0)";
+                    prompt.style.webkitTransform = "matrix("+(flipH+1)+", 0, 0, "+(flipV+1)+", 0, 0)";
+                    prompt.style.transform = "matrix("+(flipH+1)+", 0, 0, "+(flipV+1)+", 0, 0)";
+                    // IE<9 unsupported
                 }
                 if (flipV) {
                     // Start scroll at inverted top
@@ -223,7 +254,6 @@
                     else if (focus == 2) document.getElementById("overlayBottom").style.height = '1vh';
                 }
                 // Set Teleprompter Style
-                var i = 0;
                 switch (promptStyle) {
                     case 1:
                         document.body.style.background = '#FFF';

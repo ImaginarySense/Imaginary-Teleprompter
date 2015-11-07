@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
     Teleprompter!
-    Copyright (C) 2015 Imaginary Films LLC, Victor Ortiz <va2ron1@gmail.com>, Javier Cordero <javier.cordero@upr.edu>
+    Copyright (C) 2015 Imaginary Films LLC and contributors
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -65,6 +65,7 @@
       <div class="bs-docs-header" id="content" tabindex="-1">
         <div class="container">
           <div class='row'>
+            <!--
             <div class='col-md-3 desktopOnly'>
               <label for="basic-url">Current display</label>
               <select class="form-control" id="primary" name="primary">
@@ -75,30 +76,31 @@
                 <option value="4">Double flip</option>
               </select>
             </div>
-            <div class='col-md-3'>
-              <label class="desktopOnly" for="basic-url">External display</label>
-              <label class="mobileOnly" for="basic-url">Flip mode</label>
+            -->
+            <div class='col-md-4'>
+              <!--<label class="desktopOnly" for="basic-url">External display</label>-->
+              <label for="basic-url">Flip mode</label>
               <select class="form-control" id="secondary" name="secondary">
-                <option value="0" class="desktopOnly">Disabled</option>
+                <!--<option value="0" class="desktopOnly">Disabled</option>-->
                 <option value="1" selected="selected">Normal (Don't Flip)</option>
                 <option value="2">Horizontal Flip</option>
                 <option value="3">Vertical Flip</option>
                 <option value="4">Double Flip</option>
               </select>
             </div>
-            <div class='col-md-3'>
+            <div class='col-md-4'>
               <label for="basic-url">Prompter style</label>
               <select class="form-control" id="prompterStyle" name="prompterStyle" onchange="OnChange(this.form.prompterStyle);">
                 <option value="0" selected="selected">Blackboard</option>
                 <option value="1">Whiteboard</option>
               </select>
             </div>
-            <div class='col-md-3'>
+            <div class='col-md-4'>
               <label for="basic-url">Focus</label>
               <select class="form-control" id="focus" name="focus">
-                <option value="1">Top</option>
-                <option value="0" selected="selected">Middle</option>
-                <option value="2">Bottom</option>
+                <option value="1">Top (webcam)</option>
+                <option value="0" selected="selected">Middle (professional prompter)</option>
+                <option value="2">Bottom (screen above camera)</option>
               </select>
             </div>
           </div>
@@ -130,7 +132,7 @@
         <p>Code licensed under <a rel="license" href="LICENSE" target="_blank">GPL3</a>, assets under <a rel="license" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.</p>
         
         <ul class="bs-docs-footer-links">
-          <li>Currently v1.2.0a</li>
+          <li>Currently v1.2</li>
           <!--
           <li>&middot;</li>
           <li><a href="downloads">Download</a></li>
@@ -199,7 +201,8 @@
         localStorage.setItem('data', data);
         console.log(data);
         
-        // "Primary"
+        /*
+        // Set and load "Primary"
         if ( $("#primary").val()>0 )
         {
           // Hide stuff
@@ -211,6 +214,7 @@
           // Load teleprompter
           document.getElementById("frameprompt").src = "teleprompter.html";
         }
+        */
 
         // "Secondary"
         if ( $("#secondary").val()>0 )
@@ -233,6 +237,7 @@
         //console.log(window.mobileAndTabletcheck());
       }
 
+      document.body.onload = init();
     </script>
   </body>
 </html>

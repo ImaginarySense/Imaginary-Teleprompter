@@ -1,7 +1,22 @@
 CHANGELOG
 
+v1.2
+Added jump to anchor support
+Fix animation speed units are now consistant across all resolutions
+Fix double flip bug
+Fix "Focus->Top" placement bug
+Fix multithreading bug at togglePlay()
+Fix made focus modes more descriptive
+Fix copyright to include contributors
+
+v1.2.1a
+Encapsulate teleprompter.html's code in an anonymous function to not fill the global object
+Fix Improved negSpeed() eficiency
+Fix Overlay display changed to absolute to prevent bug in iOS
+
 v1.2a
 Added Play and Pause on pressing spacebar
+Fix made animation smoother
 Fix Vertical flip scroll not starting
 Fix top focus not loading on all browsers
 InProgress Multi monitor support
