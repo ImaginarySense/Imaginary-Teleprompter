@@ -65,13 +65,14 @@
             var speed = unit; // initial speed
             var sensitivity = 1.84;
             var limit = 40/sensitivity;
+            var negLimit = limit*-1;
             // Parse values from localStorage
             var obj = JSON.parse(localStorage.getItem('data'));
             prompt.innerHTML = decodeURIComponent(obj.html);
             var timeoutStat;
 
             function negSpeed() {
-                if (limit > speed) speed -= unit;
+                if (speed > negLimit) speed -= unit;
             }
 
             function posSpeed() {
@@ -86,13 +87,16 @@
             }
 
             function togglePlay() {
-                play = !play;
-                if (play) doScroll();
-                else
+                if (speed!=0)
                 {
-                    // Not a good practice but as of 2015 we can't implement workers for all platforms due to security limitations. Calling wrapper.stop() twice prevents multithreading bug since animate() can be preempted.
-                    wrapper.stop();
-                    wrapper.stop();
+                    play = !play;
+                    if (play) doScroll();
+                    else
+                    {
+                        // Not a good practice but as of 2015 we can't implement workers for all platforms due to security limitations. Calling wrapper.stop() twice prevents multithreading bug since animate() can be preempted.
+                        wrapper.stop();
+                        wrapper.stop();
+                    }
                 }
             }
 
@@ -155,6 +159,7 @@
                     default:
                         // If pressed numbers from 0 to 9 in and out of numpad.
                         if ([48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,103,104,105].indexOf(evt.keyCode) > -1 )
+                            if ( evt.keyCode<96 )
                                 moveToAnchor( evt.keyCode-48 )
                             else
                                 moveToAnchor( evt.keyCode-96 )
@@ -165,7 +170,7 @@
             // Reset speed to 0 when reaching Top or Bottom.
             wrapper.scroll(function() {
                 var currPos = wrapper.scrollTop();
-                if (currPos === 0 || currPos + wrapperById.clientHeight == prompt.clientHeight) speed = 0;
+                if (currPos === 0 || currPos + wrapperById.clientHeight == prompt.clientHeight) speed=0;
             });
 
             function timeout(event) {
@@ -177,7 +182,11 @@
                     window.clearTimeout(timeoutStat);
                 }
                 // Set: Wait one second before resuming animation
-                timeoutStat = window.setTimeout(togglePlay, 1000);
+                timeoutStat = window.setTimeout( function(){
+                    // If user hasn't resumed animation, resume it.
+                    if (!play)
+                        togglePlay();
+                }, 1000);
             }
             // Bind wheel to timeout
             $(window).bind('wheel', timeout);
@@ -232,10 +241,10 @@
                 // Flip prompt
                 if (flipH||flipV)
                 {
-                    prompt.style.MozTransform = "matrix("+(flipH+1)+", 0, 0, "+(flipV+1)+", 0, 0)";
-                    prompt.style.OTransform = "matrix("+(flipH+1)+", 0, 0, "+(flipV+1)+", 0, 0)";
-                    prompt.style.webkitTransform = "matrix("+(flipH+1)+", 0, 0, "+(flipV+1)+", 0, 0)";
-                    prompt.style.transform = "matrix("+(flipH+1)+", 0, 0, "+(flipV+1)+", 0, 0)";
+                    prompt.style.MozTransform="matrix("+(flipH+1)+",0,0,"+(flipV+1)+",0,0)";
+                    prompt.style.OTransform="matrix("+(flipH+1)+",0,0,"+(flipV+1)+",0,0)";
+                    prompt.style.webkitTransform="matrix("+(flipH+1)+",0,0,"+(flipV+1)+",0,0)";
+                    prompt.style.transform="matrix("+(flipH+1)+",0,0,"+(flipV+1)+",0,0)";
                     // IE<9 unsupported
                 }
                 if (flipV) {
