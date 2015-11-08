@@ -19,8 +19,13 @@
 <html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <!-- Meta, title, CSS, favicons, etc. -->
     <meta charset="utf-8">
+    <meta property="og:title" content="Teleprompter by Imaginary Films" />
+    <meta property="og:site_name" content="Imaginary Tech"/>
+    <meta property="og:url" content="http://imaginary.tech/teleprompter/" />
+    <meta property="og:description" content="'Teleprompter' is a professional grade, multi-platform, free software teleprompter for everyone to use. Click on 'Prompt It!' whenever you're ready and control the speed with the arrow keys." />
+    <meta property="og:image" content="img/if-teleprompter-web.jpg" />
+    <meta property="fb:app_id" content="196769633992905" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Teleprompter by Imaginary Films</title>
@@ -40,6 +45,23 @@
     <![endif]-->
   </head>
   <body>
+  <script>
+  /*window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '196769633992905',
+      xfbml      : true,
+      version    : 'v2.5'
+    });
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+*/</script>
     <form>
       <!-- Header -->
       <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
@@ -112,36 +134,6 @@
             <div class="bs-docs-section">
               <div id="CKEditor">
                 <textarea name="editor1" id="teleprompterdata">
-                  <h2>Welcome to Teleprompter!</h2>
-<p>Are you ready to tell your story?</p>
-<br>
-<p>"Teleprompter" is a professional grade, multi-platform, free software teleprompter for everyone to use. Click on "Prompt It!" whenever you're ready and control the speed with the arrow keys.</p>
-<br>
-<h3>Here are some of our features:</h3>
-<ol>
-  <li>Speed controls with the Arrow and WASD keys.</li>
-  <li>Our Rich Text Editor gives unlimited possibilities on what you can prompt.</li>
-  <li>Different focus modes allows using Teleprompter with a webcam, a tablet, or professional teleprompter systems.</li>
-  <li>Flip modes allow <em>mirroring</em> the prompter in every possible way.</li>
-  <li>By setting up <a id="5" name="5">anchors</a> with the numbers '0' through '9', you can instantly jump to any part of the script.<br>Try pressing '5' now!</li>
-  <li>You may choose between a black or a white background to read from.</li>
-  <li>Prompter loads on a separate window so you can display it on a secondary monitor.</li>
-  <li>Text can be pasted from other word processors like Microsoft® Word or <a href="https://www.libreoffice.org/">Libre Office</a> Writer.</li>
-  <li>Scrolling pauses the text for one second before resuming the animation.</li>
-  <li>You may pause the teleprompter at anytime pressing 'spacebar'.</li>
-  <li>Press 'F11' to enter and leave fullscreen.</li>
-  <li>Edits continuously auto save. You can recover previous prompts on the bottom right of the editor.</li>
-  <li>All data is managed locally. No data is stored on our servers.</li>
-</ol>
-<hr />
-<h3>How to use anchors:</h3>
-<ol>
-  <li>Select a keyword on the line you want to jump to.</li>
-  <li>Click on the <strong>Flag Icon</strong> on the editor's tool bar.</li>
-  <li>A box named "Anchor Properties" should have popped up. Type any number from 0 through 9 and click 'Ok'.</li>
-  <li>When prompting, press or tap on the number you typed to jump into the desired location.</li>
-</ol>
-<p>###</p>
                 </textarea>
               </div> 
             </div>
@@ -252,6 +244,8 @@
             prompterWindow.focus();
         }
       }
+
+      
 
       function init()
       {
