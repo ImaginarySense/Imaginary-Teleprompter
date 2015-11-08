@@ -62,6 +62,8 @@
             var prompt = document.getElementById('text_block');
             // Set speed controls
             var unit = prompt.clientHeight/1600;
+            if (unit<1)
+                unit = 1;
             var speed = unit; // initial speed
             var sensitivity = 1.84;
             var limit = 40/sensitivity;
