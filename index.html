@@ -77,7 +77,7 @@
             <a href="http://imaginary.tech/teleprompter" target="_blank" class="navbar-brand"><img src="img/logo.png" alt="Teleprompter" style="height:20px;"></a>
           </div>
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="" onclick="submitTeleprompter(); return false;" style="font-size: 1.4em; background:#EEE";><strong>Prompt It!</strong></a></li>
+            <li><a href="" onclick="submitTeleprompter(); return false;" style="font-size: 1.4em; background:#EEE;"><strong>Prompt It!</strong></a></li>
           </ul>
         </div>
       </header>
@@ -164,7 +164,7 @@
 </ol>
 <p>###</p>
                 </textarea>
-              </div> 
+              </div>
             </div>
           </div>
         </div>
@@ -173,13 +173,13 @@
     <!-- Footer -->
     <footer id="footer" class="bs-docs-footer finalFooter" role="contentinfo">
       <div class="container">
-        
+
         <p style="color:#FFF;">&copy; <a href="http://imaginary.tech">Imaginary Films LLC</a></p>
-        
+
         <p>Created by <a href="https://twitter.com/Va2ron1" target="_blank">Victor Ortiz</a> and <a href="https://www.facebook.com/javicorper" target="_blank">Javier Cordero</a>.</p>
-        
+
         <p>Code licensed under <a rel="license" href="LICENSE" target="_blank">GPL3</a>, assets under <a rel="license" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.</p>
-        
+
         <ul class="bs-docs-footer-links">
           <li>Currently v1.2</li>
           <!--
@@ -211,7 +211,7 @@
       function OnChange(prompterStyle)
       {
         var selection = prompterStyle.selectedIndex
-        
+
         if ( selection )
         {
           document.getElementsByTagName('iframe')[0].contentWindow.document.body.style.background="#FFF";
@@ -220,7 +220,7 @@
         else
         {
           document.getElementsByTagName('iframe')[0].contentWindow.document.body.style.background='#272822';
-          document.getElementsByTagName('iframe')[0].contentWindow.document.body.style.color = '#FFF'; 
+          document.getElementsByTagName('iframe')[0].contentWindow.document.body.style.color = '#FFF';
         }
       }
 /*
@@ -242,14 +242,14 @@
       {
         // Get html from CKEditor
         var htmldata = CKEDITOR.instances.teleprompterdata.getData();
-        
+
         // Get remaining form data
         var data = '{ "data": {"secondary":'+$( "#secondary" ).val()+',"prompterStyle":'+$( "#prompterStyle" ).val()+',"focus":'+$( "#focus" ).val()+'},"html" : "' + encodeURIComponent(htmldata) + '"}';
-        
+
         // Store data locally for prompter to use
         localStorage.setItem('data', data);
         //console.log(data);
-        
+
         /*
         // Set and load "Primary"
         if ( $("#primary").val()>0 )
@@ -274,7 +274,7 @@
         }
       }
 
-      
+
 
       function init()
       {
@@ -287,8 +287,8 @@
           $(".desktopOnly").css('display', 'block');
         //console.log(window.mobileAndTabletcheck());
       }
-
-      document.body.onload = init();
+    //   Call init when the DOM loads
+      $(document).ready(init);
     </script>
   </body>
 </html>

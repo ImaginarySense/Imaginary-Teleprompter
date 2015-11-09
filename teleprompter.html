@@ -123,7 +123,7 @@
                     location.href = '#'+h;
                     // Change url back
                     history.replaceState(null,null,url);
-                    // Scroll anchor to center 
+                    // Scroll anchor to center
                     wrapper.scrollTop(wrapper.scrollTop()-wrapperById.clientHeight/2);
                     // Resume animation
                     togglePlay();
@@ -252,7 +252,7 @@
                 if (flipV) {
                     // Start scroll at inverted top
                     wrapper.scrollTop(prompt.offsetHeight - wrapperById.clientHeight - 30);
-                    
+
                     // If focus is top or bottom, change overlay positions
                     if (focus == 1) document.getElementById("overlayBottom").style.height = '1vh';
                     else if (focus == 2) document.getElementById("overlayTop").style.display = 'none';
@@ -279,7 +279,8 @@
                 // Start scrolling
                 togglePlay();
             }
-            document.body.onload = init();
+            //   Call init when the DOM loads
+            $(document).ready(init);
         }());
     </script>
 </body>
