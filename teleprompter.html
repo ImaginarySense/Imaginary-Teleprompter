@@ -24,6 +24,7 @@
     <link href="favicon.ico" rel="icon" type="image/x-icon" />
     <script src="js/jquery.min.js"></script>
     <script src="js/pep.min.js"></script>
+    <script src="js/jquery.popupwindow.js"></script>
     <link rel="stylesheet" href="ckeditor/contents.css">
     <link rel="stylesheet" href="css/prompterstyle.css">
 </head>
@@ -50,9 +51,13 @@
     </div>
     <script>
         (function() {
+         
+         
+        
             //Encapsulate the code in an anonymous function to not fill the global object. (Window)
             //JavaSript Strict
             "use strict";
+         var win;
             var play = false;
             var flipH = 0;
             var flipV = 0;
@@ -104,11 +109,16 @@
                     recoverSpeed();
                 */
                 // Recursive animation
+         
+         
                 wrapper.animate({scrollTop:"+="+(Math.pow(Math.abs(speed),sensitivity)*((speed>0)?1:-1))}, {
                     duration: 40, // [ 1000ms mod 60fps = 40ms/fps ]
                     complete:  doScroll
                 });
             }
+         wrapper.scroll(function(){
+                          win.postMessage(wrapper.scrollTop(),(location.protocol + '//' + location.host));
+                          });
             /*
             function setPrimaryHeight(pad) {
                 
@@ -123,6 +133,7 @@
 
             }
             */
+         
             $( window ).resize(function() {
                 currHeight=wrapper.height();
                 /*
@@ -218,6 +229,8 @@
                 //console.log("Key: "+evt.key);
                 switch ( evt.key ) {
                     case "s":
+         wrapper.popupwindow();
+         break;
                     case "ArrowDown":
                     case 40: // Down
                     case 68: // D
@@ -323,9 +336,16 @@
                     document.location.href = "about:blank";
                 } else window.close();
             }
+         
+         
 
             function init() {
                 // Local variables (All variables in javascript are function scope not block scope)
+         
+         if (!inIframe()) {
+         win = window.open("multi.html",'TelePrompter Multi','height='+screen.availHeight+', width='+screen.width+', top=0, left='+screen.width+', fullscreen=1, status=0, location=0, menubar=0, toolbar=0' );
+         }
+         
                 var promptStyle = 0;
                 var i = 0;
                 // Get Flip values

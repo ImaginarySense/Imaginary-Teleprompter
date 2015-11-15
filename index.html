@@ -31,7 +31,7 @@
     <link  rel="icon" href="favicon.ico" type="image/x-icon" />
     <script src="ckeditor/ckeditor.js"></script>
     <script src="js/jquery.min.js"></script>
-    <script src="js/jquery.inc.js"></script>
+   
     <script src="js/mobilecheck.js"></script>
     <style class="anchorjs"></style>
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -285,15 +285,25 @@
         // Set and load "Primary"
         if ( $("#primary").val()>0 )
         {
-          // Hide stuff
-          document.getElementById("content").style.display = "none";
-          document.getElementById("editor").style.display = "none";
-          document.getElementById("footer").style.display = "none";
-          // Show prompter frame
-          document.getElementById("framecontainer").style.display = "block";
-          // Load teleprompter
-          document.getElementById("frameprompt").src = "teleprompter.html";
-          document.getElementById("PromptIt").innerHTML = "<strong>Close It...</strong>";
+            
+            if(document.getElementById("framecontainer").style.display == "block"){
+                document.getElementById("framecontainer").style.display = "none";
+                document.getElementById("content").style.display = "";
+                document.getElementById("editor").style.display = "";
+                document.getElementById("footer").style.display = "";
+                document.getElementById("PromptIt").innerHTML = "<strong>Prompt It!</strong>";
+            }else{
+                // Hide stuff
+                document.getElementById("content").style.display = "none";
+                document.getElementById("editor").style.display = "none";
+                document.getElementById("footer").style.display = "none";
+                // Show prompter frame
+                document.getElementById("framecontainer").style.display = "block";
+                // Load teleprompter
+                document.getElementById("frameprompt").src = "teleprompter.html";
+                document.getElementById("PromptIt").innerHTML = "<strong>Close It...</strong>";
+            }
+          
         
           //if (!window.fullScreen)
           //  enterFullScreen();
@@ -302,9 +312,14 @@
         // "Secondary"
         if ( $("#secondary").val()>0 )
         {
-          prompterWindow = window.open("teleprompter.html",'TelePrompter Output','height='+screen.availHeight+', width='+screen.width+', top=0, left='+screen.width+', fullscreen=1, status=0, location=0, menubar=0, toolbar=0' );
-          if (window.focus)
-            prompterWindow.focus();
+            if(document.getElementById("framecontainer").style.display != "block"){
+                prompterWindow = window.open("teleprompter.html",'TelePrompter Output','height='+screen.availHeight+', width='+screen.width+', top=0, left='+screen.width+', fullscreen=1, status=0, location=0, menubar=0, toolbar=0' );
+                
+                if (window.focus)
+                prompterWindow.focus();
+            }
+            
+          
         }
       }
 
