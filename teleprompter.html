@@ -56,50 +56,103 @@
             var play = false;
             var flipH = 0;
             var flipV = 0;
+            var focus = 0;
             // Object identifiers
             var wrapper = $('#scroll_wrapper');
-            var wrapperById = document.getElementById('scroll_wrapper');
-            var prompt = document.getElementById('text_block');
+            var prompt = $('#text_block');
+            var currPadding = wrapper.height();
             // Set speed controls
-            var unit = prompt.clientHeight/1600;
+            var unit = 1 //wrapper.height();
             if (unit<1)
-                unit = 1;
+                unit=0;
             var speed = unit; // initial speed
-            var sensitivity = 1.84;
-            var limit = 40/sensitivity;
+            var sensitivity = 1.2;
+            var limit = 50/sensitivity;
             var negLimit = limit*-1;
             // Parse values from localStorage
             var obj = JSON.parse(localStorage.getItem('data'));
-            prompt.innerHTML = decodeURIComponent(obj.html);
+            prompt.html(decodeURIComponent(obj.html));
             var timeoutStat;
 
+            function atStart() {
+                return (wrapper.scrollTop()===0);
+            }
+
+            function atEnd() {
+                return (wrapper.scrollTop()===wrapper.height()+prompt.height());
+            }
+            
             function negSpeed() {
-                if (speed > negLimit) speed -= unit;
+                if (speed>negLimit&&!atStart()) speed -= unit;
             }
 
             function posSpeed() {
-                if (speed < limit) speed += unit;
+                if (speed<limit&&!atEnd()) speed += unit;
             }
-
+            /*
+            function recoverSpeed() {
+                speed=1; // dev: get actual speed
+            }
+            */
             function doScroll() {
-                wrapper.animate({scrollTop:"+="+speed}, {
-                    duration: 50 - Math.abs(speed * sensitivity),
+                // If scrollTop is not in the range of the prompter with the shortest height, speed is 0. Otherwise, recover speed value if speed is 0.
+                /*
+                if (!(wrapper.scrollTop()-currPadding >= -smallestPadding || 
+                    wrapper.scrollTop()+currPaddin >= prompt.height()+smallestPadding))
+                    speed=0;
+                else if ( speed===0 )
+                    recoverSpeed();
+                */
+                // Recursive animation
+                wrapper.animate({scrollTop:"+="+(Math.pow(Math.abs(speed),sensitivity)*((speed>0)?1:-1))}, {
+                    duration: 40, // [ 1000ms mod 60fps = 40ms/fps ]
                     complete:  doScroll
                 });
             }
+            /*
+            function setPrimaryHeight(pad) {
+                
+            }
+
+            function setSecondaryHeight(pad) {
+                
+            }
+
+            function setSmallestHeight(pad) {
+                if (secondaryPadding<primaryPadding)
+
+            }
+            */
+            $( window ).resize(function() {
+                currHeight=wrapper.height();
+                /*
+                if (inIframe) 
+                    setPrimaryHeight(currHeight);
+                else
+                    setSecondaryHeight(currHeight);
+                */
+            });
+
+            function startPlay() {
+                play=true;
+                doScroll();
+            }
+            
+            function stopPlay() {
+                if ( !(atStart()||atEnd()) )
+                {
+                    play=false;
+                    // Not a good practice but as of 2015 we can't implement workers for all platforms due to security limitations. Calling wrapper.stop() twice prevents multithreading bug since animate() can be preempted.
+                    wrapper.stop();
+                    wrapper.stop();
+                }
+            }
 
             function togglePlay() {
-                if (speed!=0)
-                {
-                    play = !play;
-                    if (play) doScroll();
-                    else
-                    {
-                        // Not a good practice but as of 2015 we can't implement workers for all platforms due to security limitations. Calling wrapper.stop() twice prevents multithreading bug since animate() can be preempted.
-                        wrapper.stop();
-                        wrapper.stop();
-                    }
-                }
+                if (play) 
+                    stopPlay();
+                else
+                    startPlay();
             }
 
             function inIframe() {
@@ -121,64 +174,112 @@
                     var url = location.href;
                     // Go to the target element.
                     location.href = '#'+h;
-                    // Change url back
-                    history.replaceState(null,null,url);
-                    // Scroll anchor to center
-                    wrapper.scrollTop(wrapper.scrollTop()-wrapperById.clientHeight/2);
+                    // If not in an iframe...
+                    if (!inIframe())
+                        // Change url back
+                        history.replaceState(null,null,url);
+                    // Scroll To Focus,
+                    switch (focus) {
+                        case 0:
+                            // If center and flip. Take a little above center
+                            if (flipV)
+                            {
+                                //console.log($('#overlayFocus').height());
+                                wrapper.scrollTop(wrapper.scrollTop()-wrapper.height()/2+$('#overlayFocus').height()/2);
+                            }
+                            // If no flip. Leave a little bellow center
+                            else
+                                wrapper.scrollTop(wrapper.scrollTop()-wrapper.height()/2);
+                            break;
+                        // If top and flipped, take a bit above bottom
+                        case 1:
+                            if (flipV)
+                                wrapper.scrollTop(wrapper.scrollTop()-wrapper.height()+$('#overlayFocus').height());
+                            else
+                                wrapper.scrollTop(wrapper.scrollTop()-$('#overlayFocus').height()/2);
+                            break;
+                        // If bottom and flipped, default position is correct
+                        case 2:
+                            if (!flipV)
+                                wrapper.scrollTop(wrapper.scrollTop()-wrapper.height()+$('#overlayFocus').height()/2);
+                            break;
+                    }
                     // Resume animation
                     togglePlay();
                 }
             }
 
             document.onkeydown = function(evt) {
-                // Change speed toward intended direction.
-                evt = evt || window.event;
-                switch (evt.keyCode) {
-                    case 39: // Right
+                // Change speed toward intended direction
+                var evt = evt || window.event;
+                // keyCode is announced to be deprecated bu not all browsers support key as of 2015.
+                if (evt.key === undefined)
+                    evt.key = evt.keyCode;
+                //console.log("Key: "+evt.key);
+                switch ( evt.key ) {
+                    case "s":
+                    case "ArrowDown":
                     case 40: // Down
-                    case 83: // S
                     case 68: // D
                         if (flipV) negSpeed();
                         else posSpeed();
                         break;
-                    case 37: // Left
+                    case "w":
+                    case "ArrowUp":
                     case 38: // Up
                     case 87: // W
-                    case 65: // A
                         if (flipV) posSpeed();
                         else negSpeed();
                         break;
+                    case "d":
+                    case "ArrowRight":
+                    case 83: // S
+                    case 39: // Right
+                        //dev: increaseFontSize();
+                        break;
+                    case "a":
+                    case "ArrowLeft":
+                    case 37: // Left
+                    case 65: // A
+                        //dev: decreaseFontSize();
+                        break;
+                    case " ":
                     case 32: // Spacebar
                         togglePlay();
                         break;
+                    case "Escape":
                     case 27: // ESC
                         returnToEditor();
                         break;
+                    case ".":
                     case 190: // Dot
                     case 110: // Decimal point
                         //dev: Load interface to search for custom anchor.
                         break;
                     default:
                         // If pressed numbers from 0 to 9 in and out of numpad.
-                        if ([48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,103,104,105].indexOf(evt.keyCode) > -1 )
-                            if ( evt.keyCode<96 )
-                                moveToAnchor( evt.keyCode-48 )
+                        if (["0","1","2","3","4","5","6","7","8","9",48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,103,104,105].indexOf(evt.key) > -1 )
+                            if ( evt.key<10 )
+                                moveToAnchor( evt.key )
+                            else if ( evt.key<96 )
+                                moveToAnchor( evt.key-48 )
                             else
-                                moveToAnchor( evt.keyCode-96 )
+                                moveToAnchor( evt.key-96 )
                 }
                 // Prevent arrow and spacebar scroll bug.
-                if ([32, 37, 38, 39, 40].indexOf(evt.keyCode) > -1) evt.preventDefault();
+                if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," ",32,37,38,39,40].indexOf(evt.key) > -1) evt.preventDefault();
+                //console.log("Speed: "+speed);
             };
             // Reset speed to 0 when reaching Top or Bottom.
             wrapper.scroll(function() {
                 var currPos = wrapper.scrollTop();
-                if (currPos === 0 || currPos + wrapperById.clientHeight == prompt.clientHeight) speed=0;
+                if (currPos===0 || currPos===prompt.height()+wrapper.height())
+                    speed=0;
             });
 
             function timeout(event) {
-                // ALWAYS stop animation here.
-                wrapper.stop();
-                play = false;
+                // Stop animation here.
+                stopPlay();
                 // If waiting, clear and reset.
                 if (timeoutStat) {
                     window.clearTimeout(timeoutStat);
@@ -192,14 +293,21 @@
             }
             // Bind wheel to timeout
             $(window).bind('wheel', timeout);
-            // Bind scrolls to timeout
-            $("#text_block").on("pointermove", function(event) {
-                //console.log("pointer in action");
-                timeout();
+            //dev: Prevent wheel's default action
+            //dev: Instead, increment or decrement speed values!
+            
+            // Stop animation while pressing on the screen, resume on letting go.
+            $("#text_block").on("pointerdown", function(event) {
+                stopPlay();
+            });
+            $("#text_block").on("pointerup", function(event) {
+                startPlay();
             });
 
             function returnToEditor() {
+            //dev: Send message to index.html and let index take care of these operations:
                 if (inIframe()) {
+                    $('#PromptIt', parent.document).html("<strong>Prompt It!</strong>");
                     $('#content', parent.document).css({
                         "display": "block"
                     });
@@ -212,18 +320,19 @@
                     $('#framecontainer', parent.document).css({
                         "display": "none"
                     });
-                    this.document.location.href = "about:blank";
+                    document.location.href = "about:blank";
                 } else window.close();
             }
 
             function init() {
                 // Local variables (All variables in javascript are function scope not block scope)
                 var promptStyle = 0;
-                var focus = 0;
                 var i = 0;
-                var overBgs = $('.overlayBg');
-                // Get JSON values from local storage
-                var flip = obj.data.secondary;
+                // Get Flip values
+                if (inIframe())
+                    var flip = obj.data.primary;
+                else
+                    var flip = obj.data.secondary;
                 // Flips are used to indicate both boolean action and scale values
                 switch (flip) {
                     case 2:
@@ -237,43 +346,52 @@
                         flipV = -2;
                         break;
                 }
-                focus = obj.data.focus;
+                focus = obj.data.focusMode;
                 promptStyle = obj.data.prompterStyle;
 
-                // Flip prompt
+                // Flip text
                 if (flipH||flipV)
                 {
-                    prompt.style.MozTransform="matrix("+(flipH+1)+",0,0,"+(flipV+1)+",0,0)";
-                    prompt.style.OTransform="matrix("+(flipH+1)+",0,0,"+(flipV+1)+",0,0)";
-                    prompt.style.webkitTransform="matrix("+(flipH+1)+",0,0,"+(flipV+1)+",0,0)";
-                    prompt.style.transform="matrix("+(flipH+1)+",0,0,"+(flipV+1)+",0,0)";
-                    // IE<9 unsupported
+                    prompt.css({
+                        "transform":"matrix("+(flipH+1)+",0,0,"+(flipV+1)+",0,0)",
+                        "webkitTransform":"matrix("+(flipH+1)+",0,0,"+(flipV+1)+",0,0)",
+                        "MozTransform":"matrix("+(flipH+1)+",0,0,"+(flipV+1)+",0,0)",
+                        "msTransform":"matrix("+(flipH+1)+",0,0,"+(flipV+1)+",0,0)",
+                        "OTransform":"matrix("+(flipH+1)+",0,0,"+(flipV+1)+"+,0,0)"
+                    });
                 }
                 if (flipV) {
                     // Start scroll at inverted top
-                    wrapper.scrollTop(prompt.offsetHeight - wrapperById.clientHeight - 30);
+                    wrapper.scrollTop(prompt.height()+wrapper.height()-10);
 
                     // If focus is top or bottom, change overlay positions
-                    if (focus == 1) document.getElementById("overlayBottom").style.height = '1vh';
-                    else if (focus == 2) document.getElementById("overlayTop").style.display = 'none';
+                    if (focus == 1)
+                        $("#overlayBottom").css("display","none");
+                    else if (focus == 2)
+                        $("#overlayTop").css("display","none");
                     // Reverse initial speed
                     speed *= -1;
                 } else // If no vertical flip
                 {
                     // If focus is top or bottom, change overlay positions.
-                    if (focus == 1) document.getElementById("overlayTop").style.display = 'none';
-                    else if (focus == 2) document.getElementById("overlayBottom").style.height = '1vh';
+                    if (focus == 1) $("#overlayTop").css("display","none")
+                    else if (focus == 2) $("#overlayBottom").css("display","none");
                 }
                 // Set Teleprompter Style
+                var overBgs = $('.overlayBg');
                 switch (promptStyle) {
                     case 1:
-                        document.body.style.background = '#FFF';
-                        document.body.style.color = '#000';
+                        $("body").css({
+                            "background":"#FFF",
+                            "color":"#000"
+                        });
                         for (i = 0; i < overBgs.length; i++) overBgs[i].style.backgroundColor = '#BBB';
                         break;
                     default:
-                        document.body.style.background = '#272822';
-                        document.body.style.color = '#FFF';
+                        $("body").css({
+                            "background":"#272822",
+                            "color":"#FFF"
+                        });
                         for (i = 0; i < overBgs.length; i++) overBgs[i].style.backgroundColor = '#000';
                 }
                 // Start scrolling

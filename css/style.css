@@ -17,11 +17,34 @@
 */
 body {
 	background: #333;
+	margin: 0px;
+	padding: 0px;
+	-webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 #content {
 	margin-bottom: 0px;
 	padding-top: 10px;
 	padding-bottom: 10px;
+}
+#PromptIt {
+	font-size: 1.4em;
+	background:#EEE;
+}
+#framecontainer {
+	position: fixed;
+	margin: 0px;
+	padding: 0px;
+	top: 48px;
+	bottom: 0px;
+	width: 100%;
+	z-index:10;
+	display: none;
+	border: none;
 }
 .finalFooter {
 	margin-top: 0px;

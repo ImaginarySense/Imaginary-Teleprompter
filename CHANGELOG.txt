@@ -1,5 +1,18 @@
 CHANGELOG
 
+v1.3a.1
+Speed improvements in animate function
+Speed improvements in z-index painting
+Implemented pointer actions, stop animation at screen press
+Improved atStart and atEnd of prompt detection 
+Prevent user from selecting text outside of editor
+Added separate flip modes to primary and seconadry prompters
+Fix Primary prompter height bug
+Fix moveToAnchor, now always places text in the focus area
+
+v1.3a.0
+Created multi.html to sync position accross multiple prompters
+
 v1.2
 Added jump to anchor support
 Fix animation speed units are now consistant across all resolutions
