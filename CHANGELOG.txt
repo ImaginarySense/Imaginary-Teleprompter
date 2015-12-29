@@ -1,5 +1,20 @@
 CHANGELOG
 
+v2.0a 15.12.29 build 011
++ Recreated animation engine from scratch. Now using CSS Transform animations for hardware accelerated graphics.
++ Separated javascript and css from teleprompter.html.
++ Added mouse wheel acceleration control.
++ Added 'Custom' Prompter Style mode. Currently unfinished at index.html, sends hardcoded values to teleprompter.html.
++ Normalized animation speed across resolutions.
++ Added synchronization mechanisms for multiple teleprompter instances. These mechanisms are based on localStorage events. Currently working on Mozilla and partially on Webkit browsers.
++ Normalized animation speed across resolutions.
++ Prompter auto corrects vertical displacement errors caused by resize and orientation changes.
++ Prompt always stays in range of smallest screen.
++ Moved from CKEditor to TinyMCE because we need an inline-editor for the local versions of Teleprompter and TinyMCE's inline-editor is way more efficient. As of this built not all of CKEditor's features have been reimplemented.
++ Added None option to Focus.
++ Includes code for experimenting with pointer based events. 
++ Various CSS improvements.
+
 v1.3a.1
 Speed improvements in animate function
 Speed improvements in z-index painting

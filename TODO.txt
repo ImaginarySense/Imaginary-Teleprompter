@@ -2,50 +2,36 @@ To do list
 
 Prioridades: [ baja, normal, alta ]
 
-- Currently 1.3a.1 -
+- Currently 2.0a 011 -
 
 Goals:
 
 Limpieza de código, alta
 > Convertir index.html a javascript puro
-> Revisar conversión de teleprompter.html a jquery puro
-> Sustituir manipulación de estilos en el DOM por cambios a clases tanto en index como en teleprompter
+> Sustituir manipulación de estilos en el DOM por asignación de clases en index.html
+> Añadir feature selección de colores en estilo Custom en index.html
 
 Multi-ventana, alta
-> Implementar Cross-document messaging
-> Desarrollar mecanismo de sincronización entre prompters (en progreso)
->> Crear evento para restaurar los estilos del Primary Display al salir de un teleprompter
->> Convertir startPlay, stopPlay, negSpeed y posSpeed en eventos
->> Reestructurar teleprompter.html para que la animación sea en base a la ventana y no del wrapper
->>> Programar cambio de acción en botón "Prompt It!"/"Close It!"
+> Alternativa a sincronización de teleprompters aparte de localStorage
+> Crear evento para restaurar los estilos del Primary Display al salir de un teleprompter
+> Perfeccionar manejo de eventos de puntero. Integrar opción de arrastre de texto.
 
 - Release 1.3 -
 
 Cambio dinámico de font-size, normal
 > Cambiar em del container para que actúe como un multiplicador del font
 > Crear evento para cambiar el font-size
-> Programar atajos de teclado
-> Añadir a interface movil
-
-Override comportamiento del mousewheel, normal
-> Prevent wheel's default action
-> Instead, increment or decrement speed values!
+>> Programar cambio de acción en botón "Prompt It!"/"Close It!"
 
 Interface gráfica / mobil, baja
 > Mostrar botones semi transparentes en móvil
-> Ubicar en posición óptima de acuerdo al focus y el flip
 
-- Release 1.4 -
-Chrome app, normal
-> Cambiar a la versión inline de CKEditor o la inline de TinyMCE
-> Resolver otros posibles problemas para convertir a Chrome Ap
-
-- Release for Chrome App Store -
 
 Desktop app, normal
-> Wrapper basado en QT que permita auto detección de pantallas y full screens
+> Wrapper basado en Electron (Chromium + NodeJS) que permita auto detección de pantallas y full screens.
 > Si multi-pantalla no es posible de sincronizar bien en web, implementar multiple instanciación del browser y transformaciones en QT.
 
+- Release for Chrome App Store -
 - Release as Desktop App -
 
 Fullscreen, baja
@@ -64,8 +50,8 @@ Sensitividad variable, baja
 - Release 1.5 -
 
 Sockets, normal
-> Actualizar Cross Document messaging a Sockets 
 > Broadcast instancia del teleprompter a red local
+> Permitir comunicación entre app móbil y app local
 > Permitir descargar el texto actualmente en el prompter
 
 - 1.6a -
