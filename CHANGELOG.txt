@@ -1,5 +1,10 @@
 CHANGELOG
 
+v2.1a 15.12.30 build 011 with Electron
++ Created main.js and package.json to create the wrapped browser on electron, to make application work offline.
++ Added local support for Mac, Linux & Windows by using Electron.
++ Fix in index.html prevents external hyperlinks from loading inside Electron.
+
 v2.0a 15.12.29 build 011
 + Recreated animation engine from scratch. Now using CSS Transform animations for hardware accelerated graphics.
 + Separated javascript and css from teleprompter.html.
@@ -12,25 +17,25 @@ v2.0a 15.12.29 build 011
 + Prompt always stays in range of smallest screen.
 + Moved from CKEditor to TinyMCE because we need an inline-editor for the local versions of Teleprompter and TinyMCE's inline-editor is way more efficient. As of this built not all of CKEditor's features have been reimplemented.
 + Added None option to Focus.
-+ Includes code for experimenting with pointer based events. 
++ Includes code for experimenting with pointer based events.
 + Various CSS improvements.
 
 v1.3a.1
 Speed improvements in animate function
 Speed improvements in z-index painting
 Implemented pointer actions, stop animation at screen press
-Improved atStart and atEnd of prompt detection 
+Improved atStart and atEnd of prompt detection
 Prevent user from selecting text outside of editor
-Added separate flip modes to primary and seconadry prompters
+Added separate flip modes to primary and secondary prompters
 Fix Primary prompter height bug
 Fix moveToAnchor, now always places text in the focus area
 
 v1.3a.0
-Created multi.html to sync position accross multiple prompters
+Created multi.html to sync position across multiple prompters
 
 v1.2
 Added jump to anchor support
-Fix animation speed units are now consistant across all resolutions
+Fix animation speed units are now consistent across all resolutions
 Fix double flip bug
 Fix "Focus->Top" placement bug
 Fix multithreading bug at togglePlay()
@@ -39,7 +44,7 @@ Fix copyright to include contributors
 
 v1.2.1a
 Encapsulate teleprompter.html's code in an anonymous function to not fill the global object
-Fix Improved negSpeed() eficiency
+Fix Improved negSpeed() efficiency
 Fix Overlay display changed to absolute to prevent bug in iOS
 
 v1.2a

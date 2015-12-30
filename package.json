@@ -1,0 +1,13 @@
+{
+  "name": "Teleprompter",
+  "version": "1.0.0",
+  "description": "The most complete and free professional teleprompter app on the web.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron main.js"
+  },
+  "homepage": "https://github.com/atom/electron-quick-start#readme",
+  "devDependencies": {
+    "electron-prebuilt": "^0.36.0"
+  }
+}

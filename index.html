@@ -37,6 +37,7 @@
 	<link href="css/docs.min.css" rel="stylesheet">
 	<link href="css/style.css" rel="stylesheet">
 	<link href="css/mobilehide.css" rel="stylesheet">
+	<script>var ipc = require('ipc');</script>
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 	<!--[if lt IE 9]>
 		<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
@@ -174,18 +175,18 @@
 	<footer id="footer" class="bs-docs-footer finalFooter" role="contentinfo">
 		<div class="container">
 
-		<p style="color:#FFF;">&copy; <a href="http://imaginary.tech">Imaginary Films LLC</a></p>
+		<p style="color:#FFF;">&copy; <a href="#" onclick="ipc.send('Imaginary-Films-LLC');" target="_parent">Imaginary Films LLC</a></p>
 
-		<p>Created by <a href="https://twitter.com/Va2ron1" target="_blank">Victor Ortiz</a> and <a href="https://www.facebook.com/javicorper" target="_blank">Javier Cordero</a>.</p>
+		<p>Created by <a href="#" target="_parent" onclick="ipc.send('Victor-Ortiz');">Victor Ortiz</a> and <a href="#" target="_parent" onclick="ipc.send('Javier-Cordero');">Javier Cordero</a>.</p>
 
-		<p>Code licensed under <a rel="license" href="LICENSE" target="_blank">GPL3</a>, assets under <a rel="license" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.</p>
+		<p>Code licensed under <a rel="license" href="LICENSE" target="_blank">GPL3</a>, assets under <a rel="license" href="#" target="_parent" onclick="ipc.send('CC-BY-4.0');">CC BY 4.0</a>.</p>
 
 		<ul class="bs-docs-footer-links">
 			<li>Currently v2.0a build 011 (15.12.29)</li>
 			<li>&middot;</li>
-			<li><a target="_blank" href="https://github.com/imaginaryfilms/Teleprompter.git">Source</a></li>
+			<li><a target="_parent" href="#" onclick="ipc.send('source');">Source</a></li>
 			<li>&middot;</li>
-			<li><a target="_blank" href="http://imaginary.tech/software/teleprompter">About</a></li>
+			<li><a target="_parent" href="#" onclick="ipc.send('about');">About</a></li>
 		</ul>
 		</div>
 	</footer>
@@ -200,7 +201,7 @@
     		inline: true, // The key to make apps without security loopholes.
     		elementpath: false, // Remove the path bar from the bottom.
     		height : 300, //dev: Adjust initial size accoding to window size.
-    		resize: true, // True means will be vertically resizable. 
+    		resize: true, // True means will be vertically resizable.
     		theme: 'modern', //dev: We should make a custom theme.
     		plugins: "advlist anchor save autosave charmap code colorpicker contextmenu emoticons hr image media lists nonbreaking paste print searchreplace spellchecker table textcolor wordcount imagetools insertdatetime",
     		toolbar: ['anchor save | undo redo | bold italic underline strikethrough superscript subscript | forecolor backcolor | image searchreplace charmap'],
@@ -215,8 +216,8 @@
 			},
 		    /*advlist_bullet_styles: "default,circle,disc,square",
 	 		advlist_number_styles: "default,lower-alpha,lower-greek,lower-roman,upper-alpha,upper-roman",*/
-		  	/*image_list: [ 
-		        {title: 'My image 1', value: 'http://www.tinymce.com/my1.gif'}, 
+		  	/*image_list: [
+		        {title: 'My image 1', value: 'http://www.tinymce.com/my1.gif'},
 		        {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
 		    ],*/
 	 		save_enablewhendirty: false,
@@ -248,7 +249,7 @@
 		function submitTeleprompter() {
 			// Get html from editor
 			var htmldata = tinymce.get('editor').getContent();
-			
+
 			// Get remaining form data
 			var settings = '{ "data": {"secondary":'+$( "#secondary" ).val()+',"primary":'+$( "#primary" ).val()+',"prompterStyle":'+$( "#prompterStyle" ).val()+',"background":"#3CC","color":"#333", "overlayBg":"#333","focusMode":'+$("#focus").val()+'}}',
 				session = '{ "html":"'+encodeURIComponent(htmldata)+'" }';
@@ -269,7 +270,7 @@
 				document.getElementById("frameprompt").src = "teleprompter.html?debug=0";
 				document.getElementById("PromptIt").innerHTML = "<strong>Reset...</strong>";
 			}
-			
+
 			// "Secondary"
 			if ( $("#secondary").val()>0 ) {
 				prompterWindow = window.open("teleprompter.html?debug=0",'TelePrompter Output','height='+screen.availHeight+', width='+screen.width+', top=0, left='+screen.width+', fullscreen=1, status=0, location=0, menubar=0, toolbar=0' );
@@ -292,7 +293,7 @@
 			*/
 			save();
 		}
-	    
+
 		// Set prompter style
 		setStyle(0);
 	</script>
