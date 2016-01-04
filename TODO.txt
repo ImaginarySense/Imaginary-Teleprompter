@@ -1,35 +1,58 @@
-To do list
+- Currently v2.0a 16.01.03 build 014 (with Electron) -
 
-Prioridades: [ baja, normal, alta ]
+Next release: 2.0
+Milestone set for: Jan 20, 2016
 
-- Currently 2.0a 011 -
+Keyvan:
+> Correct self closing meta and link tags to html5 standard.
+> Design "Custom Style" setup options into index.html.
+> Design touch friendly Playback Controls into teleprompter.html.
+> Investigate TinyMCE bugs.
+> If bugs can't be resolved. Insert code to select between TinyMCE and CKEditor.
+>> Add inline mode CKEditor and implement features currently present in TinyMCE.
+> Code remember and set values from last time used on index.html.
+> Code relative font size increase and decrease feature.
+	Font size changes must ocurr either at the #prompt pr at the #promptcontainer level.
 
-Goals:
+Rafael:
+> Override window.open in index.html to successfully load teleprompter.html in Electron.
+> Code sockets.io based communication between remote.html and teleprompter.html.
+	Functions to call at the moment are:
+	toggleAnimation()
+	increaseVelocity()
+	decreaseVelocity()
+	increaseFontSize()*
+	decreaseFontSize()*
+	*Even though these functions are yet to be implemented, they exist. Use console.log() to detect execution.
+> Code sockets.io based communication between remote.html and index.html.
+	Allow sending html from remote.html's editor into index.html.
+	index.html must receive and ask user for authorization before inserting html into it's editor instance.
+> Research on OS X .app package creation.
 
-Limpieza de código, alta
-> Convertir index.html a javascript puro
-> Sustituir manipulación de estilos en el DOM por asignación de clases en index.html
-> Añadir feature selección de colores en estilo Custom en index.html
+Javier:
+> Investigate possible remainingTime() bug that prevents true synchronization.
+> Research alternative synchronization methods.
+> Prepare PhoneGap integration.
 
-Multi-ventana, alta
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+LONG TERM REFERENCE:
+
+Priorities: [ high, normal, low ]
+
+Normal
+Code Save/Load Interface for prompt files in localStorage.
+Code Import html and Export html options.
+
+Multi-ventana, High
+> Detección de pantallas en Electron y entrar a Fullscreen en Electron.
 > Alternativa a sincronización de teleprompters aparte de localStorage
 > Crear evento para restaurar los estilos del Primary Display al salir de un teleprompter
-> Perfeccionar manejo de eventos de puntero. Integrar opción de arrastre de texto.
-
-- Release 1.3 -
-
-Cambio dinámico de font-size, normal
-> Cambiar em del container para que actúe como un multiplicador del font
-> Crear evento para cambiar el font-size
->> Programar cambio de acción en botón "Prompt It!"/"Close It!"
-
-Interface gráfica / mobil, baja
-> Mostrar botones semi transparentes en móvil
-
+> Perfeccionar manejo de eventos de puntero.
+> Programar cambio de acción en botón "Prompt It!"/"Close It!"
 
 Desktop app, normal
-> Wrapper basado en Electron (Chromium + NodeJS) que permita auto detección de pantallas y full screens.
-> Si multi-pantalla no es posible de sincronizar bien en web, implementar multiple instanciación del browser y transformaciones en QT.
 
 - Release for Chrome App Store -
 - Release as Desktop App -

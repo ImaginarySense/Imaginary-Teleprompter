@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-	Teleprompter!
+	Teleprompter
 	Copyright (C) 2015 Imaginary Films LLC and contributors
 
 	This program is free software: you can redistribute it and/or modify
@@ -16,302 +16,158 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
+
 <html>
-	<head>
+<head>
 	<meta charset="utf-8">
 	<meta property="og:title" content="Teleprompter by Imaginary Films" />
 	<meta property="og:site_name" content="Imaginary Tech"/>
 	<meta property="og:url" content="http://imaginary.tech/teleprompter/" />
-	<meta property="og:description" content="'Teleprompter' is a professional grade, multi-platform, free software teleprompter for everyone to use. Click on 'Prompt It!' whenever you're ready and control the speed with the arrow keys." />
+	<meta property="og:description" content="'Teleprompter' is a professional grade, multi-platform, free software teleprompter for everyone to use. It's built on web technologies so it can run in any device." />
 	<meta property="og:image" content="http://imaginary.tech/teleprompter/img/if-teleprompter-web-fb.jpg" />
 	<meta property="fb:app_id" content="196769633992905" />
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Teleprompter by Imaginary Films</title>
-	<link  rel="icon" href="favicon.ico" type="image/x-icon" />
-	<!--<script src="ckeditor/ckeditor.js"></script>-->
+	<link rel="icon" href="favicon.ico" type="image/x-icon" />
+	<link rel="stylesheet" href="css/reset.css">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/docs.min.css">
+	<link rel="stylesheet" href="css/editor.css">
+	<link rel="stylesheet" href="css/prompt.css">
+	<link rel="stylesheet" href="css/teleprompter-themes.css">
+	<link rel="stylesheet" href="css/mobilehide.css">
 	<script src="tinymce/tinymce.min.js"></script>
-	<script src="js/jquery.min.js"></script>
-	<style class="anchorjs"></style>
-	<link href="css/bootstrap.min.css" rel="stylesheet">
-	<link href="css/docs.min.css" rel="stylesheet">
-	<link href="css/style.css" rel="stylesheet">
-	<link href="css/mobilehide.css" rel="stylesheet">
-	<script>const shell = require('electron').shell;</script>
-	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-	<!--[if lt IE 9]>
-		<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-	<![endif]-->
-	</head>
-	<body>
-	<script>
-	const ipcRenderer = require('electron').ipcRenderer;
-	ipcRenderer.on('asynchronous-reply', function(event, arg) {
-	  // Search for the "a" Tags and set the attributes
-	  // of onclick to "require('shell').openExternal('href')"
-	  classTags = document.getElementsByClassName('external');
-	  for (var i = 0; i < classTags.length; i++) {
-			if(classTags[i].href != " "){
-				classTags[i].setAttribute("onclick","require('shell').openExternal('" + classTags[i].href + "')");
-			  classTags[i].href = "#";
-				classTags[i].target = "_parent";
-			}
-	  }
-	});
-	ipcRenderer.send('asynchronous-message', 'working');
-	</script>
-	<script>
-	/*window.fbAsyncInit = function() {
-	FB.init({
-		appId      : '196769633992905',
-		xfbml      : true,
-		version    : 'v2.5'
-	});
-	};
-
-	(function(d, s, id){
-	 var js, fjs = d.getElementsByTagName(s)[0];
-	 if (d.getElementById(id)) {return;}
-	 js = d.createElement(s); js.id = id;
-	 js.src = "//connect.facebook.net/en_US/sdk.js";
-	 fjs.parentNode.insertBefore(js, fjs);
-	 }(document, 'script', 'facebook-jssdk'));*/
-	</script>
+	<script src="js/editor.js"></script>
+	<script src="js/teleprompter-themes.js"></script>
+	<script src="js/social.js"></script>
+</head>
+<body>
 	<form>
 		<!-- Header -->
 		<header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
-		<div class="container">
-			<div class="navbar-header">
-			<!--
-			<button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#bs-navbar" aria-controls="bs-navbar" aria-expanded="false">
-				<span class="sr-only">Toggle navigation</span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-			</button>
-			-->
-			<a href="http://imaginary.tech/teleprompter" target="_blank" class="navbar-brand"><img src="img/logo.png" alt="Teleprompter" style="height:20px;"></a>
+			<div class="container">
+				<div class="navbar-header">
+					<!--
+					<button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#bs-navbar" aria-controls="bs-navbar" aria-expanded="false">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					-->
+					<a href="http://imaginary.tech/teleprompter" target="_blank" class="navbar-brand"><img src="img/logo.png" alt="Teleprompter" style="height:20px;"></a>
+				</div>
+				<ul class="nav navbar-nav navbar-right">
+					<li><a id="promptIt" href=" "><strong>Prompt It!</strong></a></li>
+				</ul>
 			</div>
-			<ul class="nav navbar-nav navbar-right">
-			<li><a id="PromptIt" href="" onclick="submitTeleprompter(); return false;"><strong>Prompt It!</strong></a></li>
-			</ul>
-		</div>
 		</header>
-
-		<!-- Custom controls -->
+		<!-- Controls -->
 		<div class="bs-docs-header" id="content" tabindex="-1">
-		<div class="container">
-			<div class='row'>
-			<div class='col-md-3'>
-				<label for="basic-url">Current display</label>
-				<!--<label class="mobileOnly" for="basic-url">Flip mode</label>-->
-				<select class="form-control" id="primary" name="primary">
-				<option value="0">Don't prompt on this window</option>
-				<option value="1" selected="selected">Normal (Don't Flip)</option>
-				<option value="2">Horizontal Flip</option>
-				<option value="3">Vertical Flip</option>
-				<option value="4">Double Flip</option>
-				</select>
-			</div>
-			<div class='col-md-3'>
-				<!--<label for="basic-url">Flip mode</label>-->
-				<label for="basic-url">Secondary display</label>
-				<select class="form-control" id="secondary" name="secondary">
-				<option value="0" >Disabled</option>
-				<option value="1" selected="selected">Normal (Don't Flip)</option>
-				<option value="2">Horizontal Flip</option>
-				<option value="3">Vertical Flip</option>
-				<option value="4">Double Flip</option>
-				</select>
-			</div>
-			<div class='col-md-3'>
-				<label for="basic-url">Prompter style</label>
-				<select class="form-control" id="prompterStyle" name="prompterStyle" onchange="setStyle(this.form.prompterStyle);">
-				<option value="0" selected="selected">Blackboard</option>
-				<option value="1">Whiteboard</option>
-				<option value="2">Custom</option>
-				</select>
-			</div>
-			<div class='col-md-3'>
-				<label for="basic-url">Focus</label>
-				<select class="form-control" id="focus" name="focus">
-				<option value="3">None</option>
-				<option value="1">Top (webcam)</option>
-				<option value="0" selected="selected">Middle (professional prompter)</option>
-				<option value="2">Bottom (screen above camera)</option>
-				</select>
-			</div>
-			</div>
-		</div>
-		</div>
-		<div id="editor" class="container bs-docs-container" style="width:100%;">
-		<div class="row">
-			<div class="col-md-12" role="main" style="padding-right: 0px; padding-left: 0px;">
-			<div class="bs-docs-section">
-				<div id="editor">
-		<h2>Welcome to Telerompter!</h2>
-		<p>Are you ready to tell your story?</p>
-		<br>
-		<p>"Teleprompter" is a professional grade, multi-platform, free software teleprompter for everyone to use. Click on "Prompt It!" whenever you're ready and control the speed with the arrow keys.</p>
-		<br>
-		<h3>Here are some of our features:</h3>
-		<ol>
-			<li>Speed controls with the Arrow keys, WASD keys and the mouse wheel.</li>
-			<li>Multi-screen support allows for differently flipped variants of the same prompt, all in sync.</li>
-			<li>Different focus modes allows using Teleprompter with a webcam, a tablet, or professional teleprompter systems.</li>
-			<li>Flip modes allow <em>mirroring</em> the prompter in every possible way.</li>
-			<li>By setting up <a id="5" name="5">anchors</a> with the numbers '0' through '9', you can instantly jump to any part of the script. Try pressing '5' now!</li>
-			<li>Our Rich Text Editor gives unlimited possibilities on what you can prompt.</li>
-			<li>You may also customize your background and general text color.</li>
-			<li>If your hardware supports, CSS animations will be processed on the GPU for faster rendering.</li>
-			<li>Text can be pasted from other word processors like Microsoft® Word or Libre Office Writer.</li>
-			<li>Touch controls allow for a good, simillar touch screen experience accross all devices.</li>
-			<li>You may pause the teleprompter at anytime pressing 'spacebar'.</li>
-			<li>Press 'F11' to enter and leave fullscreen.</li>
-			<li>Edits continuously auto save. You may recover previous prompts on the bottom right of the editor.</li>
-			<li>All data is managed locally. No data is stored on our servers.</li>
-		</ol>
-		<hr>
-		<h3>How to use anchors:</h3>
-		<ol>
-			<li>Select a keyword on the line you want to jump to.</li>
-			<li>Click on the <strong>Flag Icon</strong> on the editor's tool bar.</li>
-			<li>A box named "Anchor Properties" should have popped up. Type any number from 0 through 9 and click 'Ok'.</li>
-			<li>When prompting, press or tap on the number you typed to jump into the desired location.</li>
-		</ol>
-		<p>###</p>
+			<div class="container">
+				<div class='row'>
+					<div class='col-md-3'>
+						<label for="basic-url">Current display</label>
+						<!--<label class="mobileOnly" for="basic-url">Flip mode</label>-->
+						<select class="form-control" id="primary" name="primary">
+							<option value="0">Don't prompt on this window</option>
+							<option value="1" selected="selected">Normal (Don't Flip)</option>
+							<option value="2">Horizontal Flip</option>
+							<option value="3">Vertical Flip</option>
+							<option value="4">Double Flip</option>
+						</select>
+					</div>
+					<div class='col-md-3'>
+						<!--<label for="basic-url">Flip mode</label>-->
+						<label for="basic-url">Secondary display</label>
+						<select class="form-control" id="secondary" name="secondary">
+							<option value="0" >Disabled</option>
+							<option value="1" selected="selected">Normal (Don't Flip)</option>
+							<option value="2">Horizontal Flip</option>
+							<option value="3">Vertical Flip</option>
+							<option value="4">Double Flip</option>
+						</select>
+					</div>
+					<div class='col-md-3'>
+						<label for="basic-url">Prompter style</label>
+						<select class="form-control" id="prompterStyle" name="prompterStyle">
+							<option value="0" selected="selected">Blackboard</option>
+							<option value="1">Whiteboard</option>
+							<option value="3">Classic Yellow</option>
+							<option value="4">Intergalactic</option>
+							<option value="2">Custom</option>
+						</select>
+					</div>
+					<div class='col-md-3'>
+						<label for="basic-url">Focus</label>
+						<select class="form-control" id="focus" name="focus">
+							<option value="3">None</option>
+							<option value="1">Top (webcam)</option>
+							<option value="0" selected="selected">Middle (professional prompter)</option>
+							<option value="2">Bottom (screen above camera)</option>
+						</select>
+					</div>
 				</div>
 			</div>
-			</div>
 		</div>
+		<div id="editorcontainer">
+			<div id="fixedToolbarContainer"></div>
+			<div id="promptcontainer">
+				<div id="prompt">
+	<h3>Welcome to Telerompter!</h3>
+	<p>Are you ready to tell your story?</p>
+	<br>
+	<p>"Teleprompter" is a professional grade, multi-platform, free software teleprompter for everyone to use. Click on "Prompt It!" whenever you're ready and control the speed with the arrow keys.</p>
+	<br>
+	<h3>Here are some of our features:</h3>
+	<ol>
+		<li>Speed controls with the Arrow keys, WASD keys and the mouse wheel.</li>
+		<li>Multi-screen support allows for differently flipped variants of the same prompt, all in sync.</li>
+		<li>Different focus modes allows using Teleprompter with a webcam, a tablet, or professional teleprompter systems.</li>
+		<li>Flip modes allow <em>mirroring</em> the prompter in every possible way.</li>
+		<li><a id="5"></a>By setting up anchors with the numbers '0' through '9', you can instantly jump to any part of the script. Try pressing '5' now!</li>
+		<li>Our Rich Text Editor gives unlimited possibilities on what you can prompt.</li>
+		<li>You may also customize your background and general text color.</li>
+		<li>Teleprompter 2.0 and forth uses CSS transitions so animations will be hardware accelerated.</li>
+		<li>Text can be pasted from other word processors like Microsoft® Word or Libre Office Writer.</li>
+		<li>Touch controls allow for a good, simillar touch screen experience accross all devices.</li>
+		<li>You may pause the teleprompter at anytime pressing 'spacebar'.</li>
+		<li>Press 'F11' to enter and leave fullscreen.</li>
+		<li>Edits continuously auto save. You may recover previous prompts on the bottom right of the editor.</li>
+		<li>All data is managed locally. No data is stored on our servers.</li>
+	</ol>
+	<hr>
+	<h4>How to use anchors:</h4>
+	<ol>
+		<li>Select a keyword on the line you want to jump to.</li>
+		<li>Click on the <strong>Flag Icon</strong> on the editor's tool bar.</li>
+		<li>A box named "Anchor Properties" should have popped up. Type any number from 0 through 9 and click 'Ok'.</li>
+		<li>When prompting, press or tap on the number you typed to jump into the desired location.</li>
+	</ol>
+	<p>###</p>
+				</div>
+			</div>
 		</div>
 	</form>
 	<!-- Footer -->
-	<footer id="footer" class="bs-docs-footer finalFooter" role="contentinfo">
+	<footer id="footer" class="bs-docs-footer" role="contentinfo">
 		<div class="container">
 
-		<p style="color:#FFF;">&copy; <a class="external" href="http://imaginary.tech" onclick="" target="_blank">Imaginary Films LLC</a></p>
+			<p style="color:#FFF;">&copy; <a class="external" href="http://imaginary.tech" target="_blank">Imaginary Films LLC</a></p>
 
-		<p>Created by <a class="external" href="https://twitter.com/Va2ron1" target="_blank" onclick="">Victor Ortiz</a> and <a href="https://www.facebook.com/javicorper" target="_blank" onclick="">Javier Cordero</a>.</p>
+			<p>Created by <a class="external" href="https://twitter.com/Va2ron1" target="_blank">Victor Ortiz</a> and <a href="https://www.facebook.com/javicorper" target="_blank">Javier Cordero</a>.</p>
 
-		<p>Code licensed under <a rel="license" href="LICENSE" target="_blank">GPL3</a>, assets under <a class="external" rel="license" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" onclick="">CC BY 4.0</a>.</p>
-
-		<ul class="bs-docs-footer-links">
-			<li>Currently v2.0a build 011 (15.12.29)</li>
-			<li>&middot;</li>
-			<li><a class="external" target="_blank" href="https://github.com/imaginaryfilms/Teleprompter.git" onclick="">Source</a></li>
-			<li>&middot;</li>
-			<li><a class="external" target="_blank" href="http://imaginary.tech/software/teleprompter" onclick="">About</a></li>
-		</ul>
+			<p>Code licensed under <a rel="license" href="LICENSE" target="_blank">GPL3</a>, assets under <a class="external" rel="license" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.</p>
+			<ul class="bs-docs-footer-links">
+				<li>Currently v2.0a build 013 (16.01.02)</li>
+				<li>&middot;</li>
+				<li><a class="external" target="_blank" href="https://github.com/imaginaryfilms/Teleprompter.git">Source</a></li>
+				<li>&middot;</li>
+				<li><a class="external" target="_blank" href="http://imaginary.tech/software/teleprompter">About</a></li>
+			</ul>
 		</div>
 	</footer>
 	<div id="framecontainer">
-		<iframe id="frameprompt" src="about:blank" style="top: 0px; left: 0px; width: 100%; height: 100%;"></iframe>
+		<iframe id="teleprompterframe" src="blank.html" style="top: 0px; left: 0px; width: 100%; height: 100%;"></iframe>
 	</div>
-	<script>
-		// Instance CKEditor
-		//CKEDITOR.replace( 'teleprompterdata');
-		tinymce.init({
-    		selector: 'div#editor',
-    		inline: true, // The key to make apps without security loopholes.
-    		elementpath: false, // Remove the path bar from the bottom.
-    		height : 300, //dev: Adjust initial size accoding to window size.
-    		resize: true, // True means will be vertically resizable.
-    		theme: 'modern', //dev: We should make a custom theme.
-    		plugins: "advlist anchor save autosave charmap code colorpicker contextmenu emoticons hr image media lists nonbreaking paste print searchreplace spellchecker table textcolor wordcount imagetools insertdatetime",
-    		toolbar: ['anchor save | undo redo | bold italic underline strikethrough superscript subscript | forecolor backcolor | image searchreplace charmap'],
-			contextmenu: "copy cut paste pastetext | anchor | image charmap",
-		  	menu: {
-				file: {title: 'File', items: 'newdocument print'},
-				edit: {title: 'Edit', items: 'undo redo | cut copy paste pastetext | selectall'},
-				insert: {title: 'Insert', items: 'anchor insertdatetime | image media emoticons | hr charmap'},
-				format: {title: 'Format', items: 'bold italic underline | strikethrough superscript subscript | formats | removeformat'},
-				table: {title: 'Table', items: 'inserttable tableprops deletetable | cell row column'},
-				tools: {title: 'Tools', items: 'searchreplace spellchecker code'}
-			},
-		    /*advlist_bullet_styles: "default,circle,disc,square",
-	 		advlist_number_styles: "default,lower-alpha,lower-greek,lower-roman,upper-alpha,upper-roman",*/
-		  	/*image_list: [
-		        {title: 'My image 1', value: 'http://www.tinymce.com/my1.gif'},
-		        {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
-		    ],*/
-	 		save_enablewhendirty: false,
-		    save_onsavecallback: save,
-		    nonbreaking_force_tab: true
-		});
-
-		// Object variables
-		var prompterWindow;
-
-		function save () {
-			console.log("Save pressed");
-		}
-
-		// On change Prompter Style
-		function setStyle (prompterStyle) {
-			var selection = prompterStyle.selectedIndex;
-
-			if ( selection ) {
-				document.getElementById('editor').style.background="#FFF";
-				document.getElementById('editor').style.color="#000";
-			}
-			else {
-				document.getElementById('editor').style.background='#272822';
-				document.getElementById('editor').style.color = '#FFF';
-			}
-		}
-
-		function submitTeleprompter() {
-			// Get html from editor
-			var htmldata = tinymce.get('editor').getContent();
-
-			// Get remaining form data
-			var settings = '{ "data": {"secondary":'+$( "#secondary" ).val()+',"primary":'+$( "#primary" ).val()+',"prompterStyle":'+$( "#prompterStyle" ).val()+',"background":"#3CC","color":"#333", "overlayBg":"#333","focusMode":'+$("#focus").val()+'}}',
-				session = '{ "html":"'+encodeURIComponent(htmldata)+'" }';
-			// Store data locally for prompter to use
-			localStorage.setItem('IFTeleprompterSettings', settings);
-			sessionStorage.setItem('IFTeleprompterSession', session);
-			//console.log(data);
-
-			// Set and load "Primary"
-			if ( $("#primary").val()>0 ) {
-				// Hide stuff
-				document.getElementById("content").style.display = "none";
-				document.getElementById("editor").style.display = "none";
-				document.getElementById("footer").style.display = "none";
-				// Show prompter frame
-				document.getElementById("framecontainer").style.display = "block";
-				// Load teleprompter
-				document.getElementById("frameprompt").src = "teleprompter.html?debug=0";
-				document.getElementById("PromptIt").innerHTML = "<strong>Reset...</strong>";
-			}
-
-			// "Secondary"
-			if ( $("#secondary").val()>0 ) {
-				prompterWindow = window.open("teleprompter.html?debug=0",'TelePrompter Output','height='+screen.availHeight+', width='+screen.width+', top=0, left='+screen.width+', fullscreen=1, status=0, location=0, menubar=0, toolbar=0' );
-				if (window.focus)
-				prompterWindow.focus();
-			}
-
-			// In case of both
-			/*
-			if ( $("#primary").val()>0 && $("#secondary").val()>0 ) {
-				console.log(frameprompt.contentWindow);
-				console.log(prompterWindow);
-				localStorage.setItem('primaryInstance', frameprompt.contentWindow);
-				localStorage.setItem('secondaryInstance', prompterWindow);
-			}
-			// In case of none
-			else if ( !($("#primary").val()>0 || $("#secondary").val()>0) ) {
-				window.alert("You must prompt at least to one 'display'.");
-			}
-			*/
-			save();
-		}
-
-		// Set prompter style
-		setStyle(0);
-	</script>
-	</body>
+</body>
 </html>

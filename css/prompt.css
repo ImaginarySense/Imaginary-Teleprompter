@@ -16,10 +16,45 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-.desktopOnly {
-	display: none;
+#prompt {
+	position: absolute;
+	left: 8%;
+	width: 84%;
+	font-size: 5vw;	
+	line-height: 1.1;
+	text-align: center;
+	list-style-position: inside;
+	font-family: sans-serif, Arial, Verdana, "Trebuchet MS";
 }
 
-.mobileOnly {
-	display: none;
+#prompt h6 {
+	font-size: 1em;
+}
+
+#prompt h5 {
+	font-size: 1em;
+}
+
+#prompt h4 {
+	font-size: 1.16666em;
+}
+
+#prompt h3 {
+	font-size: 1.16666em;
+}
+
+#prompt h2 {
+	font-size: 1.33333em;
+}
+
+#prompt h1 {
+	font-size: 1.5em;
+}
+
+#prompt a {
+	color: #FFF;
+}
+
+#prompt table {
+	width: 100%;
 }

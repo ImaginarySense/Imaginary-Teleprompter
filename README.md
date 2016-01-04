@@ -1,6 +1,6 @@
 #Teleprompter
 The most complete and free professional teleprompter app on the web.
-##Copyright: Imaginary Films LLC
+##Copyright: Imaginary Films LLC & contributors
 ##Contributors:
 *  Javier O. Cordero Pérez <javier.cordero@upr.edu>
 *  Victor Ortiz <va2ron1@gmail.com>

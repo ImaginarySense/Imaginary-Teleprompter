@@ -1,6 +1,17 @@
 CHANGELOG
 
-v2.1a 15.12.30 build 011 with Electron
+v2.0a 16.01.03 build 014 (with Electron)
++ Performance improvements and asynchronious bug fixes by making use of requestAnimationFrame().
++ Implemented basic pointer based drag and drop in teleprompter.html.
++ Implemented all of CKEditor's features using TinyMCE.
++ Improved TinyMCE Integration. Some bugs remain though.
++ Separated javascript and css from index.html.
++ Dissabled playback controls from localStorage. Prompters no longer "sync". Making room for alternative methods.
++ Small improvements to Electron related code.
++ Separated style related scripts into it's own theme module.
++ Added "Classic Yellow" and "Intergalactic" themes.
+
+v2.0a 15.12.30 build 011 (with Electron)
 + Created main.js and package.json to create the wrapped browser on electron, to make application work offline.
 + Added local support for Mac, Linux & Windows by using Electron.
 + Fix in index.html prevents external hyperlinks from loading inside Electron.

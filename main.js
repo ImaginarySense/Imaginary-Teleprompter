@@ -1,4 +1,22 @@
-	"use strict";
+/*
+	Teleprompter
+	Copyright (C) 2015 Imaginary Films LLC and contributors
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+"use strict";
 const electron = require('electron');
 const app = electron.app; // Module to control application life.
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
@@ -12,26 +30,26 @@ var mainWindow = null;
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
-        app.quit();
+	app.quit();
 });
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
-    // Create the browser window.
-    mainWindow = new BrowserWindow({width: 1280, height: 800, javascritp: true, title: 'Teleprompter', useContentSize: true, nodeIntegration: true});
+	// Create the browser window.
+	mainWindow = new BrowserWindow({width: 1280, height: 800, javascritp: true, title: 'Teleprompter', useContentSize: true, nodeIntegration: true});
 
-    // and load the index.html of app.
-    mainWindow.loadURL('file://' + __dirname + '/index.html');
+	// and load the index.html of app.
+	mainWindow.loadURL('file://' + __dirname + '/index.html');
+
+	//
+	ipcMain.on('asynchronous-message', function(event, arg) {
+		event.sender.send('asynchronous-reply', 'Done');
+	});
 
 
-  ipcMain.on('asynchronous-message', function(event, arg) {
-     event.sender.send('asynchronous-reply', 'Done');
-   });
-
-
-   // Emitted when the window is closed.
-   mainWindow.on('closed', function(){
-      mainWindow = null;
-   });
+	// Emitted when the window is closed.
+	mainWindow.on('closed', function(){
+		mainWindow = null;
+	});
 });

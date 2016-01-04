@@ -1,40 +1,75 @@
 /*
 	Teleprompter
-    Copyright (C) 2015 Imaginary Films LLC, Victor Ortiz <va2ron1@gmail.com>, Javier Cordero <javier.cordero@upr.edu>
+	Copyright (C) 2015 Imaginary Films LLC and contributors
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 body {
 	background: #333;
 	margin: 0px;
 	padding: 0px;
 	-webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
+
 #content {
 	margin-bottom: 0px;
 	padding-top: 10px;
 	padding-bottom: 10px;
 }
-#PromptIt {
+
+#promptIt {
 	font-size: 1.4em;
 	background:#EEE;
 }
+
+#editorcontainer {
+	position: relative;
+	overflow: auto;
+	resize: vertical;
+	min-height: 200px;
+	height: 480px;
+}
+
+#editorcontainer:-webkit-full-screen {
+	width: 100%;
+	height: 100%;
+}
+
+#promptcontainer {
+	position: absolute;
+	overflow: auto;
+	top: 105px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+	/* Cancel 3D transform from intergalactic theme. */
+	transform: rotateX(0deg) translate3d(0px,0px,0px) !important;
+}
+
+#fixedToolbarContainer {
+	position: static;
+	width: 100%;
+	margin: auto;
+	background: #F0F0F0;
+}
+
 #framecontainer {
 	position: fixed;
 	margin: 0px;
@@ -46,11 +81,10 @@ body {
 	display: none;
 	border: none;
 }
-.finalFooter {
-	margin-top: 0px;
-	margin-bottom: 0px;
-	padding-top: 20px;
-	padding-bottom: 20px;
+
+#footer {
+	margin: 0px;
+	padding: 20px;
 	text-align: center;
 	text-shadow: 0 1px 0 rgba(0,0,0,.1);
 	background-color: #6f5499;
@@ -58,19 +92,26 @@ body {
 	background-image: -webkit-linear-gradient(top,#563d7c 0,#6f5499 100%);
 	background-image: -o-linear-gradient(top,#563d7c 0,#6f5499 100%);
 	background-image: linear-gradient(to bottom,#563d7c 0,#6f5499 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#563d7c', endColorstr='#6F5499', GradientType=0);
 	background-repeat: repeat-x;
 	color: #CCF;
 }
+
+ul.bs-docs-footer-links {
+	margin: 10px;
+}
+
 a:link {
 	color: #FFF;
 }
+
 a:visited {
 	color: #FFF;
 }
+
 a:active {
 	color: #CCF;
 }
+
 .carbonad{
 	display:block;background:#fdfdfd;background-image:-moz-linear-gradient(top,#f8f8f8,#fdfdfd);background-image:-webkit-gradient(linear,left top,left bottom,color-stop(0,#f8f8f8),color-stop(1,#fdfdfd));border:1px solid #d5d5d5;font-family:Lucida Grande,Arial,Helvetica,sans-serif;font-size:11px;height:118px;line-height:15px;overflow:hidden;width:300px}.carbonad-img{border:none;display:inline;float:left;height:100px;margin:9px;width:130px}.carbonad-text{display:inline;float:left;width:142px;padding-top:13px}.carbonad-text a{color:#000;text-decoration:none;text-transform:none;}.carbonad-tag{float:left;margin-top:9px;text-align:center;width:142px;color:#999}.carbonad-tag a{color:#999;text-decoration:none
 }

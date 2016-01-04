@@ -19,6 +19,7 @@
 /*  References:
 https://github.com/jquery/PEP
 https://github.com/briangonzalez/jquery.pep.js/
+http://stackoverflow.com/questions/18240107/make-background-follow-the-cursor
 https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 */
 
@@ -27,7 +28,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	// Use JavaScript Strict Mode.
 	"use strict";
 	// Global objects
-	var settings, session, prompt, pointer, overlay, overlayFocus, styleElement, styleSheet;
+	var settings, session, prompt, pointer, overlay, overlayFocus, styleElement, styleSheet, argument;
 	// Global variables
 	var unit, x, velocity, sensitivity, speedMultip, limit, relativeLimit, play, timeoutStatus, invertedWheel, focus, promptStyleOption, customStyle, flipV, flipH, fontSize, previousPromptHeight, previousScreenHeight, previousScreenWidth, previousVerticalDisplacementCorrector, tic, debug;
 	// Global constants
@@ -51,7 +52,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		prompt = document.querySelector(".prompt");
 		overlay = document.querySelector("#overlay");
 		overlayFocus = document.querySelector("#overlayFocus");
-		pointer = document.querySelector("#pointer");
+		pointer = {}; //document.querySelector("#pointer");
 
 		// Initialize CSS
 		initCSS();
@@ -83,7 +84,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		focus = settings.data.focusMode;
 		// Get prompter style
 		promptStyleOption = settings.data.prompterStyle;
-		customStyle = { "background": settings.data.background , "color": settings.data.color , "overlayBg": settings.data.overlayBg };
+		customStyle = { "background": settings.data.background, "color": settings.data.color, "overlayBg": settings.data.overlayBg };
 		// Get and set prompter text
 		prompt.innerHTML = decodeURIComponent(session.html);
 		
@@ -129,7 +130,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		}
 		// Set flip and styles to values from settings.
 		setFlips();
-		setStyle();
+		setStyle( promptStyleOption, customStyle );
 
 		// Save current screen position related settings for when resize and screen rotation ocurrs.
 		previousPromptHeight = getPromptHeight();
@@ -139,22 +140,12 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
 		// Add pointer controls
 		// Stop animation while pressing on the screen, resume on letting go.
-	    overlay.addEventListener( "pointerdown", function( e ) {
-	        if (debug) console.log("pointerdown");
-	    });
-	    overlay.addEventListener( "pointerup", function( e ) {
-	        if (debug) console.log("pointerup");
-	    });
+		overlay.addEventListener( "pointerdown", pointerActive );
+		overlay.addEventListener( "pointerup", pointerInactive );
+		overlay.addEventListener( "pointerleave", pointerInactive );
+		overlay.addEventListener( "pointermove", pointerMove );
 
-	    $("#pointer").pep({
-	    	axis: 'y',
-	    	shouldPreventDefault: false,
-			start: internalPauseAnimation,
-			rest: atRest,
-			hardwareAccelerate: true,
-    		useCSSTranslation: true
-		});
-
+		// Wait a moment to prevent possible asynchronic CSS issues.
 		window.setTimeout( function() {
 			// If flipped vertically, set start at inverted top.
 			if (flipV)
@@ -168,22 +159,75 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		}, 500);
 	}
 
+	function pointerActive(event) {
+		if (!pointer.active) {
+			if (debug) console.log("Pointer active");
+			internalPauseAnimation();
+			pointer.prompterstart = getCurrPos();
+			pointer.startposition = event.clientY;
+			pointer.previousposition = pointer.startposition;
+			pointer.active = true;
+		}
+	}
+
+	function pointerInactive() {
+		if (pointer.active) {
+			if (debug) console.log("Pointer inactive");
+			pointer.active = false;
+			//letGoAnimation();
+			internalPlayAnimation();
+		}
+	}
+
+	function letGoAnimation() {
+		var fallPosition = getCurrPos()+pointer.delta*9,
+			fallDelay = pointer.delta*1000;
+		animate(fallDelay, fallPosition, "ease-out");
+	}
+
+	function pointerMove(event) {
+		if (pointer.active) {
+			// Get current point location
+			var pointerCurrPos = event.clientY,
+				distance = pointerCurrPos-pointer.startposition;
+			pointer.delta = pointerCurrPos-pointer.previousposition
+			pointer.deltaTime = pointer.deltaTime;
+			// time and last time ?
+			argument = pointer.prompterstart+distance;
+			// Update previous position value.
+			pointer.previousposition = pointerCurrPos;
+			// Debug info
+			if (debug) console.log("Pointer start: "+pointer.startposition+"\nPointer at: "+pointerCurrPos+"\nDistance: "+distance+"\nDelta: "+pointer.delta);
+			// Move to pointed position.
+			setCurrPosStill(argument);
+			//requestAnimationFrame(touchUpdate);
+		}
+	}
+
+	function touchUpdate() {
+		setCurrPosStill(argument);
+	}
+
+	/*
 	function atRest() {
+		if (debug) console.log("At rest");
 		requestAnimationFrame(restorePointer);
 		syncPrompters();
 		internalPlayAnimation();
-		//console.log(e.type);	
 	}
 
 	function restorePointer() {
-		setCurrPosStill( getCurrPos()+getCurrPos(pointer) );
-		setCurrPosStill( 0, pointer );
+		if (debug) console.log("Restoring pointer position");
+		setCurrPosStill( getCurrPos()-getCurrPos( document.getElementById("prompt") ) );
+		setCurrPosStill( 0, document.getElementById("prompt") );
 	}
+	*/
 
 	function returnToEditor() {
-	//dev: Send message to index.html and let index take care of restoring its interface:
-		if (inIframe())
+		if (inIframe()) {
 			document.location.href = "about:blank";
+			//dev: Send message to index.html and let index take care of restoring its interface:
+		}
 		else
 			window.close();
 	}
@@ -197,56 +241,23 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	}
 
 	function setFlips() {
-		//d Add support for real-time flipping.
+		//dev: Add support for real-time flipping.
 		// Both flips
 		if (flipH&&flipV) {
 			//prompt.classList.add("flipHV");
 			overlay.classList.add("flipV");
-			//overlay.classList.add("flipHV"); // Currently unnecesary.
+			//overlay.classList.add("flipHV"); // Currently unnecesary. Uncomment if overlay isn't symetric.
 		}
 		// Vertical flip
 		else if (flipV) {
-			//prompt.classList.add("flipV");
+			//prompt.classList.add("flipV"); // Not necesary if using css transform based animations.
 			overlay.classList.add("flipV");
 		}
 		// Horizontal flip
 		//else if (flipH) {
-			//prompt.classList.add("flipH");
-			//overlay.classList.add("flipH"); // Currently unnecesary.
+			//prompt.classList.add("flipH"); // Not necesary if using css transform based animations.
+			//overlay.classList.add("flipH"); // Currently unnecesary. Uncomment if overlay isn't symetric.
 		//}
-	}
-
-	// Set Teleprompter Style.
-	function setStyle() {
-		// 
-		var body = document.querySelector("body"),
-			overlayBgs = document.getElementsByClassName("overlayBg"),
-			overlayBgSetting;
-		// Set body background.
-		switch (promptStyleOption) {
-			case 2:
-				styleSheet.insertRule('\
-					body {\
-						background: '+customStyle["background"]+';\
-						color: '+customStyle["color"]+';\
-				}', 0);
-				styleSheet.insertRule('\
-					.customOverlay {\
-						background: '+customStyle["overlayBg"]+';\
-				}', 1);
-				overlayBgSetting="customOverlay";
-				break;
-			case 1:
-				body.classList.add("lightBody");
-				overlayBgSetting="lightOverlay";
-				break;
-			default:
-				body.classList.add("darkBody");
-				overlayBgSetting="darkOverlay";
-		}
-		// Set overlay background.
-		for (var i=0; i<overlayBgs.length; i++)
-			overlayBgs[i].classList.add( overlayBgSetting );
 	}
 
 	function syncPrompters() {
@@ -319,13 +330,14 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	}
 /*
 	function getAspectRatio() {
-		// Used to correct animation speed by aspect ratio. 
 		return getScreenWidth()/getScreenHeight();
 	}
 */
 	// Solve for time to reach end.
 	function getRemainingTime() {
-		var time = Math.abs((getDestination()-getCurrPos())/(velocity));
+		var destination = getDestination(),
+			paddingDifference = 0,//(destination===0?getScreenHeight():-getScreenHeight()),
+			time = Math.abs((destination+paddingDifference-getCurrPos())/velocity);
 		if ( isNaN(time) )
 			time = 0;
 		return time;
@@ -364,14 +376,24 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	}
 
 	function setCurrPosStill( theCurrPos, obj ) {
+		if (!theCurrPos)
+			theCurrPos = getCurrPos();
 		if (!obj)
 			obj = prompt;
+		// If animation is running...
+		if (prompt.classList.contains("move")) {
+			// Stop animation by removing move class.
+			obj.classList.remove("move");
+			// Delete animation rules before setting new ones.
+			styleSheet.deleteRule(0);
+		}
 		//prompt.style.top = theCurrPos+'px';
 		obj.style.WebkitTransform = 'translateY('+theCurrPos+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+')'; 
 		obj.style.MozTransform = 'translateY('+theCurrPos+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+')'; 
 		obj.style.msTransform = 'translateY('+theCurrPos+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+')'; 
 		obj.style.OTransform = 'translateY('+theCurrPos+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+')';  
 		obj.style.transform = 'translateY('+theCurrPos+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+')';
+		//hack();
 	}
 
 	function getDestination() {
@@ -406,19 +428,11 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	}
 
 	function animate( time, destination, curve ) {
-		var hack;
 		// If no curve parameter, default to linear. This is the equivalent of a function overload.
 		if (!curve)
 			curve = 'linear';
 		// Retain current position.
-		setCurrPosStill( getCurrPos() );
-		// If animation is running...
-		if (prompt.classList.contains("move")) {
-			// Stop animation by removing move class.
-			prompt.classList.remove("move");
-			// Delete animation rules before setting new ones.
-			styleSheet.deleteRule(0);
-		}
+		setCurrPosStill();
 		// Set new animation rules.
 		styleSheet.insertRule('\
 			.prompt.move {\
@@ -434,12 +448,16 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 				transition: transform '+time+'s '+curve+';\
 		}', 0);
 		// Prevent race condition in Chrome by requesting for current position (not just transform) before resuming animation.
-		hack=prompt.offsetTop;
+		hack();
 		// Resume animation by re adding the class.
 		prompt.classList.add("move");
 		if (debug) console.log("Curr: "+getCurrPos()+"\nDest: "+destination+"\nRemTime "+time);
 	}
 	//https://css-tricks.com/controlling-css-animations-transitions-javascript/
+
+	function hack() {
+		return prompt.offsetTop;
+	}
 
 	function focusVerticalDisplacementCorrector() {
 		var vDisp=0;
@@ -643,20 +661,24 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	}
 
 	function internalDecreaseVelocity() {
-		if (velocity>relativeLimit*-1&&!atStart()) {
-			x--;
-			updateVelocity();
-			updateAnimation();
+		if (!atStart()) {
+			if (velocity>relativeLimit*-1) {
+				x--;
+				updateVelocity();
+				requestAnimationFrame(updateAnimation);
+			}
 		}
 		else
 			stopAll();
 	}
 
 	function internalIncreaseVelocity() {
-		if (velocity<relativeLimit&&!atEnd()) {
-			x++;
-			updateVelocity();
-			updateAnimation();
+		if (!atEnd()) {
+			if (velocity<relativeLimit) {
+				x++;
+				updateVelocity();
+				requestAnimationFrame(updateAnimation);
+			}
 		}
 		else
 			stopAll();
@@ -673,7 +695,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		// Save setting to storage sends storage event to other windows.
 		localStorage.setItem("play", "pause");
 		// Then take action locally.
-		localPauseAnimation();
+		requestAnimationFrame(localPauseAnimation);
 		// Stop, then set play to false.
 		play = false;
 		syncPrompters();
@@ -694,7 +716,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		// Save setting to storage sends storage event to other windows.
 		localStorage.setItem("play", "internalPause");
 		// Then take action locally.
-		localPauseAnimation();
+		requestAnimationFrame(localPauseAnimation);
 		if (debug) console.log("Internal Pause");
 	}
 
@@ -711,12 +733,14 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	}
 
 	function localPlayAnimation() {
-		updateAnimation();
+		requestAnimationFrame(updateAnimation);
 	}
 
 	window.addEventListener("storage", function(evt) {
 		if (debug) console.log("Storage event key: "+evt.key);
 			switch (evt.key) {
+				// Uncomment this to enable full localstorage based synchronization (experimental).
+				/*
 				case "direction":
 					var direction = evt.newValue;
 					if (direction>0)
@@ -729,9 +753,6 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 						updateAnimation();
 					}
 					break;
-				case "anchor":
-					internalMoveToAnchor(evt.newValue);
-					break;
 				case "play":
 					switch (evt.newValue) {
 						case "play":
@@ -742,18 +763,22 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 							localPlayAnimation();
 							break;
 						case "pause":
-							localPauseAnimation();
+							requestAnimationFrame(localPauseAnimation);
 							play=false;
 							break;
 						case "internalPause":
-							localPauseAnimation();
+							requestAnimationFrame(localPauseAnimation;
 							break;
 					} break;
+				*/
+				case "anchor":
+					internalMoveToAnchor(evt.newValue);
+					break;
 				case "sync":
 					correctVerticalDisplacement(evt.newValue, 0);
 					break;
-			}
-		}, false);
+			} // end switch
+	}, false); // end event
 
 	document.onkeydown = function( evt ) {
 		evt = evt || window.event;

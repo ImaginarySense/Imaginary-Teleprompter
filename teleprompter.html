@@ -9,7 +9,7 @@
 	(at your option) any later version.
 
 	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	buunityt WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
 
@@ -19,18 +19,20 @@
 <html>
 <head>
 	<meta charset="utf-8">
-    <title>Teleprompter | Teleprompter by Imaginary Films</title>
-    <link href="favicon.ico" rel="icon" type="image/x-icon" />
-    <link rel="stylesheet" href="css/reset.css">
-    <link rel="stylesheet" href="css/teleprompter.css">
-    <link rel="stylesheet" href="css/teleprompter-themes.css">
-    <script src="js/jquery.min.js"></script>
-    <script src="js/pep.min.js"></script>
-    <script src="js/jquery.pep.min.js"></script>
-    <script src="js/teleprompter.js"></script>
+	<title>Teleprompter | Teleprompter by Imaginary Films</title>
+	<link href="favicon.ico" rel="icon" type="image/x-icon" />
+	<link rel="stylesheet" href="css/reset.css">
+	<link rel="stylesheet" href="css/teleprompter.css">
+	<link rel="stylesheet" href="css/prompt.css">
+	<link rel="stylesheet" href="css/teleprompter-themes.css">
+	<script src="js/pep.min.js"></script>
+	<script src="js/teleprompter.js"></script>
+	<script src="js/teleprompter-themes.js"></script>
 </head>
-<body>
-	<header class="top">
+<!-- Prompt id brings text formating -->
+<body id="promptcontainer">
+	<!-- header contains visual controls. -->
+	<header id="controls" class="top">
 		<h1>Teleprompter</h1>
 		<nav>
 			<ul>
@@ -43,20 +45,23 @@
 			</ul>
 		</nav>
 	</header>
-	<div id="pointer">
+	<!-- #prompt contains formating, which is shared with the overlay. -->
+	<div id="prompt">
+		<!-- .prompt helps us identify and manipulate the prompt itself. -->
 		<article class="prompt"></article>
+		<!-- #overlay layers focus area on top of the prompt. -->
+		<table border="0" cellpadding="0" cellspacing="0" id="overlay">
+			<tbody>
+				<tr id="overlayTop" class="overlayBg">
+					<td>&nbsp;</td>
+				</tr>
+				<tr id="overlayFocus">
+					<td>&nbsp;</td>
+				</tr>
+				<tr id="overlayBottom" class="overlayBg">
+					<td>&nbsp;</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
-	<table border="0" cellpadding="0" cellspacing="0" id="overlay">
-		<tbody>
-			<tr id="overlayTop" class="overlayBg">
-				<td>&nbsp;</td>
-			</tr>
-			<tr id="overlayFocus">
-				<td>&nbsp;</td>
-			</tr>
-			<tr id="overlayBottom" class="overlayBg">
-				<td>&nbsp;</td>
-			</tr>
-		</tbody>
-	</table>
 </body>
