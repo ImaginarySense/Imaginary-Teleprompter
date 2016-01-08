@@ -1,5 +1,10 @@
 CHANGELOG
 
+v2.0a 16.01.08 build 001 (with Electron)
++ Improve code efficiency.
++ Moved Prompt It! styling to css.
++ Implemented Reset...
+
 v2.0a 16.01.03 build 014 (with Electron)
 + Performance improvements and asynchronious bug fixes by making use of requestAnimationFrame().
 + Implemented basic pointer based drag and drop in teleprompter.html.

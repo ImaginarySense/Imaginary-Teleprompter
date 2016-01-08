@@ -31,7 +31,7 @@ var debug;
 
 		// Set DOM javascript controls
 		document.getElementById("prompterStyle").setAttribute("onclick","setStyleEvent(value);");
-		document.getElementById("promptIt").setAttribute("onclick","submitTeleprompter(); return false;");
+		document.getElementById("promptIt").onclick = submitTeleprompter;
 
 		// Set default style
 		setStyle();
@@ -124,17 +124,20 @@ var debug;
 		console.log("Save pressed");
 	}
 	
-	// Initialize objects after DOM is loaded
-	if (document.readyState === "interactive" || document.readyState === "complete")
-		// Call init if the DOM (interactive) or document (complete) is ready.
-		init();
-	else
-		// Set init as a listener for the DOMContentLoaded event.
-		document.addEventListener("DOMContentLoaded", init);
-
-}());
-
-// DOM Level functions, allow UI click interaction
+	function resetTeleprompter(event) {
+		// Stops the event but continues executing he code.
+	    event.preventDefault();
+		// INFO: event.target === document.getElementById("promptIt") and more efficient.
+	    event.target.textContent = "Prompt It!";
+		event.target.onclick = submitTeleprompter;
+		document.getElementById("content").style.display = "";
+		document.getElementById("editorcontainer").style.display = "";
+		document.getElementById("footer").style.display = "";
+		// Hide prompter frame
+		document.getElementById("framecontainer").style.display = "none";
+	}
+	
+	// DOM Level functions, allow UI click interaction
 // On change Prompter Style
 function setStyleEvent(prompterStyle) {
 	if (setStyle) {
@@ -152,7 +155,9 @@ function setStyleEvent(prompterStyle) {
 }
 
 // On "Prompt It!" clicked
-function submitTeleprompter() {
+function submitTeleprompter(event) {
+	// Stops the event but continues executing the code.
+	event.preventDefault();
 	// Get html from editor
 	var htmldata = tinymce.get("prompt").getContent();
 
@@ -173,7 +178,9 @@ function submitTeleprompter() {
 		document.getElementById("framecontainer").style.display = "block";
 		// Load teleprompter
 		document.getElementById("teleprompterframe").src = "teleprompter.html?debug=1";
-		document.getElementById("promptIt").innerHTML = "<strong>Reset...</strong>";
+		// INFO: event.target === document.getElementById("promptIt") and more efficient.
+		event.target.textContent = "Reset...";
+		event.target.onclick = resetTeleprompter;
 	}
 
 	// "Secondary"
@@ -197,3 +204,13 @@ function submitTeleprompter() {
 	}
 	*/
 }
+	
+	// Initialize objects after DOM is loaded
+	if (document.readyState === "interactive" || document.readyState === "complete")
+		// Call init if the DOM (interactive) or document (complete) is ready.
+		init();
+	else
+		// Set init as a listener for the DOMContentLoaded event.
+		document.addEventListener("DOMContentLoaded", init);
+
+}());

@@ -37,6 +37,7 @@ body {
 #promptIt {
 	font-size: 1.4em;
 	background:#EEE;
+	font-weight: bold;
 }
 
 #editorcontainer {
