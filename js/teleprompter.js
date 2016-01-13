@@ -180,6 +180,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 			if (debug) console.log("Pointer inactive");
 			pointer.active = false;
 			//letGoAnimation();
+			timeout(0.5, syncPrompters);
 			internalPlayAnimation();
 		}
 	}
@@ -540,13 +541,18 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
 	function internalMoveToAnchor( theAnchor ) {
 		// Proceed to anchor only if anchor is valid.
-		if ( document.getElementById( theAnchor ) )
-			moveToCSSAnchor( theAnchor );
-		else
-			if (debug) console.log("Invalid Anchor");
+		if (theAnchor!=-1) {
+			if ( document.getElementById( theAnchor ) )
+				moveToCSSAnchor( theAnchor );
+			else
+				if (debug) console.log("Invalid Anchor");
+		}
 	}
 	
 	function moveToAnchor( theAnchor ) {
+		// Reset localStorage
+		localStorage.setItem("anchor", -1);
+		// Then send actual value.
 		localStorage.setItem("anchor", theAnchor);
 		internalMoveToAnchor( theAnchor );
 	}
@@ -776,7 +782,6 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		if (debug) console.log("Storage event key: "+evt.key);
 			switch (evt.key) {
 				// Uncomment this to enable full localstorage based synchronization (experimental).
-				/*
 				case "direction":
 					var direction = evt.newValue;
 					if (direction>0)
@@ -803,10 +808,10 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 							play=false;
 							break;
 						case "internalPause":
-							requestAnimationFrame(localPauseAnimation;
+							requestAnimationFrame(localPauseAnimation);
 							break;
 					} break;
-				*/
+				
 				case "anchor":
 					internalMoveToAnchor(evt.newValue);
 					break;
