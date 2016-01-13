@@ -1,37 +1,36 @@
-- Currently v2.0a 16.01.13.0 (with Electron) -
+- Currently v2.0a 16.01.13.0 -
 
-Next release: 2.0b
-Milestone set for: Jan 20, 2016
+Next release: 2.0
+Milestone set for: Jan 24, 2016
 
 Keyvan:
-> Correct self closing meta and link tags to html5 standard.
+> Fix TinyMCE bugs.
+> Improve overall index.html.
 > Design "Custom Style" setup options into index.html.
 > Design touch friendly Playback Controls into teleprompter.html.
-> Investigate TinyMCE bugs.
-> If bugs can't be resolved. Insert code to select between TinyMCE and CKEditor.
->> Add inline mode CKEditor and implement features currently present in TinyMCE.
-> Code remember and set values from last time used on index.html.
 > Code relative font size increase and decrease feature.
 	Font size changes must ocurr either at the #prompt pr at the #promptcontainer level.
 
 Rafael:
-> Code sockets.io based communication between remote.html and teleprompter.html.
-	Functions to call at the moment are:
-	toggleAnimation()
-	increaseVelocity()
-	decreaseVelocity()
-	increaseFontSize()*
-	decreaseFontSize()*
-	*Even though these functions are yet to be implemented, they exist. Use console.log() to detect execution.
-> Code sockets.io based communication between remote.html and index.html.
-	Allow sending html from remote.html's editor into index.html.
-	index.html must receive and ask user for authorization before inserting html into it's editor instance.
+> Implement screen detection and automatic FullScreen.
+> Hide top menu bar. Either hide it and make it appear by pressing Alt or remove it entirely.
 > Research on OS X .app package creation.
 
 Javier:
 > Investigate possible remainingTime() bug that prevents true synchronization.
+> Add optional inline CKEditor with features currently present in TinyMCE.
+> Code remember and set values from last time used on index.html.
 > Prepare PhoneGap integration.
 
+Rafael & Javier:
+> Research on how to enable node sockets.io based communication between remote.html and teleprompter.html.
+	Functions to call at the moment are:
+	toggleAnimation()
+	increaseVelocity()
+	decreaseVelocity()
+> Code sockets.io based communication between remote.html and index.html.
+	Allow sending html from remote.html's editor into index.html.
+	index.html must receive and ask user for authorization before inserting html into it's editor instance.
 
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 

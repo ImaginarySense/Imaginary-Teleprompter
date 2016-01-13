@@ -1,5 +1,9 @@
 CHANGELOG
 
+v2.0a 16.01.13.1
+> Correct self closing meta and link tags to html5 standard.
+> Updated ToDo
+
 v2.0a 16.01.13.0
 + Secondary display now runs in Electron.
 + Implemented mechanism to close all teleprompter instances on "Close It!".
