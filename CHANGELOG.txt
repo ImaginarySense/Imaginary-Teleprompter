@@ -1,5 +1,8 @@
 CHANGELOG
 
+v2.0a 16.01.13.6
+> Added TinyMCE "imaginary" theme.
+
 v2.0a 16.01.13.5
 > Updated toolbar for next TinyMCE update.
 
