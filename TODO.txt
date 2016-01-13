@@ -17,7 +17,6 @@ Rafael:
 > Research on OS X .app package creation.
 
 Javier:
-> Investigate possible remainingTime() bug that prevents true synchronization.
 > Add optional inline CKEditor with features currently present in TinyMCE.
 > Code remember and set values from last time used on index.html.
 > Prepare PhoneGap integration.

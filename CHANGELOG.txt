@@ -1,5 +1,8 @@
 CHANGELOG
 
+v2.0a 16.01.13.4
+> Fixed out of sync localstorage based animation.
+
 v2.0a 16.01.13.3
 > Fixed sync jump to anchor.
 

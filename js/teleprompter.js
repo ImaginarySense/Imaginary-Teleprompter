@@ -374,7 +374,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	function getRemainingTime() {
 		var destination = getDestination(),
 			paddingDifference = 0,//(destination===0?getScreenHeight():-getScreenHeight()),
-			time = Math.abs((destination+paddingDifference-getCurrPos())/velocity);
+			time = Math.abs((destination-paddingDifference-getCurrPos())/velocity);
 		if ( isNaN(time) )
 			time = 0;
 		return time;
@@ -570,7 +570,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		// If a timeout is already executing, reset it.
 		if (timeoutStatus)
 			window.clearTimeout(timeoutStatus);
-		// Set: Wait one second before resuming animation
+		// Set: Wait time second before resuming animation
 		timeoutStatus = window.setTimeout(func, time);
 	}
 
@@ -677,7 +677,8 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	}
 
 	function updateFont() {
-		prompt.classList.add();
+		//dev: ToDo
+		//prompt.classList.add();
 	}
 
 	function toc() {
