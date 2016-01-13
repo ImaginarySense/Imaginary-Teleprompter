@@ -1,5 +1,10 @@
 CHANGELOG
 
+v2.0a 16.01.13.2
+> Polish: Added focus iframe on "Prompt It!"
+> Updated ui text.
+> Updated credits
+
 v2.0a 16.01.13.1
 > Correct self closing meta and link tags to html5 standard.
 > Updated ToDo

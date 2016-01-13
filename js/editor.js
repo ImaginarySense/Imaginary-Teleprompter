@@ -216,7 +216,7 @@ var debug;
 			document.getElementById("framecontainer").style.display = "block";
 			// Load teleprompter
 			frame.src = "teleprompter.html?debug=1";
-			// INFO: event.target === document.getElementById("promptIt") and more efficient.
+			frame.focus();
 		}
 
 		// "Secondary"
