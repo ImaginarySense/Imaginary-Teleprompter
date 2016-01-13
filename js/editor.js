@@ -23,7 +23,7 @@ var debug;
 	// Use JavaScript Strict Mode.
 	"use strict";
 	// Global objects
-	var prompterWindow;
+	var prompterWindow, frame;
 
 	function init () {
 		// Set globals
@@ -32,12 +32,12 @@ var debug;
 		// Set DOM javascript controls
 		document.getElementById("prompterStyle").setAttribute("onclick","setStyleEvent(value);");
 		document.getElementById("promptIt").onclick = submitTeleprompter;
-
+		frame = document.getElementById("teleprompterframe");
 		// Set default style
 		setStyle();
 
 		// If running inside Electron...
-		if (navigator.userAgent.indexOf("Electron")!=-1) {			
+		if ( inElectron() ) {			
 			// Import Electron libraries.
 			const ipcRenderer = require('electron').ipcRenderer;
 			// When asynchronous reply from main process, run function to...
@@ -54,6 +54,9 @@ var debug;
 			ipcRenderer.send('asynchronous-message', 'working');
 		}; // end if
 	} // end init()
+
+	// Initialize postMessage event listener.
+	addEventListener("message", listener, false);
 
 	// Instance Editor
 	tinymce.init({
@@ -123,13 +126,56 @@ var debug;
 	function save () {
 		console.log("Save pressed");
 	}
+
+	function inElectron() {
+		return navigator.userAgent.indexOf("Electron")!=-1;
+	}
 	
-	function resetTeleprompter(event) {
-		// Stops the event but continues executing he code.
-	    event.preventDefault();
-		// INFO: event.target === document.getElementById("promptIt") and more efficient.
-	    event.target.textContent = "Prompt It!";
-		event.target.onclick = submitTeleprompter;
+	function listener(event) {
+		// If the event comes from the same domain...
+		//if (event.domain==getDomain())
+			// Act according to the message.
+			switch (event.data) {
+				// Close prompters.
+				case "restoreEditor":
+					restoreEditor();
+					break;
+				// Notify unknown message received.
+				default : if (debug) console.log("Unknown post message received: "+event.data);
+			}
+	}
+
+	function getDomain() {
+		// Get current domain.
+		var domain = document.domain;
+		// If not running on a server, return catchall.
+		if ( domain.indexOf("http://")!=0 || domain.indexOf("https://")!=0 )
+			domain = "*";
+		return domain;
+	}
+
+	function restoreEditor(event) {
+		if (debug) console.log("Restoring editor.");
+
+		// Request to close prompters:
+		// Close frame.
+		if (frame.src.indexOf("teleprompter.html")!=-1)
+			frame.contentWindow.postMessage( "close", getDomain() );
+		// Close window.
+		if (prompterWindow)
+			prompterWindow.postMessage( "close", getDomain() );
+
+		// Stops the event but continues executing current function.
+		if (event&&event.preventDefault)
+			event.preventDefault();
+
+		// Change button and behaviour.
+		// INFO: event.target === document.getElementById("promptIt") and it's more efficient. Unfortunatelly it doesn't cover all use cases.
+		var button = document.getElementById("promptIt");
+		button.innerHTML = "Prompt It!";
+		button.onclick = submitTeleprompter;
+		// Reset DOM
+		//dev: Rewrite index.html for a cleaner way to do the following.
 		document.getElementById("content").style.display = "";
 		document.getElementById("editorcontainer").style.display = "";
 		document.getElementById("footer").style.display = "";
@@ -137,74 +183,81 @@ var debug;
 		document.getElementById("framecontainer").style.display = "none";
 	}
 	
-	// DOM Level functions, allow UI click interaction
-// On change Prompter Style
-function setStyleEvent(prompterStyle) {
-	if (setStyle) {
-		if (debug) console.log(prompterStyle);
-		setStyle(prompterStyle);
-	}
-	//if ( selection ) {
-	//	document.getElementById("editorcontainer").style.background="#FFF";
-	//	document.getElementById("editorcontainer").style.color="#272822";
-	//}
-	//else {
-	//	document.getElementById("editorcontainer").style.background="#272822";
-	//	document.getElementById("editorcontainer").style.color="#FFF";
-	//}
-}
+	//window.addEventListener("beforeunload", restoreEditor);
+	//dev: Añadir caso ESC.
 
-// On "Prompt It!" clicked
-function submitTeleprompter(event) {
-	// Stops the event but continues executing the code.
-	event.preventDefault();
-	// Get html from editor
-	var htmldata = tinymce.get("prompt").getContent();
+	// On "Prompt It!" clicked
+	function submitTeleprompter(event) {
+		if (debug) console.log("Submitting to prompter");
 
-	// Get remaining form data
-	var settings = '{ "data": {"secondary":'+document.getElementById("secondary").value+',"primary":'+document.getElementById("primary").value+',"prompterStyle":'+document.getElementById("prompterStyle").value+',"background":"#3CC","color":"#333", "overlayBg":"#333","focusMode":'+document.getElementById("focus").value+'}}',
-		session = '{ "html":"'+encodeURIComponent(htmldata)+'" }';
-	// Store data locally for prompter to use
-	localStorage.setItem("IFTeleprompterSettings", settings);
-	sessionStorage.setItem("IFTeleprompterSession", session);
+		// Stops the event but continues executing the code.
+		event.preventDefault();
+		// Get html from editor
+		var htmldata = tinymce.get("prompt").getContent();
 
-	// Set and load "Primary"
-	if ( document.getElementById("primary").value>0 ) {
-		// Hide stuff
-		document.getElementById("content").style.display = "none";
-		document.getElementById("editorcontainer").style.display = "none";
-		document.getElementById("footer").style.display = "none";
-		// Show prompter frame
-		document.getElementById("framecontainer").style.display = "block";
-		// Load teleprompter
-		document.getElementById("teleprompterframe").src = "teleprompter.html?debug=1";
-		// INFO: event.target === document.getElementById("promptIt") and more efficient.
-		event.target.textContent = "Reset...";
-		event.target.onclick = resetTeleprompter;
+		// Get remaining form data
+		var settings = '{ "data": {"secondary":'+document.getElementById("secondary").value+',"primary":'+document.getElementById("primary").value+',"prompterStyle":'+document.getElementById("prompterStyle").value+',"background":"#3CC","color":"#333", "overlayBg":"#333","focusMode":'+document.getElementById("focus").value+'}}',
+			session = '{ "html":"'+encodeURIComponent(htmldata)+'" }';
+		
+		// Store data locally for prompter to use
+		localStorage.setItem("IFTeleprompterSettings", settings);
+		if (inElectron())
+			localStorage.setItem("IFTeleprompterSession", session);
+		else
+			sessionStorage.setItem("IFTeleprompterSession", session);
+		
+		// Set and load "Primary"
+		if ( document.getElementById("primary").value>0 ) {
+			// Hide stuff
+			document.getElementById("content").style.display = "none";
+			document.getElementById("editorcontainer").style.display = "none";
+			document.getElementById("footer").style.display = "none";
+			// Show prompter frame
+			document.getElementById("framecontainer").style.display = "block";
+			// Load teleprompter
+			frame.src = "teleprompter.html?debug=1";
+			// INFO: event.target === document.getElementById("promptIt") and more efficient.
+		}
+
+		// "Secondary"
+		if ( document.getElementById("secondary").value>0 ) {
+			prompterWindow = window.open("teleprompter.html?debug=1",'TelePrompter Output','height='+screen.availHeight+', width='+screen.width+', top=0, left='+screen.width+', fullscreen=1, status=0, location=0, menubar=0, toolbar=0' );
+			if (window.focus)
+			prompterWindow.focus();
+		}
+
+		// In case of both
+		// In case of none
+		if ( !(document.getElementById("primary").value>0 || document.getElementById("secondary").value>0) )
+			window.alert("You must prompt at least to one display.");
+		else {
+			event.target.textContent = "Close It...";
+			event.target.onclick = restoreEditor;	
+		}
 	}
 
-	// "Secondary"
-	if ( document.getElementById("secondary").value>0 ) {
-		prompterWindow = window.open("teleprompter.html?debug=1",'TelePrompter Output','height='+screen.availHeight+', width='+screen.width+', top=0, left='+screen.width+', fullscreen=1, status=0, location=0, menubar=0, toolbar=0' );
-		if (window.focus)
-		prompterWindow.focus();
+	// On change Prompter Style
+	function setStyleEvent(prompterStyle) {
+		if (setStyle) {
+			if (debug) console.log(prompterStyle);
+			setStyle(prompterStyle);
+		}
 	}
 
-	// In case of both
-	/*
-	if ( $("#primary").value>0 && $("#secondary").value>0 ) {
-		console.log(teleprompterframe.contentWindow);
-		console.log(prompterWindow);
-		localStorage.setItem('primaryInstance', teleprompterframe.contentWindow);
-		localStorage.setItem('secondaryInstance', prompterWindow);
-	}
-	// In case of none
-	else if ( !($("#primary").value>0 || $("#secondary").value>0) ) {
-		window.alert("You must prompt at least to one 'display'.");
-	}
-	*/
-}
-	
+	document.onkeydown = function( evt ) {
+		evt = evt || window.event;
+		// keyCode is announced to be deprecated but not all browsers support key as of 2015.
+		if (evt.key === undefined)
+			evt.key = evt.keyCode;
+		//if (debug) console.log("Key: "+evt.key);
+		switch ( evt.key ) {
+			case "Escape":
+			case 27: // ESC
+				restoreEditor();
+				break;
+		}
+	};
+		
 	// Initialize objects after DOM is loaded
 	if (document.readyState === "interactive" || document.readyState === "complete")
 		// Call init if the DOM (interactive) or document (complete) is ready.
@@ -212,5 +265,4 @@ function submitTeleprompter(event) {
 	else
 		// Set init as a listener for the DOMContentLoaded event.
 		document.addEventListener("DOMContentLoaded", init);
-
 }());

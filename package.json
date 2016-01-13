@@ -1,7 +1,7 @@
 {
 	"_comment": "0061 = a (Alpha), 0062 = b (Beta), 0072 = r (Release)",
 	"name": "Teleprompter",
-	"version": "2.0.0061.16.01.08.001",
+	"version": "2.0.16.01.13.0",
 	"description": "The most complete and professional free software teleprompter app on the web.",
 	"main": "main.js",
 	"scripts": {

@@ -30,7 +30,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	// Global objects
 	var settings, session, prompt, pointer, overlay, overlayFocus, styleElement, styleSheet, argument;
 	// Global variables
-	var unit, x, velocity, sensitivity, speedMultip, limit, relativeLimit, play, timeoutStatus, invertedWheel, focus, promptStyleOption, customStyle, flipV, flipH, fontSize, previousPromptHeight, previousScreenHeight, previousScreenWidth, previousVerticalDisplacementCorrector, tic, debug;
+	var unit, x, velocity, sensitivity, speedMultip, limit, relativeLimit, play, timeoutStatus, invertedWheel, focus, promptStyleOption, customStyle, flipV, flipH, fontSize, previousPromptHeight, previousScreenHeight, previousScreenWidth, previousVerticalDisplacementCorrector, tic, debug, closing;
 	// Global constants
 	var transitionDelays = 500,
 		timeoutDelay = 500;
@@ -63,10 +63,11 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		// Evaluate it to boolean expresion.
 		debug = debug>0||debug=="true";
 
-		// Init variables
+		// Init variables. Do not change these unless you know what you are doing.
 		x = 0;
-		velocity = 0;
+		velocity = 0;closing
 		tic = false;
+		closing = false;
 		
 		// Animation settings
 		play = true;
@@ -79,7 +80,11 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		
 		// Local Storage and Session data
 		settings = JSON.parse(localStorage.getItem('IFTeleprompterSettings'));
-		session = JSON.parse(sessionStorage.getItem('IFTeleprompterSession'));
+		if (inElectron())
+			session = JSON.parse(localStorage.getItem('IFTeleprompterSession'));
+		else
+			session = JSON.parse(sessionStorage.getItem('IFTeleprompterSession'));
+
 		// Get focus mode
 		focus = settings.data.focusMode;
 		// Get prompter style
@@ -223,13 +228,45 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	}
 	*/
 
-	function returnToEditor() {
-		if (inIframe()) {
-			document.location.href = "about:blank";
-			//dev: Send message to index.html and let index take care of restoring its interface:
+	function restoreRequest() {
+		// "closing" mutex prevents infinite loop.
+		if (debug) console.log("Restore request.");
+		// Locate editor
+		var editor;
+		if (window.opener)
+			editor = window.opener;
+		else if (window.top)
+			editor = window.top;
+		// If we have normal access to the editor, request it to restore the prompters.
+		if (editor)
+			editor.postMessage( "restoreEditor", getDomain() );
+	}
+
+	function closeInstance() {
+		if (!closing) {
+			closing = true;
+			// Finally, close this window or clear iFrame. The editor must not be the one who closes cause it could cause an infinite loop.
+			if ( inIframe() ) {
+				if (debug) console.log("Closing iFrame prompter.");
+				document.location = "about:blank";//"blank.html";
+			}
+			else {
+				if (debug) console.log("Closing window prompter.");
+				window.close();
+			}
 		}
-		else
-			window.close();
+	}
+
+	// On close
+	window.addEventListener("beforeunload", restoreRequest);
+
+	function getDomain() {
+		// Get current domain.
+		var domain = document.domain;
+		// If not running on a server, return catchall.
+		if ( domain.indexOf("http://")!=0 || domain.indexOf("https://")!=0 )
+			domain = "*";
+		return domain;
 	}
 
 	function inIframe() {
@@ -241,7 +278,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	}
 
 	function setFlips() {
-		//dev: Add support for real-time flipping.
+		//dev@javi: Add support for real-time flipping.
 		// Both flips
 		if (flipH&&flipV) {
 			//prompt.classList.add("flipHV");
@@ -307,7 +344,6 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	function getTransitionEnd() {
 		// Transition var and transition list.
 		var transitionEnd = ['webkitTransitionEnd',
-					'transitionend',
 					"oTransitionEnd",
 					'MSTransitionEnd',
 					'transitionend'];
@@ -822,7 +858,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 				break;
 			case "Escape":
 			case 27: // ESC
-				returnToEditor();
+				closeInstance();
 				break;
 			default: // Move to anchor.
 				// If pressed any number from 0 to 9.
@@ -837,6 +873,27 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		// Prevent arrow and spacebar scroll bug.
 		if ([" ","ArrowUp","ArrowDown","ArrowLeft","ArrowRight",32,37,38,39,40].indexOf(evt.key) > -1) evt.preventDefault();
 	};
+
+	function listener(event) {
+		// If the event comes from the same domain...
+		//if (event.domain==getDomain())
+			// Act according to the message.
+			switch (event.data) {
+				// Close prompters.
+				case "close":
+					closeInstance();
+					break;
+				// Notify unknown message received.
+				default : if (debug) console.log("Unknown post message received: "+event.data);
+			}
+	}
+
+	// Initialize postMessage event listener.
+	addEventListener("message", listener, false);
+
+	function inElectron() {
+		return navigator.userAgent.indexOf("Electron")!=-1;
+	}
 
 	// Initialize objects after DOM is loaded
 	if (document.readyState === "interactive" || document.readyState === "complete")

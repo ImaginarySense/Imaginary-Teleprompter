@@ -47,7 +47,6 @@ app.on('ready', function() {
 		event.sender.send('asynchronous-reply', 'Done');
 	});
 
-
 	// Emitted when the window is closed.
 	mainWindow.on('closed', function(){
 		mainWindow = null;

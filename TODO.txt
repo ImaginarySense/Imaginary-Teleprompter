@@ -1,6 +1,6 @@
-- Currently v2.0a 16.01.03 build 014 (with Electron) -
+- Currently v2.0a 16.01.13.0 (with Electron) -
 
-Next release: 2.0
+Next release: 2.0b
 Milestone set for: Jan 20, 2016
 
 Keyvan:
@@ -15,7 +15,6 @@ Keyvan:
 	Font size changes must ocurr either at the #prompt pr at the #promptcontainer level.
 
 Rafael:
-> Override window.open in index.html to successfully load teleprompter.html in Electron.
 > Code sockets.io based communication between remote.html and teleprompter.html.
 	Functions to call at the moment are:
 	toggleAnimation()
@@ -31,7 +30,6 @@ Rafael:
 
 Javier:
 > Investigate possible remainingTime() bug that prevents true synchronization.
-> Research alternative synchronization methods.
 > Prepare PhoneGap integration.
 
 
