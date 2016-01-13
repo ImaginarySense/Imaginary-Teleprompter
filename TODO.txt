@@ -1,4 +1,4 @@
-- Currently v2.0a 16.01.13.0 -
+- Currently v2.0a 16.01.13.5 -
 
 Next release: 2.0
 Milestone set for: Jan 24, 2016
@@ -17,7 +17,6 @@ Rafael:
 > Research on OS X .app package creation.
 
 Javier:
-> Add optional inline CKEditor with features currently present in TinyMCE.
 > Code remember and set values from last time used on index.html.
 > Prepare PhoneGap integration.
 

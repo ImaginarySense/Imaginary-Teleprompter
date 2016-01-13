@@ -71,8 +71,7 @@ var debug;
 		editor_css : "css/tinymce.css",
 		//content_css : '/css/prompt.css',
 		plugins: "advlist anchor save charmap code colorpicker contextmenu directionality emoticons fullscreen hr image media lists nonbreaking paste print searchreplace spellchecker table textcolor wordcount imagetools insertdatetime",
-		toolbar: ['undo redo | styleselect | bold italic underline strikethrough | superscript subscript | forecolor backcolor | image',
-			'anchor | save | bullist numlist | alignleft aligncenter alignright | charmap searchreplace fullscreen'],
+		toolbar: ['anchor | save | undo redo | styleselect | bold italic underline strikethrough | superscript subscript | forecolor backcolor | bullist numlist | alignleft aligncenter alignright | charmap image | searchreplace fullscreen'],
 		contextmenu: "copy cut paste pastetext | anchor | image charmap",
 		menu: {
 			file: {title: 'File', items: 'newdocument print'},
