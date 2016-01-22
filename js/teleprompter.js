@@ -374,7 +374,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	function getRemainingTime() {
 		var destination = getDestination(),
 			paddingDifference = 0,//(destination===0?getScreenHeight():-getScreenHeight()),
-			time = Math.abs((destination-paddingDifference-getCurrPos())/velocity);
+			time = Math.abs((destination+paddingDifference-getCurrPos())/velocity);
 		if ( isNaN(time) )
 			time = 0;
 		return time;
