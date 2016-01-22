@@ -32,7 +32,7 @@ v2.0a 16.01.13.0
 v2.0a 16.01.08 build 001 (with Electron)
 + Improve code efficiency.
 + Moved Prompt It! styling to css.
-+ Implemented Reset... ("Close It!'s" restore editor)f
++ Implemented Reset... ("Close It!'s" restore editor)
 
 v2.0a 16.01.03 build 014 (with Electron)
 + Performance improvements and asynchronious bug fixes by making use of requestAnimationFrame().
