@@ -87,6 +87,7 @@ var debug;
 			editor.on("blur", function () { return false; });
 			// On editor clicked, go to fullscreen.
 			//dev: This is meant to be inserted into it's own TinyMCE Button.
+			/*
 			editor.on("click", function() {
 				var elem = document.getElementById("editorcontainer");
 				if (elem.requestFullscreen) {
@@ -99,6 +100,7 @@ var debug;
 					elem.webkitRequestFullscreen();
 				}
 			});
+			*/
 		},
 		/*
 		style_formats: [
@@ -185,6 +187,19 @@ var debug;
 	//window.addEventListener("beforeunload", restoreEditor);
 	//dev: Añadir caso ESC.
 
+	function doFullScreen() {
+		var elem = document.getElementById("editorcontainer");
+			if (elem.requestFullscreen) {
+				elem.requestFullscreen();
+			} else if (elem.msRequestFullscreen) {
+				elem.msRequestFullscreen();
+			} else if (elem.mozRequestFullScreen) {
+				elem.mozRequestFullScreen();
+			} else if (elem.webkitRequestFullscreen) {
+				elem.webkitRequestFullscreen();
+			}
+	}
+
 	// On "Prompt It!" clicked
 	function submitTeleprompter(event) {
 		if (debug) console.log("Submitting to prompter");
@@ -235,14 +250,6 @@ var debug;
 		}
 	}
 
-	// On change Prompter Style
-	function setStyleEvent(prompterStyle) {
-		if (setStyle) {
-			if (debug) console.log(prompterStyle);
-			setStyle(prompterStyle);
-		}
-	}
-
 	document.onkeydown = function( evt ) {
 		evt = evt || window.event;
 		// keyCode is announced to be deprecated but not all browsers support key as of 2015.
@@ -250,6 +257,11 @@ var debug;
 			evt.key = evt.keyCode;
 		//if (debug) console.log("Key: "+evt.key);
 		switch ( evt.key ) {
+			case "F11":
+			case 122:
+				evt.preventDefault();
+				doFullScreen();
+				break;
 			case "Escape":
 			case 27: // ESC
 				restoreEditor();
@@ -265,3 +277,11 @@ var debug;
 		// Set init as a listener for the DOMContentLoaded event.
 		document.addEventListener("DOMContentLoaded", init);
 }());
+
+// On change Prompter Style
+function setStyleEvent(prompterStyle) {
+	if (setStyle) {
+		if (debug) console.log(prompterStyle);
+		setStyle(prompterStyle);
+	}
+}

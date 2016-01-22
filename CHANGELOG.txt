@@ -1,5 +1,8 @@
 CHANGELOG
 
+v2.0a 16.01.22.0
+> Added Fullscreen editor mode for when F11 is pressed.
+
 v2.0a 16.01.13.6
 > Added TinyMCE "imaginary" theme.
 
@@ -29,7 +32,7 @@ v2.0a 16.01.13.0
 v2.0a 16.01.08 build 001 (with Electron)
 + Improve code efficiency.
 + Moved Prompt It! styling to css.
-+ Implemented Reset... ("Close It!'s" restore editor)
++ Implemented Reset... ("Close It!'s" restore editor)f
 
 v2.0a 16.01.03 build 014 (with Electron)
 + Performance improvements and asynchronious bug fixes by making use of requestAnimationFrame().
