@@ -40,18 +40,29 @@ var debug;
 		if ( inElectron() ) {			
 			// Import Electron libraries.
 			const ipcRenderer = require('electron').ipcRenderer;
+            var screen = require('electron').screen //Returns the object returned by require(electron.screen) in the main process.
 			// When asynchronous reply from main process, run function to...
 			ipcRenderer.on('asynchronous-reply', function(event, arg) {
 				// Get the "exteral" classes and update each link to load on an actual browser.
 				var classTags = document.getElementsByClassName('external');
+                var idTags = document.getElementById('secondary');
 				for (var i = 0; i < classTags.length; i++)
 					if (classTags[i].href != " ") {
 						classTags[i].setAttribute("onclick","require('shell').openExternal('" + classTags[i].href + "'); return false;");
 						classTags[i].href = "#";
 						classTags[i].target = "_parent";
-					}
-			});
-			ipcRenderer.send('asynchronous-message', 'working');
+					} 
+              // Checks if a display was added, then enables secondary screen botton.               
+            screen.on('display-added', function(event, oldDisplay){
+               // idTags.setAttribute("disabled", "false", "return false;"); 
+                idTags.removeAttribute("disabled", "return false;");
+                });   
+               // Checks if the display was removed, then disables secondary screen botton.  
+            screen.on('display-removed', function(event, oldDisplay){
+                idTags.setAttribute("disabled", "disabled", "return false;"); 
+                }); 
+			});  
+			ipcRenderer.send('asynchronous-message', 'working');    
 		}; // end if
 	} // end init()
 
@@ -203,6 +214,7 @@ var debug;
 	// On "Prompt It!" clicked
 	function submitTeleprompter(event) {
 		if (debug) console.log("Submitting to prompter");
+        const ipcRenderer = require('electron').ipcRenderer;
 
 		// Stops the event but continues executing the code.
 		event.preventDefault();
@@ -222,6 +234,11 @@ var debug;
 		
 		// Set and load "Primary"
 		if ( document.getElementById("primary").value>0 ) {
+            // Checks if is running on electron app...
+           if(navigator.userAgent.indexOf("Electron")!=-1){
+              ipcRenderer.send('make-fullscreen');         
+           }
+            
 			// Hide stuff
 			document.getElementById("content").style.display = "none";
 			document.getElementById("editorcontainer").style.display = "none";
@@ -235,11 +252,37 @@ var debug;
 
 		// "Secondary"
 		if ( document.getElementById("secondary").value>0 ) {
-			prompterWindow = window.open("teleprompter.html?debug=1",'TelePrompter Output','height='+screen.availHeight+', width='+screen.width+', top=0, left='+screen.width+', fullscreen=1, status=0, location=0, menubar=0, toolbar=0' );
-			if (window.focus)
-			prompterWindow.focus();
-		}
+				// Checks if is running on electron app...
+		if (navigator.userAgent.indexOf("Electron")!=-1) {
+			 // Imported libraries for the us of externalDisplay...
+				const remote = require('electron').remote; //Returns the object returned by require(electron) in the main process.
+				const BrowserWindow = remote.BrowserWindow; //Returns the object returned by require(electron.BrowserWindow) in the main process.
+				var screen = require('electron').screen //Returns the object returned by require(electron.screen) in the main process.
 
+				//var electronScreen = electron.screen; // Module that retrieves information about screen size, displays,
+				// cursor position, etc. Important: You should not use this module until the ready event of the app module is Emitted.
+				var displays = screen.getAllDisplays(); // Returns an array of displays that are currently  available.
+				var externalDisplay = null;
+				for (var i in displays) {
+					if (displays[i].bounds.x != 0 || displays[i].bounds.y != 0) {
+							externalDisplay = displays[i]; // externalDisplay recives all available displays.
+							break;
+							}
+						}
+   
+				// If there are any externalDisplay; then create a new window for the display.
+   			if(externalDisplay){
+	       		    //mainWindow = new BrowserWindow({x: externalDisplay.bounds.x + 50, y: externalDisplay.bounds.y + 50, title: 'Teleprompter', fullscreen: true});
+	       			//mainWindow.loadURL('file://' + __dirname + '/teleprompter.html'); // load the teleprompter.html file when the mainWindow is created.
+                       prompterWindow = window.open("teleprompter.html?debug=1",'TelePrompter Output','height='+externalDisplay.bounds.y + 50 +', width='+externalDisplay.bounds.x + 50 +', top=0, left='+screen.width+', fullscreen=1, status=0, location=0, menubar=0, toolbar=0');
+	 						}
+		} else {
+				prompterWindow = window.open("teleprompter.html?debug=1",'TelePrompter Output','height='+externalDisplay.bounds.y+', width='+externalDisplay.bounds.x+', top=0, left='+screen.width+', fullscreen=1, status=0, location=0, menubar=0, toolbar=0' );
+				if (window.focus)
+			 	prompterWindow.focus();
+		}
+	}
+    
 		// In case of both
 		// In case of none
 		if ( !(document.getElementById("primary").value>0 || document.getElementById("secondary").value>0) )

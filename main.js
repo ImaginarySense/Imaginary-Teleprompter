@@ -24,9 +24,12 @@ const BrowserWindow = electron.BrowserWindow; // Module to create native browser
 //handles asynchronous and synchronous messages sent from a renderer process (web page).
 const ipcMain = require('electron').ipcMain;
 const shell = require('electron').shell; // Module that provides functions related to desktop integration.
+const globalShortcut = electron.globalShortcut;// module can register/unregister a global keyboard shortcut with the operating system so that you can customize the operations for various shortcuts.
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 var mainWindow = null;
+// The menu class is used to create native menus that can be used as application menus and context menus.
+var Menu = require('menu');
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
@@ -41,11 +44,46 @@ app.on('ready', function() {
 
 	// and load the index.html of app.
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
-
-	//
+    
+    // Creates a Null menu..
+    var menu = Menu.buildFromTemplate([]);
+    Menu.setApplicationMenu(menu);
+    
+	// this function sends a message to the renderer process...
 	ipcMain.on('asynchronous-message', function(event, arg) {
 		event.sender.send('asynchronous-reply', 'Done');
 	});
+    
+    // this function sends a message to the renderer process...
+    ipcMain.on('make-fullscreen', function(event) {
+       mainWindow.setFullScreen(true);
+    });
+
+  // Register a 'F8' shortcut listener.
+  var ret = globalShortcut.register('F8', function() {
+    mainWindow.openDevTools();
+  });
+  
+  var ret2 = globalShortcut.register('F12', function() {
+      mainWindow.setFullScreen(false);
+  });
+
+  if (!ret || !ret2) {
+    console.log('registration failed');
+  }
+
+  // Check whether a shortcut is registered.
+  console.log(globalShortcut.isRegistered('F8'));
+  console.log(globalShortcut.isRegistered('F12'));
+  
+  app.on('will-quit', function() {
+  // Unregister a shortcut.
+  globalShortcut.unregister('F8');
+  globalShortcut.unregister('F12');
+
+  // Unregister all shortcuts.
+  globalShortcut.unregisterAll();
+});
 
 	// Emitted when the window is closed.
 	mainWindow.on('closed', function(){
