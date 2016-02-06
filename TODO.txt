@@ -1,91 +1,91 @@
-- Currently v2.0a 16.01.13.5 -
++ Teleprompter Schedule +
+- Current version: v2.0a build 16.02.6.0 -
+
+Note: Unless otherwise specified, developers may move ahead of schedule and work on their code for the next release.
+
+Next release: 2.0b
+Milestone set for: Feb 22, 2016
+Comment: I'm scheduling as if we only had weekends to work on this.
+
+- Keyvan -
+1. Editor: Fix TinyMCE menu bug.
+2. Editor: Fix TinyMCE toolbar bug.
+
+- Rafael -
+1. Editor: When leaving prompter mode, if in fullscreen, toggle out of Fullscreen when restoreEditor(event) runs.
+2. Editor: Wait for Keyvan to finish fixing TinyMCE bugs.
+	If user enters fullscreen in editor mode, make only the editor fulscreen, not the rest of the user interface.
+
+- Javier -
+1. Teleprompter: Fix bad sync on single vertical flip.
+2. Teleprompter: Cap command input per given time. 
+3. Teleprompter: Code relative font size increase and decrease feature.
+	Font size changes must ocurr either at the #prompt or at the #promptcontainer level.
+
+- Victor -
+1. Editor: Add color selection prompt for when user selects "Custom Style" option in index.html.
+2. Editor: Remember and set values from last session on startup and exit of index.html.
+
 
 Next release: 2.0
-Milestone set for: Jan 24, 2016
+Milestone set for: March 7, 2016
+Comment: Going Mobile!
+
+- Keyvan -
+1. Editor: Minimum HTML code improvements.
+2. Packages: Create Chrome OS app.
+
+- Rafael -
+2. Packages: Create OS X .app package.
+
+- Victor -
+1. Packages: Create Windows Installer.
+
+- Javier -
+1. Packages: Create deb and rpm installers.
+2. Packages: Test every installer.
+3. Web: Create teleprompter download website.
+
+
+Next release: 2.1*
+Milestone set for: April 4, 2016
+Comment: Going Mobile!
 
 Keyvan:
-> Fix TinyMCE bugs.
-> Improve overall index.html.
-> Design "Custom Style" setup options into index.html.
-> Design touch friendly Playback Controls into teleprompter.html.
-> Code relative font size increase and decrease feature.
-	Font size changes must ocurr either at the #prompt pr at the #promptcontainer level.
+1. Design touch friendly Playback Controls for teleprompter.html.
 
 Rafael:
-> Implement screen detection and automatic FullScreen.
-> Hide top menu bar. Either hide it and make it appear by pressing Alt or remove it entirely.
-> Research on OS X .app package creation.
+1. Setup sockets integration between remote.html and editor.html.
+2. Send commands from app's remote to pc's editor.
+3. Pull and push Text to from and to editor.
 
 Javier:
-> Code remember and set values from last time used on index.html.
-> Prepare PhoneGap integration.
+1. Setup PhoneGap version.
+2. Create additional mobile UIs.
+3. Add network setup options.
 
-Rafael & Javier:
-> Research on how to enable node sockets.io based communication between remote.html and teleprompter.html.
-	Functions to call at the moment are:
-	toggleAnimation()
-	increaseVelocity()
-	decreaseVelocity()
-> Code sockets.io based communication between remote.html and index.html.
-	Allow sending html from remote.html's editor into index.html.
-	index.html must receive and ask user for authorization before inserting html into it's editor instance.
 
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+Next release: 2.2
+Milestone set for: Pending.
+Comment: We'll do this here and not before, to save time.
+> Add variable sensitivity...
 
-LONG TERM REFERENCE:
 
-Priorities: [ high, normal, low ]
+Next release: 2.3
+Milestone set for: Pending.
+Comment: 私はテレプロンプターが好き！
+> Add language translations.
 
-Normal
-Code Save/Load Interface for prompt files in localStorage.
-Code Import html and Export html options.
 
-Multi-ventana, High
-> Detección de pantallas en Electron y entrar a Fullscreen en Electron.
-> Alternativa a sincronización de teleprompters aparte de localStorage
-> Crear evento para restaurar los estilos del Primary Display al salir de un teleprompter
-> Perfeccionar manejo de eventos de puntero.
-> Programar cambio de acción en botón "Prompt It!"/"Close It!"
+Next release: 3.0*
+Milestone set for: Pending.
+Comment: Rewrite multi-window. Implement our own Electron to get multiple outputs of the same site.
 
-Desktop app, normal
 
-- Release for Chrome App Store -
-- Release as Desktop App -
+Next release: 4.0*
+Milestone set for: Pending.
+Comment: Auto advance with speech recognition libraries.
 
-Fullscreen, baja
-> Crear botón en la interfaz gráfica
-> Dar aviso al cargar teleprompter.html que diga que el usuario presione F11 para entrar a fullscreen. El aviso hará fadeOut a los tres segundos.
-> Resolver conflicto de eventos al salir de fullscreen al oprimir ESC, posible mensaje al detectar salida: "Oprima ESC para volver al editor". Sólo mostrar mensaje dentro del iFrame.
 
-Scroll to any anchor, baja
-> Programar teclado para que cuando el usuario presione '.', pueda entrar cualquier otra tecla y el prompter haga un move to anchor a la misma
+*We'll probably do a Kickstarter to develop some or all of these versions.
 
-Sensitividad variable, baja
-> Crear evento para ajustar la sensitividad
-> Añadir control que permita ajustar la sensitividad
-> Programar atajos de teclado
-
-- Release 1.5 -
-
-Sockets, normal
-> Broadcast instancia del teleprompter a red local
-> Permitir comunicación entre app móbil y app local
-> Permitir descargar el texto actualmente en el prompter
-
-- 1.6a -
-
-Distribución móvil, baja
-> Incorporar cordova.js
-> Crear versión de Android
-> Crear versión de iPhone
-> Crear versión de Windows Phone
-> Crear versión de Firefox OS
-
-- Mobile releases 1.5 -
-
-Mecanismos de control remoto, baja
-Conseguir la data que está siendo broadcasted, baja
-
-- Release 1.6 -
-
-Incorporar mecanismo de traducción y traducción al español, baja

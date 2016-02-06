@@ -45,26 +45,25 @@ app.on('ready', function() {
 	// and load the index.html of app.
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
     
-    // Creates a Null menu..
-    var menu = Menu.buildFromTemplate([]);
-    Menu.setApplicationMenu(menu);
+  // Disables menu in systems where it can be disabled.
+  Menu.setApplicationMenu(null);
     
-	// this function sends a message to the renderer process...
+	// Send a message to the renderer process...
 	ipcMain.on('asynchronous-message', function(event, arg) {
 		event.sender.send('asynchronous-reply', 'Done');
 	});
     
-    // this function sends a message to the renderer process...
-    ipcMain.on('make-fullscreen', function(event) {
-       mainWindow.setFullScreen(true);
-    });
+  // Send a message to the renderer process...
+  ipcMain.on('make-fullscreen', function(event) {
+     mainWindow.setFullScreen(true);
+  });
 
   // Register a 'F8' shortcut listener.
   var ret = globalShortcut.register('F8', function() {
     mainWindow.openDevTools();
   });
   
-  var ret2 = globalShortcut.register('F12', function() {
+  var ret2 = globalShortcut.register('F11', function() {
       mainWindow.setFullScreen(false);
   });
 
@@ -74,12 +73,12 @@ app.on('ready', function() {
 
   // Check whether a shortcut is registered.
   console.log(globalShortcut.isRegistered('F8'));
-  console.log(globalShortcut.isRegistered('F12'));
+  console.log(globalShortcut.isRegistered('F11'));
   
   app.on('will-quit', function() {
   // Unregister a shortcut.
   globalShortcut.unregister('F8');
-  globalShortcut.unregister('F12');
+  globalShortcut.unregister('F11');
 
   // Unregister all shortcuts.
   globalShortcut.unregisterAll();
