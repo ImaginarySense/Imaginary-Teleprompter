@@ -38,7 +38,7 @@ var debug;
 		debug = true;
 
 		// Set DOM javascript controls
-		document.getElementById("prompterStyle").setAttribute("onclick","setStyleEvent(value);");
+		document.getElementById("prompterStyle").setAttribute("onchange","setStyleEvent(value);");
 		document.getElementById("promptIt").onclick = submitTeleprompter;
 		frame = document.getElementById("teleprompterframe");
 		// Set default style
