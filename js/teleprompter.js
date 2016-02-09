@@ -85,7 +85,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		if (inElectron())
 			session = JSON.parse(localStorage.getItem('IFTeleprompterSession'));
 		else
-			session = JSON.parse(localStorage.getItem('IFTeleprompterSession'));
+			session = JSON.parse(sessionStorage.getItem('IFTeleprompterSession'));
 
 		// Locate and set editor
 		if (window.opener)
