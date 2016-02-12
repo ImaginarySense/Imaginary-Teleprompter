@@ -42,8 +42,7 @@ var debug;
 		document.getElementById("promptIt").onclick = submitTeleprompter;
 		frame = document.getElementById("teleprompterframe");
 		// Set default style and option style
-		setStyle(0);
-        	document.getElementById("prompterStyle").value = 0;
+		setStyle(document.getElementById("prompterStyle").value);
 		// Set domain to current domain.
 		setDomain();
 
