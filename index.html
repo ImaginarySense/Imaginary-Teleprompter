@@ -35,7 +35,8 @@
 	<link rel="stylesheet" href="css/prompt.css">
 	<link rel="stylesheet" href="css/teleprompter-themes.css">
 	<link rel="stylesheet" href="css/mobilehide.css">
-	<script src="tinymce/tinymce.min.js"></script>
+	<script src="ckeditor/ckeditor.js"></script>
+	<!--<script src="tinymce/tinymce.min.js"></script>-->
 	<script src="js/editor.js"></script>
 	<script src="js/teleprompter-themes.js"></script>
 	<script src="js/social.js"></script>
@@ -67,7 +68,7 @@
 				<div class='row'>
 					<div class='col-md-3'>
 						<!--<label for="basic-url">Flip mode</label>-->
-						<label for="basic-url">Primary display</label>
+						<label for="basic-url">In-frame prompter</label>
 						<select class="form-control" id="primary" name="primary">
 							<option value="0">Don't prompt on this window</option>
 							<option value="1" selected="selected">Normal (Don't Flip)</option>
@@ -77,7 +78,7 @@
 						</select>
 					</div>
 					<div class='col-md-3'>
-						<label for="basic-url">Secondary display</label>
+						<label for="basic-url">External prompter</label>
 						<select class="form-control" id="secondary" name="secondary">
 							<option value="0">Disabled</option>
 							<option value="1" selected="selected">Normal (Don't Flip)</option>
@@ -97,7 +98,7 @@
 						</select>
 					</div>
 					<div class='col-md-3'>
-						<label for="basic-url">Focus</label>
+						<label for="basic-url">Focus area</label>
 						<select class="form-control" id="focus" name="focus">
 							<option value="3">None</option>
 							<option value="1">Top (webcam)</option>
@@ -109,9 +110,9 @@
 			</div>
 		</div>
 		<div id="editorcontainer">
-			<div id="fixedToolbarContainer"></div>
+			<div id="toolbar"></div>
 			<div id="promptcontainer">
-				<div id="prompt">
+				<div id="prompt" contenteditable="true">
 	<h3>Welcome to Teleprompter!</h3>
 	<p>Are you ready to tell your story?</p>
 	<br>
@@ -120,10 +121,10 @@
 	<h3>Here are some of our features:</h3>
 	<ol>
 		<li>Speed controls with the Arrow keys, WASD keys and the mouse wheel.</li>
-		<li>Multi-screen support allows for differently flipped variants of the same prompt, all in sync.</li>
-		<li>Different focus modes allows using Teleprompter with a webcam, a tablet, or professional teleprompter systems.</li>
+		<li>Multi-screen feature allows you to monitor your prompt w.</li>
+		<li>Different focus modes allow you to easilly use Teleprompter with a webcam, a tablet, or professional teleprompter equipment.</li>
 		<li>Flip modes allow <em>mirroring</em> the prompter in every possible way.</li>
-		<li><a id="5"></a>By setting up anchors with the numbers '0' through '9', you can instantly jump to any part of the script. Try pressing '5' now!</li>
+		<li>By setting up anchors with the numbers '0' through '9', you can instantly jump to any part of the script. <a id="5" name="5">Try pressing '5' now!</a></li>
 		<li>Our Rich Text Editor gives unlimited possibilities on what you can prompt.</li>
 		<li>You may also customize your background and general text color.</li>
 		<li>Teleprompter 2.0 and forth uses CSS transitions so animations will be hardware accelerated.</li>
@@ -145,6 +146,7 @@
 	<p>###</p>
 				</div>
 			</div>
+			<div id="statusbar"></div>
 		</div>
 	</form>
 	<!-- Footer -->
@@ -157,7 +159,7 @@
 
 			<p>Code licensed under <a rel="license" href="LICENSE" target="_blank">GPL3</a>, assets under <a class="external" rel="license" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.</p>
 			<ul class="bs-docs-footer-links">
-				<li>Currently v2.0a (16.02.06.0)</li>
+				<li>Currently v2.0a (16.02.14.0)</li>
 				<li>&middot;</li>
 				<li><a class="external" target="_blank" href="https://github.com/imaginaryfilms/Teleprompter.git">Source</a></li>
 				<li>&middot;</li>
@@ -169,4 +171,20 @@
 		<iframe id="teleprompterframe" src="blank.html" class="fullsize"></iframe>
 	</div>
 </body>
+<script type="text/javascript">
+if (typeof CKEDITOR!=="undefined") {
+	// Turn off automatic editor creation first.
+	CKEDITOR.disableAutoInline = true;
+	// Create editor
+	CKEDITOR.inline( 'prompt', {
+		// To enable source code editing in a dialog window, inline editors require the "sourcedialog" plugin.
+		extraPlugins: 'sharedspace,sourcedialog',
+		removePlugins: 'floatingspace,maximize,resize',
+		sharedSpaces: {
+			top: 'toolbar',
+			bottom: 'statusbar'
+		}
+	} );
+}
+</script>
 </html>

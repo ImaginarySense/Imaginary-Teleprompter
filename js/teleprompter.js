@@ -71,7 +71,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		// Animation settings
 		play = true;
 		sensitivity = 1.3;
-		speedMultip = 10;
+		speedMultip = 7;
 		limit = 3000;
 		
 		// Set values relative to unit size.
@@ -562,7 +562,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	function updateUnit() {
 		unit = getFocusHeight()/80;
 		relativeLimit = limit*unit;
-		if (debug) console.log("Unit updated: "+unit);
+		if (debug) setTimeout( function(){ console.log("Unit updated: "+unit); });
 		updateAnimation();
 	}
 
@@ -767,12 +767,15 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	}, false); // end event
 
 	function listener(event) {
+		/*
+		// Message data. Uncommenting will give you valuable information and decrease performance dramatically.
 		setTimeout(function() {
 			if (debug) {
 				console.log("Editor:");
 				console.log(event);
 			}
 		}, 0);
+		*/
 		// If the event comes from the same domain...
 		if (!event.domain||event.domain===getDomain()) {
 			// Act according to the message.
@@ -813,7 +816,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 				},
 				'anchor' : function () {
 					 requestAnimationFrame(function(){
-					 	internalMoveToAnchor(message.data);
+						internalMoveToAnchor(message.data);
 					 });
 				},
 				'sync' : function () {

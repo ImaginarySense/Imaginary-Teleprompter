@@ -1,30 +1,42 @@
 + Teleprompter Schedule +
-- Current version: v2.0a build 16.02.6.0 -
+- Current version: v2.0a build 16.02.14.0 -
 
 Note: Unless otherwise specified, developers may move ahead of schedule and work on their code for the next release.
 
 Next release: 2.0b
-Milestone set for: Feb 22, 2016
-Comment: I'm scheduling as if we only had weekends to work on this.
+Milestone set for: Feb 29, 2016
+Comment: It's important to complete the high and normal priorities for the milestone date. Work on the low priorities when yoú're done with the other ones. If something is left out, we'll include on the 2.0 or a later release.
 
 - Keyvan -
-1. Editor: Fix TinyMCE menu bug.
-2. Editor: Fix TinyMCE toolbar bug.
+1. CKEditor|High: Add custom "Fullscreen" button plugin to CKEditor. The button must run the toggleFullscreen function from editor.js.
+2. CKEditor|Normal: Make bottom left border of CKEditor's status bar not round.
+3. CKEditor|Low: Move "Word Count" into the Status Bar, without sacrificing inline mode.
 
 - Rafael -
-1. Editor: When leaving prompter mode, if in fullscreen, toggle out of Fullscreen when restoreEditor(event) runs.
-2. Editor: Wait for Keyvan to finish fixing TinyMCE bugs.
-	If user enters fullscreen in editor mode, make only the editor fulscreen, not the rest of the user interface.
+1. Main,Editor|High: Improve fullscreen in the following ways:
+	> F11 must toggle the focused window's fullscreen at any given moment.
+	> You no longer need to dissable secondary prompter. Instead we need to create a smarter auto-fullscreen:
+		>> In Electron, when checking for "document.getElementById("primary").value>0" or "secondary", you must also test for available screens.
+			>>> If there are two screens and both instances are set to be active, do as you've already done, fullscreen primary to screen 0 and secondary to screen 1.
+			>>> If there are two screens and only one instance is set to be active, if the instance is primaryPrompter, do a normal fullscreen.
+			>>> If there are two screens and only one instance is set to be active, if the instance is secondaryPrompter, fullscreen to screen x (x being a variable at editor.js, set to 1).
+			>>> If there's only one screen, and one instance is set to be active, do a normal fullscreen.
+			>>> If there's only one screen, and both instances are set to be active, activate and do a normal fullscreen only to the secondary prompter.
+		>> Note: Find an efficient way to test for these conditions.
+	> Note: None of these features should interfere with browser functionality. In the browser, anything a user chooses goes.
+2. Main|Low: Add "Spell Check" to Electron.
+	> Languages to add: Spanish (Spain, Latinamerican), English (US and British), French, Portuguese (Brazil and Portugal's), Italian, German.
 
 - Javier -
-1. Teleprompter: Fix bad sync on single vertical flip.
-2. Teleprompter: Cap command input per given time. 
-3. Teleprompter: Code relative font size increase and decrease feature.
+1. Teleprompter|High: Fix bad sync on single vertical flip.
+2. Teleprompter|High: Cap command input per given time. 
+3. Teleprompter|Low: Code relative font size increase and decrease feature.
 	Font size changes must ocurr either at the #prompt or at the #promptcontainer level.
 
 - Victor -
-1. Editor: Add color selection prompt for when user selects "Custom Style" option in index.html.
-2. Editor: Remember and set values from last session on startup and exit of index.html.
+1. Editor|High: Polish "Add Custom Style" prompt.
+2. Editor|Normal: Add edit and remove custom style options.
+3. Editor|Normal: Remember and set values from last session on startup and exit of index.html.
 
 
 Next release: 2.0
@@ -32,19 +44,18 @@ Milestone set for: March 7, 2016
 Comment: Going Mobile!
 
 - Keyvan -
-1. Editor: Minimum HTML code improvements.
-2. Packages: Create Chrome OS app.
+1. Packages|High: Create deb and rpm installers.
+2. Packages|Normal: Create Chrome OS app.
 
 - Rafael -
-2. Packages: Create OS X .app package.
+1. Packages|High: Create OS X .app package.
 
 - Victor -
-1. Packages: Create Windows Installer.
+1. Packages|High: Create Windows Installer.
 
 - Javier -
-1. Packages: Create deb and rpm installers.
-2. Packages: Test every installer.
-3. Web: Create teleprompter download website.
+1. Web|High: Create teleprompter download website.
+2. Packages|Normal: Test all installer.
 
 
 Next release: 2.1*
@@ -52,23 +63,24 @@ Milestone set for: April 4, 2016
 Comment: Going Mobile!
 
 Keyvan:
-1. Design touch friendly Playback Controls for teleprompter.html.
+1. Teleprompter|High: Design touch friendly Playback Controls for teleprompter.html.
 
 Rafael:
-1. Setup sockets integration between remote.html and editor.html.
-2. Send commands from app's remote to pc's editor.
-3. Pull and push Text to from and to editor.
+1. Editor,Remote|Normal: Setup sockets integration between remote.html and editor.html.
+2. Editor,Remote|Normal: Send commands from app's remote to pc's editor.
+3. Editor,Remote|Normal: Pull and push Text to from and to editor.
 
 Javier:
-1. Setup PhoneGap version.
-2. Create additional mobile UIs.
-3. Add network setup options.
+1. Main|High: Setup Cordova version.
+2. Main|High: Create additional mobile UIs.
+3. Main|Normal: Add network setup options.
 
 
 Next release: 2.2
 Milestone set for: Pending.
 Comment: We'll do this here and not before, to save time.
-> Add variable sensitivity...
+> Teleprompter|Normal: Add variable sensitivity controls.
+> TinyMCE|Low: Add custom "Fullscreen" button plugin to TinyMCE. The button must run the toggleFullscreen function at editor.js.
 
 
 Next release: 2.3
@@ -87,5 +99,5 @@ Milestone set for: Pending.
 Comment: Auto advance with speech recognition libraries.
 
 
-*We'll probably do a Kickstarter to develop some or all of these versions.
+*We'll probably do a Kickstarter to develop some or all of these versions. No date estimate for the time being.
 

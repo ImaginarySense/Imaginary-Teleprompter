@@ -73,7 +73,7 @@ function setStyle(promptStyleOption, customStyle) {
 	switch (promptStyleOption) {
 		/*
 		// Uncomment and insert new teleprompter color configurations here. (A.k.a. teleprompter-templates.css styles.)
-		case 4:
+		case 5:
 			container.classList.add("newTemplatesBody");
 			overlayBgSetting="newTemplatesOverlay";
 			break;

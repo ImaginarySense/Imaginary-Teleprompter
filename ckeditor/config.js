@@ -1,5 +1,5 @@
 /**
- * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -17,19 +17,18 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'forms' },
 		{ name: 'tools' },
 		{ name: 'document',	   groups: [ 'mode', 'document', 'doctools' ] },
-		{ name: 'colors' },
 		{ name: 'others' },
 		'/',
 		{ name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
 		{ name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
-		{ name: 'styles' }/*,
-		{ name: 'about' }*/
+		{ name: 'styles' },
+		{ name: 'colors' },
+		{ name: 'about' }
 	];
 
 	// Remove some buttons provided by the standard plugins, which are
 	// not needed in the Standard(s) toolbar.
 	config.removeButtons = 'Underline,Subscript,Superscript';
-	config.height = $(window).height()/2;
 
 	// Set the most common block elements.
 	config.format_tags = 'p;h1;h2;h3;pre';

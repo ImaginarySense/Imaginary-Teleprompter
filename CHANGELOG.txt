@@ -1,21 +1,37 @@
 CHANGELOG
 
+v2.0a 16.02.14.0
+> Moved from inline TinyMCE to inline CKEditor. Also made it easy to choose between one or the other by uncommenting and commenting imports at index.html. Notice we're sticking with CKEditor because not only is it more robust, but fixing or avoiding inline TinyMCE bugs means a lot unnecessary of work.
+> Reimplemented fullscreen at index.html, editor.css, editor.js.
+
+v2.0a 16.02.11.1
+> Made change default style simpler.
+
+v2.0a 16.02.11.0
+> Made it easier to change default style.
+
+v2.0a 16.02.09.1
+> Changed setAttribute onclick from prompterStyle to onchange.
+
+v2.0a 16.02.09.0
+> Fixed a mistake with the session variable.
+
 v2.0a 16.02.06.0
 > Fully transitioned into postmessage based communication between the editor and all teleprompter instances.
 > Efficiency improvements. Sync is almost perfect at this point.
 > Removed fullscreen editor mode. Pending for future release.
-> Chaged Electron's fullscreen key to F11.
+> Changed Electron's fullscreen key to F11.
 > Fix Electron's fullscreen implementation bugs.
 
 v2.0a 16.01.24.0
 > Implemented screen detection in Electron.
 > Auto Fullscreen prompts at start in Electron.
-> Added Fullscreen in Electron when F12 is pressed. There's a conflic with fullscreen setup for the browsers.
+> Added Fullscreen in Electron when F12 is pressed. There's a conflict with fullscreen setup for the browsers.
 
 v2.0a 16.01.23.1
 > Substitued localStorage based communication with postMessage based communication. This fixes 'no synchronization' bug on Chrome for Linux.
 > Other small synchronization improvements.
-> Added abillity to toggle debug mode.
+> Added ability to toggle debug mode.
 
 v2.0a 16.01.22.0
 > Added Fullscreen editor mode for when F11 is pressed.
@@ -52,7 +68,7 @@ v2.0a 16.01.08 build 001 (with Electron)
 + Implemented Reset... ("Close It!'s" restore editor)
 
 v2.0a 16.01.03 build 014 (with Electron)
-+ Performance improvements and asynchronious bug fixes by making use of requestAnimationFrame().
++ Performance improvements and asynchronous bug fixes by making use of requestAnimationFrame().
 + Implemented basic pointer based drag and drop in teleprompter.html.
 + Implemented all of CKEditor's features using TinyMCE.
 + Improved TinyMCE Integration. Some bugs remain though.

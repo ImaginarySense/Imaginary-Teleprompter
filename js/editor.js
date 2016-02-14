@@ -31,7 +31,7 @@ var debug;
 	var prompterWindow, frame;
 
 	// Global variables
-	var domain;
+	var domain, instance = [false, false];
 
 	function init () {
 		// Set globals
@@ -79,71 +79,50 @@ var debug;
 	addEventListener("message", listener, false);
 
 	// Instance Editor
-	tinymce.init({
-		selector: "div#prompt",
-		inline: true, // The key to make apps without security loopholes.
-		auto_focus: "prompt", // Focus to show controls..
-		fixed_toolbar_container: "#fixedToolbarContainer",
-		statusbar: true,
-		elementpath: false, // Remove the path bar at the bottom.
-		resize: true, // True means will be vertically resizable.
-		theme: "modern", //dev: We should make a custom theme.
-		editor_css : "css/tinymce.css",
-		//content_css : '/css/prompt.css',
-		plugins: "advlist anchor save charmap code colorpicker contextmenu directionality emoticons fullscreen hr image media lists nonbreaking paste print searchreplace spellchecker table textcolor wordcount imagetools insertdatetime",
-		toolbar: ['anchor | save | undo redo | styleselect | bold italic underline strikethrough | superscript subscript | forecolor backcolor | bullist numlist | alignleft aligncenter alignright | charmap image | searchreplace fullscreen'],
-		contextmenu: "copy cut paste pastetext | anchor | image charmap",
-		menu: {
-			file: {title: 'File', items: 'newdocument print'},
-			edit: {title: 'Edit', items: 'undo redo | cut copy paste pastetext | selectall'},
-			insert: {title: 'Insert', items: 'anchor insertdatetime | image media emoticons | hr charmap'},
-			format: {title: 'Format', items: 'bold italic underline strikethrough | superscript subscript | formats | removeformat | ltr rtl'},
-			table: {title: 'Table', items: 'inserttable tableprops deletetable | cell row column'},
-			tools: {title: 'Tools', items: 'searchreplace spellchecker code'}
-		},
-		directionality: "ltr",
-		setup: function(editor) {
-			// Don't close editor when out of focus.
-			editor.on("blur", function () { return false; });
-			// On editor clicked, go to fullscreen.
-			//dev: This is meant to be inserted into it's own TinyMCE Button.
-			/*
-			editor.on("click", function() {
-				var elem = document.getElementById("editorcontainer");
-				if (elem.requestFullscreen) {
-					elem.requestFullscreen();
-				} else if (elem.msRequestFullscreen) {
-					elem.msRequestFullscreen();
-				} else if (elem.mozRequestFullScreen) {
-					elem.mozRequestFullScreen();
-				} else if (elem.webkitRequestFullscreen) {
-					elem.webkitRequestFullscreen();
-				}
-			});
-			*/
-		},
-		/*
-		style_formats: [
-			{title: 'Heading 1', block: 'h1', styles: {color: '#000'}},
-			{title: 'Heading 2', block: 'h2', styles: {color: '#000'}},
-			{title: 'Paragraph', block: 'p', styles: {color: '#000'}},
-			{title: 'Example 1', inline: 'span', classes: 'example1'},
-			{title: 'Table styles'},
-			{title: 'Table row 1', selector: 'tr', classes: 'tablerow1'}
-		],
-		*/
-		/*advlist_bullet_styles: "default,circle,disc,square",
-		advlist_number_styles: "default,lower-alpha,lower-greek,lower-roman,upper-alpha,upper-roman",*/
-		/*image_list: [
-			{title: 'My image 1', value: 'http://www.tinymce.com/my1.gif'},
-			{title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
-		],*/
-		save_enablewhendirty: false,
-		save_onsavecallback: save,
-		nonbreaking_force_tab: true
-	
-	});
-
+	if (typeof tinymce!=="undefined") {
+		tinymce.init({
+			selector: "div#prompt",
+			inline: true, // The key to make apps without security loopholes.
+			auto_focus: "prompt", // Focus to show controls..
+			fixed_toolbar_container: "#toolbar",
+			statusbar: true,
+			elementpath: false, // Remove the path bar at the bottom.
+			resize: true, // True means will be vertically resizable.
+			theme: "modern", //dev: We should make a custom theme.
+			skin: "imaginary",
+			editor_css : "css/tinymce.css",
+			plugins: "advlist anchor save charmap code colorpicker contextmenu directionality emoticons fullscreen hr image media lists nonbreaking paste print searchreplace spellchecker table textcolor wordcount imagetools insertdatetime",
+			toolbar: ['anchor | save | undo redo | styleselect | bold italic underline strikethrough | superscript subscript | forecolor backcolor | bullist numlist | alignleft aligncenter alignright | charmap image | searchreplace fullscreen'],
+			contextmenu: "copy cut paste pastetext | anchor | image charmap",
+			menu: {
+				file: {title: 'File', items: 'newdocument print'},
+				edit: {title: 'Edit', items: 'undo redo | cut copy paste pastetext | selectall'},
+				insert: {title: 'Insert', items: 'anchor insertdatetime | image media emoticons | hr charmap'},
+				format: {title: 'Format', items: 'bold italic underline strikethrough | superscript subscript | formats | removeformat | ltr rtl'},
+				table: {title: 'Table', items: 'inserttable tableprops deletetable | cell row column'},
+				tools: {title: 'Tools', items: 'searchreplace spellchecker code'}
+			},
+			directionality: "ltr",
+			setup: function(editor) {
+				// Don't close editor when out of focus.
+				editor.on("blur", function () { return false; });
+			},
+			style_formats: [
+				{title: 'Paragraph', block: 'p'},
+				{title: 'Heading 1', block: 'h1'},
+				{title: 'Heading 2', block: 'h2'},
+				{title: 'Heading 3', block: 'h3'},
+				{title: 'Heading 4', block: 'h4'},
+			],
+			//image_list: [
+			//	{title: 'My image 1', value: 'http://www.tinymce.com/my1.gif'},
+			//	{title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
+			//],
+			save_enablewhendirty: false,
+			save_onsavecallback: save,
+			nonbreaking_force_tab: true
+		});
+	}
 	function save () {
 		console.log("Save pressed");
 	}
@@ -193,17 +172,28 @@ var debug;
 		document.getElementById("framecontainer").style.display = "none";
 	}
 	
-	function doFullScreen() {
-		var elem = document.getElementById("editorcontainer");
-			if (elem.requestFullscreen) {
-				elem.requestFullscreen();
-			} else if (elem.msRequestFullscreen) {
-				elem.msRequestFullscreen();
-			} else if (elem.mozRequestFullScreen) {
-				elem.mozRequestFullScreen();
-			} else if (elem.webkitRequestFullscreen) {
-				elem.webkitRequestFullscreen();
-			}
+	function launchIntoFullscreen(element) {
+		var requestFullscreen = element.requestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen || element.msRequestFullscreen;
+		requestFullscreen.call(element);
+	}
+
+	function exitFullscreen() {
+		var exitFullscreen = document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen;
+		exitFullscreen.call(document);
+	}
+
+	function toggleFullscreen() {
+		var fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement,
+			elem;
+		if (fullscreenElement)
+			exitFullscreen();
+		else {
+			if (document.getElementById("promptIt").onclick===submitTeleprompter)
+				elem = document.getElementById("editorcontainer");
+			else
+				elem = document.documentElement;
+			launchIntoFullscreen(elem);
+		}
 	}
 
 	// On "Prompt It!" clicked
@@ -213,7 +203,11 @@ var debug;
 		// Stops the event but continues executing the code.
 		event.preventDefault();
 		// Get html from editor
-		var htmldata = tinymce.get("prompt").getContent();
+		var htmldata
+		if (typeof CKEDITOR !== "undefined")
+			htmldata = CKEDITOR.instances.prompt.getData()
+		else if (typeof tinymce !== "undefined")
+			htmldata = tinymce.get("prompt").getContent();
 
 		// Get remaining form data
 		var settings = '{ "data": {"secondary":'+document.getElementById("secondary").value+',"primary":'+document.getElementById("primary").value+',"prompterStyle":'+document.getElementById("prompterStyle").value+',"background":"#3CC","color":"#333", "overlayBg":"#333","focusMode":'+document.getElementById("focus").value+'}}',
@@ -228,6 +222,7 @@ var debug;
 		
 		// Set and load "Primary"
 		if ( document.getElementById("primary").value>0 ) {
+			instance[0] = true;
 			// Hide stuff
 			document.getElementById("content").style.display = "none";
 			document.getElementById("editorcontainer").style.display = "none";
@@ -243,9 +238,12 @@ var debug;
 			frame.src = "teleprompter.html?debug=1";
 			frame.focus();
 		}
+		else
+			instance[0] = false;
 
 		// "Secondary"
 		if ( document.getElementById("secondary").value>0 ) {
+			instance[1] = true;
 			// Checks if is running on electron app...
 			if (navigator.userAgent.indexOf("Electron")!=-1) {
 				// Imported libraries for the us of externalDisplay...
@@ -276,10 +274,12 @@ var debug;
 					prompterWindow.focus();
 			}
 		}
+		else
+			instance[1] = false;
 	
 		// In case of both
 		// In case of none
-		if ( !(document.getElementById("primary").value>0 || document.getElementById("secondary").value>0) )
+		if ( !(instance[0]||instance[1]) )
 			window.alert("You must prompt at least to one display.");
 		else {
 			event.target.textContent = "Close It...";
@@ -288,12 +288,15 @@ var debug;
 	}
 
 	function listener(event) {
+		/*
+		// Message data. Uncommenting will give you valuable information and decrease performance dramatically.
 		setTimeout(function() {
 			if (debug) {
 				console.log("Editor:");
 				console.log(event);
 			}
 		}, 0);
+		*/
 		// If the event comes from the same domain...
 		if (!event.domain||event.domain===getDomain()) {
 			var message = event.data;
@@ -301,32 +304,31 @@ var debug;
 				restoreEditor();
 			else {
 				// Redirect message to each prompter instance.
-				prompterWindow.postMessage( message, getDomain());
-				frame.contentWindow.postMessage( message, getDomain());
+				if (instance[1])
+					prompterWindow.postMessage( message, getDomain());
+				if (instance[0])
+					frame.contentWindow.postMessage( message, getDomain());
 			}
 		}
 	}
 
-	document.onkeydown = function( evt ) {
-		evt = evt || window.event;
-		// keyCode is announced to be deprecated but not all browsers support key as of 2015.
-		if (evt.key === undefined)
-			evt.key = evt.keyCode;
-		//if (debug) console.log("Key: "+evt.key);
-		switch ( evt.key ) {
-/*
-			case "F11":
+	document.onkeydown = function( event ) {
+		// keyCode is announced to be deprecated but not all browsers support key as of 2016.
+		if (event.key === undefined)
+			event.key = event.keyCode;
+		if (debug) console.log(event.key);
+		switch ( event.key ) {
 			case 122:
-				evt.preventDefault();
-				doFullScreen();
+			case "F11":
+				event.preventDefault();
+				toggleFullscreen();
 				break;
-*/
-			case "F8":
-			case 119:
+			case 123:
+			case "F12":
 				debug=!debug;
 				break;
-			case "Escape":
 			case 27: // ESC
+			case "Escape":
 				restoreEditor();
 				break;
 		}

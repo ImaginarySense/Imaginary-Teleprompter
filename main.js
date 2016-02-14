@@ -63,7 +63,7 @@ app.on('ready', function() {
     mainWindow.openDevTools();
   });
   
-  var ret2 = globalShortcut.register('F11', function() {
+  var ret2 = globalShortcut.register('F10', function() {
       mainWindow.setFullScreen(false);
   });
 
@@ -73,12 +73,12 @@ app.on('ready', function() {
 
   // Check whether a shortcut is registered.
   console.log(globalShortcut.isRegistered('F8'));
-  console.log(globalShortcut.isRegistered('F11'));
+  console.log(globalShortcut.isRegistered('F10'));
   
   app.on('will-quit', function() {
   // Unregister a shortcut.
   globalShortcut.unregister('F8');
-  globalShortcut.unregister('F11');
+  globalShortcut.unregister('F10');
 
   // Unregister all shortcuts.
   globalShortcut.unregisterAll();
