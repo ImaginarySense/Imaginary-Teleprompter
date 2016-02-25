@@ -70,21 +70,21 @@
 						<!--<label for="basic-url">Flip mode</label>-->
 						<label for="basic-url">In-frame prompter</label>
 						<select class="form-control" id="primary" name="primary">
-							<option value="0">Don't prompt on this window</option>
-							<option value="1" selected="selected">Normal (Don't Flip)</option>
-							<option value="2">Horizontal Flip (Mirror)</option>
-							<option value="3">Vertical Flip</option>
-							<option value="4">Double Flip</option>
+							<option value="0" title="Don't prompt on this window">Disabled (Don't prompt on this window)</option>
+							<option value="1" title="Normal screen" selected="selected">Don't Flip (Normal screen)</option>
+							<option value="2" title="Normal mirror">Horizontal Flip (Mirror)</option>
+							<option value="3" title="Miror plus 180&deg; rotation">Vertical Flip (Miror plus 180&deg; rotation)</option>
+							<option value="4" title="180&deg; screen rotation">Double Flip (180&deg; screen rotation)</option>
 						</select>
 					</div>
 					<div class='col-md-3'>
 						<label for="basic-url">External prompter</label>
 						<select class="form-control" id="secondary" name="secondary">
-							<option value="0">Disabled</option>
-							<option value="1" selected="selected">Normal (Don't Flip)</option>
-							<option value="2">Horizontal Flip (Mirror)</option>
-							<option value="3">Vertical Flip</option>
-							<option value="4">Double Flip</option>
+							<option value="0" title="Don't prompt to a second window">Disabled (Don't prompt to a second window)</option>
+							<option value="1" title="Normal screen" selected="selected">Don't Flip (Normal screen)</option>
+							<option value="2" title="Normal mirror">Horizontal Flip (Mirror)</option>
+							<option value="3" title="Miror plus 180&deg; rotation">Vertical Flip (Miror plus 180&deg; rotation)</option>
+							<option value="4" title="180&deg; screen rotation">Double Flip  (180&deg; screen rotation)</option>
 						</select>
 					</div>
 					<div class='col-md-3'>
@@ -100,10 +100,10 @@
 					<div class='col-md-3'>
 						<label for="basic-url">Focus area</label>
 						<select class="form-control" id="focus" name="focus">
-							<option value="3">None</option>
-							<option value="1">Top (webcam)</option>
-							<option value="0" selected="selected">Middle (professional prompter)</option>
-							<option value="2">Bottom (screen above camera)</option>
+							<option value="3" title="You can interact with prompter elements, such as hyperlinks and videos, by disabling focus area.">None</option>
+							<option value="1">Top Overlay (webcam)</option>
+							<option value="0" selected="selected">Middle Overlay (professional prompter)</option>
+							<option value="2">Bottom Overlay (screen above camera)</option>
 						</select>
 					</div>
 				</div>
@@ -116,32 +116,33 @@
 	<h3>Welcome to Teleprompter!</h3>
 	<p>Are you ready to tell your story?</p>
 	<br>
-	<p>"Teleprompter" is a professional grade, multi-platform, free software teleprompter for everyone to use. Click on "Prompt It!" whenever you're ready and control the speed with the arrow keys.</p>
+	<p>"Teleprompter" is a professional grade, multi-platform, free software teleprompter for anyone to use. Click on "Prompt It!" whenever you're ready and control the speed with the arrow keys.</p>
 	<br>
 	<h3>Here are some of our features:</h3>
 	<ol>
-		<li>Speed controls with the Arrow keys, WASD keys and the mouse wheel.</li>
-		<li>Multi-screen feature allows you to monitor your prompt w.</li>
-		<li>Different focus modes allow you to easilly use Teleprompter with a webcam, a tablet, or professional teleprompter equipment.</li>
+		<li>Control the speed with the Arrow keys, WASD keys or the mouse wheel. You may pause at anytime with the 'spacebar'.</li>
+		<li>Different focus areas allow you to easilly use Teleprompter with a webcam, a tablet, or professional teleprompter equipment.</li>
 		<li>Flip modes allow <em>mirroring</em> the prompter in every possible way.</li>
-		<li>By setting up anchors with the numbers '0' through '9', you can instantly jump to any part of the script. <a id="5" name="5">Try pressing '5' now!</a></li>
-		<li>Our Rich Text Editor gives unlimited possibilities on what you can prompt.</li>
-		<li>You may also customize your background and general text color.</li>
-		<li>Teleprompter 2.0 and forth uses CSS transitions so animations will be hardware accelerated.</li>
-		<li>Text can be pasted from other word processors like Microsoft® Word or Libre Office Writer.</li>
-		<li>Touch controls allow for a good, simillar touch screen experience accross all devices.</li>
-		<li>You may pause the teleprompter at anytime pressing 'spacebar'.</li>
+		<li>You can use one or two instances. Mirror one instance, monitor on the other one.</li>
+		<li><a id="5" name="5">Set almost any key as an Anchor and instantly jump to any part of the script. Try pressing '5' now!</a></li>
+		<li>The HTML prompt editor gives unlimited possibilities on what you can prompt.</li>
+		<li>There are various Prompter Styles to choose from. You may also create your own.</li>
+		<li>Text can be pasted from other word processors like Microsoft Word&reg; or Libre Office Writer&trade;.</li>
+		<li>Animations are hardware accelerated for a smooth result.</li>
 		<li>Press 'F11' to enter and leave fullscreen.</li>
-		<li>Edits continuously auto save. You may recover previous prompts on the bottom right of the editor.</li>
 		<li>All data is managed locally. No data is stored on our servers.</li>
+		<li>Local version can be downloaded for Windows, OS X and Linux operating systems.</li>
+		<li>Close prompts and return to editor by pressing 'ESC'.</li>
 	</ol>
 	<hr>
-	<h4>How to use anchors:</h4>
+	<h4>How to use anchor shortcuts:</h4>
 	<ol>
-		<li>Select a keyword on the line you want to jump to.</li>
+		<li>Select a keyword or line you want to jump to on your text in the editor.</li>
 		<li>Click on the <strong>Flag Icon</strong> on the editor's tool bar.</li>
-		<li>A box named "Anchor Properties" should have popped up. Type any number from 0 through 9 and click 'Ok'.</li>
-		<li>When prompting, press or tap on the number you typed to jump into the desired location.</li>
+		<li>A box named "Anchor Properties" should have appeared. Type any single key of your choice and click 'Ok'.
+		<li>Note preassigned keys, such as WASD and Spacebar will be ignored.</li>
+		<li>Repeat as many times as you wish.</li>
+		<li>When prompting, press on the shortcut key to jump into the desired location.</li>
 	</ol>
 	<p>###</p>
 				</div>
@@ -154,17 +155,26 @@
 		<div class="container">
 
 			<p style="color:#FFF;">&copy; <a class="external" href="http://imaginary.tech" target="_blank">Imaginary Films LLC</a></p>
+			<p>Developed by: <a class="external" href="https://www.linkedin.com/in/javier-oscar-cordero-p%25C3%25A9rez-70658033" target="_blank">Javier Cordero</a>,<br>
+			<a class="external" href="https://twitter.com/Va2ron1" target="_blank">Victor Ortiz</a>, <a class="external" href="#">Keyvan Pérez</a> &amp; <a class="external" href="#">Rafael Sierra</a>.</p>
 
-			<p>Developed by: <a class="external" href="https://www.facebook.com/javicorper" target="_blank">Javier Cordero</a>,<br><a class="external" href="https://twitter.com/Va2ron1" target="_blank">Victor Ortiz</a>, <a class="external" href="#">Keyvan Pérez</a> &amp; <a class="external" href="#">Rafael Sierra.</a></p>
-
-			<p>Code licensed under <a rel="license" href="LICENSE" target="_blank">GPL3</a>, assets under <a class="external" rel="license" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.</p>
 			<ul class="bs-docs-footer-links">
-				<li>Currently v2.0a (16.02.14.0)</li>
+				<li>Currently v2.0a (16.02.25.0)</li>
 				<li>&middot;</li>
-				<li><a class="external" target="_blank" href="https://github.com/imaginaryfilms/Teleprompter.git">Source</a></li>
+				<li>Licensed under <a rel="license" href="LICENSE" target="_blank">GPL3</a>, assets under <a class="external" rel="license" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a></li>
+				<br>
 				<li>&middot;</li>
-				<!--<li><a class="external" target="_blank" href="http://imaginary.tech/software/teleprompter">About</a></li>-->
+				<li><a id="credits-link" href="#">Full Credits</a></li>
+				<li>&middot;</li>
+				<li><a class="external" target="_blank" href="https://github.com/imaginaryfilms/Teleprompter.git">Source Code</a></li>
+				<li>&middot;</li>
+				<li><a class="external" target="_blank" href="#">Downloads</a></li>
+				<li>&middot;</li>
 			</ul>
+
+			<ul class="bs-docs-footer-links">
+			</ul>
+				<!--<li><a class="external" target="_blank" href="http://imaginary.tech/software/teleprompter">About</a></li>-->
 		</div>
 	</footer>
 	<div id="framecontainer">

@@ -1,5 +1,17 @@
 CHANGELOG
 
+v2.0a 16.02.25.0
+> Emulated perfect sync:
+>> Added an inputs per second cap.
+>> Added tic toc mechanism in editor.js to symetrically distribute communication latency between instances.
+>> Reduced message receipt execution latency at teleprompter.js by improving efficiency.
+>> Implemented instantaneous sync milliseconds after no input is received.
+>> Modified our timeout function to achieve instantaneous sync.
+> Added Full Credits feature.
+> Updated index.html's footer.
+> Reorganized editor.js code.
+> Removed unnecesary CSS prefixes from javascript code.
+
 v2.0a 16.02.14.0
 > Moved from inline TinyMCE to inline CKEditor. Also made it easy to choose between one or the other by uncommenting and commenting imports at index.html. Notice we're sticking with CKEditor because not only is it more robust, but fixing or avoiding inline TinyMCE bugs means a lot unnecessary of work.
 > Reimplemented fullscreen at index.html, editor.css, editor.js.

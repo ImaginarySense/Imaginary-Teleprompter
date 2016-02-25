@@ -30,10 +30,12 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	// Global objects
 	var settings, session, prompt, pointer, overlay, overlayFocus, styleElement, styleSheet, editor;
 	// Global variables
-	var unit, x, velocity, sensitivity, speedMultip, limit, relativeLimit, play, timeoutStatus, invertedWheel, focus, promptStyleOption, customStyle, flipV, flipH, fontSize, previousPromptHeight, previousScreenHeight, previousScreenWidth, previousVerticalDisplacementCorrector, domain, debug, closing;
+	var unit, x, velocity, sensitivity, speedMultip, relativeLimit, play, timeoutStatus, invertedWheel, focus, promptStyleOption, customStyle, flipV, flipH, fontSize, previousPromptHeight, previousScreenHeight, previousScreenWidth, previousVerticalDisplacementCorrector, domain, debug, closing, cap;
 	// Global constants
 	const transitionDelays = 500,
-		timeoutDelay = 250;
+		timeoutDelay = 250,
+		inputCapDelay = 100,
+		limit = 2600;
 	
 	function initCSS() {
 		// Create style element.
@@ -52,7 +54,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		prompt = document.querySelector(".prompt");
 		overlay = document.querySelector("#overlay");
 		overlayFocus = document.querySelector("#overlayFocus");
-		pointer = {}; //document.querySelector("#pointer");
+		pointer = {};
 
 		// Initialize CSS
 		initCSS();
@@ -67,12 +69,12 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		x = 0;
 		velocity = 0;
 		closing = false;
+		cap = false;
 		
 		// Animation settings
 		play = true;
 		sensitivity = 1.3;
 		speedMultip = 7;
-		limit = 3000;
 		
 		// Set values relative to unit size.
 		updateUnit();
@@ -169,7 +171,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
 			// Begin animation
 			internalIncreaseVelocity();
-		}, 500);
+		}, 750);
 	}
 
 	function pointerActive(event) {
@@ -302,6 +304,10 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		editor.postMessage( {'request':'sync','data':getProgress()}, getDomain() );
 	}
 
+	function instaSync() {
+		editor.postMessage( {'request':'iSync','data':getProgress()}, getDomain() );
+	}
+
 	function updateVelocity() {
 		// (|x|^sensitivity) * (+|-)
 		velocity = speedMultip*Math.pow(Math.abs(x),sensitivity)*(x>=0?1:-1);
@@ -346,16 +352,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		return property;
 	}
 
-	function getTransitionEnd() {
-		// Transition var and transition list.
-		var transitionEnd = ['webkitTransitionEnd',
-					"oTransitionEnd",
-					'MSTransitionEnd',
-					'transitionend'];
-		return firstValidProperty( transitionEnd );
-	}
-
-	document.addEventListener( getTransitionEnd(), function() {
+	document.addEventListener( 'transitionend', function() {
 		if(atStart()||atEnd())
 			stopAll();
 		if (debug) console.log("Reached end");
@@ -405,11 +402,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		if (!obj)
 			obj=prompt;
 		var computedStyle = window.getComputedStyle(obj, null),
-			theMatrix = computedStyle.getPropertyValue("-webkit-transform") ||
-				computedStyle.getPropertyValue("-moz-transform") ||
-				computedStyle.getPropertyValue("-ms-transform") ||
-				computedStyle.getPropertyValue("-o-transform") ||
-				computedStyle.getPropertyValue("transform"),
+			theMatrix = computedStyle.getPropertyValue("transform"),
 		// Reading data from matrix.
 			mat = theMatrix.match(/^matrix3d\((.+)\)$/);
 		if (mat) return parseFloat(mat[1].split(', ')[13]);
@@ -418,23 +411,19 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	}
 
 	function setCurrPosStill( theCurrPos, obj ) {
-		if (!theCurrPos)
-			theCurrPos = getCurrPos();
-		if (!obj)
+		if (obj===undefined)
 			obj = prompt;
+		if (theCurrPos===undefined)
+			theCurrPos = getCurrPos();
 		// If animation is running...
+		//prompt.style.top = theCurrPos+'px';
+		obj.style.transform = 'translateY('+theCurrPos+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+')';
 		if (prompt.classList.contains("move")) {
 			// Stop animation by removing move class.
 			obj.classList.remove("move");
 			// Delete animation rules before setting new ones.
 			styleSheet.deleteRule(0);
 		}
-		//prompt.style.top = theCurrPos+'px';
-		obj.style.WebkitTransform = 'translateY('+theCurrPos+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+')'; 
-		obj.style.MozTransform = 'translateY('+theCurrPos+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+')'; 
-		obj.style.msTransform = 'translateY('+theCurrPos+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+')'; 
-		obj.style.OTransform = 'translateY('+theCurrPos+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+')';  
-		obj.style.transform = 'translateY('+theCurrPos+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+')';
 	}
 
 	function getDestination() {
@@ -464,7 +453,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 			// Get new style variables.
 			var destination = getDestination(),
 				time = getRemainingTime(destination);
-				
+			
 			animate( time, destination );
 		}
 	}
@@ -478,15 +467,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		// Set new animation rules.
 		styleSheet.insertRule('\
 			.prompt.move {\
-				-moz-transform: translateY('+destination+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+') !important;\
-				-webkit-transform: translateY('+destination+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+') !important;\
-				-ms-transform: translateY('+destination+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+') !important;\
-				-o-transform: translateY('+destination+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+') !important;\
 				transform: translateY('+destination+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+') !important;\
-				-moz-transition: -moz-transform '+time+'ms '+curve+';\
-				-webkit-transition: -webkit-transform '+time+'ms '+curve+';\
-				-ms-transition: -ms-transform '+time+'ms '+curve+';\
-				-o-transition: -o-transform '+time+',ms '+curve+';\
 				transition: transform '+time+'ms '+curve+';\
 		}', 0);
 		// Prevent race condition in Chrome by requesting for current position (not just transform) before resuming animation.
@@ -528,6 +509,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 					vDisp = getScreenHeight()/2;
 				break;
 		}
+		console.log("Vertical displacement: "+vDisp);
 		return vDisp;
 	}
 
@@ -566,8 +548,12 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		updateAnimation();
 	}
 
-	function timeout( time, func ) {
+	function animationTimeout(time, func) {
 		internalPauseAnimation();
+		timeout(time, func);
+	}
+
+	function timeout( time, func ) {
 		// If a timeout is already executing, reset it.
 		if (timeoutStatus)
 			window.clearTimeout(timeoutStatus);
@@ -587,6 +573,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		else
 			progress = -(getCurrPos()+previousScreenHeight-previousVerticalDisplacementCorrector)/(previousPromptHeight-previousScreenHeight*2);
 		if (debug) console.log("Progress: "+(progress*100)+"%");
+		console.log(progress);
 		return progress;
 	}
 		
@@ -599,7 +586,8 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		}
 		else
 			delay = transitionDelay/2;
-		timeout( delay, function() {
+		internalPauseAnimation();
+		animationTimeout( delay, function() {
 			// Get current screen settings. To be used multiple times.
 			var updatedPos,
 				promptHeight = getPromptHeight(),
@@ -656,17 +644,20 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	}, false);
 
 	window.addEventListener("wheel", function(event) {
-		if (invertedWheel) {
-			if (event.deltaY>0)
-				increaseVelocity();
-			else
-				decreaseVelocity();
-		}
-		else {
-			if (event.deltaY>0)
-				decreaseVelocity();
-			else
-				increaseVelocity();
+		if (!cap) {
+			setCap();
+			if (invertedWheel) {
+				if (event.deltaY>0)
+					increaseVelocity();
+				else
+					decreaseVelocity();
+			}
+			else {
+				if (event.deltaY>0)
+					decreaseVelocity();
+				else
+					increaseVelocity();
+			}
 		}
 		event.preventDefault();
 	}, false);
@@ -690,10 +681,12 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
 	function decreaseVelocity() {
 		editor.postMessage( {'request':-11,'data':getProgress()}, getDomain() );
+		timeout(250, instaSync);
 	}
 
 	function increaseVelocity() {
 		editor.postMessage( {'request':11,'data':getProgress()}, getDomain() );
+		timeout(250, instaSync);
 	}
 
 	function internalDecreaseVelocity() {
@@ -730,10 +723,13 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	function pauseAnimation() {
 		editor.postMessage( {'request':'pause'}, getDomain() );	
 		syncPrompters();
+		//instaSync();
+		if (debug) console.log("Paused");
 	}
 
 	function playAnimation() {
 		editor.postMessage( {'request':'play'}, getDomain() );	
+		if (debug) console.log("Playing");
 	}
 	
 	function internalPauseAnimation() {
@@ -746,25 +742,11 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
 	function localPauseAnimation() {
 		animate(0, getCurrPos());
-		//if (debug) console.log("Paused");
 	}
 
 	function localPlayAnimation() {
 		updateAnimation();
-		//if (debug) console.log("Playing");
 	}
-
-	window.addEventListener("storage", function(event) {
-		if (debug) console.log("Storage event key: "+event.key);
-			switch (event.key) {
-				case "anchor":
-					//internalMoveToAnchor(event.newValue);
-					break;
-				case "sync":
-					//correctVerticalDisplacement(event.newValue, 0);
-					break;
-			} // end switch
-	}, false); // end event
 
 	function listener(event) {
 		/*
@@ -783,32 +765,23 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 				response = {
 				'11' : function () {
 					requestAnimationFrame(internalIncreaseVelocity);
-					//correctVerticalDisplacement(message.data,0);
 				},
 				'-11' : function () {
 					requestAnimationFrame(internalDecreaseVelocity);
-					//correctVerticalDisplacement(message.data,0);
 				},
 				'10' : function () {
-					requestAnimationFrame(function(){
-						stopThis();
-						//correctVerticalDisplacement(message.data,0);
-					});
+					requestAnimationFrame(stopThis);
 				},
 				'play' : function () {
-					requestAnimationFrame(function(){
-						play=true;
-						localPlayAnimation();
-					});
+					play=true;
+					requestAnimationFrame(localPlayAnimation);
 				},
 				'internalPlay' : function () {
 					requestAnimationFrame(localPlayAnimation);
 				},
 				'pause' : function () {
-					requestAnimationFrame( function(){
-						localPauseAnimation();
-						play=false;
-					 });
+					requestAnimationFrame(localPauseAnimation);
+					play=false;
 				},
 				'internalPause' : function () {
 					//localPauseAnimation();
@@ -824,9 +797,10 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 						correctVerticalDisplacement(message.data);
 					});
 				},
+				/* Insta sync */
 				'iSync' : function () {
 					requestAnimationFrame(function(){
-						
+						correctVerticalDisplacement(message.data,0);
 					});
 				},
 				'close' : closeInstance,
@@ -843,70 +817,81 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	// Initialize postMessage event listener.
 	addEventListener("message", listener, false);
 
+	function resetCap() {
+		cap = false;
+	}
+
+	function setCap() {
+		cap = true;
+		setTimeout(resetCap, inputCapDelay);
+	}
+
 	document.onkeydown = function( event ) {
 		// keyCode is announced to be deprecated but not all browsers support key as of 2016.
-		setTimeout( function() {
-			if (event.key === undefined)
-				event.key = event.keyCode;
-			if (debug) console.log("Key: "+event.key);
-			switch ( event.key ) {
-				case "s":
-				case "S":
-				case "ArrowDown":
-				case 40: // Down
-				case 68: // S
-					setTimeout(increaseVelocity, 0);
-					break;
-				case "w":
-				case "W":
-				case "ArrowUp":
-				case 38: // Up
-				case 87: // W
-					setTimeout(decreaseVelocity, 0);
-					break;
-				case "d":
-				case "D":
-				case "ArrowRight":
-				case 83: // S
-				case 39: // Right
-					increaseFontSize();
-					break;
-				case "a":
-				case "A":
-				case "ArrowLeft":
-				case 37: // Left
-				case 65: // A
-					decreaseFontSize();
-					break;
-				case " ":
-				case 32: // Spacebar
-					toggleAnimation();
-					break;
-				case ".":
-				case 110: // Numpad dot
-				case 190: // Dot
-					syncPrompters();
-					break;
-				case "Escape":
-				case 27: // ESC
-					closeInstance();
-					break;
-				case "F8":
-				case 119:
-					event.preventDefault();
-					debug=!debug;
-					break;
-				default: // Move to anchor.
-					// If pressed any number from 0 to 9.
-					if ( event.key>=48 && event.key<=57 )
-						moveToAnchor( event.key-48 );
-					else if ( event.key>=96 && event.key<=105 )
-						moveToAnchor( event.key-96 );
-					// Or if pressed any other key.
-					else
-						moveToAnchor( event.key );
-			}
-		}, 0);
+		if (!cap)
+			setTimeout( function() {
+				setCap();
+				if (event.key === undefined)
+					event.key = event.keyCode;
+				if (debug) console.log("Key: "+event.key);
+				switch ( event.key ) {
+					case "s":
+					case "S":
+					case "ArrowDown":
+					case 40: // Down
+					case 68: // S
+						increaseVelocity();
+						break;
+					case "w":
+					case "W":
+					case "ArrowUp":
+					case 38: // Up
+					case 87: // W
+						decreaseVelocity();
+						break;
+					case "d":
+					case "D":
+					case "ArrowRight":
+					case 83: // S
+					case 39: // Right
+						increaseFontSize();
+						break;
+					case "a":
+					case "A":
+					case "ArrowLeft":
+					case 37: // Left
+					case 65: // A
+						decreaseFontSize();
+						break;
+					case " ":
+					case 32: // Spacebar
+						toggleAnimation();
+						break;
+					case ".":
+					case 110: // Numpad dot
+					case 190: // Dot
+						syncPrompters();
+						break;
+					case "Escape":
+					case 27: // ESC
+						closeInstance();
+						break;
+					case "F8":
+					case 119:
+						event.preventDefault();
+						debug=!debug;
+						break;
+					default: // Move to anchor.
+						// If pressed any number from 0 to 9.
+						if ( event.key>=48 && event.key<=57 )
+							moveToAnchor( event.key-48 );
+						else if ( event.key>=96 && event.key<=105 )
+							moveToAnchor( event.key-96 );
+						// Or if pressed any other key.
+						else
+							moveToAnchor( event.key );
+				}
+			}, 0);
 		// Prevent arrow and spacebar scroll bug.
 		if ([" ","ArrowUp","ArrowDown","ArrowLeft","ArrowRight",32,37,38,39,40].indexOf(event.key) > -1) event.preventDefault();
 	};

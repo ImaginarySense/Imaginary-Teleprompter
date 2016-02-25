@@ -28,18 +28,22 @@ var debug;
 		var ipcRenderer = require('electron').ipcRenderer;
 	
 	// Global objects
-	var prompterWindow, frame;
+	var promptIt, prompterWindow, frame;
 
 	// Global variables
-	var domain, instance = [false, false];
+	var domain, tic, instance = [false, false], htmldata;
 
 	function init () {
 		// Set globals
 		debug = true;
+		tic = false;
 
 		// Set DOM javascript controls
+		promptIt = document.getElementById("promptIt");
+		promptIt.onclick = submitTeleprompter;
 		document.getElementById("prompterStyle").setAttribute("onchange","setStyleEvent(value);");
-		document.getElementById("promptIt").onclick = submitTeleprompter;
+		document.getElementById("credits-link").onclick = credits;
+		
 		frame = document.getElementById("teleprompterframe");
 		// Set default style and option style
 		setStyle(document.getElementById("prompterStyle").value);
@@ -144,32 +148,20 @@ var debug;
 	}
 
 	function restoreEditor(event) {
-		if (debug) console.log("Restoring editor.");
-
-		// Request to close prompters:
-		// Close frame.
-		if (frame.src.indexOf("teleprompter.html")!=-1)
-			frame.contentWindow.postMessage( {'request':'close'}, getDomain() );
-		// Close window.
-		if (prompterWindow)
-			prompterWindow.postMessage( {'request':'close'}, getDomain() );
-
-		// Stops the event but continues executing current function.
-		if (event&&event.preventDefault)
-			event.preventDefault();
-
-		// Change button and behaviour.
-		// INFO: event.target === document.getElementById("promptIt") and it's more efficient. Unfortunatelly it doesn't cover all use cases.
-		var button = document.getElementById("promptIt");
-		button.innerHTML = "Prompt It!";
-		button.onclick = submitTeleprompter;
-		// Reset DOM
-		//dev: Rewrite index.html for a cleaner way to do the following.
-		document.getElementById("content").style.display = "";
-		document.getElementById("editorcontainer").style.display = "";
-		document.getElementById("footer").style.display = "";
-		// Hide prompter frame
-		document.getElementById("framecontainer").style.display = "none";
+		if (promptIt.onclick===restoreEditor) {
+			if (debug) console.log("Restoring editor.");
+			// Request to close prompters:
+			// Close frame.
+			if (frame.src.indexOf("teleprompter.html")!=-1)
+				frame.contentWindow.postMessage( {'request':'close'}, getDomain() );
+			// Close window.
+			if (prompterWindow)
+				prompterWindow.postMessage( {'request':'close'}, getDomain() );
+			// Stops the event but continues executing current function.
+			if (event&&event.preventDefault)
+				event.preventDefault();			
+			togglePromptIt();
+		}
 	}
 	
 	function launchIntoFullscreen(element) {
@@ -188,12 +180,77 @@ var debug;
 		if (fullscreenElement)
 			exitFullscreen();
 		else {
-			if (document.getElementById("promptIt").onclick===submitTeleprompter)
+			if (promptIt.onclick===submitTeleprompter)
 				elem = document.getElementById("editorcontainer");
 			else
 				elem = document.documentElement;
 			launchIntoFullscreen(elem);
 		}
+	}
+
+	function togglePromptIt() {
+		if (promptIt.onclick===submitTeleprompter) {		
+			// Update button
+			promptIt.textContent = "Close It...";
+			promptIt.onclick = restoreEditor;
+			// Hide stuff
+			document.getElementById("content").style.display = "none";
+			document.getElementById("editorcontainer").style.display = "none";
+			document.getElementById("footer").style.display = "none";
+			// Show prompter frame
+			document.getElementById("framecontainer").style.display = "block";
+		}
+		else {
+			// Update button
+			promptIt.innerHTML = "Prompt It!";
+			promptIt.onclick = submitTeleprompter;
+			// Restore editor
+			document.getElementById("content").style.display = "";
+			document.getElementById("editorcontainer").style.display = "";
+			document.getElementById("footer").style.display = "";
+			// Hide prompter frame
+			document.getElementById("framecontainer").style.display = "none";
+		}
+	}
+
+	var xmlhttp = new XMLHttpRequest();
+	xmlhttp.onreadystatechange = function() {
+		if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+			htmldata = xmlhttp.responseText;
+			internalCredits();
+		}
+	}
+
+	function internalCredits() {
+		// Set primary instance as active.
+		instance[0] = true;
+		instance[1] = false;
+
+		// Toggle editor interface
+		togglePromptIt();
+
+		// Set data to send.
+		var settings = '{ "data": {"secondary":0,"primary":1,"prompterStyle":3,"focusMode":3,"background":"#3CC","color":"#333","overlayBg":"#333"}}',
+			session = '{ "html":"'+encodeURIComponent(htmldata)+'" }';
+
+		// Store data locally for prompter to use
+		localStorage.setItem("IFTeleprompterSettings", settings);
+		if (inElectron())
+			localStorage.setItem("IFTeleprompterSession", session);
+		else
+			sessionStorage.setItem("IFTeleprompterSession", session);
+
+		// Update frame and focus on it.
+		//frame.src = "teleprompter.html";
+		frame.src = "teleprompter.html?debug=1";
+		frame.focus();
+
+	}
+
+	function credits() {
+		// Get credits page.
+		xmlhttp.open("GET", "credits.html", true);
+		xmlhttp.send();
 	}
 
 	// On "Prompt It!" clicked
@@ -203,7 +260,6 @@ var debug;
 		// Stops the event but continues executing the code.
 		event.preventDefault();
 		// Get html from editor
-		var htmldata
 		if (typeof CKEDITOR !== "undefined")
 			htmldata = CKEDITOR.instances.prompt.getData()
 		else if (typeof tinymce !== "undefined")
@@ -223,13 +279,6 @@ var debug;
 		// Set and load "Primary"
 		if ( document.getElementById("primary").value>0 ) {
 			instance[0] = true;
-			// Hide stuff
-			document.getElementById("content").style.display = "none";
-			document.getElementById("editorcontainer").style.display = "none";
-			document.getElementById("footer").style.display = "none";
-			// Show prompter frame
-			document.getElementById("framecontainer").style.display = "block";
-
 			// Checks if is running on electron app...
 			if(navigator.userAgent.indexOf("Electron")!=-1)
 				ipcRenderer.send('make-fullscreen');         
@@ -281,10 +330,12 @@ var debug;
 		// In case of none
 		if ( !(instance[0]||instance[1]) )
 			window.alert("You must prompt at least to one display.");
-		else {
-			event.target.textContent = "Close It...";
-			event.target.onclick = restoreEditor;	
-		}
+		else
+			togglePromptIt();
+	}
+
+	function toc () {
+		tic!=tic;
 	}
 
 	function listener(event) {
@@ -304,10 +355,19 @@ var debug;
 				restoreEditor();
 			else {
 				// Redirect message to each prompter instance.
-				if (instance[1])
-					prompterWindow.postMessage( message, getDomain());
-				if (instance[0])
-					frame.contentWindow.postMessage( message, getDomain());
+				if (tic) {
+					if (instance[1])
+						prompterWindow.postMessage( message, getDomain());
+					if (instance[0])
+						frame.contentWindow.postMessage( message, getDomain());
+				}
+				else  {
+					if (instance[0])
+						frame.contentWindow.postMessage( message, getDomain());
+					if (instance[1])
+						prompterWindow.postMessage( message, getDomain());
+				}
+				setTimeout(toc, 10);
 			}
 		}
 	}
@@ -330,6 +390,10 @@ var debug;
 			case 27: // ESC
 			case "Escape":
 				restoreEditor();
+				break;
+			case 81: // ESC
+			case "q":
+				credits();
 				break;
 		}
 	};

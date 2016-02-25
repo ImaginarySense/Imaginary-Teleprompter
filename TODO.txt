@@ -29,8 +29,7 @@ Comment: It's important to complete the high and normal priorities for the miles
 
 - Javier -
 1. Teleprompter|High: Fix bad sync on single vertical flip.
-2. Teleprompter|High: Cap command input per given time. 
-3. Teleprompter|Low: Code relative font size increase and decrease feature.
+2. Teleprompter|Low: Code relative font size increase and decrease feature.
 	Font size changes must ocurr either at the #prompt or at the #promptcontainer level.
 
 - Victor -
