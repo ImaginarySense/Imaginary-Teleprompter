@@ -53,32 +53,23 @@ app.on('ready', function() {
 		event.sender.send('asynchronous-reply', 'Done');
 	});
     
-  // Send a message to the renderer process...
-  ipcMain.on('make-fullscreen', function(event) {
-     mainWindow.setFullScreen(true);
-  });
 
   // Register a 'F8' shortcut listener.
   var ret = globalShortcut.register('F8', function() {
     mainWindow.openDevTools();
   });
   
-  var ret2 = globalShortcut.register('F10', function() {
-      mainWindow.setFullScreen(false);
-  });
 
-  if (!ret || !ret2) {
+  if (!ret) {
     console.log('registration failed');
   }
 
   // Check whether a shortcut is registered.
   console.log(globalShortcut.isRegistered('F8'));
-  console.log(globalShortcut.isRegistered('F10'));
-  
+
   app.on('will-quit', function() {
   // Unregister a shortcut.
   globalShortcut.unregister('F8');
-  globalShortcut.unregister('F10');
 
   // Unregister all shortcuts.
   globalShortcut.unregisterAll();

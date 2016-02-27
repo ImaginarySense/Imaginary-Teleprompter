@@ -280,12 +280,22 @@ var debug;
 		if ( document.getElementById("primary").value>0 ) {
 			instance[0] = true;
 			// Checks if is running on electron app...
-			if(navigator.userAgent.indexOf("Electron")!=-1)
-				ipcRenderer.send('make-fullscreen');         
-			
-			// Load teleprompter
-			frame.src = "teleprompter.html?debug=1";
-			frame.focus();
+			if(inElectron()){
+                const remote = require('electron').remote; //Returns the object returned by require(electron) in the main process.
+				var elecScreen = require('electron').screen //Returns the object returned by require(electron.screen) in the main process.
+                
+                if(elecScreen.getPrimaryDisplay() && instance[0]){
+                    toggleFullscreen();
+                    frame.src = "teleprompter.html?debug=1";
+                }
+            } else {
+                 // Load teleprompter
+			     frame.src = "teleprompter.html?debug=1";
+			     frame.focus();
+            }
+            
+           
+            
 		}
 		else
 			instance[0] = false;
@@ -294,10 +304,9 @@ var debug;
 		if ( document.getElementById("secondary").value>0 ) {
 			instance[1] = true;
 			// Checks if is running on electron app...
-			if (navigator.userAgent.indexOf("Electron")!=-1) {
+			if (inElectron()) {
 				// Imported libraries for the us of externalDisplay...
 				const remote = require('electron').remote; //Returns the object returned by require(electron) in the main process.
-				const BrowserWindow = remote.BrowserWindow; //Returns the object returned by require(electron.BrowserWindow) in the main process.
 				var elecScreen = require('electron').screen //Returns the object returned by require(electron.screen) in the main process.
 
 				//var electronScreen = electron.screen; // Module that retrieves information about screen size, displays,
@@ -312,9 +321,7 @@ var debug;
 				}
 
 				// If there are any externalDisplay; then create a new window for the display.
-				if (externalDisplay) {
-					//mainWindow = new BrowserWindow({x: externalDisplay.bounds.x + 50, y: externalDisplay.bounds.y + 50, title: 'Teleprompter', fullscreen: true});
-					//mainWindow.loadURL('file://' + __dirname + '/teleprompter.html'); // load the teleprompter.html file when the mainWindow is created.
+				if (externalDisplay && instance[1]) {
 					prompterWindow = window.open("teleprompter.html?debug=1",'TelePrompter Output','height='+externalDisplay.bounds.y + 50 +', width='+externalDisplay.bounds.x + 50 +', top=0, left='+elecScreen.width+', fullscreen=1, status=0, location=0, menubar=0, toolbar=0');
 				}
 			} else {
