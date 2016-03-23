@@ -32,6 +32,25 @@ var debug;
 
 	// Global variables
 	var domain, tic, instance = [false, false], htmldata;
+	
+	// Enums
+	var command = Object.freeze({
+		"incVelocity":1,
+		"decVelocity":2,
+		"iSync":3,
+		"sync":4,
+		"togglePlay":5,
+		"internalPlay":6,
+		"internalPause":7,
+		"play":8,
+		"pause":9,
+		"stopAll":10,
+		"incFont":11,
+		"decFont":12,
+		"anchor":13,
+		"close":14,
+		"restoreEditor":15
+	});
 
 	function init () {
 		// Set globals
@@ -73,7 +92,7 @@ var debug;
 				// Checks if the display was removed, then disables secondary screen botton.  
 				elecScreen.on('display-removed', function(event, oldDisplay) {
 					idTags.setAttribute("disabled", "disabled", "return false;"); 
-				}); 
+				});
 			});  
 			ipcRenderer.send('asynchronous-message', 'working');    
 		} // end if
@@ -153,10 +172,10 @@ var debug;
 			// Request to close prompters:
 			// Close frame.
 			if (frame.src.indexOf("teleprompter.html")!=-1)
-				frame.contentWindow.postMessage( {'request':'close'}, getDomain() );
+				frame.contentWindow.postMessage( {'request':command.close}, getDomain() );
 			// Close window.
 			if (prompterWindow)
-				prompterWindow.postMessage( {'request':'close'}, getDomain() );
+				prompterWindow.postMessage( {'request':command.close}, getDomain() );
 			// Stops the event but continues executing current function.
 			if (event&&event.preventDefault)
 				event.preventDefault();			
@@ -194,22 +213,26 @@ var debug;
 			promptIt.textContent = "Close It...";
 			promptIt.onclick = restoreEditor;
 			// Hide stuff
-			document.getElementById("content").style.display = "none";
-			document.getElementById("editorcontainer").style.display = "none";
-			document.getElementById("footer").style.display = "none";
-			// Show prompter frame
-			document.getElementById("framecontainer").style.display = "block";
+			if (instance[0]) {
+				document.getElementById("content").style.display = "none";
+				document.getElementById("editorcontainer").style.display = "none";
+				document.getElementById("footer").style.display = "none";
+				// Show prompter frame
+				document.getElementById("framecontainer").style.display = "block";
+			}
 		}
 		else {
 			// Update button
 			promptIt.innerHTML = "Prompt It!";
 			promptIt.onclick = submitTeleprompter;
 			// Restore editor
-			document.getElementById("content").style.display = "";
-			document.getElementById("editorcontainer").style.display = "";
-			document.getElementById("footer").style.display = "";
-			// Hide prompter frame
-			document.getElementById("framecontainer").style.display = "none";
+			if (instance[0]) {
+				document.getElementById("content").style.display = "";
+				document.getElementById("editorcontainer").style.display = "";
+				document.getElementById("footer").style.display = "";
+				// Hide prompter frame
+				document.getElementById("framecontainer").style.display = "none";
+			}
 		}
 	}
 
@@ -339,8 +362,8 @@ var debug;
 	}
 
 	function listener(event) {
-		/*
 		// Message data. Uncommenting will give you valuable information and decrease performance dramatically.
+		/*
 		setTimeout(function() {
 			if (debug) {
 				console.log("Editor:");
@@ -351,22 +374,47 @@ var debug;
 		// If the event comes from the same domain...
 		if (!event.domain||event.domain===getDomain()) {
 			var message = event.data;
-			if (message.request==="restoreEditor")
+			// Special case. Restore editor message received.
+			if (message.request===command.restoreEditor)
 				restoreEditor();
 			else {
-				// Redirect message to each prompter instance.
-				if (tic) {
-					if (instance[1])
-						prompterWindow.postMessage( message, getDomain());
-					if (instance[0])
-						frame.contentWindow.postMessage( message, getDomain());
+				// If this isn't a instant sync command, follow normal procedure.
+				if (!(message.request===command.iSync||message.request===command.sync)) {
+					// Tic toc mechanism symmetricaly distributes message request lag.
+					if (tic) {
+						// Redirect message to each prompter instance.
+						if (instance[1])
+							prompterWindow.postMessage( message, getDomain());
+						if (instance[0])
+							frame.contentWindow.postMessage( message, getDomain());
+					}
+					else  {
+						// Redirect message to each prompter instance.
+						if (instance[0])
+							frame.contentWindow.postMessage( message, getDomain());
+						if (instance[1])
+							prompterWindow.postMessage( message, getDomain());
+					}
 				}
-				else  {
-					if (instance[0])
-						frame.contentWindow.postMessage( message, getDomain());
-					if (instance[1])
-						prompterWindow.postMessage( message, getDomain());
+				// If requesting for sync, ensure both instances are open. Otherwise do nothing.
+				else if (instance[0]&&instance[1]) {
+					// Tic toc mechanism symmetricaly distributes message request lag.
+					if (tic) {
+						// Redirect message to each prompter instance.
+						if (instance[1])
+							prompterWindow.postMessage( message, getDomain());
+						if (instance[0])
+							frame.contentWindow.postMessage( message, getDomain());
+					}
+					else {
+						// Redirect message to each prompter instance.
+						if (instance[0])
+							frame.contentWindow.postMessage( message, getDomain());
+						if (instance[1])
+							prompterWindow.postMessage( message, getDomain());
+					}
 				}
+				// Update tic-toc bit.
 				setTimeout(toc, 10);
 			}
 		}
@@ -378,6 +426,46 @@ var debug;
 			event.key = event.keyCode;
 		if (debug) console.log(event.key);
 		switch ( event.key ) {
+			// TELEPROMPTER COMMANDS
+			case "s":
+			case "S":
+			case "ArrowDown":
+			case 40: // Down
+			case 68: // S
+				listener( {data:{request:command.incVelocity}} );
+				break;
+			// prompterWindow.postMessage( message, getDomain())
+			case "w":
+			case "W":
+			case "ArrowUp":
+			case 38: // Up
+			case 87: // W
+				listener( {data:{request:command.decVelocity}} );
+				break;
+			case "d":
+			case "D":
+			case "ArrowRight":
+			case 83: // S
+			case 39: // Right
+				listener( {data:{request:command.incFont}} );
+				break;
+			case "a":
+			case "A":
+			case "ArrowLeft":
+			case 37: // Left
+			case 65: // A
+				listener( {data:{request:command.decVelocity}} );
+				break;
+			case " ":
+			case 32: // Spacebar
+				listener( {data:{request:command.togglePlay}} );
+				break;
+			case ".":
+			case 110: // Numpad dot
+			case 190: // Dot
+				listener( {data:{request:command.sync}} );
+				break;
+			// EDITOR COMMANDS
 			case 122:
 			case "F11":
 				event.preventDefault();
@@ -391,13 +479,17 @@ var debug;
 			case "Escape":
 				restoreEditor();
 				break;
-			case 81: // ESC
-			case "q":
-				credits();
-				break;
+			default:
+				// If pressed any number from 0 to 9.
+				if ( event.key>=48 && event.key<=57 )
+					event.key-=48;
+				else if ( event.key>=96 && event.key<=105 )
+					event.key-=96;
+				// Or if pressed any other key.
+				listener( {data:{request:command.anchor, data:event.key}} );
 		}
 	};
-		
+	
 	// Initialize objects after DOM is loaded
 	if (document.readyState === "interactive" || document.readyState === "complete")
 		// Call init if the DOM (interactive) or document (complete) is ready.

@@ -9,8 +9,7 @@ Comment: It's important to complete the high and normal priorities for the miles
 
 - Keyvan -
 1. CKEditor|High: Add custom "Fullscreen" button plugin to CKEditor. The button must run the toggleFullscreen function from editor.js.
-2. CKEditor|Normal: Make bottom left border of CKEditor's status bar not round.
-3. CKEditor|Low: Move "Word Count" into the Status Bar, without sacrificing inline mode.
+2. CKEditor|Low: Move "Word Count" into the Status Bar, without sacrificing inline mode.
 
 - Rafael -
 1. Main,Editor|High: Improve fullscreen in the following ways:

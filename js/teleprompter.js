@@ -30,7 +30,26 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	// Global objects
 	var settings, session, prompt, pointer, overlay, overlayFocus, styleElement, styleSheet, editor;
 	// Global variables
-	var unit, x, velocity, sensitivity, speedMultip, relativeLimit, play, timeoutStatus, invertedWheel, focus, promptStyleOption, customStyle, flipV, flipH, fontSize, previousPromptHeight, previousScreenHeight, previousScreenWidth, previousVerticalDisplacementCorrector, domain, debug, closing, cap;
+	var unit, x, velocity, sensitivity, speedMultip, relativeLimit, steps, play, timeoutStatus, invertedWheel, focus, promptStyleOption, customStyle, flipV, flipH, fontSize, previousPromptHeight, previousScreenHeight, previousScreenWidth, previousVerticalDisplacementCorrector, domain, debug, closing, cap, syncDelay;
+	// Enums
+	var command = Object.freeze({
+		"incVelocity":1,
+		"decVelocity":2,
+		"iSync":3,
+		"sync":4,
+		"togglePlay":5,
+		"internalPlay":6,
+		"internalPause":7,
+		"play":8,
+		"pause":9,
+		"stopAll":10,
+		"incFont":11,
+		"decFont":12,
+		"anchor":13,
+		"close":14,
+		"restoreEditor":15
+	});
+
 	// Global constants
 	const transitionDelays = 500,
 		timeoutDelay = 250,
@@ -70,12 +89,13 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		velocity = 0;
 		closing = false;
 		cap = false;
+		syncDelay = 12,
 		
 		// Animation settings
 		play = true;
-		sensitivity = 1.3;
-		speedMultip = 7;
-		
+		sensitivity = 1.2;
+		speedMultip = 13;
+
 		// Set values relative to unit size.
 		updateUnit();
 		
@@ -95,6 +115,8 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		else if (window.top)
 			editor = window.top;
 
+		// Sync delay control.
+		resetSteps();
 		// Get focus mode
 		focus = settings.data.focusMode;
 		// Get prompter style
@@ -176,7 +198,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
 	function pointerActive(event) {
 		if (!pointer.active) {
-			if (debug) console.log("Pointer active");
+			if (debug) console.log("Pointer active") && false;
 			internalPauseAnimation();
 			pointer.prompterstart = getCurrPos();
 			pointer.startposition = event.clientY;
@@ -187,7 +209,10 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
 	function pointerInactive() {
 		if (pointer.active) {
-			if (debug) console.log("Pointer inactive");
+			if ( !pointer.moved )
+				toggleTouchControls();
+			if (debug) console.log("Pointer inactive") && false;
+			pointer.moved = false;
 			pointer.active = false;
 			//letGoAnimation();
 			timeout(0, syncPrompters);
@@ -207,13 +232,14 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 			var argument,
 				pointerCurrPos = event.clientY,
 				distance = pointerCurrPos-pointer.startposition;
+			pointer.moved = true;
 			pointer.delta = pointerCurrPos-pointer.previousposition;
 			pointer.deltaTime = pointer.deltaTime;
 			argument = pointer.prompterstart+distance;
 			// Update previous position value.
 			pointer.previousposition = pointerCurrPos;
 			// Debug info
-			if (debug) console.log("Pointer start: "+pointer.startposition+"\nPointer at: "+pointerCurrPos+"\nDistance: "+distance+"\nDelta: "+pointer.delta);
+			if (debug) console.log("Pointer start: "+pointer.startposition+"\nPointer at: "+pointerCurrPos+"\nDistance: "+distance+"\nDelta: "+pointer.delta) && false;
 			// Move to pointed position.
 			setCurrPosStill(argument);
 		}
@@ -221,14 +247,14 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
 	/*
 	function atRest() {
-		if (debug) console.log("At rest");
+		if (debug) console.log("At rest") && false;
 		requestAnimationFrame(restorePointer);
 		syncPrompters();
 		internalPlayAnimation();
 	}
 
 	function restorePointer() {
-		if (debug) console.log("Restoring pointer position");
+		if (debug) console.log("Restoring pointer position") && false;
 		setCurrPosStill( getCurrPos()-getCurrPos( document.getElementById("prompt") ) );
 		setCurrPosStill( 0, document.getElementById("prompt") );
 	}
@@ -236,10 +262,10 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
 	function restoreRequest() {
 		// "closing" mutex prevents infinite loop.
-		if (debug) console.log("Restore request.");
+		if (debug) console.log("Restore request.") && false;
 		// If we have normal access to the editor, request it to restore the prompters.
 		if (editor)
-			editor.postMessage( {'request':'restoreEditor'}, getDomain() );	
+			editor.postMessage( {'request':command.restoreEditor}, getDomain() );	
 	}
 
 	function closeInstance() {
@@ -247,11 +273,11 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 			closing = true;
 			// Finally, close this window or clear iFrame. The editor must not be the one who closes cause it could cause an infinite loop.
 			if ( inIframe() ) {
-				if (debug) console.log("Closing iFrame prompter.");
+				if (debug) console.log("Closing iFrame prompter.") && false;
 				document.location = "about:blank";//"blank.html";
 			}
 			else {
-				if (debug) console.log("Closing window prompter.");
+				if (debug) console.log("Closing window prompter.") && false;
 				window.close();
 			}
 		}
@@ -301,11 +327,14 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	}
 
 	function syncPrompters() {
-		editor.postMessage( {'request':'sync','data':getProgress()}, getDomain() );
+		editor.postMessage( {'request':command.sync,'data':getProgress()}, getDomain() );
 	}
 
-	function instaSync() {
-		editor.postMessage( {'request':'iSync','data':getProgress()}, getDomain() );
+	function instaSync( forceSync ) {
+		if (forceSync||steps>syncDelay) {
+			editor.postMessage( {'request':command.iSync,'data':getProgress()}, getDomain() );
+			resetSteps();
+		}
 	}
 
 	function updateVelocity() {
@@ -320,7 +349,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 			flag = getCurrPos() >= 0;
 		else
 			flag = getCurrPos() <= -(getPromptHeight()-getScreenHeight());
-		if (debug&&flag) console.log("At top");
+		if (debug&&flag) console.log("At top") && false;
 		return flag;
 	}
 
@@ -330,32 +359,24 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 			flag = getCurrPos() <= -(getPromptHeight()-getScreenHeight());
 		else
 			flag = getCurrPos() >= 0;
-		if (debug&&flag) console.log("At bottom");
+		if (debug&&flag) console.log("At bottom") && false;
 		return flag;
 	}
 
 	function stopAll() {
-		editor.postMessage( {'request':10}, getDomain() );
+		editor.postMessage( {'request':command.stopAll}, getDomain() );
 	}
 
-	function stopThis() {
+	function stopInstance() {
 		x=0;
 		updateVelocity();
 		updateAnimation();
 	}
 
-	function firstValidProperty( properties ) {
-		var property;
-		for ( var i=0; i<properties.length; i++ )
-			if (properties[i])
-				property = properties[i];
-		return property;
-	}
-
 	document.addEventListener( 'transitionend', function() {
 		if(atStart()||atEnd())
 			stopAll();
-		if (debug) console.log("Reached end");
+		if (debug) console.log("Reached end") && false;
 	}, false);
 
 	// Gets variables from HTTP GET.
@@ -399,15 +420,22 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	}
 	
 	function getCurrPos(obj) {
-		if (!obj)
-			obj=prompt;
-		var computedStyle = window.getComputedStyle(obj, null),
-			theMatrix = computedStyle.getPropertyValue("transform"),
-		// Reading data from matrix.
-			mat = theMatrix.match(/^matrix3d\((.+)\)$/);
-		if (mat) return parseFloat(mat[1].split(', ')[13]);
-			mat = theMatrix.match(/^matrix\((.+)\)$/);
-		return mat ? parseFloat(mat[1].split(', ')[5]) : 0;
+		// There's more than a way to calculate the current position.
+		// This is the original method, slower and more reliable. Used only for Intergalactic Style, where the other method fails.
+		if (promptStyleOption===4) {
+			if (!obj)
+				obj=prompt;
+			var computedStyle = window.getComputedStyle(obj, null),
+				theMatrix = computedStyle.getPropertyValue("transform"),
+			// Reading data from matrix.
+				mat = theMatrix.match(/^matrix3d\((.+)\)$/);
+			if (mat) return parseFloat(mat[1].split(', ')[13]);
+				mat = theMatrix.match(/^matrix\((.+)\)$/);
+			return mat ? parseFloat(mat[1].split(', ')[5]) : 0;
+		}
+		// This method is faster, and it's prefered because it generates less lag. Unfortunatelly it fails to calculate in 3D space.
+		else
+			return prompt.getBoundingClientRect().top;
 	}
 
 	function setCurrPosStill( theCurrPos, obj ) {
@@ -474,7 +502,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		hack();
 		// Resume animation by re adding the class.
 		prompt.classList.add("move");
-		if (debug) setTimeout( function(){ console.log("Curr: "+getCurrPos()+"\nDest: "+destination+"\nRemTime "+time); }, 0);
+		if (debug) setTimeout( function(){ console.log("Curr: "+getCurrPos()+"\nDest: "+destination+"\nRemTime "+time) && false; }, 0);
 	}
 	//https://css-tricks.com/controlling-css-animations-transitions-javascript/
 
@@ -485,41 +513,33 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	function focusVerticalDisplacementCorrector() {
 		var vDisp;
 		switch (focus) {
-			// None syncs to top
+			// "None" syncs to top.
 			case 3:
-			// If top and flipped, take a bit above bottom
+			// Sync to "Top".
 			case 1:
-				if (flipV)
-					vDisp = getScreenHeight()-getFocusHeight();
-				else
-					vDisp = getFocusHeight()/2;
+				vDisp = getFocusHeight()/2;
 				break;
-			// If bottom and flipped, current position is correct
+			// Sync to "Bottom".
 			case 2:
-				if (!flipV)
-					vDisp = getScreenHeight()-getFocusHeight()/2;
+				vDisp = getScreenHeight()-getFocusHeight()/2;
 				break;
-			// Sync to center by default
+			// Sync to "Center" by default
 			default:
 				// If center and flip. Take a little above center
-				if (flipV)
-					vDisp = getScreenHeight()/2-getFocusHeight()/2;
-				// If no flip. Leave a little bellow center
-				else
-					vDisp = getScreenHeight()/2;
+				vDisp = getScreenHeight()/2;
 				break;
 		}
-		console.log("Vertical displacement: "+vDisp);
+		//if (debug) window.setTimeout( function() { console.log("Vertical displacement: "+vDisp) && false; };
 		return vDisp;
 	}
 
 	function moveToCSSAnchor( theAnchor ) {
 		var jump;
 		if (flipV)
-			jump = -getPromptHeight()+document.getElementById(theAnchor).offsetTop+focusVerticalDisplacementCorrector()+getFocusHeight()/2;
+			jump = -getPromptHeight()+document.getElementById(theAnchor).offsetTop + getScreenHeight()-focusVerticalDisplacementCorrector();
 		else
 			jump = -document.getElementById(theAnchor).offsetTop + focusVerticalDisplacementCorrector();
-		if (debug) console.log("Jumped to: "+jump);
+		if (debug) console.log("Jumped to: "+jump) && false;
 		// Jump to anchor
 		animate(0, jump);
 		// Resume animation
@@ -532,19 +552,19 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 			if ( document.getElementById( theAnchor ) )
 				moveToCSSAnchor( theAnchor );
 			else
-				if (debug) console.log("Invalid Anchor");
+				if (debug) console.log("Invalid Anchor") && false;
 		}
 	}
 	
 	function moveToAnchor( theAnchor ) {
-		editor.postMessage( {'request':'anchor','data':theAnchor}, getDomain() );
+		editor.postMessage( {'request':command.anchor,'data':theAnchor}, getDomain() );
 	}
 
 	// Update unit and unit related meassurements
 	function updateUnit() {
 		unit = getFocusHeight()/80;
 		relativeLimit = limit*unit;
-		if (debug) setTimeout( function(){ console.log("Unit updated: "+unit); });
+		if (debug) setTimeout( function(){ console.log("Unit updated: "+unit) && false; });
 		updateAnimation();
 	}
 
@@ -566,14 +586,14 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		// By using these we are able to recalculate position on correctVerticalDisplacement() and improve performance.
 		// Solve for current progress. P = (-(currPos+screenHeight-valToCenterAtFocusArea)) / (promptHeight-screenHeight)
 		// If flipV solve for...       P = (-(currPos+screenHeight-valToCenterAtFocusArea)) / (promptHeight-screenHeight)
-		var progress;
+		var progress,
+			currPos = getCurrPos();
 		if (flipV)
-			//progress = (getCurrPos()+previousPromptHeight-previousScreenHeight-previousVerticalDisplacementCorrector)/(previousPromptHeight-previousScreenHeight*2);
-			progress = (getCurrPos()+previousPromptHeight-previousScreenHeight-previousVerticalDisplacementCorrector)/(previousPromptHeight-previousScreenHeight*2);
+			progress = (-(previousPromptHeight-previousScreenHeight+currPos)-previousVerticalDisplacementCorrector+previousScreenHeight)/-(previousPromptHeight-previousScreenHeight*2);
 		else
-			progress = -(getCurrPos()+previousScreenHeight-previousVerticalDisplacementCorrector)/(previousPromptHeight-previousScreenHeight*2);
-		if (debug) console.log("Progress: "+(progress*100)+"%");
-		console.log(progress);
+			progress = (currPos-previousVerticalDisplacementCorrector+previousScreenHeight)/-(previousPromptHeight-previousScreenHeight*2);
+		if (debug) console.log("Progress: "+(progress*100)+"%") && false;
+		console.log(progress) && false;
 		return progress;
 	}
 		
@@ -583,7 +603,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		if (transitionDelay===undefined) {
 			transitionDelay = transitionDelays;
 			delay = timeoutDelay;
-		}
+		}	
 		else
 			delay = transitionDelay/2;
 		internalPauseAnimation();
@@ -595,13 +615,15 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 				valToCenterAtFocusArea = focusVerticalDisplacementCorrector();
 			if (percentage===undefined)
 				percentage = getProgress();
-			//
+			// Solve
+//			if (flipV)
+//				updatedPos = -((-percentage*(promptHeight-screenHeight*2))+promptHeight-screenHeight-valToCenterAtFocusArea);
+//			else
+//				updatedPos = (-percentage*(promptHeight-screenHeight*2))-screenHeight+valToCenterAtFocusArea;
 			if (flipV)
-				//updatedPos = -((-percentage*(promptHeight-screenHeight*2))+promptHeight-screenHeight-valToCenterAtFocusArea);
-				updatedPos = -((-percentage*(promptHeight-screenHeight*2))+promptHeight-screenHeight-valToCenterAtFocusArea);
+				updatedPos = -(-percentage*(promptHeight-screenHeight*2)+valToCenterAtFocusArea-screenHeight)-promptHeight+screenHeight;
 			else
-				// Solve for updated position. K=(-percentage*actualPromptHeight)-screenHeight+valToCenterAtFocusArea
-				updatedPos = (-percentage*(promptHeight-screenHeight*2))-screenHeight+valToCenterAtFocusArea;
+				updatedPos = -percentage*(promptHeight-screenHeight*2)+valToCenterAtFocusArea-screenHeight;
 			// Update "previous" values to current ones.
 			previousPromptHeight = promptHeight;
 			previousScreenHeight = screenHeight;
@@ -629,7 +651,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	}
 
 	window.addEventListener("resize", function() {
-		if (debug) console.log("Resize");
+		if (debug) console.log("Resize") && false;
 		// In case of resolution change, update density unit.
 		updateUnit();
 		// You can guess what the next line does.
@@ -638,7 +660,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
 	window.addEventListener("orientationchange", function() {
 		//http://stackoverflow.com/questions/5284878/how-do-i-correctly-detect-orientation-change-using-javascript-and-phonegap-in-io
-		if (debug) console.log("Orientation Change");
+		if (debug) console.log("Orientation Change") && false;
 		updateUnit();
 		correctVerticalDisplacement();
 	}, false);
@@ -663,6 +685,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	}, false);
 
 	// CONTROL RELATED FUNCTIONS
+
 	// FONT SIZE
 	function increaseFontSize() {
 		fontSize++;
@@ -680,13 +703,24 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	}
 
 	function decreaseVelocity() {
-		editor.postMessage( {'request':-11,'data':getProgress()}, getDomain() );
-		timeout(250, instaSync);
+		editor.postMessage( {'request':2,'data':getProgress()}, getDomain() );
 	}
 
 	function increaseVelocity() {
-		editor.postMessage( {'request':11,'data':getProgress()}, getDomain() );
+		editor.postMessage( {'request':1,'data':getProgress()}, getDomain() );
+	}
+
+	function incSteps() {
+		steps++;
+		if (steps>40) {
+			instaSync();
+			resetSteps();
+		}
 		timeout(250, instaSync);
+	}
+
+	function resetSteps() {
+		steps = 0;
 	}
 
 	function internalDecreaseVelocity() {
@@ -695,6 +729,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 				x--;
 				updateVelocity();
 				updateAnimation();
+				incSteps();
 			}
 		}
 		else
@@ -707,6 +742,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 				x++;
 				updateVelocity();
 				updateAnimation();
+				incSteps();
 			}
 		}
 		else
@@ -721,23 +757,21 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	}
 
 	function pauseAnimation() {
-		editor.postMessage( {'request':'pause'}, getDomain() );	
-		syncPrompters();
-		//instaSync();
-		if (debug) console.log("Paused");
+		editor.postMessage( {'request':command.pause}, getDomain() );
+		if (debug) console.log("Paused") && false;
 	}
 
 	function playAnimation() {
-		editor.postMessage( {'request':'play'}, getDomain() );	
-		if (debug) console.log("Playing");
+		editor.postMessage( {'request':command.play}, getDomain() );	
+		if (debug) console.log("Playing") && false;
 	}
 	
 	function internalPauseAnimation() {
-		editor.postMessage( {'request':'internalPause'}, getDomain() );	
+		editor.postMessage( {'request':command.internalPause}, getDomain() );	
 	}
 
 	function internalPlayAnimation() {
-		editor.postMessage( {'request':'internalPlay'}, getDomain() );	
+		editor.postMessage( {'request':command.internalPlay}, getDomain() );	
 	}
 
 	function localPauseAnimation() {
@@ -749,68 +783,77 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	}
 
 	function listener(event) {
-		/*
 		// Message data. Uncommenting will give you valuable information and decrease performance dramatically.
+		/*
 		setTimeout(function() {
 			if (debug) {
-				console.log("Editor:");
-				console.log(event);
+				console.log("Editor:") && false;
+				console.log(event) && false;
 			}
 		}, 0);
 		*/
 		// If the event comes from the same domain...
-		if (!event.domain||event.domain===getDomain()) {
+		if (!cap&&!event.domain||event.domain===getDomain()) {
 			// Act according to the message.
-			var message = event.data,
-				response = {
-				'11' : function () {
-					requestAnimationFrame(internalIncreaseVelocity);
-				},
-				'-11' : function () {
-					requestAnimationFrame(internalDecreaseVelocity);
-				},
-				'10' : function () {
-					requestAnimationFrame(stopThis);
-				},
-				'play' : function () {
-					play=true;
-					requestAnimationFrame(localPlayAnimation);
-				},
-				'internalPlay' : function () {
-					requestAnimationFrame(localPlayAnimation);
-				},
-				'pause' : function () {
-					requestAnimationFrame(localPauseAnimation);
-					play=false;
-				},
-				'internalPause' : function () {
-					//localPauseAnimation();
-					requestAnimationFrame(localPauseAnimation);
-				},
-				'anchor' : function () {
-					 requestAnimationFrame(function(){
-						internalMoveToAnchor(message.data);
-					 });
-				},
-				'sync' : function () {
-					requestAnimationFrame(function(){
-						correctVerticalDisplacement(message.data);
-					});
-				},
-				/* Insta sync */
-				'iSync' : function () {
+			var message = event.data;
+			if(message.request==command.increaseVelocity||message.request==command.decreaseVelocity)
+				setCap();
+			switch (message.request) {
+				case 1 :
+					internalIncreaseVelocity();
+					//requestAnimationFrame(internalIncreaseVelocity);
+					break;
+				case 2 :
+					internalDecreaseVelocity();
+					//requestAnimationFrame(internalDecreaseVelocity);
+					break;
+				case command.iSync :
 					requestAnimationFrame(function(){
 						correctVerticalDisplacement(message.data,0);
 					});
-				},
-				'close' : closeInstance,
-				'default' : function () {
+					break;
+				case command.sync :
+					requestAnimationFrame(function(){
+						correctVerticalDisplacement(message.data);
+					});
+					break;
+				case command.stopAll :
+					requestAnimationFrame(stopInstance);
+					break;
+				case command.play :
+					play=true;
+				case command.internalPlay :
+					requestAnimationFrame(localPlayAnimation);
+					break;
+				case command.pause :
+					requestAnimationFrame(localPauseAnimation);
+					play=false;
+					syncPrompters();
+					break;
+				case command.internalPause :
+					requestAnimationFrame(localPauseAnimation);
+					break;
+				case command.togglePlay :
+					toggleAnimation();
+					break;
+				case command.anchor :
+					requestAnimationFrame(function(){
+						internalMoveToAnchor(message.data);
+					});
+					break;
+				case command.incFont :
+					increaseFontSize();
+					break;
+				case command.decFont :
+					decreaseFontSize();
+					break;
+				case command.close :
+					closeInstance();
+					break;
+				default :
 					// Notify unknown message received.
-					if (debug) console.log("Unknown post message received: "+message.request);
-				}
-			};
-			// Invoque response.
-			(response[String(message.request)] || response['default'])();
+					if (debug) console.log("Unknown post message received: "+message.request) && false;
+			}
 		}
 	}
 
@@ -826,14 +869,16 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		setTimeout(resetCap, inputCapDelay);
 	}
 
+	function toggleTouchControls() {
+
+	}
+
 	document.onkeydown = function( event ) {
 		// keyCode is announced to be deprecated but not all browsers support key as of 2016.
-		if (!cap)
 			setTimeout( function() {
-				setCap();
 				if (event.key === undefined)
 					event.key = event.keyCode;
-				if (debug) console.log("Key: "+event.key);
+				if (debug) console.log("Key: "+event.key) && false;
 				switch ( event.key ) {
 					case "s":
 					case "S":
@@ -884,12 +929,10 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 					default: // Move to anchor.
 						// If pressed any number from 0 to 9.
 						if ( event.key>=48 && event.key<=57 )
-							moveToAnchor( event.key-48 );
+							event.key-=48;
 						else if ( event.key>=96 && event.key<=105 )
-							moveToAnchor( event.key-96 );
-						// Or if pressed any other key.
-						else
-							moveToAnchor( event.key );
+							event.key-=96;
+						moveToAnchor( event.key );
 				}
 			}, 0);
 		// Prevent arrow and spacebar scroll bug.

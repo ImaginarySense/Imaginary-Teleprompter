@@ -16,6 +16,23 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#prompt * a {
+	color: inherit !important;
+}
+
+#prompt * img {
+	width: 100% !important;
+	height: auto !important;
+}
+
+#prompt * table {
+	table-layout: fixed;
+}
+
+#prompt * td {
+	width: 10%;
+}
+
 .darkBody {
 	background: #272822;
 	color:#FFF;

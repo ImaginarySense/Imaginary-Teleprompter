@@ -1,16 +1,35 @@
 CHANGELOG
 
+v2.0b 16.03.23
+> Improved perfect sync:
+>> Reduced communication lag by commenting unecesary debug messages, returning to switch based message comparison and using enums for testing.
+>> Implemented faster way to getCurrPos() and reduce lag.
+>> Made iSync jitter less noticeable by reducing sync frequency.
+> Improved status bar's styling.
+> Fix: Single vFlip vertical align mismatch bug and implicit jump to anchor bug.
+> Fix: Made link color inheritable for all prompted contents.
+> Fix: Made prompted image and iframes use relative measures.
+> Fix: Fully toggled editor's interface when requesting only for external instance.
+> Fix: iFrame prompter misplaced in screens smaller than 768px.
+> Fix: CKEditor's default font-sizes inappropriate for teleprompter.
+> Fix: CKEditor's font-sizes too small to fit larger font alternatives.
+> Upgraded to CKEditor Full to make it easier for users to customize CKEditor.
+> Improved CKEditor's panel layout, removed some features to fit most users' needs.
+> Configured CKEditor's image, table, iframe, flash and math equation sizes to be relative by default in order to prevent bug that breaks synchronization.
+> Added teleprompter keyboard inputs to editor so teleprompter doesn't need to be focused in order to send commands.
+> Added gesture to toggle yet to be implemented touch controls.
+
 v2.0a 16.02.25.0
 > Emulated perfect sync:
 >> Added an inputs per second cap.
->> Added tic toc mechanism in editor.js to symetrically distribute communication latency between instances.
+>> Added tic toc mechanism in editor.js to symmetrically distribute communication latency between instances.
 >> Reduced message receipt execution latency at teleprompter.js by improving efficiency.
 >> Implemented instantaneous sync milliseconds after no input is received.
 >> Modified our timeout function to achieve instantaneous sync.
 > Added Full Credits feature.
 > Updated index.html's footer.
 > Reorganized editor.js code.
-> Removed unnecesary CSS prefixes from javascript code.
+> Removed unnecessary CSS prefixes from javascript code.
 
 v2.0a 16.02.14.0
 > Moved from inline TinyMCE to inline CKEditor. Also made it easy to choose between one or the other by uncommenting and commenting imports at index.html. Notice we're sticking with CKEditor because not only is it more robust, but fixing or avoiding inline TinyMCE bugs means a lot unnecessary of work.
