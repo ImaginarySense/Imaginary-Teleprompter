@@ -1,5 +1,8 @@
 CHANGELOG
 
+v2.0b 16.03.24.0
+> Merged smart fullscreen implementation.
+
 v2.0b 16.03.23
 > Improved perfect sync:
 >> Reduced communication lag by commenting unecesary debug messages, returning to switch based message comparison and using enums for testing.
