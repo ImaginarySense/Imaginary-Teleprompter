@@ -152,3 +152,7 @@ a:active {
 .cke_combopanel__fontsize {
 	width: 235px !important;
 }
+
+.bs-docs-footer-links {
+	margin-bottom: 0 !important;
+}

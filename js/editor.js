@@ -176,9 +176,11 @@ var debug;
 			// Close window.
 			if (prompterWindow)
 				prompterWindow.postMessage( {'request':command.close}, getDomain() );
+			// Clear contents from frame
+			frame.src = "about:blank";
 			// Stops the event but continues executing current function.
 			if (event&&event.preventDefault)
-				event.preventDefault();			
+				event.preventDefault();
 			togglePromptIt();
 		}
 	}
@@ -219,6 +221,7 @@ var debug;
 				document.getElementById("footer").style.display = "none";
 				// Show prompter frame
 				document.getElementById("framecontainer").style.display = "block";
+				launchIntoFullscreen(document.documentElement);
 			}
 		}
 		else {
@@ -232,6 +235,7 @@ var debug;
 				document.getElementById("footer").style.display = "";
 				// Hide prompter frame
 				document.getElementById("framecontainer").style.display = "none";
+				exitFullscreen();
 			}
 		}
 	}
@@ -251,7 +255,7 @@ var debug;
 
 		// Toggle editor interface
 		togglePromptIt();
-
+		
 		// Set data to send.
 		var settings = '{ "data": {"secondary":0,"primary":1,"prompterStyle":3,"focusMode":3,"background":"#3CC","color":"#333","overlayBg":"#333"}}',
 			session = '{ "html":"'+encodeURIComponent(htmldata)+'" }';
@@ -274,6 +278,7 @@ var debug;
 		// Get credits page.
 		xmlhttp.open("GET", "credits.html", true);
 		xmlhttp.send();
+		toggleFullscreen();
 	}
 
 	// On "Prompt It!" clicked
@@ -304,13 +309,13 @@ var debug;
 			instance[0] = true;
 			// Checks if is running on electron app...
 			if ( inElectron() ) {
-				ipcRenderer.send('make-fullscreen');         		                const remote = require('electron').remote; //Returns the object returned by require(electron) in the main process.
+				ipcRenderer.send('make-fullscreen');
+				const remote = require('electron').remote; //Returns the object returned by require(electron) in the main process.
 				var elecScreen = require('electron').screen //Returns the object returned by require(electron.screen) in the main process.
 				// Load teleprompter
 				frame.src = "teleprompter.html?debug=1";
 				if ( elecScreen.getPrimaryDisplay() && instance[0] ) {
 					frame.focus();
-					toggleFullscreen();
 					frame.src = "teleprompter.html?debug=1";
 				}
 			}

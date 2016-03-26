@@ -1,7 +1,11 @@
 CHANGELOG
 
+v2.0b 16.03.26.0
+> Completed Windows installer.
+> Quickfixes to first instance fullscreen.
+
 v2.0b 16.03.24.0
-> Merged smart fullscreen implementation.
+> Partially merged smart fullscreen implementation.
 
 v2.0b 16.03.23
 > Improved perfect sync:
