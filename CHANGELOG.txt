@@ -1,5 +1,12 @@
 CHANGELOG
 
+v2.0b RC-0 (16.03.27.0)
+> Fix: Absolute pixel based Font-sizes bugs. Font-size was not enough on some screens and it broke multi-window mode when used. Using em now instead.
+> Updated download link and footer credit links.
+
+v2.0b 16.03.26.1
+> Perfected smart fullscreen for 2.0 release.
+
 v2.0b 16.03.26.0
 > Completed Windows installer.
 > Quickfixes to first instance fullscreen.
