@@ -3,6 +3,7 @@ CHANGELOG
 v2.0b 16.03.26.0
 > Completed Windows installer.
 > Quickfixes to first instance fullscreen.
+> Completed Fullscreen code with BETA version.
 
 v2.0b 16.03.24.0
 > Partially merged smart fullscreen implementation.

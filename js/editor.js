@@ -84,15 +84,6 @@ var debug;
 						classTags[i].href = "#";
 						classTags[i].target = "_parent";
 					}
-				// Checks if a display was added, then enables secondary screen botton.               
-				elecScreen.on('display-added', function(event, oldDisplay) {
-					// idTags.setAttribute("disabled", "false", "return false;"); 
-					idTags.removeAttribute("disabled", "return false;");
-				});   
-				// Checks if the display was removed, then disables secondary screen botton.  
-				elecScreen.on('display-removed', function(event, oldDisplay) {
-					idTags.setAttribute("disabled", "disabled", "return false;"); 
-				});
 			});  
 			ipcRenderer.send('asynchronous-message', 'working');    
 		} // end if
@@ -309,24 +300,23 @@ var debug;
 			instance[0] = true;
 			// Checks if is running on electron app...
 			if ( inElectron() ) {
-				ipcRenderer.send('make-fullscreen');
-				const remote = require('electron').remote; //Returns the object returned by require(electron) in the main process.
+				var remote = require('electron').remote; //Returns the object returned by require(electron) in the main process.
 				var elecScreen = require('electron').screen //Returns the object returned by require(electron.screen) in the main process.
-				// Load teleprompter
-				frame.src = "teleprompter.html?debug=1";
-				if ( elecScreen.getPrimaryDisplay() && instance[0] ) {
-					frame.focus();
+				
+                // Load teleprompter
+				if (elecScreen.getPrimaryDisplay() && instance[0]) {
+					toggleFullscreen();
 					frame.src = "teleprompter.html?debug=1";
 				}
-			}
-			else {
+			} else {
 				// Load teleprompter
 				frame.src = "teleprompter.html?debug=1";
 				frame.focus();
 			}
 		}
-		else
-			instance[0] = false;
+		else {
+            instance[0] = false;
+        }			
 
 		// "Secondary"
 		if ( document.getElementById("secondary").value>0 ) {
@@ -336,7 +326,7 @@ var debug;
 				// Imported libraries for the us of externalDisplay...
 				var remote = require('electron').remote; //Returns the object returned by require(electron) in the main process.
 				var elecScreen = require('electron').screen //Returns the object returned by require(electron.screen) in the main process.
-
+                var availableScreen = false;
 				//var electronScreen = electron.screen; // Module that retrieves information about screen size, displays,
 				// cursor position, etc. Important: You should not use this module until the ready event of the app module is Emitted.
 				var displays = elecScreen.getAllDisplays(); // Returns an array of displays that are currently  available.
@@ -347,24 +337,43 @@ var debug;
 						break;
 					}
 				}
+                
+                // Checks if a display was added, then enables secondary screen botton.               
+				elecScreen.on('display-added', function(event, oldDisplay) {
+					availableScreen = true;
+				});   
+				// Checks if the display was removed, then disables secondary screen botton.  
+				elecScreen.on('display-removed', function(event, oldDisplay) {
+					availableScreen = false;
+				}); 
 
 				// If there are any externalDisplay; then create a new window for the display.
-				if ( externalDisplay && instance[1] )
-					prompterWindow = window.open("teleprompter.html?debug=1",'TelePrompter Output','height='+externalDisplay.bounds.y + 50 +', width='+externalDisplay.bounds.x + 50 +', top=0, left='+elecScreen.width+', fullscreen=1, status=0, location=0, menubar=0, toolbar=0');
-			}
-			else {
+				if ( externalDisplay && instance[1] && availableScreen === true){
+                    prompterWindow = window.open("teleprompter.html?debug=1",'TelePrompter Output','height='+externalDisplay.bounds.y + 50 +', width='+externalDisplay.bounds.x + 50 +', top=0, left='+elecScreen.width+', fullscreen=1, status=0, location=0, menubar=0, toolbar=0');
+                }else if(!externalDisplay && instance[0] === false){
+                    prompterWindow = window.open("teleprompter.html"+(debug?"?debug=1":""),'TelePrompter Output','height='+screen.availHeight+', width='+screen.width+', top=0, left='+screen.width+', fullscreen=1, status=0, location=0, menubar=0, toolbar=0' );
+				if (window.focus)
+					prompterWindow.focus();
+                }
+					
+			}else {
 				prompterWindow = window.open("teleprompter.html"+(debug?"?debug=1":""),'TelePrompter Output','height='+screen.availHeight+', width='+screen.width+', top=0, left='+screen.width+', fullscreen=1, status=0, location=0, menubar=0, toolbar=0' );
 				if (window.focus)
 					prompterWindow.focus();
 			}
 		}
-		else
-			instance[1] = false;
+		else{
+            instance[1] = false;
+        }
+			
 	
 		// In case of both
 		// In case of none
 		if ( !(instance[0]||instance[1]) )
 			window.alert("You must prompt at least to one display.");
+        else if (inElectron() && instance[0] && instance[1] && !externalDisplay){
+            window.alert("You dont have any external Display");
+       }
 		else
 			togglePromptIt();
 	}
@@ -491,6 +500,16 @@ var debug;
 			case "Escape":
 				restoreEditor();
 				break;
+            // Electron Commands
+            case 17, 91, 70:
+            case "ctrl" + "" + "f":
+            if(inElectron()){
+                event.preventDefault();
+                toggleFullscreen();
+                break;
+            } else{
+                break;
+            }
 			default:
 				// If pressed any number from 0 to 9.
 				if ( event.key>=48 && event.key<=57 )
