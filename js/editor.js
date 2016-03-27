@@ -326,7 +326,6 @@ var debug;
 				// Imported libraries for the us of externalDisplay...
 				var remote = require('electron').remote; //Returns the object returned by require(electron) in the main process.
 				var elecScreen = require('electron').screen //Returns the object returned by require(electron.screen) in the main process.
-                var availableScreen = false;
 				//var electronScreen = electron.screen; // Module that retrieves information about screen size, displays,
 				// cursor position, etc. Important: You should not use this module until the ready event of the app module is Emitted.
 				var displays = elecScreen.getAllDisplays(); // Returns an array of displays that are currently  available.
@@ -337,18 +336,8 @@ var debug;
 						break;
 					}
 				}
-                
-                // Checks if a display was added, then enables secondary screen botton.               
-				elecScreen.on('display-added', function(event, oldDisplay) {
-					availableScreen = true;
-				});   
-				// Checks if the display was removed, then disables secondary screen botton.  
-				elecScreen.on('display-removed', function(event, oldDisplay) {
-					availableScreen = false;
-				}); 
-
 				// If there are any externalDisplay; then create a new window for the display.
-				if ( externalDisplay && instance[1] && availableScreen === true){
+				if (externalDisplay && instance[1]){
                     prompterWindow = window.open("teleprompter.html?debug=1",'TelePrompter Output','height='+externalDisplay.bounds.y + 50 +', width='+externalDisplay.bounds.x + 50 +', top=0, left='+elecScreen.width+', fullscreen=1, status=0, location=0, menubar=0, toolbar=0');
                 }else if(!externalDisplay && instance[0] === false){
                     prompterWindow = window.open("teleprompter.html"+(debug?"?debug=1":""),'TelePrompter Output','height='+screen.availHeight+', width='+screen.width+', top=0, left='+screen.width+', fullscreen=1, status=0, location=0, menubar=0, toolbar=0' );
