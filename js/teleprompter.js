@@ -548,12 +548,10 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
 	function internalMoveToAnchor( theAnchor ) {
 		// Proceed to anchor only if anchor is valid.
-		if (theAnchor!=-1) {
-			if ( document.getElementById( theAnchor ) )
-				moveToCSSAnchor( theAnchor );
-			else
-				if (debug) console.log("Invalid Anchor") && false;
-		}
+		if ( document.getElementById( theAnchor ) )
+			moveToCSSAnchor( theAnchor );
+		else
+			if (debug) console.log("Invalid Anchor") && false;
 	}
 	
 	function moveToAnchor( theAnchor ) {
@@ -616,10 +614,6 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 			if (percentage===undefined)
 				percentage = getProgress();
 			// Solve
-//			if (flipV)
-//				updatedPos = -((-percentage*(promptHeight-screenHeight*2))+promptHeight-screenHeight-valToCenterAtFocusArea);
-//			else
-//				updatedPos = (-percentage*(promptHeight-screenHeight*2))-screenHeight+valToCenterAtFocusArea;
 			if (flipV)
 				updatedPos = -(-percentage*(promptHeight-screenHeight*2)+valToCenterAtFocusArea-screenHeight)-promptHeight+screenHeight;
 			else
@@ -666,20 +660,17 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	}, false);
 
 	window.addEventListener("wheel", function(event) {
-		if (!cap) {
-			setCap();
-			if (invertedWheel) {
-				if (event.deltaY>0)
-					increaseVelocity();
-				else
-					decreaseVelocity();
-			}
-			else {
-				if (event.deltaY>0)
-					decreaseVelocity();
-				else
-					increaseVelocity();
-			}
+		if (invertedWheel) {
+			if (event.deltaY>0)
+				increaseVelocity();
+			else
+				decreaseVelocity();
+		}
+		else {
+			if (event.deltaY>0)
+				decreaseVelocity();
+			else
+				increaseVelocity();
 		}
 		event.preventDefault();
 	}, false);
@@ -874,70 +865,86 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	}
 
 	document.onkeydown = function( event ) {
+		var key;
 		// keyCode is announced to be deprecated but not all browsers support key as of 2016.
-			setTimeout( function() {
-				if (event.key === undefined)
-					event.key = event.keyCode;
-				if (debug) console.log("Key: "+event.key) && false;
-				switch ( event.key ) {
-					case "s":
-					case "S":
-					case "ArrowDown":
-					case 40: // Down
-					case 68: // S
-						increaseVelocity();
-						break;
-					case "w":
-					case "W":
-					case "ArrowUp":
-					case 38: // Up
-					case 87: // W
-						decreaseVelocity();
-						break;
-					case "d":
-					case "D":
-					case "ArrowRight":
-					case 83: // S
-					case 39: // Right
-						increaseFontSize();
-						break;
-					case "a":
-					case "A":
-					case "ArrowLeft":
-					case 37: // Left
-					case 65: // A
-						decreaseFontSize();
-						break;
-					case " ":
-					case 32: // Spacebar
-						toggleAnimation();
-						break;
-					case ".":
-					case 110: // Numpad dot
-					case 190: // Dot
-						syncPrompters();
-						break;
-					case "Escape":
-					case 27: // ESC
-						closeInstance();
-						break;
-					case "F8":
-					case 119:
-						event.preventDefault();
-						debug=!debug;
-						break;
-					default: // Move to anchor.
-						// If pressed any number from 0 to 9.
-						if ( event.key>=48 && event.key<=57 )
-							event.key-=48;
-						else if ( event.key>=96 && event.key<=105 )
-							event.key-=96;
-						moveToAnchor( event.key );
-				}
-			}, 0);
+		if (event.key === undefined)
+			event.key = event.keyCode;
+		if (debug) console.log("Key: "+event.key) && false;
+		switch ( event.key ) {
+			case "s":
+			case "S":
+			case "ArrowDown":
+			case 40: // Down
+			case 68: // S
+				increaseVelocity();
+				break;
+			case "w":
+			case "W":
+			case "ArrowUp":
+			case 38: // Up
+			case 87: // W
+				decreaseVelocity();
+				break;
+			case "d":
+			case "D":
+			case "ArrowRight":
+			case 83: // S
+			case 39: // Right
+				increaseFontSize();
+				break;
+			case "a":
+			case "A":
+			case "ArrowLeft":
+			case 37: // Left
+			case 65: // A
+				decreaseFontSize();
+				break;
+			case " ":			
+			case 32: // Spacebar
+				toggleAnimation();
+				break;
+			case ".":
+			case 110: // Numpad dot
+			case 190: // Dot
+				syncPrompters();
+				break;
+			case "Escape":
+			case 27: // ESC
+				closeInstance();
+				break;
+			case "F8":
+			case 119:
+				event.preventDefault();
+				debug=!debug;
+				break;
+			default: // Move to anchor.
+				// If key is not a string
+				if ( !isFunction(event.key.indexOf) )
+					key = String.fromCharCode(event.key);
+				else
+					key = event.key;
+				//if ( key.indexOf("Key")===0 || key.indexOf("Digit")===0 )
+				//		key = key.charAt(key.length-1);
+				if ( !is_int(key) )
+					key = key.toLowerCase();
+				if (debug) console.log(key);
+				moveToAnchor( key );
+		}
 		// Prevent arrow and spacebar scroll bug.
-		if ([" ","ArrowUp","ArrowDown","ArrowLeft","ArrowRight",32,37,38,39,40].indexOf(event.key) > -1) event.preventDefault();
+		if ([" ","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(event.key) > -1)
+			event.preventDefault();
 	};
+
+	function isFunction( possibleFunction ) {
+		return typeof(possibleFunction)===typeof(Function)
+	}
+
+	function is_int(value){
+		if (parseFloat(value) == parseInt(value) && !isNaN(value))
+			return true;
+		else
+			return false;
+	}
 
 	function inElectron() {
 		return navigator.userAgent.indexOf("Electron")!=-1;

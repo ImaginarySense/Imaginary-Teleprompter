@@ -175,7 +175,7 @@
 			<a class="external" href="https://twitter.com/Va2ron1" target="_blank">Victor Ortiz</a>, <a class="external" href="https://github.com/keyvanp">Keyvan Pérez</a> &amp; <a class="external" href="https://www.facebook.com/rafael.jose.7737">Rafael Sierra</a>.</p>
 
 			<ul class="bs-docs-footer-links">
-				<li>Currently v2.0b RC-0</li>
+				<li>Currently v2.0b RC-1</li>
 				<li>&middot;</li>
 				<li>Licensed under <a rel="license" href="LICENSE" target="_blank">GPL3</a>, assets under <a class="external" rel="license" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a></li>
 				<br>
@@ -224,12 +224,10 @@ if (typeof CKEDITOR!=="undefined") {
 
 		// Remove the redundant buttons from toolbar groups defined above.
 		removeButtons: 'Save,Smiley,ShowBlocks,Unlink,Link,Blockquote,CreateDiv,PageBreak,Language,Styles',/*,Styles,Specialchar*/
-		
 		// Font sizes
-//		fontSize_sizes: '36/36px;48/48px;50/50px;55/55px;60/60px;65/65px;72/72px;80/80px;85/85px;90/90px;95/95px;100/100px',
 		fontSize_sizes: '0.7 em/0.7em;0.8 em/0.8em;0.9 em/0,9em;1.0 em/1em;1.1 em/1.1em;1.2 em/1.2em;1.3 em/1.3em;1.4 em/1.4em;1.5 em/1.5em;1.6 em/1.6em;1.7 em/1.7em;1.8 em/1.8em;1.9 em/1.9em;2.0 em/2em;2.1 em/2.1em;2.2 em/2.2em;2.3 em/2.3em;2.4 em/2.4em;2.5 em/2.5em;2.6 em/2.6em;2.7 em/2.7em;2.8 em/2.8em;2.9 em/2.9em;3.0 em/3em',
-//		fontSize_sizes: '3/3vw;4/4vw;5/5vw',
-
+		// Font sizes
+		line_height: '1 em/1em;1.1 em/1.1em;1.2 em/1.2em;1.3 em/1.3em;1.4 em/1.4em;1.5 em/1.5em;1.6 em/1.6em;1.7 em/1.7em;1.8 em/1.8em;1.9 em/1.9em;2.0 em/2.0em',
 		// Quick tables
         qtRows: 10, // Count of rows
         qtColumns: 10, // Count of columns
@@ -257,13 +255,13 @@ if (typeof CKEDITOR!=="undefined") {
 			var info = dialogDefinition.getContents( 'info' );
 			console.log(info);
 			info.get( 'width' )[ 'default' ] = '100%';
-			info.get( 'height' )[ 'default' ] = '50vh';
+			info.get( 'height' )[ 'default' ] = '50%';
 		}
 		if ( dialogName == 'flash' ) {
 			var info = dialogDefinition.getContents( 'info' );
 			console.log(info);
 			info.get( 'width' )[ 'default' ] = '100%';
-			info.get( 'height' )[ 'default' ] = '50vh';
+			info.get( 'height' )[ 'default' ] = '50%';
 			info.get( 'hSpace' )[ 'default' ] = '0';
 			info.get( 'vSpace' )[ 'default' ] = '0';
 		}
