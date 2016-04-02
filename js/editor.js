@@ -431,6 +431,7 @@ var debug;
 	}
 
 	document.onkeydown = function( event ) {
+		var key;
 		// keyCode is announced to be deprecated but not all browsers support key as of 2016.
 		if (event.key === undefined)
 			event.key = event.keyCode;
@@ -467,10 +468,12 @@ var debug;
 				listener( {data:{request:command.decVelocity}} );
 				break;
 			case " ":
+			case "Space": // Spacebar
 			case 32: // Spacebar
 				listener( {data:{request:command.togglePlay}} );
 				break;
 			case ".":
+			case "Period": // Numpad dot
 			case 110: // Numpad dot
 			case 190: // Dot
 				listener( {data:{request:command.sync}} );
@@ -490,6 +493,7 @@ var debug;
 				restoreEditor();
 				break;
             // Electron Commands
+            /*
             case 17, 91, 70:
             case "ctrl" + "" + "f":
             if(inElectron()){
@@ -499,16 +503,32 @@ var debug;
             } else{
                 break;
             }
+            */
 			default:
-				// If pressed any number from 0 to 9.
-				if ( event.key>=48 && event.key<=57 )
-					event.key-=48;
-				else if ( event.key>=96 && event.key<=105 )
-					event.key-=96;
-				// Or if pressed any other key.
-				listener( {data:{request:command.anchor, data:event.key}} );
+				// If key is not a string
+				if ( !isFunction(event.key.indexOf) )
+					key = String.fromCharCode(event.key);
+				else
+					key = event.key;
+				//if ( key.indexOf("Key")===0 || key.indexOf("Digit")===0 )
+				//		key = key.charAt(key.length-1);
+				if ( !is_int(key) )
+					key = key.toLowerCase();
+				if (debug) console.log(key);
+				listener( {data:{request:command.anchor, data:key}} );
 		}
 	};
+
+	function isFunction( possibleFunction ) {
+		return typeof(possibleFunction)===typeof(Function)
+	}
+
+	function is_int(value){
+		if (parseFloat(value) == parseInt(value) && !isNaN(value))
+			return true;
+		else
+			return false;
+	}
 	
 	// Initialize objects after DOM is loaded
 	if (document.readyState === "interactive" || document.readyState === "complete")

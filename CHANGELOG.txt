@@ -1,5 +1,9 @@
 CHANGELOG
 
+v2.0b RC-1 (16.04.02.0)
+> Fix: Jump to non-numerical anchors not working in Webkit.
+> Partial-Fix: iFrame and Flash plug-ins don't suport units outside of px and %. Changed 50vh to 50%.
+
 v2.0b RC-0 (16.03.27.0)
 > Fix: Absolute pixel based Font-sizes bugs. Font-size was not enough on some screens and it broke multi-window mode when used. Using em now instead.
 > Updated download link and footer credit links.
