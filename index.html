@@ -39,13 +39,95 @@
 	<!--<script src="tinymce/tinymce.min.js"></script>-->
 	<script src="js/editor.js"></script>
 	<script src="js/teleprompter-themes.js"></script>
+	<script src="js/jscolor.min.js"></script>
 	<script src="js/social.js"></script>
 </head>
 <body>
+<!-- ColorPicker modal dialog -->
+    <div id="openCustomStyles" class="modalDialog">
+        <div style="width: 84%;">
+            <a href="#close" title="Close" class="close">X</a>
+            <div style="margin-bottom:-15px;">
+                <h1>Custom Styles <small>Administration Panel</small></h1>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <h1><small>Styles</small></h1>
+                            <div class="panel panel-default">
+                            <table class="table table-bordered" id="stylesTable" >
+                                <tbody>
+                                    <tr>
+                                        <th class="table-item"><span>No Styles</span></th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <h1><small>Properties</small></h1>
+                        <div class='row'>
+                            <div class='col-md-4'>
+                                <label>Body</label>
+                                <input type="text" class="form-control jscolor" onchange="updateColorOnPreview(this)" id="bodyColor" value="" >
+                                    </div>
+                            <div class='col-md-4'>
+                                <label>Overlay</label>
+                                <input type="text" class="form-control jscolor" onchange="updateColorOnPreview(this)" id="overlayColor" value="" >
+                                    </div>
+                            <div class='col-md-4'>
+                                <label>Text Color</label>
+                                <input type="text" class="form-control jscolor" onchange="updateColorOnPreview(this)" id="textColor" value="" >
+                            </div>
+						</div>
+                    
+                    
+                    <h1><small>Preview</small></h1>
+                    <div id="promptPreviewColor">
+                    
+                        <!-- #overlay layers focus area on top of the prompt. -->
+                        <table cellpadding="0" cellspacing="0" id="overlayPreview" >
+                            <tbody>
+                                <tr id="overlayTop" style = "background-color:#000;opacity:0.5;">
+                                    <td>Text</td>
+                                </tr>
+                                <tr id="overlayFocus" >
+                                    <td>Text</td>
+                                </tr>
+                                <tr id="overlayBottom" class="overlayBg" style = "background-color:#000;opacity:0.5;">
+                                    <td>Text</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    </br>
+                        <div class='row'>
+                            
+                            <div class='col-md-3'>
+                                <div class="input-group">
+                                    <span class="input-group-addon" id="basic-addon1">Style Name</span>
+                                    <input type="text"  class="form-control" placeholder="name" aria-describedby="basic-addon1" id="nameStyle">
+                                </div>
+                            </div>
+                            <div class='col-md-9'>
+                                <button class="btn btn-default" id="editStyleButton" disabled>Edit Style</button>
+                                <button class="btn btn-default" id="addStyleButton" disabled>Add Style</button>
+                                <button class="btn btn-default" id="removeStyleButton" disabled>Delete Style</button>
+                                <button class="btn btn-default" id="defaultStyleButton">Default Style</button>
+                            </div>
+						</div>
+                </div>
+            </div>
+            
+            
+            
+            
+        </div>
+    </div>
 	<form>
 		<!-- Header -->
 		<header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
 			<div class="container">
+				<div class='row'>
 				<div class="navbar-header">
 					<!--
 					<button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#bs-navbar" aria-controls="bs-navbar" aria-expanded="false">
@@ -55,11 +137,12 @@
 						<span class="icon-bar"></span>
 					</button>
 					-->
-					<a class="external navbar-brand" href="http://imaginary.tech/teleprompter" target="_blank"><img src="img/logo.png" alt="Teleprompter" style="height:20px;"></a>
+					<a class="external navbar-brand" href="http://imaginary.tech/teleprompter" target="_blank"><img src="img/logo.png" alt="Teleprompter" ></a>
 				</div>
 				<ul class="nav navbar-nav navbar-right">
 					<li><a id="promptIt" href=" ">Prompt It!</a></li>
 				</ul>
+				</div>
 			</div>
 		</header>
 		<!-- Controls -->
