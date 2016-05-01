@@ -1,14 +1,15 @@
 {
-	"name": "Teleprompter",
-	"version": "2.0.16.03.24.0",
-	"description": "The most complete and professional free software teleprompter app on the web.",
-	//"main": "main.js",
-	"main": "index.html",
-	//"scripts": {
-	//	"start": "electron main.js"
-	//},
-	"homepage": "https://github.com/imaginaryfilms/Teleprompter"//,
-	//"devDependencies": {
-	//	"electron-prebuilt": "^0.36.0"
-	//}
+    "name": "Teleprompter",
+    "email":"javier.cordero@upr.edu",
+    "version": "2.0.17",
+    "description": "The most complete and professional free software teleprompter app on the web.",
+    "author": "Javier O. Cordero Pérez <javier.cordero@upr.edu>",
+    "contributors": [
+                     "Victor A. Ortiz Alvarado <va2ron1@gmail.com>",
+                     "Rafael Sierra <rafael.sierra2@upr.edu>",
+                     "Keyvan Pérez <keyvan.perez2@gmail.com>"
+                     ],
+    "license": "GPL3",
+    "homepage":"https://github.com/imaginaryfilms/Teleprompter",
+    "main": "main.js"
 }
