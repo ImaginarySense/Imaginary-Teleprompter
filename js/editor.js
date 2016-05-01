@@ -65,7 +65,9 @@ var debug;
 		
 		frame = document.getElementById("teleprompterframe");
 		// Set default style and option style
-		setStyle(document.getElementById("prompterStyle").value);
+		//setStyle(document.getElementById("prompterStyle").value);
+		// Set initial configuration to prompter style
+        	styleInit(document.getElementById("prompterStyle"));
 		// Set domain to current domain.
 		setDomain();
 

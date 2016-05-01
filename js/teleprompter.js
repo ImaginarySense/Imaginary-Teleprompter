@@ -167,7 +167,8 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		}
 		// Set flip and styles to values from settings.
 		setFlips();
-		setStyle( promptStyleOption, customStyle );
+		styleInit();
+		setStyle( promptStyleOption );
 
 		// Save current screen position related settings for when resize and screen rotation ocurrs.
 		previousPromptHeight = getPromptHeight();
