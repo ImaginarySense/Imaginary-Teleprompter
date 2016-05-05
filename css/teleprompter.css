@@ -83,10 +83,6 @@ body {
 	text-align: center;
 }
 
-#promptcontainer img{
-    max-width:100%;
-}
-
 .prompt {
 	z-index: 10;
 	position: relative;

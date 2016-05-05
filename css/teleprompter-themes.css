@@ -49,6 +49,23 @@ This is has been moved to the teleprompter-theme.js
 	// https://www.youtube.com/watch?v=ZTLAx3VDX7g
 }*/
 
+#prompt * a {
+    color: inherit !important;
+}
+
+#prompt * img {
+    width: 100% !important;
+    height: auto !important;
+}
+
+#prompt * table {
+    table-layout: fixed;
+}
+
+#prompt * td {
+    width: 10%;
+}
+
 .modalDialog {
     position: fixed;
     font-family: Arial, Helvetica, sans-serif;

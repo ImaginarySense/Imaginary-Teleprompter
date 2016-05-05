@@ -69,10 +69,6 @@ body {
 	transform: rotateX(0deg) translate3d(0px,0px,0px) !important;
 }
 
-#promptcontainer img{
-    max-width:100%;
-}
-
 #toolbar {
 	position: relative;
 	top: 0px;
