@@ -21,7 +21,7 @@ body {
 	margin: 0px;
 	padding: 0px;
 	-webkit-touch-callout: none;
-	-webkit-user-select: none;
+	/*-webkit-user-select: none;*/
 	-khtml-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
@@ -155,4 +155,133 @@ a:active {
 
 .bs-docs-footer-links {
 	margin-bottom: 0 !important;
+}
+
+#wrapper {
+    padding-left: 0;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+#wrapper.toggled {
+    padding-left: 250px;
+}
+
+#sidebar-wrapper {
+    z-index: 1000;
+    position: fixed;
+    left: 250px;
+    width: 0;
+    height: 100%;
+    margin-left: -250px;
+    overflow-y: auto;
+    background: rgba(0,0,0,0.9);
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+    width: 250px;
+}
+
+#page-content-wrapper {
+    width: 100%;
+    position: absolute;
+    padding: 15px;
+}
+
+#wrapper.toggled #page-content-wrapper {
+    position: absolute;
+    margin-right: -250px;
+}
+
+/* Sidebar Styles */
+
+.sidebar-nav {
+    top: 0;
+    width: 250px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sidebar-nav li {
+    text-indent: 20px;
+    line-height: 40px;
+}
+
+.sidebar-nav li div {
+    display: block;
+    text-decoration: none;
+    color: #999999;
+}
+
+.sidebar-nav li div.list:hover {
+    text-decoration: none;
+    color: #fff;
+    background: rgba(255,255,255,0.2);
+}
+
+.sidebar-nav li div.addOption:hover {
+    text-decoration: none;
+    color: #fff;
+    background: rgba(255,255,255,0.2);
+}
+
+.editableMode {
+    text-decoration: none;
+    color: #fff;
+    background: rgba(255,255,255,0.2);
+}
+
+.sidebar-nav li div.list:active,
+.sidebar-nav li div.list:focus {
+    text-decoration: none;
+}
+
+.sidebar-nav > .sidebar-brand {
+    height: 65px;
+    font-size: 18px;
+    line-height: 60px;
+}
+
+.sidebar-nav > .sidebar-brand {
+    color: #999999;
+}
+
+@media(min-width:768px) {
+    #wrapper {
+        padding-left: 250px;
+    }
+    
+    #wrapper.toggled {
+        padding-left: 0;
+    }
+    
+    #sidebar-wrapper {
+        width: 250px;
+    }
+    
+    #wrapper.toggled #sidebar-wrapper {
+        width: 0;
+    }
+    
+    #page-content-wrapper {
+        padding: 20px;
+        position: relative;
+    }
+    
+    #wrapper.toggled #page-content-wrapper {
+        position: relative;
+        margin-right: 0;
+    }
+}
+
+.disabled{
+    pointer-events:none;
+    opacity:0.4;
 }

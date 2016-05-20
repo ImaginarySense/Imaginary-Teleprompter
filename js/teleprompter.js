@@ -102,12 +102,16 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		// Initialize domain for interprocess communication
 		setDomain();
 
+		
 		// Local Storage and Session data
-		settings = JSON.parse(localStorage.getItem('IFTeleprompterSettings'));
-		if (inElectron())
-			session = JSON.parse(localStorage.getItem('IFTeleprompterSession'));
-		else
-			session = JSON.parse(sessionStorage.getItem('IFTeleprompterSession'));
+		dataManager.getItem('IFTeleprompterSettings',function(data){
+			settings = JSON.parse(data);
+    	},1,false);
+    	
+    	dataManager.getItem('IFTeleprompterSession',function(data){
+			session = JSON.parse(data);
+		},0,false);
+    
 
 		// Locate and set editor
 		if (window.opener)
@@ -194,6 +198,11 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
 			// Begin animation
 			internalIncreaseVelocity();
+
+			//Init Remote Controllers
+			if(isMobileApp)
+				remoteControls();
+			
 		}, 750);
 	}
 
@@ -501,6 +510,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		}', 0);
 		// Prevent race condition in Chrome by requesting for current position (not just transform) before resuming animation.
 		hack();
+
 		// Resume animation by re adding the class.
 		prompt.classList.add("move");
 		if (debug) setTimeout( function(){ console.log("Curr: "+getCurrPos()+"\nDest: "+destination+"\nRemTime "+time) && false; }, 0);
@@ -920,7 +930,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 				break;
 			default: // Move to anchor.
 				// If key is not a string
-				if ( !isFunction(event.key.indexOf) )
+				if(!isFunction(event.key.indexOf))
 					key = String.fromCharCode(event.key);
 				else
 					key = event.key;
@@ -932,9 +942,22 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 				moveToAnchor( key );
 		}
 		// Prevent arrow and spacebar scroll bug.
-		if ([" ","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(event.key) > -1)
+		if ([" ","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(event.key) > -1 && event.preventDefault)
 			event.preventDefault();
 	};
+
+	function remoteControls() {
+		var res;
+		dataManager.getItem("IFTeleprompterControl",function(data){
+			res = JSON.parse(data);
+		},0,false);
+		if(typeof res !== "undefined"){
+			if(res.hasOwnProperty('key') > 0){
+       			document.onkeydown(res);
+       		}
+       	}
+        setTimeout(remoteControls, 0);
+    }
 
 	function isFunction( possibleFunction ) {
 		return typeof(possibleFunction)===typeof(Function)
