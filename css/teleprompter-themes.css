@@ -48,7 +48,6 @@ This is has been moved to the teleprompter-theme.js
 	transform: perspective(300px) rotateX(30deg) translate3d(0px,-115px,-180px);
 	// https://www.youtube.com/watch?v=ZTLAx3VDX7g
 }*/
-
 #prompt * a {
     color: inherit !important;
 }

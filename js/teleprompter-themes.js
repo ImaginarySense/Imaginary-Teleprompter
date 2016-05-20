@@ -50,15 +50,10 @@ function inElectron() {
 
 function styleInit(prompterStyleElement) {
 
-    if (inElectron()) {
-        if (!(localStorage.getItem("IFTeleprompterThemeStyles") === null)) {
-            themeStyles = JSON.parse(localStorage.getItem("IFTeleprompterThemeStyles"));
-        }
-    } else {
-        if (!(sessionStorage.getItem("IFTeleprompterThemeStyles") === null)) {
-            themeStyles = JSON.parse(sessionStorage.getItem("IFTeleprompterThemeStyles"));
-        }
-    }
+    
+    dataManager.getItem('IFTeleprompterThemeStyles',function(data){
+        themeStyles = JSON.parse(data);
+    },0,false);
 
     if (!themeStyles) {
         themeStyles = [{
@@ -103,16 +98,12 @@ function styleInit(prompterStyleElement) {
     }
     
     defaultStyle = 0;
-    if (inElectron()) {
-		if(typeof localStorage.getItem("IFTeleprompterThemeDefaultStyle") !== "undefined")
-			defaultStyle = localStorage.getItem("IFTeleprompterThemeDefaultStyle");
-    } else {
-		if(typeof sessionStorage.getItem("IFTeleprompterThemeDefaultStyle") !== "undefined")
-			defaultStyle = sessionStorage.getItem("IFTeleprompterThemeDefaultStyle");
-    }
-	
-    ///Maybe will need a fix in the future....
+    dataManager.getItem('IFTeleprompterThemeDefaultStyle',function(data){
+        if(JSON.parse(data) !== "undefined")
+            defaultStyle = JSON.parse(data);
+    },0,false);
 
+    ///Maybe will need a fix in the future...
     setStyle(defaultStyle);
 
     if (prompterStyleElement) {
@@ -123,11 +114,7 @@ function styleInit(prompterStyleElement) {
 
 function setDefaultStyle() {
     defaultStyle = themeStyles[lastStyleSelected]["id"];
-    if (inElectron())
-        localStorage.setItem("IFTeleprompterThemeDefaultStyle", defaultStyle);
-    else
-        sessionStorage.setItem("IFTeleprompterThemeDefaultStyle", defaultStyle);
-        
+    dataManager.setItem("IFTeleprompterThemeDefaultStyle", defaultStyle);
     refreshAdminPromptStyles();
     refreshCurrentItem();
     saveStyles();
@@ -191,10 +178,7 @@ function addThemeStyle(name2, objName, bodyColor, overlayColor, textColor) {
 }
 
 function saveStyles() {
-    if (inElectron())
-        localStorage.setItem("IFTeleprompterThemeStyles", JSON.stringify(themeStyles));
-    else
-        sessionStorage.setItem("IFTeleprompterThemeStyles", JSON.stringify(themeStyles));
+    dataManager.setItem("IFTeleprompterThemeStyles", JSON.stringify(themeStyles));
     refreshPromptStyles(document.getElementById("prompterStyle"));
 }
 
@@ -450,8 +434,6 @@ function openPromptStyles() {
     document.getElementById("addStyleButton").addEventListener("click", addStyleToPromptStyles);
     document.getElementById("removeStyleButton").addEventListener("click", removeStyleFromPromptStyles);
     document.getElementById("defaultStyleButton").addEventListener("click", setDefaultStyle);
-
-    document.getElementById("closeCustomStyle").addEventListener("click", closePromptStyles);
 
     document.getElementById("nameStyle").addEventListener("input", function() {
         onNameStyleChange(this)

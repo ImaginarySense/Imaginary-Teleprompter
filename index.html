@@ -37,16 +37,30 @@
 	<link rel="stylesheet" href="css/mobilehide.css">
 	<script src="ckeditor/ckeditor.js"></script>
 	<!--<script src="tinymce/tinymce.min.js"></script>-->
+    <script src="js/data.manager.js"></script>
+    <script src="js/sidebar.js"></script>
 	<script src="js/editor.js"></script>
 	<script src="js/teleprompter-themes.js"></script>
 	<script src="js/jscolor.min.js"></script>
 	<script src="js/social.js"></script>
+
 </head>
 <body>
+    <div id="wrapper" class="toggled hidden-xs">
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+        	<ul class="sidebar-nav" id="scripts">
+            </ul>
+            <!--<ul class="sidebar-nav" id="images">
+            	<li class="sidebar-brand">Images</li>
+            </ul>-->
+            
+        </div>
+    </div>
 <!-- ColorPicker modal dialog -->
     <div id="openCustomStyles" class="modalDialog">
         <div style="width: 84%;">
-            <a href="#close" title="Close" class="close" id="closeCustomStyle">X</a>
+            <a href="#close" title="Close" class="close">X</a>
             <div style="margin-bottom:-15px;">
                 <h1>Custom Styles <small>Administration Panel</small></h1>
             </div>
@@ -128,6 +142,9 @@
 		<header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
 			<div class="container">
 				<div class='row'>
+                    <ul class="nav navbar-nav navbar-left hidden-xs" style="padding-right:20px;">
+                        <li><a id="menu-toggle" href="#menu-toggle"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a></li>
+                    </ul>
 				<div class="navbar-header">
 					<!--
 					<button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#bs-navbar" aria-controls="bs-navbar" aria-expanded="false">
@@ -139,6 +156,7 @@
 					-->
 					<a class="external navbar-brand" href="http://imaginary.tech/teleprompter" target="_blank"><img src="img/logo.png" alt="Teleprompter" ></a>
 				</div>
+                
 				<ul class="nav navbar-nav navbar-right">
 					<li><a id="promptIt" href=" ">Prompt It!</a></li>
 				</ul>
