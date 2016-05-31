@@ -434,6 +434,7 @@ function openPromptStyles() {
     document.getElementById("addStyleButton").addEventListener("click", addStyleToPromptStyles);
     document.getElementById("removeStyleButton").addEventListener("click", removeStyleFromPromptStyles);
     document.getElementById("defaultStyleButton").addEventListener("click", setDefaultStyle);
+    document.getElementsByClassName("close")[0].addEventListener("click", closePromptStyles);
 
     document.getElementById("nameStyle").addEventListener("input", function() {
         onNameStyleChange(this)
