@@ -23,10 +23,10 @@ var debug;
     "use strict";
 
     // Import Electron libraries.
-    if (inElectron())
-        var {ipcRenderer} = require('electron');
-        var elecScreen = require('electron').screen; // Returns the object returned by require(electron.screen) in the main process.
-        var {shell} = require('electron');
+    if (inElectron()){
+         var {ipcRenderer} = require('electron');
+    }
+       
     // Global objects
     var promptIt, prompterWindow, frame, currentScript;
 
