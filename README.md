@@ -1,4 +1,10 @@
 ![Teleprompter](http://imaginary.tech/teleprompter/img/header.png)
+
+# Teleprompter-Core
+Core files of our Teleprompter software. This repo contains all the features present in the standalone desktop version and necesary files for the mobile version to work.
+
+If you intend to make standalone executables and gain access to the Electron exclusive features, please see [Teleprompter-Electron](https://github.com/imaginaryfilms/Teleprompter-Electron).
+
 Introduction
 -------------
 "Teleprompter" is a professional grade, multi-platform, free software teleprompter for anyone to use.
