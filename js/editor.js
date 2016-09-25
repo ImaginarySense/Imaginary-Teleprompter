@@ -24,8 +24,9 @@ var debug;
 
     // Import Electron libraries.
     if (inElectron())
-        var ipcRenderer = require('electron').ipcRenderer;
-
+        var {ipcRenderer} = require('electron');
+        var elecScreen = require('electron').screen; // Returns the object returned by require(electron.screen) in the main process.
+        var {shell} = require('electron');
     // Global objects
     var promptIt, prompterWindow, frame, currentScript;
 
@@ -74,15 +75,14 @@ var debug;
         // If running inside Electron...
         if (inElectron()) {
             // Setup Electron.
-            var elecScreen = require('electron').screen // Returns the object returned by require(electron.screen) in the main process.
-                // When asynchronous reply from main process, run function to...
+            // When asynchronous reply from main process, run function to...
             ipcRenderer.on('asynchronous-reply', function(event, arg) {
                 // Get the "exteral" classes and update each link to load on an actual browser.
                 var classTags = document.getElementsByClassName('external');
                 var idTags = document.getElementById('secondary');
                 for (var i = 0; i < classTags.length; i++)
                     if (classTags[i].href != " ") {
-                        classTags[i].setAttribute("onclick", "require('shell').openExternal('" + classTags[i].href + "'); return false;");
+                        classTags[i].setAttribute("onclick", "shell.openExternal('" + classTags[i].href + "'); return false;");
                         classTags[i].href = "#";
                         classTags[i].target = "_parent";
                     }
