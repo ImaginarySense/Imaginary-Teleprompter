@@ -143,10 +143,10 @@ function editThemeStyle(name2, objName, bodyColor, overlayColor, textColor) {
 
 
 function removeStyleFromPromptStyles() {
-    themeStyles.splice(lastStyleSelected, 1);
-
     if (defaultStyle == themeStyles[lastStyleSelected]["id"])
         defaultStyle = 0;
+
+    themeStyles.splice(lastStyleSelected, 1);
 
     if (lastStyleSelected > themeStyles.length - 1) {
         lastStyleSelected = themeStyles.length - 1;
