@@ -1,5 +1,4 @@
 ![Teleprompter](http://imaginary.tech/teleprompter/img/header.png)
-===================
 Introduction
 -------------
 "Teleprompter" is a professional grade, multi-platform, free software teleprompter for anyone to use.
