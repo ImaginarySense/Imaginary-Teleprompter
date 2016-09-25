@@ -30,7 +30,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	// Global objects
 	var settings, session, prompt, pointer, overlay, overlayFocus, styleElement, styleSheet, editor;
 	// Global variables
-	var unit, x, velocity, sensitivity, speedMultip, relativeLimit, steps, play, timeoutStatus, invertedWheel, focus, promptStyleOption, customStyle, flipV, flipH, fontSize, previousPromptHeight, previousScreenHeight, previousScreenWidth, previousVerticalDisplacementCorrector, domain, debug, closing, cap, syncDelay;
+	var unit, x, velocity, sensitivity, speedMultip, relativeLimit, steps, play, timeoutStatus, invertedWheel, focus, promptStyleOption, customStyle, flipV, flipH, fontSize, previousPromptHeight, previousScreenHeight, previousScreenWidth, previousVerticalDisplacementCorrector, domain, debug, closing, cap, syncDelay, isMobileApp;
 	// Enums
 	var command = Object.freeze({
 		"incVelocity":1,
@@ -89,7 +89,8 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		velocity = 0;
 		closing = false;
 		cap = false;
-		syncDelay = 12,
+		syncDelay = 12;
+		isMobileApp = false;
 		
 		// Animation settings
 		play = true;
@@ -105,7 +106,6 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		// Local Storage and Session data
 		dataManager.getItem('IFTeleprompterSettings',function(data){
 			settings = JSON.parse(data);
-			console.log("TEST");
     	},1,false);
     	
     	dataManager.getItem('IFTeleprompterSession',function(data){
@@ -200,7 +200,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 			internalIncreaseVelocity();
 
 			//Init Remote Controllers
-			if(isMobileApp)
+			if (isMobileApp)
 				remoteControls();
 			
 		}, 750);
@@ -432,7 +432,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 	function getCurrPos(obj) {
 		// There's more than a way to calculate the current position.
 		// This is the original method, slower and more reliable. Used only for Intergalactic Style, where the other method fails.
-		if (promptStyleOption===4) {
+		if (promptStyleOption===3) {
 			if (!obj)
 				obj=prompt;
 			var computedStyle = window.getComputedStyle(obj, null),

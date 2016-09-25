@@ -1,12 +1,13 @@
 CHANGELOG
 
-ver 2.0 RC-1, build 3.1, (16.09.24)
+ver 2.0 RC-1, build 3.3, (16.09.25)
+> Make use of node_modules 
+
+ver 2.0 RC-1, build 3.2, (16.09.25)
+> Fix dataManager bug
+
+ver 2.0 RC-1, build 3.1, (16.09.25)
 > Update dependencies in package.json
-> Fixed intergalactic bug
-> Fixed credits bug
-> "Scripts" file manager usability improvements
-> Improved Custom Styles' Default button usability
-> Make touch work
 > Incorporate changelog updates
 
 ver 2.0 RC-1, build 3.0, (16.09.24)

@@ -288,7 +288,7 @@ var debug;
         togglePromptIt();
 
         // Set data to send.
-        var settings = '{ "data": {"secondary":0,"primary":1,"prompterStyle":3,"focusMode":3,"background":"#3CC","color":"#333","overlayBg":"#333"}}',
+        var settings = '{ "data": {"secondary":0,"primary":1,"prompterStyle":2,"focusMode":3,"background":"#3CC","color":"#333","overlayBg":"#333"}}',
             session = '{ "html":"' + encodeURIComponent(htmldata) + '" }';
 
         // Store data locally for prompter to use
@@ -740,21 +740,20 @@ var debug;
         }
     }
 
-
-
+    // Teleprompter Scripts File Manager
     function initScripts() {
 
         var sidebar = new SIDEBAR();
         var sid = sidebar.on('scripts',{
-                "name":"Scripts",
-                "addElementName":"Add Script",
-                "newElementName":"New Script",
+                "name":"Files",
+                "addElementName":"New Script",
+                "newElementName":"Untitled",
                 "dataKey":"IFTeleprompterSideBar",
                 "preloadData":[{
                     "name": "Instructions",
-                    "data": "\n\t<h3>Welcome to Teleprompter!</h3>\n\t<p>Are you ready to tell your story?</p>\n\t<br>\n\t<p>\"Teleprompter\" is a professional grade, multi-platform, free software teleprompter for anyone to use. Click on \"Prompt It!\" whenever you're ready and control the speed with the arrow keys.</p>\n\t<br>\n\t<h3>Here are some of our features:</h3>\n\t<ol>\n\t\t<li>Control the speed with the Arrow keys, WASD keys or the mouse wheel. You may pause at anytime with the 'spacebar'.</li>\n\t\t<li>Different focus areas allow you to easily use Teleprompter with a webcam, a tablet, or professional teleprompter equipment.</li>\n\t\t<li>Flip modes allow <em>mirroring</em> the prompter in every possible way.</li>\n\t\t<li>You can use one or two instances. Mirror one, monitor on the other one.</li>\n\t\t<li><a id=\"5\" name=\"5\">Set almost any key as an Anchor and instantly jump to any part of the script. Try pressing '5' now!</a></li>\n\t\t<li>The Rich Text Editor gives unlimited possibilities on what you can prompt.</li>\n\t\t<ul>\n\t\t\t<li>You can generate and display mathematical equations.<br>\n\t\t\t\t<table border=\"1\" cellpadding=\"1\" cellspacing=\"1\">\n\t\t\t\t\t<tbody>\n\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t<td>&nbsp;</td>\n\t\t\t\t\t\t\t<td><img alt=\"\\bg_white \\huge \\sum_{\\Theta+\\Pi }^{80} sin(\\Theta)\" src=\"http://latex.codecogs.com/gif.latex?%5Cdpi%7B300%7D%20%5Cbg_white%20%5Chuge%20%5Csum_%7B%5CTheta&amp;plus;%5CPi%20%7D%5E%7B80%7D%20sin%28%5CTheta%29\"></td>\n\t\t\t\t\t\t\t<td>&nbsp;</td>\n\t\t\t\t\t\t</tr>\n\t\t\t\t\t</tbody>\n\t\t\t\t</table>\n\t\t\t</li>\n\t\t\t<li>Insert images from the web or copy and paste them into the prompter.\n\t\t\t\t<img alt=\"Picture: Arecibo Sky\" src=\"img/arecibo-sky.jpg\">\n\t\t\t</li>\n\t\t</ul>\n\t\t<li>There are various Prompter Styles to choose from. You may also create your own.</li>\n\t\t<li>Text can be pasted from other word processors like Microsoft Word® or Libre Office Writer™.</li>\n\t\t<li>Animations are hardware accelerated for a smooth result.</li>\n\t\t<li>Press 'F11' to enter and leave fullscreen.</li>\n\t\t<li>All data is managed locally. No data is stored on our servers.</li>\n\t\t<li>An offline version can be downloaded for Windows, OS X, Linux and Chrome OS.</li>\n\t\t<li>Enjoy the ease of a smart fullscreen in the local version.</li>\n\t\t<li>Close prompts and return to the editor by pressing 'ESC'.</li>\n\t</ol>\n\t<hr>\n\t<h4>How to use anchor shortcuts:</h4>\n\t<ol>\n\t\t<li>Select a keyword or line you want to jump to on your text in the editor.</li>\n\t\t<li>Click on the <strong>Flag Icon</strong> on the editor's tool bar.</li>\n\t\t<li>A box named \"Anchor Properties\" should have appeared. Type any single key of your choice and click 'Ok'.<br>Note preassigned keys, such as WASD and Spacebar will be ignored.</li>\n\t\t<li>Repeat as many times as you wish.</li>\n\t\t<li>When prompting, press on the shortcut key to jump into the desired location.</li>\n\t</ol>\n\t<p>###</p>\n\t\t\t\t"
+                    "data": "\n\t<h3>Welcome to Teleprompter!</h3>\n\t<p>Are you ready to tell your story?</p>\n\t<br>\n\t<p>\"Teleprompter\" is a professional grade, multi-platform, free software teleprompter for anyone to use. Click on \"Prompt It!\" whenever you're ready and control the speed with the arrow keys.</p>\n\t<br>\n\t<h3>Here are some of our features:</h3>\n\t<ol>\n\t\t<li>Control the speed with the Arrow keys, WASD keys or the mouse wheel. You may pause at anytime with the 'spacebar'.</li>\n\t\t<li>Different focus areas allow you to easily use Teleprompter with a webcam, a tablet, or professional teleprompter equipment.</li>\n\t\t<li>Flip modes allow <em>mirroring</em> the prompter in every possible way.</li>\n\t\t<li>You can use one or two instances. Mirror one, monitor on the other one.</li>\n\t\t<li><a id=\"5\" name=\"5\">Set almost any key as an Anchor and instantly jump to any part of the script. Try pressing '5' now!</a></li>\n\t\t<li>The Rich Text Editor gives unlimited possibilities on what you can prompt.</li>\n\t\t<ul>\n\t\t\t<li>You can generate and display mathematical equations.<br>\n\t\t\t\t<table border=\"1\" cellpadding=\"1\" cellspacing=\"1\">\n\t\t\t\t\t<tbody>\n\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t<td>&nbsp;</td>\n\t\t\t\t\t\t\t<td><img alt=\"\\bg_white \\huge \\sum_{\\Theta+\\Pi }^{80} sin(\\Theta)\" src=\"http://latex.codecogs.com/gif.latex?%5Cdpi%7B300%7D%20%5Cbg_white%20%5Chuge%20%5Csum_%7B%5CTheta&amp;plus;%5CPi%20%7D%5E%7B80%7D%20sin%28%5CTheta%29\"></td>\n\t\t\t\t\t\t\t<td>&nbsp;</td>\n\t\t\t\t\t\t</tr>\n\t\t\t\t\t</tbody>\n\t\t\t\t</table>\n\t\t\t</li>\n\t\t\t<li>Insert images from the web or copy and paste them into the prompter.\n\t\t\t\t<img alt=\"Picture: Arecibo Sky\" src=\"img/arecibo-sky.jpg\">\n\t\t\t</li>\n\t\t</ul>\n\t\t<li>There are various Prompter Styles to choose from. You may also create your own.</li>\n\t\t<li>Text can be pasted from other word processors like Microsoft Word® or Libre Office Writer™.</li>\n\t\t<li>Animations are hardware accelerated for a smooth result.</li>\n\t\t<li>Press 'F11' to enter and leave fullscreen.</li>\n\t\t<li>All data is managed locally. No data is stored on our servers.</li>\n\t\t<li>An offline version can be downloaded for Windows, OS X, Linux and Chrome OS.</li>\n\t\t<li>Enjoy the ease of a smart fullscreen in the local version.</li>\n\t\t<li>Close prompts and return to the editor by pressing 'ESC'.</li>\n\t</ol>\n\t<hr>\n\t<h4>How to use anchor shortcuts:</h4>\n\t<ol>\n\t\t<li>Select a keyword or line you want to jump to on your text in the editor.</li>\n\t\t<li>Click on the <strong>Flag Icon</strong> on the editor's tool bar.</li>\n\t\t<li>A box named \"Anchor Properties\" should have appeared. Type any single key of your choice and click 'Ok'.<br>Note preassigned keys, such as WASD and Spacebar will be ignored.</li>\n\t\t<li>Repeat as many times as you wish.</li>\n\t\t<li>When prompting, press on the shortcut key to jump into the desired location.</li>\n\t</ol>\n\t<p>###</p>\n\t\t\t\t",
+                    "editable": "false"
                 }],
-
 
             });
         sid.selectedElement = function(element){
