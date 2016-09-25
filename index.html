@@ -296,8 +296,10 @@
 	</div>
 </body>
 <script type="text/javascript">
-    var {ipcMain} = require('electron');
+if (inElectron()){
+	var {ipcMain} = require('electron');
     var {shell} = require('electron');
+}
 if (typeof CKEDITOR!=="undefined") {
 	// Turn off automatic editor creation first.
 	CKEDITOR.disableAutoInline = true;
