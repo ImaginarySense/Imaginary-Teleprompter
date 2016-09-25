@@ -1,15 +1,43 @@
 {
-    "name": "Teleprompter",
-    "email":"javier.cordero@upr.edu",
-    "version": "2.0.17",
-    "description": "The most complete and professional free software teleprompter app on the web.",
-    "author": "Javier O. Cordero Pérez <javier.cordero@upr.edu>",
-    "contributors": [
-                     "Victor A. Ortiz Alvarado <va2ron1@gmail.com>",
-                     "Rafael Sierra <rafael.sierra2@upr.edu>",
-                     "Keyvan Pérez <keyvan.perez2@gmail.com>"
-                     ],
-    "license": "GPL3",
-    "homepage":"https://github.com/imaginaryfilms/Teleprompter",
-    "main": "main.js"
+  "name": "imaginary-teleprompter-core",
+  "email": "support@imaginary.tech",
+  "homepage": "http://imaginary.tech/teleprompter/",
+  "description": "The most complete and professional free software teleprompter app on the web.",
+  "license": "GPL-3.0+",
+  "version": "2.0.0-33",
+  "keywords": [
+    "teleprompter",
+    "imaginary",
+    "television",
+    "online",
+    "portable",
+    "local"
+  ],
+  "author": "Imaginary Films LLC <support@imaginary.tech> (http://imaginary.tech)",
+  "contributors": [
+    "Javier O. Cordero-Pérez <javier@imaginary.tech> (https://www.linkedin.com/in/javier-oscar-cordero-p%25C3%25A9rez-70658033)",
+    "Victor A. Ortiz-Alvarado <va2ron1@gmail.com> (https://twitter.com/Va2ron1)",
+    "Rafael J. Sierra-Soto <rafael.sierra2@upr.edu> (https://www.facebook.com/rafael.jose.7737)",
+    "Keyvan Pérez Pérez <keyvan.perez2@gmail.com> (https://github.com/keyvanp)"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/imaginaryfilms/Teleprompter"
+  },
+  "bugs": {
+    "url": "http://imaginary.tech/support/"
+  },
+  "scripts": {
+    "start": "electron main.js"
+  },
+  "main": "main.js",
+  "dependencies": {
+    "shell": "^0.3.2"
+  },
+  "devDependencies": {
+    "jquery-pep": "jquery/PEP",
+    "ckeditor": "^4.5.9"
+  },
+  "engine": "node >= 3.10.3",
+  "preferGlobal": "false"
 }

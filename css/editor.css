@@ -110,9 +110,6 @@ body {
 	text-align: center;
 	text-shadow: 0 1px 0 rgba(0,0,0,.1);
 	background-color: #6f5499;
-	background-image: -webkit-gradient(linear,left top,left bottom,from(#563d7c),to(#6f5499));
-	background-image: -webkit-linear-gradient(top,#563d7c 0,#6f5499 100%);
-	background-image: -o-linear-gradient(top,#563d7c 0,#6f5499 100%);
 	background-image: linear-gradient(to bottom,#563d7c 0,#6f5499 100%);
 	background-repeat: repeat-x;
 	color: #CCF;
@@ -145,8 +142,46 @@ a:active {
 	color: #CCF;
 }
 
-.carbonad{
-	display:block;background:#fdfdfd;background-image:-moz-linear-gradient(top,#f8f8f8,#fdfdfd);background-image:-webkit-gradient(linear,left top,left bottom,color-stop(0,#f8f8f8),color-stop(1,#fdfdfd));border:1px solid #d5d5d5;font-family:Lucida Grande,Arial,Helvetica,sans-serif;font-size:11px;height:118px;line-height:15px;overflow:hidden;width:300px}.carbonad-img{border:none;display:inline;float:left;height:100px;margin:9px;width:130px}.carbonad-text{display:inline;float:left;width:142px;padding-top:13px}.carbonad-text a{color:#000;text-decoration:none;text-transform:none;}.carbonad-tag{float:left;margin-top:9px;text-align:center;width:142px;color:#999}.carbonad-tag a{color:#999;text-decoration:none
+.carbonad {
+	display:block;
+	background:#fdfdfd;
+	background-image:-moz-linear-gradient(top,#f8f8f8,#fdfdfd);
+	background-image:-webkit-gradient(linear,left top,left bottom,color-stop(0,#f8f8f8),color-stop(1,#fdfdfd));
+	border:1px solid #d5d5d5;
+	font-family:Lucida Grande,Arial,Helvetica,sans-serif;
+	font-size:11px;
+	height:118px;
+	line-height:15px;
+	overflow:hidden;width:300px;
+}
+.carbonad-img {
+	border:none;
+	display:inline;
+	float:left;
+	height:100px;
+	margin:9px;
+	width:130px;
+}
+.carbonad-text {
+	display:inline;
+	float:left;
+	width:142px;
+	padding-top:13px;
+}
+.carbonad-text a {
+	color:#000;
+	text-decoration:none;
+	text-transform:none;
+}.carbonad-tag {
+	float:left;
+	margin-top:9px;
+	text-align:center;
+	width:142px;
+	color:#999;
+}
+.carbonad-tag a {
+	color:#999;
+	text-decoration:none;
 }
 
 .cke_combopanel__fontsize {
@@ -159,9 +194,6 @@ a:active {
 
 #wrapper {
     padding-left: 0;
-    -webkit-transition: all 0.5s ease;
-    -moz-transition: all 0.5s ease;
-    -o-transition: all 0.5s ease;
     transition: all 0.5s ease;
 }
 
@@ -178,9 +210,6 @@ a:active {
     margin-left: -250px;
     overflow-y: auto;
     background: rgba(0,0,0,0.9);
-    -webkit-transition: all 0.5s ease;
-    -moz-transition: all 0.5s ease;
-    -o-transition: all 0.5s ease;
     transition: all 0.5s ease;
 }
 
@@ -203,7 +232,8 @@ a:active {
 
 .sidebar-nav {
     top: 0;
-    width: 250px;
+    min-width: 250px;
+    width: 100%;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -264,6 +294,7 @@ a:active {
     
     #sidebar-wrapper {
         width: 250px;
+        overflow-x: hidden;
     }
     
     #wrapper.toggled #sidebar-wrapper {
