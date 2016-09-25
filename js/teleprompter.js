@@ -102,10 +102,10 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 		// Initialize domain for interprocess communication
 		setDomain();
 
-		
 		// Local Storage and Session data
 		dataManager.getItem('IFTeleprompterSettings',function(data){
 			settings = JSON.parse(data);
+			console.log("TEST");
     	},1,false);
     	
     	dataManager.getItem('IFTeleprompterSession',function(data){
