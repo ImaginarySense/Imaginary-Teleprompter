@@ -1,4 +1,9 @@
 CHANGELOG
+ver 2.0 RC-1, build 3.3, (16.09.24)
+> Fixed going fullscreen on "You don't have any external Display." prompt.
+
+ver 2.0 RC-1, build 3.2, (16.09.24)
+> Fixed "Scripts" File Manager issues
 
 ver 2.0 RC-1, build 3.1, (16.09.24)
 > Update dependencies in package.json
