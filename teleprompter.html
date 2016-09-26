@@ -9,7 +9,7 @@
 	(at your option) any later version.
 
 	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	buunityt WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
 
@@ -17,272 +17,51 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <html>
-
 <head>
-    <meta content="text/html; charset=windows-1252" http-equiv="content-type">
-    <title>Output | Teleprompter by Imaginary Films</title>
-    <link href="favicon.ico" rel="icon" type="image/x-icon" />
-    <script src="js/jquery.min.js"></script>
-    <script src="js/pep.min.js"></script>
-    <link rel="stylesheet" href="ckeditor/contents.css">
-    <link rel="stylesheet" href="css/prompterstyle.css">
+	<meta charset="utf-8">
+	<title>Teleprompter | Teleprompter by Imaginary Films</title>
+	<link href="favicon.ico" rel="icon" type="image/x-icon">
+	<link rel="stylesheet" href="css/reset.css">
+	<link rel="stylesheet" href="css/teleprompter.css">
+	<link rel="stylesheet" href="css/prompt.css">
+	<link rel="stylesheet" href="css/teleprompter-themes.css">
+	<script src="js/pep.min.js"></script>
+	<script src="js/data.manager.js"></script>
+	<script src="js/teleprompter.js"></script>
+	<script src="js/teleprompter-themes.js"></script>
 </head>
-
-<body>
-    <div id="pointerArea" touch-action="none"></div>
-    <table border="0" cellpadding="0" cellspacing="0" id="overlay" class="cke_editable">
-        <tbody>
-            <tr id="overlayTop" class="overlayBg">
-                <td> </td>
-            </tr>
-            <tr id="overlayFocus">
-                <td>
-                    <div id="arrow"></div>
-                </td>
-            </tr>
-            <tr id="overlayBottom" class="overlayBg">
-                <td> </td>
-            </tr>
-        </tbody>
-    </table>
-    <div id="scroll_wrapper">
-        <div id="text_block" class="cke_editable"></div>
-    </div>
-    <script>
-        (function() {
-            //Encapsulate the code in an anonymous function to not fill the global object. (Window)
-            //JavaSript Strict
-            "use strict";
-            var play = false;
-            var flipH = 0;
-            var flipV = 0;
-            // Object identifiers
-            var wrapper = $('#scroll_wrapper');
-            var wrapperById = document.getElementById('scroll_wrapper');
-            var prompt = document.getElementById('text_block');
-            // Set speed controls
-            var unit = prompt.clientHeight/1600;
-            if (unit<1)
-                unit = 1;
-            var speed = unit; // initial speed
-            var sensitivity = 1.84;
-            var limit = 40/sensitivity;
-            var negLimit = limit*-1;
-            // Parse values from localStorage
-            var obj = JSON.parse(localStorage.getItem('data'));
-            prompt.innerHTML = decodeURIComponent(obj.html);
-            var timeoutStat;
-
-            function negSpeed() {
-                if (speed > negLimit) speed -= unit;
-            }
-
-            function posSpeed() {
-                if (speed < limit) speed += unit;
-            }
-
-            function doScroll() {
-                wrapper.animate({scrollTop:"+="+speed}, {
-                    duration: 50 - Math.abs(speed * sensitivity),
-                    complete:  doScroll
-                });
-            }
-
-            function togglePlay() {
-                if (speed!=0)
-                {
-                    play = !play;
-                    if (play) doScroll();
-                    else
-                    {
-                        // Not a good practice but as of 2015 we can't implement workers for all platforms due to security limitations. Calling wrapper.stop() twice prevents multithreading bug since animate() can be preempted.
-                        wrapper.stop();
-                        wrapper.stop();
-                    }
-                }
-            }
-
-            function inIframe() {
-                try {
-                    return window.self !== window.top;
-                } catch (e) {
-                    return true;
-                }
-            }
-
-            function moveToAnchor( h )
-            {
-                // If anchor exists...
-                if ($("#"+h).length>0)
-                {
-                    // Pause animation
-                    togglePlay();
-                    // Save the URL without hash.
-                    var url = location.href;
-                    // Go to the target element.
-                    location.href = '#'+h;
-                    // Change url back
-                    history.replaceState(null,null,url);
-                    // Scroll anchor to center
-                    wrapper.scrollTop(wrapper.scrollTop()-wrapperById.clientHeight/2);
-                    // Resume animation
-                    togglePlay();
-                }
-            }
-
-            document.onkeydown = function(evt) {
-                // Change speed toward intended direction.
-                evt = evt || window.event;
-                switch (evt.keyCode) {
-                    case 39: // Right
-                    case 40: // Down
-                    case 83: // S
-                    case 68: // D
-                        if (flipV) negSpeed();
-                        else posSpeed();
-                        break;
-                    case 37: // Left
-                    case 38: // Up
-                    case 87: // W
-                    case 65: // A
-                        if (flipV) posSpeed();
-                        else negSpeed();
-                        break;
-                    case 32: // Spacebar
-                        togglePlay();
-                        break;
-                    case 27: // ESC
-                        returnToEditor();
-                        break;
-                    case 190: // Dot
-                    case 110: // Decimal point
-                        //dev: Load interface to search for custom anchor.
-                        break;
-                    default:
-                        // If pressed numbers from 0 to 9 in and out of numpad.
-                        if ([48,49,50,51,52,53,54,55,56,57,96,97,98,99,100,101,102,103,104,105].indexOf(evt.keyCode) > -1 )
-                            if ( evt.keyCode<96 )
-                                moveToAnchor( evt.keyCode-48 )
-                            else
-                                moveToAnchor( evt.keyCode-96 )
-                }
-                // Prevent arrow and spacebar scroll bug.
-                if ([32, 37, 38, 39, 40].indexOf(evt.keyCode) > -1) evt.preventDefault();
-            };
-            // Reset speed to 0 when reaching Top or Bottom.
-            wrapper.scroll(function() {
-                var currPos = wrapper.scrollTop();
-                if (currPos === 0 || currPos + wrapperById.clientHeight == prompt.clientHeight) speed=0;
-            });
-
-            function timeout(event) {
-                // ALWAYS stop animation here.
-                wrapper.stop();
-                play = false;
-                // If waiting, clear and reset.
-                if (timeoutStat) {
-                    window.clearTimeout(timeoutStat);
-                }
-                // Set: Wait one second before resuming animation
-                timeoutStat = window.setTimeout( function(){
-                    // If user hasn't resumed animation, resume it.
-                    if (!play)
-                        togglePlay();
-                }, 1000);
-            }
-            // Bind wheel to timeout
-            $(window).bind('wheel', timeout);
-            // Bind scrolls to timeout
-            $("#text_block").on("pointermove", function(event) {
-                //console.log("pointer in action");
-                timeout();
-            });
-
-            function returnToEditor() {
-                if (inIframe()) {
-                    $('#content', parent.document).css({
-                        "display": "block"
-                    });
-                    $('#editor', parent.document).css({
-                        "display": "block"
-                    });
-                    $('#footer', parent.document).css({
-                        "display": "block"
-                    });
-                    $('#framecontainer', parent.document).css({
-                        "display": "none"
-                    });
-                    this.document.location.href = "about:blank";
-                } else window.close();
-            }
-
-            function init() {
-                // Local variables (All variables in javascript are function scope not block scope)
-                var promptStyle = 0;
-                var focus = 0;
-                var i = 0;
-                var overBgs = $('.overlayBg');
-                // Get JSON values from local storage
-                var flip = obj.data.secondary;
-                // Flips are used to indicate both boolean action and scale values
-                switch (flip) {
-                    case 2:
-                        flipH = -2;
-                        break;
-                    case 3:
-                        flipV = -2;
-                        break;
-                    case 4:
-                        flipH = -2;
-                        flipV = -2;
-                        break;
-                }
-                focus = obj.data.focus;
-                promptStyle = obj.data.prompterStyle;
-
-                // Flip prompt
-                if (flipH||flipV)
-                {
-                    prompt.style.MozTransform="matrix("+(flipH+1)+",0,0,"+(flipV+1)+",0,0)";
-                    prompt.style.OTransform="matrix("+(flipH+1)+",0,0,"+(flipV+1)+",0,0)";
-                    prompt.style.webkitTransform="matrix("+(flipH+1)+",0,0,"+(flipV+1)+",0,0)";
-                    prompt.style.transform="matrix("+(flipH+1)+",0,0,"+(flipV+1)+",0,0)";
-                    // IE<9 unsupported
-                }
-                if (flipV) {
-                    // Start scroll at inverted top
-                    wrapper.scrollTop(prompt.offsetHeight - wrapperById.clientHeight - 30);
-
-                    // If focus is top or bottom, change overlay positions
-                    if (focus == 1) document.getElementById("overlayBottom").style.height = '1vh';
-                    else if (focus == 2) document.getElementById("overlayTop").style.display = 'none';
-                    // Reverse initial speed
-                    speed *= -1;
-                } else // If no vertical flip
-                {
-                    // If focus is top or bottom, change overlay positions.
-                    if (focus == 1) document.getElementById("overlayTop").style.display = 'none';
-                    else if (focus == 2) document.getElementById("overlayBottom").style.height = '1vh';
-                }
-                // Set Teleprompter Style
-                switch (promptStyle) {
-                    case 1:
-                        document.body.style.background = '#FFF';
-                        document.body.style.color = '#000';
-                        for (i = 0; i < overBgs.length; i++) overBgs[i].style.backgroundColor = '#BBB';
-                        break;
-                    default:
-                        document.body.style.background = '#272822';
-                        document.body.style.color = '#FFF';
-                        for (i = 0; i < overBgs.length; i++) overBgs[i].style.backgroundColor = '#000';
-                }
-                // Start scrolling
-                togglePlay();
-            }
-            //   Call init when the DOM loads
-            $(document).ready(init);
-        }());
-    </script>
+<!-- Prompt id brings text formating -->
+<body id="promptcontainer">
+	<!-- header contains visual controls. -->
+	<header id="touchControls" class="top">
+		<h1>Teleprompter</h1>
+		<nav>
+			<ul>
+				<li>Pause</li>
+				<li>Velocity</li>
+				<li>Sensitivity</li>
+				<li>Multiplicator</li>
+				<li>Font size</li>
+			</ul>
+		</nav>
+	</header>
+	<!-- #prompt contains formating, which is shared with the overlay. -->
+	<div id="prompt">
+		<!-- .prompt helps us identify and manipulate the prompt itself. -->
+		<article class="prompt"></article>
+		<!-- #overlay layers focus area on top of the prompt. -->
+		<table border="0" cellpadding="0" cellspacing="0" touch-action="none" id="overlay">
+			<tbody>
+				<tr id="overlayTop" class="overlayBg">
+					<td>&nbsp;</td>
+				</tr>
+				<tr id="overlayFocus">
+					<td>&nbsp;</td>
+				</tr>
+				<tr id="overlayBottom" class="overlayBg">
+					<td>&nbsp;</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 </body>
-
-</html>

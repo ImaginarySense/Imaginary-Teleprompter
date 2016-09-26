@@ -1,0 +1,60 @@
+/*
+	Teleprompter
+	Copyright (C) 2015 Imaginary Films LLC and contributors
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#prompt {
+	position: absolute;
+	left: 8%;
+	width: 84%;
+	font-size: 5vw;	
+	line-height: 1.1;
+	text-align: center;
+	list-style-position: inside;
+	font-family: sans-serif, Arial, Verdana, "Trebuchet MS";
+}
+
+#prompt h6 {
+	font-size: 1em;
+}
+
+#prompt h5 {
+	font-size: 1em;
+}
+
+#prompt h4 {
+	font-size: 1em;
+}
+
+#prompt h3 {
+	font-size: 1.16666em;
+}
+
+#prompt h2 {
+	font-size: 1.33333em;
+}
+
+#prompt h1 {
+	font-size: 1.5em;
+}
+
+#prompt a {
+	color: #FFF;
+}
+
+#prompt table {
+	width: 100%;
+}
