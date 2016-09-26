@@ -339,7 +339,6 @@ var debug;
 
                 // Load teleprompter
                 if (elecScreen.getPrimaryDisplay() && instance[0]) {
-                    toggleFullscreen();
                     frame.src = "teleprompter.html?debug=1";
                 }
             } else {
@@ -387,13 +386,12 @@ var debug;
             instance[1] = false;
         }
 
-
         // In case of both
         // In case of none
         if (!(instance[0] || instance[1]))
             window.alert("You must prompt at least to one display.");
         else if (inElectron() && instance[0] && instance[1] && !externalDisplay) {
-            window.alert("You dont have any external Display");
+            window.alert("You don't have any external Display.");
         } else
             togglePromptIt();
     }
