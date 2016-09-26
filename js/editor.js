@@ -765,6 +765,11 @@ var debug;
             document.querySelector("#wrapper").classList.toggle("toggled");
         }
 
+        sid.addElementEnded = function(element){
+            console.log(element);
+            sid.selectedElement(element);
+        }
+
         sid.setEvent('input','prompt',function(e){
             var scriptsData = sid.getElements();
             scriptsData[sid.currentElement]["data"] = document.getElementById("prompt").innerHTML;
