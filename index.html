@@ -1,294 +1,372 @@
 <!DOCTYPE html>
 <!--
-    Teleprompter!
-    Copyright (C) 2015 Imaginary Films LLC and contributors
+	Teleprompter
+	Copyright (C) 2015 Imaginary Films LLC and contributors
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta property="og:title" content="Teleprompter by Imaginary Films" />
-    <meta property="og:site_name" content="Imaginary Tech"/>
-    <meta property="og:url" content="http://imaginary.tech/teleprompter/" />
-    <meta property="og:description" content="'Teleprompter' is a professional grade, multi-platform, free software teleprompter for everyone to use. Click on 'Prompt It!' whenever you're ready and control the speed with the arrow keys." />
-    <meta property="og:image" content="http://imaginary.tech/teleprompter/img/if-teleprompter-web-fb.jpg" />
-    <meta property="fb:app_id" content="196769633992905" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Teleprompter by Imaginary Films</title>
-    <link  rel="icon" href="favicon.ico" type="image/x-icon" />
-    <script src="ckeditor/ckeditor.js"></script>
-    <script src="js/jquery.min.js"></script>
-    <script src="js/mobilecheck.js"></script>
-    <style class="anchorjs"></style>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/docs.min.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-    <link href="css/mobilehide.css" rel="stylesheet">
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-  <script>
-  /*window.fbAsyncInit = function() {
-    FB.init({
-      appId      : '196769633992905',
-      xfbml      : true,
-      version    : 'v2.5'
-    });
-  };
 
-  (function(d, s, id){
-     var js, fjs = d.getElementsByTagName(s)[0];
-     if (d.getElementById(id)) {return;}
-     js = d.createElement(s); js.id = id;
-     js.src = "//connect.facebook.net/en_US/sdk.js";
-     fjs.parentNode.insertBefore(js, fjs);
-   }(document, 'script', 'facebook-jssdk'));
-*/</script>
-    <form>
-      <!-- Header -->
-      <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
-        <div class="container">
-          <div class="navbar-header">
-            <!--
-            <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#bs-navbar" aria-controls="bs-navbar" aria-expanded="false">
-              <span class="sr-only">Toggle navigation</span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </button>
-            -->
-            <a href="http://imaginary.tech/teleprompter" target="_blank" class="navbar-brand"><img src="img/logo.png" alt="Teleprompter" style="height:20px;"></a>
-          </div>
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="" onclick="submitTeleprompter(); return false;" style="font-size: 1.4em; background:#EEE;"><strong>Prompt It!</strong></a></li>
-          </ul>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta property="og:title" content="Teleprompter by Imaginary Films">
+	<meta property="og:site_name" content="Imaginary Tech">
+	<meta property="og:url" content="http://imaginary.tech/teleprompter/">
+	<meta property="og:description" content="'Teleprompter' is a professional grade, multi-platform, free software teleprompter for everyone to use. It's built on web technologies so it can run in any device.">
+	<meta property="og:image" content="http://imaginary.tech/teleprompter/img/if-teleprompter-web-fb.jpg">
+	<meta property="fb:app_id" content="196769633992905">
+	<title>Teleprompter by Imaginary Films</title>
+	<link rel="icon" href="favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="css/reset.css">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/docs.min.css">
+	<link rel="stylesheet" href="css/editor.css">
+	<link rel="stylesheet" href="css/prompt.css">
+	<link rel="stylesheet" href="css/teleprompter-themes.css">
+	<link rel="stylesheet" href="css/mobilehide.css">
+	<script src="ckeditor/ckeditor.js"></script>
+	<!--<script src="tinymce/tinymce.min.js"></script>-->
+    <script src="js/data.manager.js"></script>
+    <script src="js/sidebar.js"></script>
+	<script src="js/editor.js"></script>
+	<script src="js/teleprompter-themes.js"></script>
+	<script src="js/jscolor.min.js"></script>
+
+</head>
+<body>
+    <div id="wrapper" class="toggled hidden-xs">
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+        	<ul class="sidebar-nav" id="scripts">
+            </ul>
+            <!--<ul class="sidebar-nav" id="images">
+            	<li class="sidebar-brand">Images</li>
+            </ul>-->
+            
         </div>
-      </header>
-
-      <!-- Custom controls -->
-      <div class="bs-docs-header" id="content" tabindex="-1">
-        <div class="container">
-          <div class='row'>
-            <!--
-            <div class='col-md-3 desktopOnly'>
-              <label for="basic-url">Current display</label>
-              <select class="form-control" id="primary" name="primary">
-                <option value="0" selected="selected">Don't prompt on this window</option>
-                <option value="1">Normal (Don't Flip)</option>
-                <option value="2">Horizontal flip</option>
-                <option value="3">Vertical flip</option>
-                <option value="4">Double flip</option>
-              </select>
-            </div>
-            -->
-            <div class='col-md-4'>
-              <!--<label class="desktopOnly" for="basic-url">External display</label>-->
-              <label for="basic-url">Flip mode</label>
-              <select class="form-control" id="secondary" name="secondary">
-                <!--<option value="0" class="desktopOnly">Disabled</option>-->
-                <option value="1" selected="selected">Normal (Don't Flip)</option>
-                <option value="2">Horizontal Flip</option>
-                <option value="3">Vertical Flip</option>
-                <option value="4">Double Flip</option>
-              </select>
-            </div>
-            <div class='col-md-4'>
-              <label for="basic-url">Prompter style</label>
-              <select class="form-control" id="prompterStyle" name="prompterStyle" onchange="OnChange(this.form.prompterStyle);">
-                <option value="0" selected="selected">Blackboard</option>
-                <option value="1">Whiteboard</option>
-              </select>
-            </div>
-            <div class='col-md-4'>
-              <label for="basic-url">Focus</label>
-              <select class="form-control" id="focus" name="focus">
-                <option value="1">Top (webcam)</option>
-                <option value="0" selected="selected">Middle (professional prompter)</option>
-                <option value="2">Bottom (screen above camera)</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id="editor" class="container bs-docs-container" style="width:100%;">
-        <div class="row">
-          <div class="col-md-12" role="main" style="padding-right: 0px; padding-left: 0px;">
-            <div class="bs-docs-section">
-              <div id="CKEditor">
-                <textarea name="editor1" id="teleprompterdata">
-<h2>Welcome to Teleprompter!</h2>
-<p>Are you ready to tell your story?</p>
-<br>
-<p>"Teleprompter" is a professional grade, multi-platform, free software teleprompter for everyone to use. Click on "Prompt It!" whenever you're ready and control the speed with the arrow keys.</p>
-<br>
-<h3>Here are some of our features:</h3>
-<ol>
-  <li>Speed controls with the Arrow and WASD keys.</li>
-  <li>Our Rich Text Editor gives unlimited possibilities on what you can prompt.</li>
-  <li>Different focus modes allows using Teleprompter with a webcam, a tablet, or professional teleprompter systems.</li>
-  <li>Flip modes allow <em>mirroring</em> the prompter in every possible way.</li>
-  <li>By setting up <a id="5" name="5">anchors</a> with the numbers '0' through '9', you can instantly jump to any part of the script.<br>Try pressing '5' now!</li>
-  <li>You may choose between a black or a white background to read from.</li>
-  <li>Prompter loads on a separate window so you can display it on a secondary monitor.</li>
-  <li>Text can be pasted from other word processors like Microsoft® Word or <a href="https://www.libreoffice.org/">Libre Office</a> Writer.</li>
-  <li>Scrolling pauses the text for one second before resuming the animation.</li>
-  <li>You may pause the teleprompter at anytime pressing 'spacebar'.</li>
-  <li>Press 'F11' to enter and leave fullscreen.</li>
-  <li>Edits continuously auto save. You can recover previous prompts on the bottom right of the editor.</li>
-  <li>All data is managed locally. No data is stored on our servers.</li>
-</ol>
-<hr />
-<h3>How to use anchors:</h3>
-<ol>
-  <li>Select a keyword on the line you want to jump to.</li>
-  <li>Click on the <strong>Flag Icon</strong> on the editor's tool bar.</li>
-  <li>A box named "Anchor Properties" should have popped up. Type any number from 0 through 9 and click 'Ok'.</li>
-  <li>When prompting, press or tap on the number you typed to jump into the desired location.</li>
-</ol>
-<p>###</p>
-                </textarea>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </form>
-    <!-- Footer -->
-    <footer id="footer" class="bs-docs-footer finalFooter" role="contentinfo">
-      <div class="container">
-
-        <p style="color:#FFF;">&copy; <a href="http://imaginary.tech">Imaginary Films LLC</a></p>
-
-        <p>Created by <a href="https://twitter.com/Va2ron1" target="_blank">Victor Ortiz</a> and <a href="https://www.facebook.com/javicorper" target="_blank">Javier Cordero</a>.</p>
-
-        <p>Code licensed under <a rel="license" href="LICENSE" target="_blank">GPL3</a>, assets under <a rel="license" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.</p>
-
-        <ul class="bs-docs-footer-links">
-          <li>Currently v1.2</li>
-          <!--
-          <li>&middot;</li>
-          <li><a href="downloads">Download</a></li>
-          -->
-          <li>&middot;</li>
-          <li><a target="_blank" href="https://github.com/imaginaryfilms/Teleprompter.git">Source</a></li>
-          <!--
-          <li>&middot;</li>
-          <li><a target="_blank" href="support">Support</a></li>
-          <li>&middot;</li>
-          <li><a target="_blank" href="releases">Releases</a></li>
-          -->
-          <li>&middot;</li>
-          <li><a target="_blank" href="http://imaginary.tech/software/teleprompter">About</a></li>
-        </ul>
-      </div>
-    </footer>
-    <div id="framecontainer" style="position: relative; top: 0px; left: 0px; width: 100%; height: 100%; z-index:10; display: none;">
-      <iframe id="frameprompt" src="about:blank" style="top: 0px; left: 0px; width: 100%; height: 100%;"></iframe>
     </div>
-    <script>
-      // Instance CKEditor
-      CKEDITOR.replace( 'teleprompterdata');
-      var prompterWindow;
+<!-- ColorPicker modal dialog -->
+    <div id="openCustomStyles" class="modalDialog">
+        <div style="width: 84%;">
+            <a href="#close" title="Close" class="close">X</a>
+            <div style="margin-bottom:-15px;">
+                <h1>Custom Styles <small>Administration Panel</small></h1>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <h1><small>Styles</small></h1>
+                            <div class="panel panel-default">
+                            <table class="table table-bordered" id="stylesTable" >
+                                <tbody>
+                                    <tr>
+                                        <th class="table-item"><span>No Styles</span></th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <h1><small>Properties</small></h1>
+                        <div class='row'>
+                            <div class='col-md-4'>
+                                <label>Body</label>
+                                <input type="text" class="form-control jscolor" onchange="updateColorOnPreview(this)" id="bodyColor" value="" >
+                                    </div>
+                            <div class='col-md-4'>
+                                <label>Overlay</label>
+                                <input type="text" class="form-control jscolor" onchange="updateColorOnPreview(this)" id="overlayColor" value="" >
+                                    </div>
+                            <div class='col-md-4'>
+                                <label>Text Color</label>
+                                <input type="text" class="form-control jscolor" onchange="updateColorOnPreview(this)" id="textColor" value="" >
+                            </div>
+						</div>
+                    
+                    
+                    <h1><small>Preview</small></h1>
+                    <div id="promptPreviewColor">
+                    
+                        <!-- #overlay layers focus area on top of the prompt. -->
+                        <table cellpadding="0" cellspacing="0" id="overlayPreview" >
+                            <tbody>
+                                <tr id="overlayTop" style = "background-color:#000;opacity:0.5;">
+                                    <td>Text</td>
+                                </tr>
+                                <tr id="overlayFocus" >
+                                    <td>Text</td>
+                                </tr>
+                                <tr id="overlayBottom" class="overlayBg" style = "background-color:#000;opacity:0.5;">
+                                    <td>Text</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    </br>
+                        <div class='row'>
+                            
+                            <div class='col-md-4'>
+                                <div class="input-group">
+                                    <span class="input-group-addon" id="basic-addon1">Style Name</span>
+                                    <input type="text"  class="form-control" placeholder="name" aria-describedby="basic-addon1" id="nameStyle">
+                                </div>
+                            </div>
+                            <div class='col-md-8'>
+                                <button class="btn btn-default" id="editStyleButton" disabled>Update Style</button>
+                                <button class="btn btn-default" id="addStyleButton" disabled>New Style</button>
+                                <button class="btn btn-default" id="removeStyleButton" disabled>Delete Style</button>
+                                <button class="btn btn-default" id="defaultStyleButton">Set As Default</button>
+                            </div>
+						</div>
+                </div>
+            </div>
+            
+            
+            
+            
+        </div>
+    </div>
+	<form>
+		<!-- Header -->
+		<header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+			<div class="container">
+				<div class='row'>
+                    <ul class="nav navbar-nav navbar-left hidden-xs" style="padding-right:20px;">
+                        <li><a id="menu-toggle" href="#menu-toggle"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a></li>
+                    </ul>
+				<div class="navbar-header">
+					<a class="external navbar-brand" href="http://imaginary.tech/teleprompter" target="_blank"><img src="img/logo.png" alt="Teleprompter" ></a>
+				</div>
+                
+				<ul class="nav navbar-nav navbar-right">
+					<li><a id="promptIt" href=" ">Prompt It!</a></li>
+				</ul>
+				</div>
+			</div>
+		</header>
+		<!-- Controls -->
+		<div class="bs-docs-header" id="content" tabindex="-1">
+			<div class="container">
+				<div class='row'>
+					<div class='col-md-3'>
+						<!--<label for="basic-url">Flip mode</label>-->
+						<label for="basic-url">In-frame prompter</label>
+						<select class="form-control" id="primary" name="primary">
+							<option value="0" title="Don't prompt on this window">Disabled (Don't prompt on this window)</option>
+							<option value="1" title="Normal screen" selected="selected">No Flip (Normal screen)</option>
+							<option value="2" title="Normal mirror">Horizontal Flip (Mirror)</option>
+							<option value="3" title="Miror plus 180&deg; rotation">Vertical Flip (Miror plus 180&deg; rotation)</option>
+							<option value="4" title="180&deg; screen rotation">Double Flip (180&deg; screen rotation)</option>
+						</select>
+					</div>
+					<div class='col-md-3'>
+						<label for="basic-url">External prompter</label>
+						<select class="form-control" id="secondary" name="secondary">
+							<option value="0" title="Don't prompt to a second window" selected="selected">Disabled (Don't prompt to a second window)</option>
+							<option value="1" title="Normal screen">No Flip (Normal screen)</option>
+							<option value="2" title="Normal mirror">Horizontal Flip (Mirror)</option>
+							<option value="3" title="Miror plus 180&deg; rotation">Vertical Flip (Miror plus 180&deg; rotation)</option>
+							<option value="4" title="180&deg; screen rotation">Double Flip  (180&deg; screen rotation)</option>
+						</select>
+					</div>
+					<div class='col-md-3'>
+						<label for="basic-url">Prompter style</label>
+						<select class="form-control" id="prompterStyle" name="prompterStyle">
+							<option value="0" selected="selected">Blackboard</option>
+							<option value="1">Whiteboard</option>
+							<option value="2">Classic Yellow</option>
+							<option value="3">Intergalactic</option>
+						</select>
+					</div>
+					<div class='col-md-3'>
+						<label for="basic-url">Focus area</label>
+						<select class="form-control" id="focus" name="focus">
+							<option value="3" title="You can interact with prompter elements, such as hyperlinks and videos, by disabling focus area.">None</option>
+							<option value="1">Top Overlay (webcam)</option>
+							<option value="0" selected="selected">Middle Overlay (professional prompter)</option>
+							<option value="2">Bottom Overlay (screen above camera)</option>
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="editorcontainer">
+			<div id="toolbar"></div>
+			<div id="promptcontainer">
+				<div id="prompt" contenteditable="true">
+	<h3>Welcome to Teleprompter!</h3>
+	<p>Are you ready to tell your story?</p>
+	<br>
+	<p>"Teleprompter" is a professional grade, multi-platform, free software teleprompter for anyone to use. Click on "Prompt It!" whenever you're ready and control the speed with the arrow keys.</p>
+	<br>
+	<h3>Here are some of our features:</h3>
+	<ol>
+		<li>Control the speed with the Arrow keys, WASD keys or the mouse wheel. You may pause at anytime with the 'spacebar'.</li>
+		<li>Different focus areas allow you to easily use Teleprompter with a webcam, a tablet, or professional teleprompter equipment.</li>
+		<li>Flip modes allow <em>mirroring</em> the prompter in every possible way.</li>
+		<li>You can use one or two instances. Mirror one, monitor on the other one.</li>
+		<li><a id="5" name="5">Set almost any key as an Anchor and instantly jump to any part of the script. Try pressing '5' now!</a></li>
+		<li>The Rich Text Editor gives unlimited possibilities on what you can prompt.</li>
+		<ul>
+			<li>You can generate and display mathematical equations.<br>
+				<table border="1" cellpadding="1" cellspacing="1">
+					<tbody>
+						<tr>
+							<td>&nbsp;</td>
+							<td><img alt="\bg_white \huge \sum_{\Theta+\Pi }^{80} sin(\Theta)" src="http://latex.codecogs.com/gif.latex?%5Cdpi%7B300%7D%20%5Cbg_white%20%5Chuge%20%5Csum_%7B%5CTheta&amp;plus;%5CPi%20%7D%5E%7B80%7D%20sin%28%5CTheta%29" /></td>
+							<td>&nbsp;</td>
+						</tr>
+					</tbody>
+				</table>
+			</li>
+			<li>Insert images from the web or copy and paste them into the prompter.
+				<img alt="Picture: Arecibo Sky" src="img/arecibo-sky.jpg">
+			</li>
+		</ul>
+		<li>There are various Prompter Styles to choose from. You may also create your own.</li>
+		<li>Text can be pasted from other word processors like Microsoft Word&reg; or Libre Office Writer&trade;.</li>
+		<li>Animations are hardware accelerated for a smooth result.</li>
+		<li>Press 'F11' to enter and leave fullscreen.</li>
+		<li>All data is managed locally. No data is stored on our servers.</li>
+		<li>An offline version can be downloaded for Windows, OS X, Linux and Chrome OS.</li>
+		<li>Enjoy the ease of a smart fullscreen in the local version.</li>
+		<li>Close prompts and return to the editor by pressing 'ESC'.</li>
+	</ol>
+	<hr>
+	<h4>How to use anchor shortcuts:</h4>
+	<ol>
+		<li>Select a keyword or line you want to jump to on your text in the editor.</li>
+		<li>Click on the <strong>Flag Icon</strong> on the editor's tool bar.</li>
+		<li>A box named "Anchor Properties" should have appeared. Type any single key of your choice and click 'Ok'.<br>Note preassigned keys, such as WASD and Spacebar will be ignored.</li>
+		<li>Repeat as many times as you wish.</li>
+		<li>When prompting, press on the shortcut key to jump into the desired location.</li>
+	</ol>
+	<p>###</p>
+				</div>
+			</div>
+			<div id="statusbar"></div>
+		</div>
+	</form>
+	<!-- Footer -->
+	<footer id="footer" class="bs-docs-footer" role="contentinfo">
+		<div class="container">
 
-      // On change Prompter Style
-      function OnChange(prompterStyle)
-      {
-        var selection = prompterStyle.selectedIndex
+			<p style="color:#FFF;">&copy; <a class="external" href="http://imaginary.tech" target="_blank">Imaginary Films LLC</a></p>
+			<p>Developed by: <a class="external" href="https://www.linkedin.com/in/javier-oscar-cordero-p%25C3%25A9rez-70658033" target="_blank">Javier Cordero</a>,<br>
+			<a class="external" href="https://twitter.com/Va2ron1" target="_blank">Victor Ortiz</a>, <a class="external" href="https://github.com/keyvanp">Keyvan Pérez</a> &amp; <a class="external" href="https://www.facebook.com/rafael.jose.7737">Rafael Sierra</a>.</p>
 
-        if ( selection )
-        {
-          document.getElementsByTagName('iframe')[0].contentWindow.document.body.style.background="#FFF";
-          document.getElementsByTagName('iframe')[0].contentWindow.document.body.style.color="#000";
-        }
-        else
-        {
-          document.getElementsByTagName('iframe')[0].contentWindow.document.body.style.background='#272822';
-          document.getElementsByTagName('iframe')[0].contentWindow.document.body.style.color = '#FFF';
-        }
-      }
-/*
-      function checkDisplaySettings()
-      {
-        if ( $( "#secondary" ).val() == 0 && $( "#primary" ).val() == 0 )
-          document.alert("You must have at least one active display.");
-      }
-      $( "#secondary" ).onChange()
-      {
-        checkDisplaySettings();
-      }
-      $( "#primary" ).onChange()
-      {
-        checkDisplaySettings();
-      }
-*/
-      function submitTeleprompter()
-      {
-        // Get html from CKEditor
-        var htmldata = CKEDITOR.instances.teleprompterdata.getData();
+			<ul class="bs-docs-footer-links">
+				<li>Currently v2.0</li>
+				<li>&middot;</li>
+				<li>Licensed under <a rel="license" href="LICENSE" target="_blank">GPL3</a>, assets under <a class="external" rel="license" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a></li>
+				<br>
+				<li>&middot;</li>
+				<li><a id="credits-link" href="#">Full Credits</a></li>
+				<li>&middot;</li>
+				<li><a class="external" target="_blank" href="https://github.com/imaginaryfilms/Teleprompter.git">Source Code</a></li>
+				<li>&middot;</li>
+				<li><a class="external" target="_blank" href="http://imaginary.tech/teleprompter/download/">Downloads</a></li>
+				<li>&middot;</li>
+			</ul>
+				<!--<li><a class="external" target="_blank" href="http://imaginary.tech/software/teleprompter">About</a></li>-->
+		</div>
+	</footer>
+	<div id="framecontainer">
+		<iframe id="teleprompterframe" src="blank.html" class="fullsize"></iframe>
+	</div>
+</body>
+<script type="text/javascript">
+if (inElectron()){
+	var {ipcMain} = require('electron');
+    var {shell} = require('electron');
+}
+if (typeof CKEDITOR!=="undefined") {
+	// Turn off automatic editor creation first.
+	CKEDITOR.disableAutoInline = true;
+	// Create editor
+	CKEDITOR.inline( 'prompt', {
+		// To enable source code editing in a dialog window, inline editors require the "sourcedialog" plugin.
+		extraPlugins: 'sharedspace,sourcedialog',
+		removePlugins: 'floatingspace,maximize,resize',
+		sharedSpaces: {
+			top: 'toolbar',
+			bottom: 'statusbar'
+		},
+		toolbarGroups: [
+			{ name: 'document',    groups: [ 'document', 'print', 'mode', 'tools' ] },
+			{ name: 'clipboard',   groups: [ 'clipboard', 'undo' ] },
+			{ name: 'editing',     groups: [ 'find', 'selection', 'spellchecker' ] },
+			{ name: 'insert' },
+			{ name: 'others' },
+			{ name: 'colors' },
+			{ name: 'about' },
+			'/',
+			{ name: 'links' },
+			{ name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+			{ name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
+			{ name: 'styles' }
+		],
 
-        // Get remaining form data
-        var data = '{ "data": {"secondary":'+$( "#secondary" ).val()+',"prompterStyle":'+$( "#prompterStyle" ).val()+',"focus":'+$( "#focus" ).val()+'},"html" : "' + encodeURIComponent(htmldata) + '"}';
+		// Remove the redundant buttons from toolbar groups defined above.
+		removeButtons: 'Save,Smiley,ShowBlocks,Unlink,Link,Blockquote,CreateDiv,PageBreak,Language,Styles',/*,Styles,Specialchar*/
+		// Font sizes
+		fontSize_sizes: '0.7 em/0.7em;0.8 em/0.8em;0.9 em/0,9em;1.0 em/1em;1.1 em/1.1em;1.2 em/1.2em;1.3 em/1.3em;1.4 em/1.4em;1.5 em/1.5em;1.6 em/1.6em;1.7 em/1.7em;1.8 em/1.8em;1.9 em/1.9em;2.0 em/2em;2.1 em/2.1em;2.2 em/2.2em;2.3 em/2.3em;2.4 em/2.4em;2.5 em/2.5em;2.6 em/2.6em;2.7 em/2.7em;2.8 em/2.8em;2.9 em/2.9em;3.0 em/3em',
+		// Font sizes
+		line_height: '1 em/1em;1.1 em/1.1em;1.2 em/1.2em;1.3 em/1.3em;1.4 em/1.4em;1.5 em/1.5em;1.6 em/1.6em;1.7 em/1.7em;1.8 em/1.8em;1.9 em/1.9em;2.0 em/2.0em',
+		// Quick tables
+        qtRows: 10, // Count of rows
+        qtColumns: 10, // Count of columns
+        qtBorder: '0', // Border of inserted table
+        qtWidth: '100%', // Width of inserted table
+        qtCellPadding: '0', // Cell padding table
+        qtCellSpacing: '0', // Cell spacing table
+	});
 
-        // Store data locally for prompter to use
-        localStorage.setItem('data', data);
-        //console.log(data);
-
-        /*
-        // Set and load "Primary"
-        if ( $("#primary").val()>0 )
-        {
-          // Hide stuff
-          document.getElementById("content").style.display = "none";
-          document.getElementById("editor").style.display = "none";
-          document.getElementById("footer").style.display = "none";
-          // Show prompter frame
-          document.getElementById("framecontainer").style.display = "block";
-          // Load teleprompter
-          document.getElementById("frameprompt").src = "teleprompter.html";
-        }
-        */
-
-        // "Secondary"
-        if ( $("#secondary").val()>0 )
-        {
-          prompterWindow = window.open("teleprompter.html",'TelePrompter Output','height=' + screen.height +',width=' + screen.width);
-          if (window.focus)
-            prompterWindow.focus();
-        }
-      }
-
-
-
-      function init()
-      {
-        if ( window.mobileAndTabletcheck() )
-        {
-          $(".mobileOnly").css('display', 'block');
-          //document.getElementById("secondary").value = 1;
-        }
-        else
-          $(".desktopOnly").css('display', 'block');
-        //console.log(window.mobileAndTabletcheck());
-      }
-    //   Call init when the DOM loads
-      $(document).ready(init);
-    </script>
-  </body>
+	CKEDITOR.on( 'dialogDefinition', function( ev ) {
+		var dialogName = ev.data.name;
+		var dialogDefinition = ev.data.definition;
+		console.log(dialogName);
+		if ( dialogName == 'table' ) {
+			var info = dialogDefinition.getContents( 'info' );
+			console.log(info);		
+			info.get( 'txtWidth' )[ 'default' ] = '100%';
+			info.get( 'txtBorder' )[ 'default' ] = '0';
+			info.get( 'txtRows' )[ 'default' ] = '1';
+			info.get( 'txtCols' )[ 'default' ] = '3';
+			info.get( 'txtCellSpace' )[ 'default' ] = '0';
+			info.get( 'txtCellPad' )[ 'default' ] = '0';
+		}
+		if ( dialogName == 'iframe' ) {
+			var info = dialogDefinition.getContents( 'info' );
+			console.log(info);
+			info.get( 'width' )[ 'default' ] = '100%';
+			info.get( 'height' )[ 'default' ] = '50%';
+		}
+		if ( dialogName == 'flash' ) {
+			var info = dialogDefinition.getContents( 'info' );
+			console.log(info);
+			info.get( 'width' )[ 'default' ] = '100%';
+			info.get( 'height' )[ 'default' ] = '50%';
+			info.get( 'hSpace' )[ 'default' ] = '0';
+			info.get( 'vSpace' )[ 'default' ] = '0';
+		}
+		if ( dialogName == 'image2' ) {
+			var info = dialogDefinition.getContents( 'info' );
+			console.log(info);	
+			info.get( 'width' )[ 'default' ] = '100%';
+			info.get( 'height' )[ 'default' ] = 'auto';
+		}
+	});
+}
+</script>
 </html>
