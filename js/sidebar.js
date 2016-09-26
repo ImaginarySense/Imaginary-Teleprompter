@@ -161,7 +161,9 @@ var SIDEBAR = function() {
                 newArr.push(elementsData[i]);
             }
         }
+        this.currentElement = elementsData.length-1;
         this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(newArr));
+        this.selectedElement(null);
     };
 
     this.addElements = function() {
@@ -195,92 +197,92 @@ var SIDEBAR = function() {
                 }
             }.bind(this);
 
+            if(elementsData[i].editable){
+                var span2 = document.createElement("span");
+                span2.id = "deleteMode";
+                span2.classList.add("glyphicon");
+                span2.classList.add("glyphicon-minus");
+                span2.onclick = function(e) {
+                    e.stopImmediatePropagation();
+                    this.deleteElement(e.target.parentNode.parentNode.value);
+                    window.setTimeout(function() {
+                        this.refreshElements();
+                    }.bind(this), 1);
+                }.bind(this);
+                span2.style.display = "none";
+                div.appendChild(span2);
 
-            var span2 = document.createElement("span");
-            span2.id = "deleteMode";
-            span2.classList.add("glyphicon");
-            span2.classList.add("glyphicon-minus");
-            span2.onclick = function(e) {
-                e.stopImmediatePropagation();
-                this.deleteElement(e.target.parentNode.parentNode.value);
-                window.setTimeout(function() {
-                    this.refreshElements();
-                }.bind(this), 1);
-            }.bind(this);
-            span2.style.display = "none";
-            div.appendChild(span2);
 
+                var span = document.createElement("span");
+                span.id = "editMode";
+                span.classList.add("glyphicon");
+                span.classList.add("glyphicon-pencil");
+                span.onclick = function(e) {
+                    e.stopImmediatePropagation();
+                    // get href of first anchor in element and change location
+                    for (var j = 0; j < menuNode.length; j++) {
+                        menuNode[j].classList.add("disabled");
+                    }
+                    e.target.style.display = "none";
+                    e.target.parentNode.querySelector("#deleteMode").style.display = "";
+                    e.target.parentNode.classList.add("editableMode");
+                    e.target.parentNode.classList.remove("disabled");
+                    var textBlock = e.target.parentNode.querySelector("#textBlock");
+                    textBlock.setAttribute("contentEditable", true);
 
-            var span = document.createElement("span");
-            span.id = "editMode";
-            span.classList.add("glyphicon");
-            span.classList.add("glyphicon-pencil");
-            span.onclick = function(e) {
-                e.stopImmediatePropagation();
-                // get href of first anchor in element and change location
-                for (var j = 0; j < menuNode.length; j++) {
-                    menuNode[j].classList.add("disabled");
-                }
-                e.target.style.display = "none";
-                e.target.parentNode.querySelector("#deleteMode").style.display = "";
-                e.target.parentNode.classList.add("editableMode");
-                e.target.parentNode.classList.remove("disabled");
-                var textBlock = e.target.parentNode.querySelector("#textBlock");
-                textBlock.setAttribute("contentEditable", true);
+                    textBlock.focus();
+                    if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
+                        var range = document.createRange();
+                        range.selectNodeContents(textBlock);
+                        range.collapse(false);
+                        var sel = window.getSelection();
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                    } else if (typeof document.body.createTextRange != "undefined") {
+                        var textRange = document.body.createTextRange();
+                        textRange.moveToElementText(textBlock);
+                        textRange.collapse(false);
+                        textRange.select();
+                    }
 
-                textBlock.focus();
-                if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
-                    var range = document.createRange();
-                    range.selectNodeContents(textBlock);
-                    range.collapse(false);
-                    var sel = window.getSelection();
-                    sel.removeAllRanges();
-                    sel.addRange(range);
-                } else if (typeof document.body.createTextRange != "undefined") {
-                    var textRange = document.body.createTextRange();
-                    textRange.moveToElementText(textBlock);
-                    textRange.collapse(false);
-                    textRange.select();
-                }
+                    textBlock.onkeydown = function(e) {
+                        if (e.keyCode == 13) {
+                            e.stopImmediatePropagation();
 
-                textBlock.onkeydown = function(e) {
-                    if (e.keyCode == 13) {
-                        e.stopImmediatePropagation();
+                            var text = e.target.innerHTML.replace("&nbsp;", '');
+                            text = text.replace("<br>", '');
+                            if (text.length > 0) {
+                                e.target.innerHTML = text;
 
-                        var text = e.target.innerHTML.replace("&nbsp;", '');
-                        text = text.replace("<br>", '');
-                        if (text.length > 0) {
-                            e.target.innerHTML = text;
+                                elementsData[e.target.parentNode.parentNode.value]['name'] = text;
+                                this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
 
-                            elementsData[e.target.parentNode.parentNode.value]['name'] = text;
-                            this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
+                                for (var j = 0; j < menuNode.length; j++) {
+                                    menuNode[j].classList.remove("disabled");
+                                }
 
-                            for (var j = 0; j < menuNode.length; j++) {
-                                menuNode[j].classList.remove("disabled");
+                                e.target.parentNode.classList.remove("editableMode");
+                                e.target.setAttribute("contentEditable", false);
+                                e.target.parentNode.querySelector("#editMode").style.display = "";
+                                e.target.parentNode.querySelector("#deleteMode").style.display = "none";
+                                return true;
+                            } else {
+                                return false;
                             }
 
-                            e.target.parentNode.classList.remove("editableMode");
-                            e.target.setAttribute("contentEditable", false);
-                            e.target.parentNode.querySelector("#editMode").style.display = "";
-                            e.target.parentNode.querySelector("#deleteMode").style.display = "none";
-                            return true;
-                        } else {
-                            return false;
-                        }
 
-
-                    } else if (e.keyCode == 8) {
-                        if (e.target.innerHTML.length - 1 === 0) {
-                            e.target.innerHTML = "&nbsp;";
+                        } else if (e.keyCode == 8) {
+                            if (e.target.innerHTML.length - 1 === 0) {
+                                e.target.innerHTML = "&nbsp;";
+                            }
                         }
-                    }
-                    return true;
+                        return true;
+                    }.bind(this);
+
+                    return false;
                 }.bind(this);
-
-                return false;
-            }.bind(this);
-
-            div.appendChild(span);
+                div.appendChild(span);
+            }
             li.appendChild(div);
             menuNode.appendChild(li);
         }
@@ -305,7 +307,8 @@ var SIDEBAR = function() {
         li.onclick = function(e) {
             e.stopImmediatePropagation();
             elementsData.push({
-                "name": this.getNewElementName()
+                "name": this.getNewElementName(),
+                "editable":true
             });
             this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
             this.refreshElements();
