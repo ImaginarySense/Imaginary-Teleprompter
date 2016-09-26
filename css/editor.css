@@ -229,6 +229,12 @@ a:active {
 }
 
 /* Sidebar Styles */
+#sidebar-connect p {
+	color: #999999;
+    text-indent: 20px;
+    text-align: center;
+    margin-top: 20px;
+}
 
 .sidebar-nav {
     top: 0;
