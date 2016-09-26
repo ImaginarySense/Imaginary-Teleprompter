@@ -309,6 +309,12 @@ var SIDEBAR = function() {
             });
             this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
             this.refreshElements();
+
+            this.currentElement = elementsData.length-1;
+
+            if (typeof this.addElementEnded === "function") {
+                this.addElementEnded(elementsData[elementsData.length]);
+            }
         }.bind(this);
 
         li.appendChild(div);
