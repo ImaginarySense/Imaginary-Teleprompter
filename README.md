@@ -1,4 +1,4 @@
-![Teleprompter](http://imaginary.tech/teleprompter/img/header.png)
+![Teleprompter](https://github.com/imaginaryfilms/Teleprompter-Electron/raw/master/build/install-spinner.png)
 
 # Teleprompter-Core
 Core files of our Teleprompter software. This repo contains all the features present in the standalone desktop version and necesary files for the mobile version to work.
