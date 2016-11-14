@@ -1,2 +1,3 @@
- **/.directory
- **/.DS_Store
+**/.directory
+**/.DS_Store
+**/node_modules/**
