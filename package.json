@@ -33,7 +33,11 @@
   "main": "main.js",
   "dependencies": {
     "shell": "^0.3.2",
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-prebuilt": "^1.4.6",
+    "electron-squirrel-startup": "^1.0.0",
+    "socket.io": "*",
+    "bonjour": "*",
+    "express": "*"
   },
   "devDependencies": {
     "jquery-pep": "jquery/PEP",
