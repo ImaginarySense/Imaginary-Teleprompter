@@ -1,4 +1,11 @@
 CHANGELOG
+
+ver 2.0.1, (14.11.16)
+> Missing dependency in package.json.
+> Duplicate variable in main.js
+
+ver 2.0 2.0 Release
+
 ver 2.0 RC-1, build 3.3, (16.09.24)
 > Fixed going fullscreen on "You don't have any external Display." prompt.
 
