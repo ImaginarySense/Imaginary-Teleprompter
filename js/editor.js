@@ -32,7 +32,7 @@ var debug;
 
     // Global variables
     var domain, tic, instance = [false, false],
-        htmldata;
+        htmldata, elecScreen=null;
 
     // Enums
     var command = Object.freeze({
@@ -74,8 +74,11 @@ var debug;
 
         // If running inside Electron...
         if (inElectron()) {
-            // Setup Electron.
-            // When asynchronous reply from main process, run function to...
+            // Load other modules
+            var remote = require('electron').remote; //Returns the object returned by require(electron) in the main process.
+            elecScreen = require('electron').screen; //Returns the object returned by require(electron.screen) in the main process.
+                //var electronScreen = electron.screen; // Module that retrieves information about screen size, displays,
+                // cursor position, etc. Important: You should not use this module until the ready event of the app module is Emitted.
             ipcRenderer.on('asynchronous-reply', function(event, arg) {
                 // Get the "exteral" classes and update each link to load on an actual browser.
                 if(arg.option === "qr"){
@@ -94,6 +97,7 @@ var debug;
                 }
             });
             ipcRenderer.send('asynchronous-message', 'network');
+            // When asynchronous reply from main process, run function to...
         } // end if
 
 
@@ -329,7 +333,9 @@ var debug;
 
         // Get remaining form data
         var settings = '{ "data": {"secondary":' + document.getElementById("secondary").value + ',"primary":' + document.getElementById("primary").value + ',"prompterStyle":' + document.getElementById("prompterStyle").value + ',"background":"#3CC","color":"#333", "overlayBg":"#333","focusMode":' + document.getElementById("focus").value + '}}',
-            session = '{ "html":"' + encodeURIComponent(htmldata) + '" }';
+            session = '{ "html":"' + encodeURIComponent(htmldata) + '" }',
+        // Declare secondaryDisplay in this scope.
+            secondaryDisplay = null;
 
         // Store data locally for prompter to use
         dataManager.setItem("IFTeleprompterSettings", settings, 1);
@@ -340,65 +346,67 @@ var debug;
             instance[0] = true;
             // Checks if is running on electron app...
             if (inElectron()) {
-                var remote = require('electron').remote; //Returns the object returned by require(electron) in the main process.
-                var elecScreen = require('electron').screen //Returns the object returned by require(electron.screen) in the main process.
-
                 // Load teleprompter
-                if (elecScreen.getPrimaryDisplay() && instance[0]) {
-                    frame.src = "teleprompter.html?debug=1";
-                }
+                frame.src = "teleprompter.html?debug=1";
             } else {
                 // Load teleprompter
                 frame.src = "teleprompter.html?debug=1";
-                frame.focus();
             }
+            frame.focus();
         } else {
             instance[0] = false;
         }
-
         // "Secondary"
         if (document.getElementById("secondary").value > 0) {
             instance[1] = true;
             // Checks if is running on electron app...
             if (inElectron()) {
-                // Imported libraries for the us of externalDisplay...
-                var remote = require('electron').remote; //Returns the object returned by require(electron) in the main process.
-                var elecScreen = require('electron').screen //Returns the object returned by require(electron.screen) in the main process.
-                    //var electronScreen = electron.screen; // Module that retrieves information about screen size, displays,
-                    // cursor position, etc. Important: You should not use this module until the ready event of the app module is Emitted.
-                var displays = elecScreen.getAllDisplays(); // Returns an array of displays that are currently  available.
-                var externalDisplay = null;
-                for (var i in displays) {
-                    if (displays[i].bounds.x != 0 || displays[i].bounds.y != 0) {
-                        externalDisplay = displays[i]; // externalDisplay recives all available displays.
-                        break;
+                var displays = elecScreen.getAllDisplays(), // Returns an array of displays that are currently  available.
+                    primaryDisplay = elecScreen.getPrimaryDisplay(),
+                    currentDisplay = 0, // 0 means primary and 1 means secondary
+                    cursorLocation = elecScreen.getCursorScreenPoint();                // Find the first display that isn't the primary display.
+                if (debug) console.log("Displays amount: "+displays.length);
+                for (var i=0; i<displays.length; i++) {
+                  if ( !(displays[i].bounds.x===primaryDisplay.bounds.x && displays[i].bounds.y===primaryDisplay.bounds.y) ) {
+                    secondaryDisplay = displays[i]; // externalDisplay recives all available displays.
+                    break;
+                  }
+                }
+                if (debug) console.log( "Primary display:" );
+                if (debug) console.log( primaryDisplay );
+                if (debug) console.log( "Secondary display:" );
+                if (debug) console.log( secondaryDisplay );
+                // Determine the display in which the main window is at.
+                if ( (cursorLocation.x < primaryDisplay.bounds.x) || (cursorLocation.x > primaryDisplay.bounds.width) || (cursorLocation.y < primaryDisplay.bounds.y) || (cursorLocation.y > primaryDisplay.bounds.height) )
+                    currentDisplay = 1;
+                // If there are any externalDisplay; then create a new window for the display.
+                if (secondaryDisplay) {
+                    if (currentDisplay===0) {
+                        if (debug) console.log("Displaying external on secondary display.");
+                        prompterWindow = window.open("teleprompter.html?debug=1", 'TelePrompter Output', 'height=' + (secondaryDisplay.workArea.height-50) + ',width=' + (secondaryDisplay.workArea.width-50) + ',top='+ (secondaryDisplay.workArea.y+50) +',left=' + (secondaryDisplay.workArea.x+50) + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0' );
+                    }
+                    // If currentDisplay isn't the primaryDisplay or if there is no secondaryDisplay and the primary is unnocupied... Display on primaryDisplay.
+                    else if ( currentDisplay>0 || (!secondaryDisplay && instance[0]===false) ) {
+                        if (debug) console.log("Displaying external on primary display.");
+                        prompterWindow = window.open("teleprompter.html?debug=1", 'TelePrompter Output', 'height=' + (primaryDisplay.workArea.height-50) + ',width=' + (primaryDisplay.workArea.width-50) + ',top='+ (primaryDisplay.workArea.y+50) +',left=' + (primaryDisplay.workArea.x+50) + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0');
                     }
                 }
-                // If there are any externalDisplay; then create a new window for the display.
-                if (externalDisplay && instance[1]) {
-                    prompterWindow = window.open("teleprompter.html?debug=1", 'TelePrompter Output', 'height=' + externalDisplay.bounds.y + 50 + ', width=' + externalDisplay.bounds.x + 50 + ', top=0, left=' + elecScreen.width + ', fullscreen=1, status=0, location=0, menubar=0, toolbar=0');
-                } else if (!externalDisplay && instance[0] === false) {
-                    prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + screen.availHeight + ', width=' + screen.width + ', top=0, left=' + screen.width + ', fullscreen=1, status=0, location=0, menubar=0, toolbar=0');
-                    if (window.focus)
-                        prompterWindow.focus();
-                }
-
             } else {
-                prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + screen.availHeight + ', width=' + screen.width + ', top=0, left=' + screen.width + ', fullscreen=1, status=0, location=0, menubar=0, toolbar=0');
-                if (window.focus)
-                    prompterWindow.focus();
+                prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + screen.availHeight + ',width=' + screen.width + ',top=0,left=' + screen.width + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0');
             }
+            if (window.focus)
+                prompterWindow.focus();
         } else {
             instance[1] = false;
         }
 
         // In case of both
-        // In case of none
-        if (!(instance[0] || instance[1]))
-            window.alert("You must prompt at least to one display.");
-        else if (inElectron() && instance[0] && instance[1] && !externalDisplay) {
+        if (inElectron() && instance[0] && instance[1] && !secondaryDisplay)
             window.alert("You don't have any external Display.");
-        } else
+        // In case of none
+        else if (!(instance[0] || instance[1]))
+            window.alert("You must prompt at least to one display.");
+        else
             togglePromptIt();
     }
 
