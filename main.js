@@ -116,65 +116,99 @@ function handleSquirrelEvent() {
     }
 }
 
-// Quit when all windows are closed.
-app.on('window-all-closed', () => {
-    // On macOS it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
-});
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', () => {
-    // Create the browser window.
-    mainWindow = new BrowserWindow({
-        width: 1280,
-        height: 800,
-        javascritp: true,
-        title: 'Teleprompter',
-        useContentSize: true,
-        nodeIntegration: true
-    });
+	// Create the browser window.
+	mainWindow = new BrowserWindow({width: 1280, height: 800, javascritp: true, title: 'Teleprompter', useContentSize: true, nodeIntegration: true});
 
-    // and load the index.html of app.
-    mainWindow.loadURL('file://' + __dirname + '/index.html');
+	// and load the index.html of app.
+	mainWindow.loadURL('file://' + __dirname + '/index.html');
 
-    // Disables menu in systems where it can be disabled.
+  	// Disables menu in systems where it can be disabled.
     Menu.setApplicationMenu(null);
 
-    // Send a message to the renderer process...
-    ipcMain.on('asynchronous-message', (event, arg) => {
-        event.sender.send('asynchronous-reply', 'Done');
-    });
+    function getIP() {
+	    var os = require('os');
+	    var nets = os.networkInterfaces();
+	    for ( var a in nets) {
+	      var ifaces = nets[a];
+	      for ( var o in ifaces) {
+	        if (ifaces[o].family == "IPv4" && !ifaces[o].internal) {
+	          return ifaces[o].address;
+	        }
+	      }
+	    }
+	    return null;
+	}
 
-    // Register a 'F8' shortcut listener.
-    let ret = globalShortcut.register('F8', () => {
-        mainWindow.openDevTools();
-    });
+	function runSocket(event){
+	    var ip = getIP();
+	    if(ip){
+	      var app2 = require('express')();
+	      var http = require('http').Server(app2);
+	      var bonjour = require('bonjour')();
 
+	      var io = require('socket.io')(http);
+	      io.sockets.on('connection', function (socket) {
+	        socket.on('command',function(res){
+	            if(res.hasOwnProperty('key') > 0){
+	              event.sender.send('asynchronous-reply',{'option':'command','data':res});
+	            }
+	        });
+	        socket.on('disconnect', function () {});
+	      });
 
-    if (!ret) {
-        console.log('registration failed');
-    }
+	      http.listen(3000, function(){
+	        event.sender.send('asynchronous-reply',{'option':'qr','data':ip});
+	        //console.log('http://' + ip + ':3000/');
+	      });
 
-    // Check whether a shortcut is registered.
-    console.log(globalShortcut.isRegistered('F8'));
+	      bonjour.publish({ name: 'Teleprompter', type: 'http', port: 3000 });
+	      bonjour.find({ type: 'http' }, function (service) {
+	        //console.log('Found an HTTP server:'+ service);
+	        event.sender.send('asynchronous-reply',{'option':'qr','data':service.host});
+	      });
+	    }else{
+	      setTimeout(function(){
+	        runSocket(event);
+	      },1000);
+	    }
+	}
 
-    app.on('will-quit', () => {
-        // Unregister a shortcut.
-        globalShortcut.unregister('F8');
+	// Send a message to the renderer process...
+	ipcMain.on('asynchronous-message', (event, arg) => {
+		if(arg === "network"){
+	  		runSocket(event);
+		}else
+	  		event.sender.send('asynchronous-reply', 'Done');
+	});
 
-        // Unregister all shortcuts.
-        globalShortcut.unregisterAll();
-    });
+	// Register a 'F8' shortcut listener.
+	let ret = globalShortcut.register('F8', () => {
+		mainWindow.openDevTools();
+	});
 
-    // Emitted when the window is closed.
-    mainWindow.on('closed', () => {
+	if (!ret) {
+		console.log('registration failed');
+	}
+
+	// Check whether a shortcut is registered.
+	console.log(globalShortcut.isRegistered('F8'));
+
+	app.on('will-quit', () => {
+		// Unregister a shortcut.
+		globalShortcut.unregister('F8');
+
+		// Unregister all shortcuts.
+		globalShortcut.unregisterAll();
+	});
+
+	// Emitted when the window is closed.
+	mainWindow.on('closed', () =>{
         // Dereference the windows object, usually you would store  windows
         // in an array if your app supports multi windows, this is the time
         // when you should delete the corresponding element.
-        mainWindow = null;
-    });
+		mainWindow = null;
+	});
 });

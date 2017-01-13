@@ -34,11 +34,21 @@ body {
 	padding-bottom: 10px;
 }
 
-#promptIt {
-	font-size: 1.4em;
+a#promptIt {
 	background:#EEE;
 	font-weight: bold;
+	font-size: 1.4em;
 }
+
+a#updateIt {
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
+#updateIt:hover {
+	background:#EEE;
+}
+
 
 #editorcontainer:-webkit-full-screen {
 	width: 100%;
@@ -229,6 +239,12 @@ a:active {
 }
 
 /* Sidebar Styles */
+#sidebar-connect p {
+	color: #999999;
+    text-indent: 20px;
+    text-align: center;
+    margin-top: 20px;
+}
 
 .sidebar-nav {
     top: 0;
@@ -312,7 +328,11 @@ a:active {
     }
 }
 
-.disabled{
+.disabled {
     pointer-events:none;
     opacity:0.4;
+}
+
+.hidden {
+	display: none;
 }
