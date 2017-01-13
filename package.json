@@ -4,7 +4,7 @@
   "homepage": "http://imaginary.tech/teleprompter/",
   "description": "The most complete and professional free software teleprompter app on the web.",
   "license": "GPL-3.0+",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "keywords": [
     "teleprompter",
     "imaginary",
@@ -33,7 +33,9 @@
   "main": "main.js",
   "dependencies": {
     "shell": "^0.3.2",
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-squirrel-startup": "^1.0.0",
+    "socket.io": "*",
+    "express": "*"
   },
   "devDependencies": {
     "jquery-pep": "jquery/PEP",
