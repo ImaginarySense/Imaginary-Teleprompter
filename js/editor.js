@@ -15,7 +15,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-// Global variables
 var debug;
 
 (function() {
@@ -81,8 +80,8 @@ var debug;
             elecScreen = require('electron').screen; //Returns the object returned by require(electron.screen) in the main process.
                 //var electronScreen = electron.screen; // Module that retrieves information about screen size, displays,
                 // cursor position, etc. Important: You should not use this module until the ready event of the app module is Emitted.
-        /*
             // Initiate QRs for Remote Control.
+            // When asynchronous reply from main process, run function to...
             ipcRenderer.on('asynchronous-reply', function(event, arg) {
                 // Get the "exteral" classes and update each link to load on an actual browser.
                 if(arg.option === "qr"){
@@ -340,7 +339,9 @@ var debug;
             htmldata = tinymce.get("prompt").getContent();
         // Get remaining form data
         var settings = '{ "data": {"secondary":' + document.getElementById("secondary").value + ',"primary":' + document.getElementById("primary").value + ',"prompterStyle":' + document.getElementById("prompterStyle").value + ',"background":"#3CC","color":"#333", "overlayBg":"#333","focusMode":' + document.getElementById("focus").value + '}}',
-            session = '{ "html":"' + encodeURIComponent(htmldata) + '" }';
+            session = '{ "html":"' + encodeURIComponent(htmldata) + '" }',
+        // Declare secondaryDisplay in this scope.
+            secondaryDisplay = null;
 
         // Store data locally for prompter to use
         dataManager.setItem("IFTeleprompterSettings", settings, 1);
