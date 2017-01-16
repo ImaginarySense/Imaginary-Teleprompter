@@ -80,6 +80,7 @@ var debug;
             elecScreen = require('electron').screen; //Returns the object returned by require(electron.screen) in the main process.
                 //var electronScreen = electron.screen; // Module that retrieves information about screen size, displays,
                 // cursor position, etc. Important: You should not use this module until the ready event of the app module is Emitted.
+        /*
             // Initiate QRs for Remote Control.
             // When asynchronous reply from main process, run function to...
             ipcRenderer.on('asynchronous-reply', function(event, arg) {
