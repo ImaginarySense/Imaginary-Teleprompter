@@ -600,8 +600,6 @@ var debug;
                     event.preventDefault();
                     toggleFullscreen();
                     break;
-                case 119:
-                case "F8":
                 case 123:
                 case "F12":
                     toggleDebug();
