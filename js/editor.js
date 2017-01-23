@@ -17,13 +17,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 var debug;
 
+// Global functions, to be accessed from Electron's main process.
+function enterDebug() {
+    debug = true;
+    console.log("Entering debug mode.");
+}
+function exitDebug() {
+    debug = false;
+    console.log("Leaving debug mode.");
+}
+function toggleDebugMode() {
+    if (debug) 
+        exitDebug();
+    else
+        enterDebug();
+}
+
 (function() {
     // Use JavaScript Strict Mode.
     "use strict";
 
     // Import Electron libraries.
     if (inElectron()){
-         var {ipcRenderer} = require('electron');
+        var {ipcRenderer} = require('electron'),
+        remote = require('electron').remote, //Returns the object returned by require(electron) in the main process.
+        elecScreen = require('electron').screen; //Returns the object returned by require(electron.screen) in the main process.
     }
     
     // Global objects
@@ -31,7 +49,7 @@ var debug;
 
     // Global variables
     var domain, tic, instance = [false, false],
-        htmldata, editorFocused=false, elecScreen=null;
+        htmldata, editorFocused=false;
 
     // Enums
     var command = Object.freeze({
@@ -75,23 +93,18 @@ var debug;
 
         // If running inside Electron...
         if (inElectron()) {
-            // Load other modules
-            var remote = require('electron').remote; //Returns the object returned by require(electron) in the main process.
-            elecScreen = require('electron').screen; //Returns the object returned by require(electron.screen) in the main process.
-                //var electronScreen = electron.screen; // Module that retrieves information about screen size, displays,
-                // cursor position, etc. Important: You should not use this module until the ready event of the app module is Emitted.
-        /*
             // Initiate QRs for Remote Control.
             // When asynchronous reply from main process, run function to...
             ipcRenderer.on('asynchronous-reply', function(event, arg) {
-                // Get the "exteral" classes and update each link to load on an actual browser.
-                if(arg.option === "qr"){
+                // Show QR Codes.
+                if(arg.option === "qr")
                     addQRConnection(arg.data);
-                }else if(arg.option === "command"){
+                // Forward remote control commands.
+                else if (arg.option === "command")
                     document.onkeydown(arg.data);
-                }else{
+                // Get the "exteral" classes and update each link to load on an actual browser.
+                else if (arg.option === "prepareLinks") {
                     var classTags = document.getElementsByClassName('external');
-                    var idTags = document.getElementById('secondary');
                     for (var i = 0; i < classTags.length; i++)
                         if (classTags[i].href != " ") {
                             classTags[i].setAttribute("onclick", "shell.openExternal('" + classTags[i].href + "'); return false;");
@@ -100,9 +113,9 @@ var debug;
                         }
                 }
             });
-            ipcRenderer.send('asynchronous-message', 'network');
-            // When asynchronous reply from main process, run function to...
-        */
+            // Scan network for remote control.
+            ipcRenderer.send('asynchronous-message', 'prepareLinks');
+            //ipcRenderer.send('asynchronous-message', 'network');
         } // end if
 
         // Initialize file management features.
@@ -205,35 +218,12 @@ var debug;
         // Get current domain from browser
         domain = document.domain;
         // If not running on a server, return catchall.
-        if (domain.indexOf("http://") != 0 || domain.indexOf("https://") != 0)
+        if (domain.indexOf("http://") != 0 || domain.indexOf("https://") != 0 || domain.indexOf("localhost") != 0)
             domain = "*";
     }
 
     function getDomain() {
         return domain;
-    }
-
-    function restoreEditor(event) {
-        if (promptIt.onclick === restoreEditor) {
-            if (debug) console.log("Restoring editor.");
-            // Request to close prompters:
-            // Close frame.
-            if (frame.src.indexOf("teleprompter.html") != -1)
-                frame.contentWindow.postMessage({
-                    'request': command.close
-                }, getDomain());
-            // Close window.
-            if (prompterWindow)
-                prompterWindow.postMessage({
-                    'request': command.close
-                }, getDomain());
-            // Clear contents from frame
-            frame.src = "about:blank";
-            // Stops the event but continues executing current function.
-            if (event && event.preventDefault)
-                event.preventDefault();
-            togglePromptIt();
-        }
     }
 
     function launchIntoFullscreen(element) {
@@ -258,6 +248,13 @@ var debug;
                 elem = document.documentElement;
             launchIntoFullscreen(elem);
         }
+    }
+
+    function togglePrompter() {
+        if (promptIt.onclick === submitTeleprompter)
+            submitTeleprompter();
+        else
+            restoreEditor();
     }
 
     function togglePromptIt() {
@@ -350,12 +347,36 @@ var debug;
         dataManager.setItem("IFTeleprompterSession", session, 1);
     }
 
+    function restoreEditor(event) {
+        if (promptIt.onclick === restoreEditor) {
+            if (debug) console.log("Restoring editor.");
+            // Request to close prompters:
+            // Close frame.
+            if (frame.src.indexOf("teleprompter.html") != -1)
+                frame.contentWindow.postMessage({
+                    'request': command.close
+                }, getDomain());
+            // Close window.
+            if (prompterWindow)
+                prompterWindow.postMessage({
+                    'request': command.close
+                }, getDomain());
+            // Clear contents from frame
+            frame.src = "about:blank";
+            // Stops the event but continues executing current function.
+            if (event && event.preventDefault)
+                event.preventDefault();
+            togglePromptIt();
+        }
+    }
+
     // On "Prompt It!" clicked
     function submitTeleprompter(event) {
         if (debug) console.log("Submitting to prompter");
 
         // Stops the event but continues executing the code.
-        event.preventDefault();
+        if (!(event===undefined||event.preventDefault===undefined))
+            event.preventDefault();
 
         var secondaryDisplay = null;
         
@@ -449,19 +470,26 @@ var debug;
     }
 
     function toggleDebug() {
-        // I do these the long way because debug could also be a numeric.
-        if (debug) {
-            debug = false;
-            console.log("Leaving debug mode.");
-        }
+        if (inElectron())
+            remote.getCurrentWindow().toggleDevTools();
         else {
-            debug = true;
-            console.log("Entering debug mode.");
+            toggleDebugMode();
         }
     }
 
     function toc() {
         tic != tic;
+    }
+
+    function refresh() {
+        location.reload();
+    }
+
+    function clearAllRequest() {
+        if ( confirm("You've pressed F6. Do you wish to perform a factory reset of Teleprompter? You will loose all saved scripts and custom styles.") ) {
+            dataManager.clearAll();
+            refresh();
+        }
     }
 
     function listener(event) {
@@ -522,7 +550,6 @@ var debug;
     }
 
     document.onkeydown = function(event) {
-        var key;
         // keyCode is announced to be deprecated but not all browsers support key as of 2016.
         if (event.key === undefined)
             event.key = event.keyCode;
@@ -594,14 +621,27 @@ var debug;
                         }
                     });
                     break;
-                    // EDITOR COMMANDS
+                // EDITOR COMMANDS
+                case 116:
+                case "F5":
+                    if (debug)
+                        refresh();
+                    else
+                        console.log("Debug mode must be active to use 'F5' refresh in Electron. 'F12' enters and leaves debug mode.");
+                    break;
+                case 117:
+                case "F6":
+                    clearAllRequest();
+                    break;
+                case 119:
+                case "F8":
+                    togglePrompter();
+                    break;
                 case 122:
                 case "F11":
                     event.preventDefault();
                     toggleFullscreen();
                     break;
-                case 119:
-                case "F8":
                 case 123:
                 case "F12":
                     toggleDebug();
@@ -623,6 +663,7 @@ var debug;
                     }
                     */
                 default:
+                    var key;
                     // If key is not a string
                     if (!isFunction(event.key.indexOf))
                         key = String.fromCharCode(event.key);
@@ -699,7 +740,6 @@ var debug;
             document.selection.createRange().text = text;
         }
     }
-
 
     function b64toBlob(b64Data, contentType, sliceSize) {
         contentType = contentType || '';
@@ -896,7 +936,7 @@ var debug;
                 }],
 
             });
-        sid.selectedElement = function(element){
+        sid.selectedElement = function(element) {
             var scriptsData = sid.getElements();
             if(scriptsData[sid.currentElement].hasOwnProperty('data'))
                 document.getElementById("prompt").innerHTML = scriptsData[sid.currentElement]['data'];
@@ -905,13 +945,13 @@ var debug;
             document.querySelector("#wrapper").classList.toggle("toggled");
         }
 
-        sid.addElementEnded = function(element){
+        sid.addElementEnded = function(element) {
             if (debug) console.log(element);
             sid.selectedElement(element);
         }
 
-        sid.setEvent('input','prompt',function(e){
-            if(sid.currentElement != 0){
+        sid.setEvent('input','prompt',function() {
+            if (sid.currentElement != 0) {
                 var scriptsData = sid.getElements();
                 scriptsData[sid.currentElement]["data"] = document.getElementById("prompt").innerHTML;
                 sid.getSaveMode().setItem(sid.getDataKey(), JSON.stringify(scriptsData));
@@ -926,20 +966,20 @@ var debug;
             else
                 document.getElementById("prompt").innerHTML = "";
 
-            editor.on('focus', function(e) {
+            editor.on('focus', function() {
                 editorFocused = true;
                 if (debug) console.log('Editor focused.');
             });
 
-            editor.on('blur', function(e) {
+            editor.on('blur', function() {
                 editorFocused = false;
                 if (debug) console.log('Editor out of focus.');
             });
         });
 
         var menuToggle = document.querySelector("#menu-toggle");
-        menuToggle.onclick = function(e) {
-            e.preventDefault();
+        menuToggle.onclick = function(event) {
+            event.preventDefault();
             document.querySelector("#wrapper").classList.toggle("toggled");
         };
     }
