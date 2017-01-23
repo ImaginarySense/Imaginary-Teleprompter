@@ -1,3 +1,4 @@
 **/.directory
 **/.DS_Store
 **/node_modules/**
+**/node_modules/pepjs/package.json

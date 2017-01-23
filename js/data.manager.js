@@ -53,6 +53,10 @@ var dataManager = {
 		    localStorage.removeItem(key);
 		else
 		    sessionStorage.removeItem(key);
+    },
+    clearAll: function () {
+    	sessionStorage.clear();
+    	localStorage.clear();
     }
 };
 

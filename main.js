@@ -189,12 +189,11 @@ app.on('ready', () => {
 		mainWindow.openDevTools();
 	});
 
-	if (!ret) {
+	if (!ret)
 		console.log('registration failed');
-	}
-
-	// Check whether a shortcut is registered.
-	console.log(globalShortcut.isRegistered('F8'));
+	else
+		// Check whether a shortcut is registered.
+		console.log( "F8 key register ... " + globalShortcut.isRegistered('F8')?"Success":"Failed");
 
 	app.on('will-quit', () => {
 		// Unregister a shortcut.

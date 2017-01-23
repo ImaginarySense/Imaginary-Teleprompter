@@ -453,15 +453,28 @@ var debug;
         if (debug) {
             debug = false;
             console.log("Leaving debug mode.");
+            alert("Leaving debug mode.");
         }
         else {
             debug = true;
             console.log("Entering debug mode.");
+            alert("Entering debug mode.");
         }
     }
 
     function toc() {
         tic != tic;
+    }
+
+    function refresh() {
+        location.reload();
+    }
+
+    function clearAllRequest() {
+        if ( confirm("You've pressed F6. Do you wish to perform a factory reset of Teleprompter? You will loose all saved scripts and custom styles.") ) {
+            dataManager.clearAll();
+            refresh();
+        }
     }
 
     function listener(event) {
@@ -594,7 +607,18 @@ var debug;
                         }
                     });
                     break;
+                case 116:
+                case "F5":
+                    if (debug)
+                        refresh();
+                    else
+                        console.log("Debug mode must be active to use 'F5' refresh in Electron. 'F12' enters and leaves debug mode. 'F8' activates Developer Tools in Electron.");
+                    break;
+                case 117:
+                case "F6":
+                    clearAllRequest();
                     // EDITOR COMMANDS
+                    break;
                 case 122:
                 case "F11":
                     event.preventDefault();

@@ -1,5 +1,9 @@
 CHANGELOG
 
+ver 2.1.2 (22.1.2017)
+> Incorporated factory reset. Press F6 to try it.
+> Improved debug tools. Press F12 to enter debug mode, F8 to load Developer Tools, and 'F5' to refresh, but only when debug mode is active.
+
 ver 2.1.1 (22.1.2017)
 > Fixed bug preventing debugger activation.
 
