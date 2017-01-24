@@ -28,7 +28,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     // Use JavaScript Strict Mode.
     "use strict";
     // Global objects
-    var settings, session, prompt, pointer, overlay, overlayFocus, styleElement, styleSheet, editor;
+    var settings, session, prompt, pointer, flipArea, overlay, overlayFocus, styleElement, styleSheet, editor, timer;
     // Global variables
     var unit, x, velocity, sensitivity, speedMultip, relativeLimit, steps, play, timeoutStatus, invertedWheel, focus, promptStyleOption, customStyle, flipV, flipH, fontSize, previousPromptHeight, previousScreenHeight, previousScreenWidth, previousVerticalDisplacementCorrector, domain, debug, closing, cap, syncDelay, isMobileApp;
     // Enums
@@ -47,7 +47,8 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         "decFont":12,
         "anchor":13,
         "close":14,
-        "restoreEditor":15
+        "restoreEditor":15,
+        "resetTimer":16
     });
 
     // Global constants
@@ -71,9 +72,13 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
         // Initialize objects
         prompt = document.querySelector(".prompt");
+        flipArea = document.querySelector("#flipArea");
         overlay = document.querySelector("#overlay");
         overlayFocus = document.querySelector("#overlayFocus");
+        timer = $('.clock').timer({ stopVal: 10000 });
         pointer = {};
+
+        timer.resetTimer();
 
         // Initialize CSS
         initCSS();
@@ -349,19 +354,18 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         // Both flips
         if (flipH&&flipV) {
             //prompt.classList.add("flipHV");
-            overlay.classList.add("flipV");
-            //overlay.classList.add("flipHV"); // Currently unnecesary. Uncomment if overlay isn't symetric.
+            flipArea.classList.add("flipHV"); // Uncomment if overlay isn't symetric.
         }
         // Vertical flip
         else if (flipV) {
             //prompt.classList.add("flipV"); // Not necesary if using css transform based animations.
-            overlay.classList.add("flipV");
+            flipArea.classList.add("flipV");
         }
         // Horizontal flip
-        //else if (flipH) {
+        else if (flipH) {
             //prompt.classList.add("flipH"); // Not necesary if using css transform based animations.
-            //overlay.classList.add("flipH"); // Currently unnecesary. Uncomment if overlay isn't symetric.
-        //}
+            flipArea.classList.add("flipH"); // Uncomment if overlay isn't symetric.
+        }
     }
 
     function syncPrompters() {
@@ -409,6 +413,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         x=0;
         updateVelocity();
         updateAnimation();
+        timer.stopTimer();
     }
 
     document.addEventListener( 'transitionend', function() {
@@ -805,10 +810,18 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
     function localPauseAnimation() {
         animate(0, getCurrPos());
+        timer.stopTimer();
     }
 
     function localPlayAnimation() {
         updateAnimation();
+        timer.startTimer();
+    }
+
+    function resetTimer() {
+        timer.resetTimer();
+        playAnimation();
+        if (debug) console.log("Timer reset.");
     }
 
     /*
@@ -875,6 +888,9 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                     break;
                 case command.togglePlay :
                     toggleAnimation();
+                    break;
+                case command.resetTimer :
+                    resetTimer();
                     break;
                 case command.anchor :
                     requestAnimationFrame(function(){
@@ -969,6 +985,11 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
             case 123:
             case "F12":
                 toggleDebug();
+                break;
+            case 8:
+            case "Backspace":
+            case "backspace":
+                resetTimer();
                 break;
             default: // Move to anchor.
                 // If key is not a string
