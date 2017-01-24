@@ -67,7 +67,8 @@ function toggleDebugMode() {
         "decFont": 12,
         "anchor": 13,
         "close": 14,
-        "restoreEditor": 15
+        "restoreEditor": 15,
+        "resetTimer":16
     });
 
     function init() {
@@ -621,6 +622,14 @@ function toggleDebugMode() {
                         }
                     });
                     break;
+                case 8:
+                case "Backspace":
+                    listener({
+                        data: {
+                            request: command.resetTimer
+                        }
+                    });                    
+                    break;
                 // EDITOR COMMANDS
                 case 116:
                 case "F5":
@@ -642,8 +651,8 @@ function toggleDebugMode() {
                     event.preventDefault();
                     toggleFullscreen();
                     break;
-                case 123:
-                case "F12":
+                case 120:
+                case "F10":
                     toggleDebug();
                     break;
                 case 27: // ESC
