@@ -104,7 +104,28 @@ var SIDEBAR = function() {
     };
 
     this.setPreloadData = function(dataArray) {
-        this.preloadData = dataArray;
+        this.preloadData = [];
+        var currentPreloadData = {};
+        for(var i = 0; i < dataArray.length; i++){
+            currentPreloadData["id"] = i;
+
+            if(dataArray[i].hasOwnProperty("name"))
+                currentPreloadData["name"] = dataArray[i].name;
+            else
+                currentPreloadData["name"] = "";
+
+            if(dataArray[i].hasOwnProperty("data"))
+                currentPreloadData["data"] = dataArray[i].data;
+            else
+                currentPreloadData["data"] = "";
+
+            if(dataArray[i].hasOwnProperty("editable"))
+                currentPreloadData["editable"] = dataArray[i].editable;
+            else
+                currentPreloadData["editable"] = true;
+
+            this.preloadData.push(currentPreloadData);
+        }
     };
 
     this.getPreloadData = function() {
@@ -126,6 +147,24 @@ var SIDEBAR = function() {
         }.bind(this), 2);
     };
 
+    this.exitEditMode = function(){
+        var menuNode = document.getElementById(this.menu).children;
+
+        for (var j = 0; j < menuNode.length; j++) {
+            menuNode[j].classList.remove("disabled");
+            menuNode[j].children[0].classList.remove("editableMode");
+
+            if(menuNode[j].children[0].querySelector("#editMode"))
+                menuNode[j].children[0].querySelector("#editMode").style.display = "";
+            
+            if(menuNode[j].children[0].querySelector("#deleteMode"))
+                menuNode[j].children[0].querySelector("#deleteMode").style.display = "none";
+            
+            if(menuNode[j].children[0].children[0])
+                menuNode[j].children[0].children[0].setAttribute("contentEditable", false);
+        }
+    };
+
     this.clearElements = function() {
         var li = document.createElement("li");
         li.classList.add("sidebar-brand");
@@ -139,12 +178,15 @@ var SIDEBAR = function() {
         div = document.createElement("div");
         div.classList.add("col-xs-6");
 
+        //Close Sidebar Button
         var span = document.createElement("span");
         span.classList.add("glyphicon");
         span.classList.add("glyphicon-chevron-left");
         span.onclick = function(e) {
+            e.stopImmediatePropagation();
+            this.exitEditMode();
             document.querySelector("#wrapper").classList.toggle("toggled");
-        };
+        }.bind(this);
 
         div.appendChild(span);
         li.appendChild(div);
@@ -154,15 +196,21 @@ var SIDEBAR = function() {
     };
 
     this.deleteElement = function(index) {
-        var newArr = [];
         var elementsData = this.getElements();
+
+        //Deleting Element
+        elementsData.splice(index, 1);
+
+        //Reindexing Items
         for (var i = 0, l = elementsData.length; i < l; i++) {
-            if (i != index) {
-                newArr.push(elementsData[i]);
-            }
+            elementsData[i].id = i;
         }
+
+        //Set Current Element
         this.currentElement = elementsData.length-1;
-        this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(newArr));
+
+        //Saving Elements
+        this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData)); 
         this.selectedElement(null);
     };
 
@@ -173,7 +221,7 @@ var SIDEBAR = function() {
         for (var i = 0; i < elementsData.length; i++) {
             var li = document.createElement("li");
             var div = document.createElement("div");
-            li.value = i;
+            li.value = elementsData[i].id;
 
             div.classList.add("list");
 
@@ -219,10 +267,9 @@ var SIDEBAR = function() {
                 span.classList.add("glyphicon-pencil");
                 span.onclick = function(e) {
                     e.stopImmediatePropagation();
-                    // get href of first anchor in element and change location
-                    for (var j = 0; j < menuNode.length; j++) {
-                        menuNode[j].classList.add("disabled");
-                    }
+                    
+                    this.exitEditMode();
+
                     e.target.style.display = "none";
                     e.target.parentNode.querySelector("#deleteMode").style.display = "";
                     e.target.parentNode.classList.add("editableMode");
@@ -256,15 +303,7 @@ var SIDEBAR = function() {
 
                                 elementsData[e.target.parentNode.parentNode.value]['name'] = text;
                                 this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
-
-                                for (var j = 0; j < menuNode.length; j++) {
-                                    menuNode[j].classList.remove("disabled");
-                                }
-
-                                e.target.parentNode.classList.remove("editableMode");
-                                e.target.setAttribute("contentEditable", false);
-                                e.target.parentNode.querySelector("#editMode").style.display = "";
-                                e.target.parentNode.querySelector("#deleteMode").style.display = "none";
+                                this.exitEditMode();
                                 return true;
                             } else {
                                 return false;
@@ -307,7 +346,9 @@ var SIDEBAR = function() {
         li.onclick = function(e) {
             e.stopImmediatePropagation();
             elementsData.push({
+                "id": this.getElements().length,
                 "name": this.getNewElementName(),
+                "data":"",
                 "editable":true
             });
             this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
