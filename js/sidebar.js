@@ -36,12 +36,18 @@ var SIDEBAR = function() {
         document.getElementById("cancelSidebarButton").onclick = function(e){
             window.location = '#close';
         };
+        document.getElementById("cancelSidebarButton2").onclick = function(e){
+            window.location = '#close';
+        };
         //Script Add Input Event
         document.getElementById("inputName").oninput = function(e){
-            var t = document.getElementById("inputName").value;
-            t = t.replace(/\s/g, '');
-            document.getElementById("inputID").value = t.toLowerCase();
-        }
+            document.getElementById("inputID").value = this.createIDTag(document.getElementById("inputName").value);
+        }.bind(this);
+    }
+
+    this.createIDTag = function(name){
+        name = name.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+        return 'id' + name.replace(/\s/g, '');
     }
 
     this.setEvent = function(event, element, method){
@@ -121,24 +127,45 @@ var SIDEBAR = function() {
         this.preloadData = [];
         var currentPreloadData = {};
         for(var i = 0; i < dataArray.length; i++){
-            currentPreloadData["id"] = i;
 
-            if(dataArray[i].hasOwnProperty("name"))
-                currentPreloadData["name"] = dataArray[i].name;
-            else
-                currentPreloadData["name"] = "";
+            if(dataArray[i].hasOwnProperty("id")){
+                currentPreloadData["id"] = dataArray[i].id;
+                if(dataArray[i].hasOwnProperty("name"))
+                    currentPreloadData["name"] = dataArray[i].name;
+                else
+                    currentPreloadData["name"] = "";
 
-            if(dataArray[i].hasOwnProperty("data"))
-                currentPreloadData["data"] = dataArray[i].data;
-            else
-                currentPreloadData["data"] = "";
+                if(dataArray[i].hasOwnProperty("data"))
+                    currentPreloadData["data"] = dataArray[i].data;
+                else
+                    currentPreloadData["data"] = "";
 
-            if(dataArray[i].hasOwnProperty("editable"))
-                currentPreloadData["editable"] = dataArray[i].editable;
-            else
-                currentPreloadData["editable"] = true;
+                if(dataArray[i].hasOwnProperty("editable"))
+                    currentPreloadData["editable"] = dataArray[i].editable;
+                else
+                    currentPreloadData["editable"] = true;
 
-            this.preloadData.push(currentPreloadData);
+                this.preloadData.push(currentPreloadData);
+            }else{
+                if(dataArray[i].hasOwnProperty("name")){
+                    currentPreloadData["id"] = this.createIDTag(dataArray[i].name);
+                    currentPreloadData["name"] = dataArray[i].name;
+
+                    if(dataArray[i].hasOwnProperty("data"))
+                        currentPreloadData["data"] = dataArray[i].data;
+                    else
+                        currentPreloadData["data"] = "";
+
+                    if(dataArray[i].hasOwnProperty("editable"))
+                        currentPreloadData["editable"] = dataArray[i].editable;
+                    else
+                        currentPreloadData["editable"] = true;
+
+                    this.preloadData.push(currentPreloadData);
+                }
+
+            }
+            
         }
     };
 
@@ -209,24 +236,20 @@ var SIDEBAR = function() {
         menu.appendChild(li);
     };
 
-    this.deleteElement = function(index) {
+    this.deleteElement = function(id) {
 
         window.location = "#sidebarDeleteElement";
         document.getElementById("deleteSidebarButton").onclick = function(e) {
             var elementsData = this.getElements();
-            //Deleting Element
-            for (var i = 0, l = elementsData.length; i < l; i++) {
-                if(elementsData[i].id == index){
-                    elementsData.splice(i, 1);
-                    break;
-                }
-            }
+            
+            elementsData.splice(this.getElementIndexByID(id), 1);
 
             //Set Current Element
             this.currentElement = elementsData.length-1;
 
             //Saving Elements
             this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData)); 
+            this.refreshElements();
             this.selectedElement(null);
             window.location = "#close";
         }.bind(this);
@@ -235,7 +258,7 @@ var SIDEBAR = function() {
     this.getElementIndexByID = function(id) {
     	var elementsData = this.getElements();
     	for(var i = 0; i < elementsData.length; i++){
-    		if(elementsData[i].id = id)
+    		if(elementsData[i].id == id)
     			return i;
     	}
     }
@@ -247,7 +270,7 @@ var SIDEBAR = function() {
         for (var i = 0; i < elementsData.length; i++) {
             var li = document.createElement("li");
             var div = document.createElement("div");
-            li.value = elementsData[i].id;
+            li.id = elementsData[i].id;
 
             div.classList.add("list");
 
@@ -262,7 +285,7 @@ var SIDEBAR = function() {
             div.onclick = function(e) {
                 e.stopImmediatePropagation();
                 if (e.target.contentEditable == "false") {
-                    this.currentElement = this.getElementIndexByID(e.target.parentNode.parentNode.value);
+                    this.currentElement = this.getElementIndexByID(e.target.parentNode.parentNode.id);
                     elementsData = this.getElements();
                     if (typeof this.selectedElement === "function") {
                         this.selectedElement(elementsData[this.currentElement]);
@@ -278,7 +301,7 @@ var SIDEBAR = function() {
                 span2.classList.add("glyphicon-minus");
                 span2.onclick = function(e) {
                     e.stopImmediatePropagation();
-                    this.deleteElement(e.target.parentNode.parentNode.value);
+                    this.deleteElement(e.target.parentNode.parentNode.id);
                     window.setTimeout(function() {
                         this.refreshElements();
                     }.bind(this), 1);
