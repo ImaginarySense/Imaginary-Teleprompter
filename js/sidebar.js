@@ -28,7 +28,21 @@ var SIDEBAR = function() {
     this.load = function() {
         this.currentElement = 0;
         this.refreshElements();
+        this.loadDialog();
     };
+
+    this.loadDialog = function(){
+        //Close Dialog
+        document.getElementById("cancelSidebarButton").onclick = function(e){
+            window.location = '#close';
+        };
+        //Script Add Input Event
+        document.getElementById("inputName").oninput = function(e){
+            var t = document.getElementById("inputName").value;
+            t = t.replace(/\s/g, '');
+            document.getElementById("inputID").value = t.toLowerCase();
+        }
+    }
 
     this.setEvent = function(event, element, method){
         document.getElementById(element).addEventListener(event,function(e){
@@ -196,23 +210,35 @@ var SIDEBAR = function() {
     };
 
     this.deleteElement = function(index) {
-        var elementsData = this.getElements();
 
-        //Deleting Element
-        elementsData.splice(index, 1);
+        window.location = "#sidebarDeleteElement";
+        document.getElementById("deleteSidebarButton").onclick = function(e) {
+            var elementsData = this.getElements();
+            //Deleting Element
+            for (var i = 0, l = elementsData.length; i < l; i++) {
+                if(elementsData[i].id == index){
+                    elementsData.splice(i, 1);
+                    break;
+                }
+            }
 
-        //Reindexing Items
-        for (var i = 0, l = elementsData.length; i < l; i++) {
-            elementsData[i].id = i;
-        }
+            //Set Current Element
+            this.currentElement = elementsData.length-1;
 
-        //Set Current Element
-        this.currentElement = elementsData.length-1;
-
-        //Saving Elements
-        this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData)); 
-        this.selectedElement(null);
+            //Saving Elements
+            this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData)); 
+            this.selectedElement(null);
+            window.location = "#close";
+        }.bind(this);
     };
+    
+    this.getElementIndexByID = function(id) {
+    	var elementsData = this.getElements();
+    	for(var i = 0; i < elementsData.length; i++){
+    		if(elementsData[i].id = id)
+    			return i;
+    	}
+    }
 
     this.addElements = function() {
         var elementsData = this.getElements();
@@ -236,7 +262,7 @@ var SIDEBAR = function() {
             div.onclick = function(e) {
                 e.stopImmediatePropagation();
                 if (e.target.contentEditable == "false") {
-                    this.currentElement = e.target.parentNode.parentNode.value;
+                    this.currentElement = this.getElementIndexByID(e.target.parentNode.parentNode.value);
                     elementsData = this.getElements();
                     if (typeof this.selectedElement === "function") {
                         this.selectedElement(elementsData[this.currentElement]);
@@ -267,7 +293,7 @@ var SIDEBAR = function() {
                 span.classList.add("glyphicon-pencil");
                 span.onclick = function(e) {
                     e.stopImmediatePropagation();
-                    
+
                     this.exitEditMode();
 
                     e.target.style.display = "none";
@@ -345,20 +371,24 @@ var SIDEBAR = function() {
 
         li.onclick = function(e) {
             e.stopImmediatePropagation();
-            elementsData.push({
-                "id": this.getElements().length,
-                "name": this.getNewElementName(),
-                "data":"",
-                "editable":true
-            });
-            this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
-            this.refreshElements();
+            window.location = '#sidebarAddElement';
+            document.getElementById("addScriptSidebarButton").onclick = function(e){
+                elementsData.push({
+                    "id": document.getElementById("inputID").value,
+                    "name": document.getElementById("inputName").value,
+                    "data":"",
+                    "editable":true
+                });
+                this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
+                this.refreshElements();
 
-            this.currentElement = elementsData.length-1;
+                this.currentElement = elementsData.length-1;
 
-            if (typeof this.addElementEnded === "function") {
-                this.addElementEnded(elementsData[elementsData.length]);
-            }
+                if (typeof this.addElementEnded === "function") {
+                    this.addElementEnded(elementsData[elementsData.length]);
+                }
+                window.location = "#close";
+            }.bind(this);
         }.bind(this);
 
         li.appendChild(div);
