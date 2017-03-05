@@ -49,7 +49,7 @@ function toggleDebugMode() {
 
     // Global variables
     var domain, tic, instance = [false, false],
-        htmldata, editorFocused=false;
+    htmldata, editorFocused=false;
 
     // Enums
     var command = Object.freeze({
@@ -94,6 +94,46 @@ function toggleDebugMode() {
 
         // If running inside Electron...
         if (inElectron()) {
+            var compare = require("deb-version-compare");
+            const remote = require('electron').remote;
+
+            //Check, Update and Migrate Teleprompter Data
+            dataManager.getItem("IFTeleprompterVersion",function(item){
+                if(item == null || compare(currentVersion, item) == 1){ 
+                    //fix 
+                    item = "0";
+
+                    //check if is going to use a develoment version 
+                    if(!isADevVersion(item) && isADevVersion(currentVersion)){
+                        //migrarate from official version to a development version
+                        window.location = "#devWarning";
+                        document.getElementById("agreeWarningButton").onclick = function(e){
+                            applyMigration(item);
+                            dataManager.setItem("IFTeleprompterVersion",currentVersion);
+                            window.location = "#close";
+                        }; 
+                        document.getElementById("cancelWarningButton").onclick = function(e){
+                            var window = remote.getCurrentWindow();
+                            window.close();
+                        };
+                    }else{
+                        //migrate from previous versions 
+                        applyMigration(item);
+                        dataManager.setItem("IFTeleprompterVersion",currentVersion);
+
+                        //make sure all modal closes after reload the page
+                        //place this here to avoid problems with the warning and the newest modal
+                        window.location = "#close";  
+                    }
+                    
+                }else if(compare(item, currentVersion) == 1){
+                    window.location = "#devNewestVersion";
+                    document.getElementById("cancelNewestButton").onclick = function(e){
+                        var window = remote.getCurrentWindow();
+                        window.close();
+                    };
+                } 
+            },0,0);
             // Initiate QRs for Remote Control.
             // When asynchronous reply from main process, run function to...
             ipcRenderer.on('asynchronous-reply', function(event, arg) {
@@ -112,8 +152,8 @@ function toggleDebugMode() {
                             classTags[i].href = "#";
                             classTags[i].target = "_parent";
                         }
-                }
-            });
+                    }
+                });
             // Scan network for remote control.
             ipcRenderer.send('asynchronous-message', 'prepareLinks');
             //ipcRenderer.send('asynchronous-message', 'network');
@@ -124,6 +164,20 @@ function toggleDebugMode() {
         //initImages();
 
     } // end init()
+
+    function isADevVersion(version){
+        if(version.includes("rc") || version.includes("alpha") || version.includes("beta"))
+            return true;
+        return false;
+    }
+
+    //Apply migration by versions
+    function applyMigration(version){
+        //Teleprompter 2.2.0 and previous versions
+        if(version == null){
+
+        }
+    }
 
     // Initialize postMessage event listener.
     addEventListener("message", listener, false);
@@ -205,17 +259,17 @@ function toggleDebugMode() {
             save_onsavecallback: save,
             nonbreaking_force_tab: true
         });
-    }
+}
 
-    function save() {
-        if (debug) console.log("Save pressed");
-    }
+function save() {
+    if (debug) console.log("Save pressed");
+}
 
-    function inElectron() {
-        return navigator.userAgent.indexOf("Electron") != -1;
-    }
+function inElectron() {
+    return navigator.userAgent.indexOf("Electron") != -1;
+}
 
-    function setDomain() {
+function setDomain() {
         // Get current domain from browser
         domain = document.domain;
         // If not running on a server, return catchall.
@@ -239,7 +293,7 @@ function toggleDebugMode() {
 
     function toggleFullscreen() {
         var fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement,
-            elem;
+        elem;
         if (fullscreenElement)
             exitFullscreen();
         else {
@@ -310,7 +364,7 @@ function toggleDebugMode() {
 
         // Set data to send.
         var settings = '{ "data": {"secondary":0,"primary":1,"prompterStyle":2,"focusMode":3,"background":"#3CC","color":"#333","overlayBg":"#333"}}',
-            session = '{ "html":"' + encodeURIComponent(htmldata) + '" }';
+        session = '{ "html":"' + encodeURIComponent(htmldata) + '" }';
 
         // Store data locally for prompter to use
         dataManager.setItem("IFTeleprompterSettings", settings, 1);
@@ -338,9 +392,9 @@ function toggleDebugMode() {
             htmldata = tinymce.get("prompt").getContent();
         // Get remaining form data
         var settings = '{ "data": {"secondary":' + document.getElementById("secondary").value + ',"primary":' + document.getElementById("primary").value + ',"prompterStyle":' + document.getElementById("prompterStyle").value + ',"background":"#3CC","color":"#333", "overlayBg":"#333","focusMode":' + document.getElementById("focus").value + '}}',
-            session = '{ "html":"' + encodeURIComponent(htmldata) + '" }',
+        session = '{ "html":"' + encodeURIComponent(htmldata) + '" }',
         // Declare secondaryDisplay in this scope.
-            secondaryDisplay = null;
+        secondaryDisplay = null;
 
         // Store data locally for prompter to use
         dataManager.setItem("IFTeleprompterSettings", settings, 1);
@@ -391,20 +445,20 @@ function toggleDebugMode() {
         if (inElectron()) {
             // Check display availabillity.
             var displays = elecScreen.getAllDisplays(), // Returns an array of displays that are currently  available.
-                primaryDisplay = elecScreen.getPrimaryDisplay(),
+            primaryDisplay = elecScreen.getPrimaryDisplay(),
                 currentDisplay = 0, // 0 means primary and 1 means secondary
                 cursorLocation = elecScreen.getCursorScreenPoint();                // Find the first display that isn't the primary display.
-            if (debug) console.log("Displays amount: "+displays.length);
-            for (var i=0; i<displays.length; i++) {
-              if ( !(displays[i].bounds.x===primaryDisplay.bounds.x && displays[i].bounds.y===primaryDisplay.bounds.y) ) {
+                if (debug) console.log("Displays amount: "+displays.length);
+                for (var i=0; i<displays.length; i++) {
+                  if ( !(displays[i].bounds.x===primaryDisplay.bounds.x && displays[i].bounds.y===primaryDisplay.bounds.y) ) {
                 secondaryDisplay = displays[i]; // externalDisplay recives all available displays.
                 break;
-              }
             }
-            if (debug) console.log( "Primary display:" );
-            if (debug) console.log( primaryDisplay );
-            if (debug) console.log( "Secondary display:" );
-            if (debug) console.log( secondaryDisplay );
+        }
+        if (debug) console.log( "Primary display:" );
+        if (debug) console.log( primaryDisplay );
+        if (debug) console.log( "Secondary display:" );
+        if (debug) console.log( secondaryDisplay );
             // Determine the display in which the main window is at.
             if ( (cursorLocation.x < primaryDisplay.bounds.x) || (cursorLocation.x > primaryDisplay.bounds.width) || (cursorLocation.y < primaryDisplay.bounds.y) || (cursorLocation.y > primaryDisplay.bounds.height) )
                 currentDisplay = 1;
@@ -421,11 +475,11 @@ function toggleDebugMode() {
                         prompterWindow = window.open("teleprompter.html?debug=1", 'TelePrompter Output', 'height=' + (primaryDisplay.workArea.height-50) + ',width=' + (primaryDisplay.workArea.width-50) + ',top='+ (primaryDisplay.workArea.y+50) +',left=' + (primaryDisplay.workArea.x+50) + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0');
                     }
                 // If currentDisplay isn't the primaryDisplay or if there is no secondaryDisplay and the primary is unnocupied... Display on primaryDisplay.
-                } else if (!instance[0]) {
-                    if (debug) console.log("Displaying external on primary display.");
-                    prompterWindow = window.open("teleprompter.html?debug=1", 'TelePrompter Output', 'height=' + (primaryDisplay.workArea.height-50) + ',width=' + (primaryDisplay.workArea.width-50) + ',top='+ (primaryDisplay.workArea.y+50) +',left=' + (primaryDisplay.workArea.x+50) + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0');
-                }
+            } else if (!instance[0]) {
+                if (debug) console.log("Displaying external on primary display.");
+                prompterWindow = window.open("teleprompter.html?debug=1", 'TelePrompter Output', 'height=' + (primaryDisplay.workArea.height-50) + ',width=' + (primaryDisplay.workArea.width-50) + ',top='+ (primaryDisplay.workArea.y+50) +',left=' + (primaryDisplay.workArea.x+50) + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0');
             }
+        }
             // Load InFrame prompter only if there's more than one screen or if the only screen available is free.
             if ( instance[0] && ( !instance[1] || secondaryDisplay ) )
                 frame.src = "teleprompter.html" + (debug ? "?debug=1" : "");
@@ -439,7 +493,7 @@ function toggleDebugMode() {
         // If an external prompt is openned, focus on it.        
         if ( prompterWindow!=undefined && window.focus )
             // Adviced to launch as separate event on a delay.
-            prompterWindow.focus();
+        prompterWindow.focus();
         else
             frame.focus();
 
@@ -464,10 +518,10 @@ function toggleDebugMode() {
         if (debug) console.log("Updating prompter contents");
         // Request update on teleprompter other instance.
         listener({
-                data: {
-                    request: command.updateContents
-                }
-            });
+            data: {
+                request: command.updateContents
+            }
+        });
     }
 
     function toggleDebug() {
@@ -487,7 +541,7 @@ function toggleDebugMode() {
     }
 
     function clearAllRequest() {
-        if ( confirm("You've pressed F6. Do you wish to perform a factory reset of Teleprompter? You will loose all saved scripts and custom styles.") ) {
+        if (confirm("You've pressed F6. Do you wish to perform a factory reset of Teleprompter? You will loose all saved scripts and custom styles.") ) {
             dataManager.clearAll();
             refresh();
         }
@@ -502,7 +556,7 @@ function toggleDebugMode() {
         	console.log(event);
         }
         }, 0);
-        */
+*/
         // If the event comes from the same domain...
         if (!event.domain || event.domain === getDomain()) {
             var message = event.data;
@@ -563,102 +617,102 @@ function toggleDebugMode() {
                 case "ArrowDown":
                 case 40: // Down
                 case 68: // S
-                    listener({
-                        data: {
-                            request: command.incVelocity
-                        }
-                    });
-                    break;
+                listener({
+                    data: {
+                        request: command.incVelocity
+                    }
+                });
+                break;
                     // prompterWindow.postMessage( message, getDomain())
-                case "w":
-                case "W":
-                case "ArrowUp":
+                    case "w":
+                    case "W":
+                    case "ArrowUp":
                 case 38: // Up
                 case 87: // W
-                    listener({
-                        data: {
-                            request: command.decVelocity
-                        }
-                    });
-                    break;
+                listener({
+                    data: {
+                        request: command.decVelocity
+                    }
+                });
+                break;
                 case "d":
                 case "D":
                 case "ArrowRight":
                 case 83: // S
                 case 39: // Right
-                    listener({
-                        data: {
-                            request: command.incFont
-                        }
-                    });
-                    break;
+                listener({
+                    data: {
+                        request: command.incFont
+                    }
+                });
+                break;
                 case "a":
                 case "A":
                 case "ArrowLeft":
                 case 37: // Left
                 case 65: // A
-                    listener({
-                        data: {
-                            request: command.decVelocity
-                        }
-                    });
-                    break;
+                listener({
+                    data: {
+                        request: command.decVelocity
+                    }
+                });
+                break;
                 case " ":
                 case "Space": // Spacebar
                 case 32: // Spacebar
-                    listener({
-                        data: {
-                            request: command.togglePlay
-                        }
-                    });
-                    break;
+                listener({
+                    data: {
+                        request: command.togglePlay
+                    }
+                });
+                break;
                 case ".":
                 case "Period": // Numpad dot
                 case 110: // Numpad dot
                 case 190: // Dot
-                    listener({
-                        data: {
-                            request: command.sync
-                        }
-                    });
-                    break;
+                listener({
+                    data: {
+                        request: command.sync
+                    }
+                });
+                break;
                 case 8:
                 case "Backspace":
-                    listener({
-                        data: {
-                            request: command.resetTimer
-                        }
-                    });                    
-                    break;
+                listener({
+                    data: {
+                        request: command.resetTimer
+                    }
+                });                    
+                break;
                 // EDITOR COMMANDS
                 case 116:
                 case "F5":
-                    if (debug)
-                        refresh();
-                    else
-                        console.log("Debug mode must be active to use 'F5' refresh in Electron. 'F12' enters and leaves debug mode.");
-                    break;
+                if (debug)
+                    refresh();
+                else
+                    console.log("Debug mode must be active to use 'F5' refresh in Electron. 'F12' enters and leaves debug mode.");
+                break;
                 case 117:
                 case "F6":
-                    clearAllRequest();
-                    break;
+                clearAllRequest();
+                break;
                 case 119:
                 case "F8":
-                    togglePrompter();
-                    break;
+                togglePrompter();
+                break;
                 case 122:
                 case "F11":
-                    event.preventDefault();
-                    toggleFullscreen();
-                    break;
+                event.preventDefault();
+                toggleFullscreen();
+                break;
                 case 120:
                 case "F10":
-                    toggleDebug();
-                    break;
+                toggleDebug();
+                break;
                 case 27: // ESC
                 case "Escape":
-                    restoreEditor();
-                    break;
+                restoreEditor();
+                break;
                     // Electron Commands
                     /*
                     case 17, 91, 70:
@@ -671,7 +725,7 @@ function toggleDebugMode() {
                     break;
                     }
                     */
-                default:
+                    default:
                     var key;
                     // If key is not a string
                     if (!isFunction(event.key.indexOf))
@@ -689,20 +743,20 @@ function toggleDebugMode() {
                             data: key
                         }
                     });
+                }
             }
+        };
+
+        function isFunction(possibleFunction) {
+            return typeof(possibleFunction) === typeof(Function)
         }
-    };
 
-    function isFunction(possibleFunction) {
-        return typeof(possibleFunction) === typeof(Function)
-    }
-
-    function is_int(value) {
-        if (parseFloat(value) == parseInt(value) && !isNaN(value))
-            return true;
-        else
-            return false;
-    }
+        function is_int(value) {
+            if (parseFloat(value) == parseInt(value) && !isNaN(value))
+                return true;
+            else
+                return false;
+        }
     /*function insertAtCaret(el,text){
     	var element = document.getElementById(el);
     	var scrollPos = element.scrollTop;
@@ -934,74 +988,74 @@ function toggleDebugMode() {
 
         var sidebar = new SIDEBAR();
         var sid = sidebar.on('scripts',{
-                "name":"Files",
-                "addElementName":"New Script",
-                "newElementName":"Untitled",
-                "dataKey":"IFTeleprompterSideBar",
-                "preloadData":[{
-                    "name": "Instructions",
-                    "data": "\n\t<h3>Welcome to Teleprompter!</h3>\n\t<p>Are you ready to tell your story?</p>\n\t<br>\n\t<p>\"Teleprompter\" is a professional grade, multi-platform, free software teleprompter for anyone to use. Click on \"Prompt It!\" whenever you're ready and control the speed with the arrow keys.</p>\n\t<br>\n\t<h3>Here are some of our features:</h3>\n\t<ol>\n\t\t<li>Control the speed with the Arrow keys, WASD keys or the mouse wheel. You may pause at anytime with the 'spacebar'.</li>\n\t\t<li>Different focus areas allow you to easily use Teleprompter with a webcam, a tablet, or professional teleprompter equipment.</li>\n\t\t<li>Flip modes allow <em>mirroring</em> the prompter in every possible way.</li>\n\t\t<li>You can use one or two instances. Mirror one, monitor on the other one.</li>\n\t\t<li><a id=\"5\" name=\"5\">Set almost any key as an Anchor and instantly jump to any part of the script. Try pressing '5' now!</a></li>\n\t\t<li>The Rich Text Editor gives unlimited possibilities on what you can prompt.</li>\n\t\t<ul>\n\t\t\t<li>You can generate and display mathematical equations.<br>\n\t\t\t\t<table border=\"1\" cellpadding=\"1\" cellspacing=\"1\">\n\t\t\t\t\t<tbody>\n\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t<td>&nbsp;</td>\n\t\t\t\t\t\t\t<td><img alt=\"\\bg_white \\huge \\sum_{\\Theta+\\Pi }^{80} sin(\\Theta)\" src=\"http://latex.codecogs.com/gif.latex?%5Cdpi%7B300%7D%20%5Cbg_white%20%5Chuge%20%5Csum_%7B%5CTheta&amp;plus;%5CPi%20%7D%5E%7B80%7D%20sin%28%5CTheta%29\"></td>\n\t\t\t\t\t\t\t<td>&nbsp;</td>\n\t\t\t\t\t\t</tr>\n\t\t\t\t\t</tbody>\n\t\t\t\t</table>\n\t\t\t</li>\n\t\t\t<li>Insert images from the web or copy and paste them into the prompter.\n\t\t\t\t<img alt=\"Picture: Arecibo Sky\" src=\"img/arecibo-sky.jpg\">\n\t\t\t</li>\n\t\t</ul>\n\t\t<li>There are various Prompter Styles to choose from. You may also create your own.</li>\n\t\t<li>Text can be pasted from other word processors like Microsoft Word® or Libre Office Writer™.</li>\n\t\t<li>Animations are hardware accelerated for a smooth result.</li>\n\t\t<li>Press 'F11' to enter and leave fullscreen.</li>\n\t\t<li>All data is managed locally. No data is stored on our servers.</li>\n\t\t<li>An offline version can be downloaded for Windows, OS X, Linux and Chrome OS.</li>\n\t\t<li>Enjoy the ease of a smart fullscreen in the local version.</li>\n\t\t<li>Close prompts and return to the editor by pressing 'ESC'.</li>\n\t</ol>\n\t<hr>\n\t<h4>How to use anchor shortcuts:</h4>\n\t<ol>\n\t\t<li>Select a keyword or line you want to jump to on your text in the editor.</li>\n\t\t<li>Click on the <strong>Flag Icon</strong> on the editor's tool bar.</li>\n\t\t<li>A box named \"Anchor Properties\" should have appeared. Type any single key of your choice and click 'Ok'.<br>Note preassigned keys, such as WASD and Spacebar will be ignored.</li>\n\t\t<li>Repeat as many times as you wish.</li>\n\t\t<li>When prompting, press on the shortcut key to jump into the desired location.</li>\n\t</ol>\n\t<p>###</p>\n\t\t\t\t",
-                    "editable": false
-                }],
+            "name":"Files",
+            "addElementName":"New Script",
+            "newElementName":"Untitled",
+            "dataKey":"IFTeleprompterSideBar",
+            "preloadData":[{
+                "name": "Instructions",
+                "data": "\n\t<h3>Welcome to Teleprompter!</h3>\n\t<p>Are you ready to tell your story?</p>\n\t<br>\n\t<p>\"Teleprompter\" is a professional grade, multi-platform, free software teleprompter for anyone to use. Click on \"Prompt It!\" whenever you're ready and control the speed with the arrow keys.</p>\n\t<br>\n\t<h3>Here are some of our features:</h3>\n\t<ol>\n\t\t<li>Control the speed with the Arrow keys, WASD keys or the mouse wheel. You may pause at anytime with the 'spacebar'.</li>\n\t\t<li>Different focus areas allow you to easily use Teleprompter with a webcam, a tablet, or professional teleprompter equipment.</li>\n\t\t<li>Flip modes allow <em>mirroring</em> the prompter in every possible way.</li>\n\t\t<li>You can use one or two instances. Mirror one, monitor on the other one.</li>\n\t\t<li><a id=\"5\" name=\"5\">Set almost any key as an Anchor and instantly jump to any part of the script. Try pressing '5' now!</a></li>\n\t\t<li>The Rich Text Editor gives unlimited possibilities on what you can prompt.</li>\n\t\t<ul>\n\t\t\t<li>You can generate and display mathematical equations.<br>\n\t\t\t\t<table border=\"1\" cellpadding=\"1\" cellspacing=\"1\">\n\t\t\t\t\t<tbody>\n\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t<td>&nbsp;</td>\n\t\t\t\t\t\t\t<td><img alt=\"\\bg_white \\huge \\sum_{\\Theta+\\Pi }^{80} sin(\\Theta)\" src=\"http://latex.codecogs.com/gif.latex?%5Cdpi%7B300%7D%20%5Cbg_white%20%5Chuge%20%5Csum_%7B%5CTheta&amp;plus;%5CPi%20%7D%5E%7B80%7D%20sin%28%5CTheta%29\"></td>\n\t\t\t\t\t\t\t<td>&nbsp;</td>\n\t\t\t\t\t\t</tr>\n\t\t\t\t\t</tbody>\n\t\t\t\t</table>\n\t\t\t</li>\n\t\t\t<li>Insert images from the web or copy and paste them into the prompter.\n\t\t\t\t<img alt=\"Picture: Arecibo Sky\" src=\"img/arecibo-sky.jpg\">\n\t\t\t</li>\n\t\t</ul>\n\t\t<li>There are various Prompter Styles to choose from. You may also create your own.</li>\n\t\t<li>Text can be pasted from other word processors like Microsoft Word® or Libre Office Writer™.</li>\n\t\t<li>Animations are hardware accelerated for a smooth result.</li>\n\t\t<li>Press 'F11' to enter and leave fullscreen.</li>\n\t\t<li>All data is managed locally. No data is stored on our servers.</li>\n\t\t<li>An offline version can be downloaded for Windows, OS X, Linux and Chrome OS.</li>\n\t\t<li>Enjoy the ease of a smart fullscreen in the local version.</li>\n\t\t<li>Close prompts and return to the editor by pressing 'ESC'.</li>\n\t</ol>\n\t<hr>\n\t<h4>How to use anchor shortcuts:</h4>\n\t<ol>\n\t\t<li>Select a keyword or line you want to jump to on your text in the editor.</li>\n\t\t<li>Click on the <strong>Flag Icon</strong> on the editor's tool bar.</li>\n\t\t<li>A box named \"Anchor Properties\" should have appeared. Type any single key of your choice and click 'Ok'.<br>Note preassigned keys, such as WASD and Spacebar will be ignored.</li>\n\t\t<li>Repeat as many times as you wish.</li>\n\t\t<li>When prompting, press on the shortcut key to jump into the desired location.</li>\n\t</ol>\n\t<p>###</p>\n\t\t\t\t",
+                "editable": false
+            }],
 
-            });
-        sid.selectedElement = function(element) {
-            var scriptsData = sid.getElements();
-            if(scriptsData[sid.currentElement].hasOwnProperty('data'))
-                document.getElementById("prompt").innerHTML = scriptsData[sid.currentElement]['data'];
-            else
-                document.getElementById("prompt").innerHTML = "";
-            document.querySelector("#wrapper").classList.toggle("toggled");
-        }
-
-        sid.addElementEnded = function(element) {
-            if (debug) console.log(element);
-            sid.selectedElement(element);
-        }
-
-        sid.setEvent('input','prompt',function() {
-            if (sid.currentElement != 0) {
-                var scriptsData = sid.getElements();
-                scriptsData[sid.currentElement]["data"] = document.getElementById("prompt").innerHTML;
-                sid.getSaveMode().setItem(sid.getDataKey(), JSON.stringify(scriptsData));
-            }
         });
-
-        CKEDITOR.on('instanceReady', function(event) {
-            var editor = event.editor,
-                scriptsData = sid.getElements();
-            if (scriptsData[sid.currentElement].hasOwnProperty('data'))
-                document.getElementById("prompt").innerHTML = scriptsData[sid.currentElement]['data'];
-            else
-                document.getElementById("prompt").innerHTML = "";
-
-            editor.on('focus', function() {
-                editorFocused = true;
-                if (debug) console.log('Editor focused.');
-            });
-
-            editor.on('blur', function() {
-                editorFocused = false;
-                if (debug) console.log('Editor out of focus.');
-            });
-        });
-
-        var menuToggle = document.querySelector("#menu-toggle");
-        menuToggle.onclick = function(event) {
-            event.preventDefault();
-            document.querySelector("#wrapper").classList.toggle("toggled");
-        };
-    }
-
-
-    // Initialize objects after DOM is loaded
-    if (document.readyState === "interactive" || document.readyState === "complete")
-    // Call init if the DOM (interactive) or document (complete) is ready.
-        init();
+sid.selectedElement = function(element) {
+    var scriptsData = sid.getElements();
+    if(scriptsData[sid.currentElement].hasOwnProperty('data'))
+        document.getElementById("prompt").innerHTML = scriptsData[sid.currentElement]['data'];
     else
+        document.getElementById("prompt").innerHTML = "";
+    document.querySelector("#wrapper").classList.toggle("toggled");
+}
+
+sid.addElementEnded = function(element) {
+    if (debug) console.log(element);
+    sid.selectedElement(element);
+}
+
+sid.setEvent('input','prompt',function() {
+    if (sid.currentElement != 0) {
+        var scriptsData = sid.getElements();
+        scriptsData[sid.currentElement]["data"] = document.getElementById("prompt").innerHTML;
+        sid.getSaveMode().setItem(sid.getDataKey(), JSON.stringify(scriptsData));
+    }
+});
+
+CKEDITOR.on('instanceReady', function(event) {
+    var editor = event.editor,
+    scriptsData = sid.getElements();
+    if (scriptsData[sid.currentElement].hasOwnProperty('data'))
+        document.getElementById("prompt").innerHTML = scriptsData[sid.currentElement]['data'];
+    else
+        document.getElementById("prompt").innerHTML = "";
+
+    editor.on('focus', function() {
+        editorFocused = true;
+        if (debug) console.log('Editor focused.');
+    });
+
+    editor.on('blur', function() {
+        editorFocused = false;
+        if (debug) console.log('Editor out of focus.');
+    });
+});
+
+var menuToggle = document.querySelector("#menu-toggle");
+    menuToggle.onclick = function(event) {
+        event.preventDefault();
+        document.querySelector("#wrapper").classList.toggle("toggled");
+    };
+}
+
+
+// Initialize objects after DOM is loaded
+if (document.readyState === "interactive" || document.readyState === "complete")
+    // Call init if the DOM (interactive) or document (complete) is ready.
+    init();              
+else
     // Set init as a listener for the DOMContentLoaded event.
-        document.addEventListener("DOMContentLoaded", init);
-}());
+    document.addEventListener("DOMContentLoaded", init);
+    }());
 
 // On change Prompter Style
 function setStyleEvent(prompterStyle) {
