@@ -28,7 +28,27 @@ var SIDEBAR = function() {
     this.load = function() {
         this.currentElement = 0;
         this.refreshElements();
+        this.loadDialog();
     };
+
+    this.loadDialog = function(){
+        //Close Dialog
+        document.getElementById("cancelSidebarButton").onclick = function(e){
+            window.location = '#close';
+        };
+        document.getElementById("cancelSidebarButton2").onclick = function(e){
+            window.location = '#close';
+        };
+        //Script Add Input Event
+        document.getElementById("inputName").oninput = function(e){
+            document.getElementById("inputID").value = this.createIDTag(document.getElementById("inputName").value);
+        }.bind(this);
+    }
+
+    this.createIDTag = function(name){
+        name = name.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+        return 'id' + name.replace(/\s/g, '');
+    }
 
     this.setEvent = function(event, element, method){
         document.getElementById(element).addEventListener(event,function(e){
@@ -107,24 +127,45 @@ var SIDEBAR = function() {
         this.preloadData = [];
         var currentPreloadData = {};
         for(var i = 0; i < dataArray.length; i++){
-            currentPreloadData["id"] = i;
 
-            if(dataArray[i].hasOwnProperty("name"))
-                currentPreloadData["name"] = dataArray[i].name;
-            else
-                currentPreloadData["name"] = "";
+            if(dataArray[i].hasOwnProperty("id")){
+                currentPreloadData["id"] = dataArray[i].id;
+                if(dataArray[i].hasOwnProperty("name"))
+                    currentPreloadData["name"] = dataArray[i].name;
+                else
+                    currentPreloadData["name"] = "";
 
-            if(dataArray[i].hasOwnProperty("data"))
-                currentPreloadData["data"] = dataArray[i].data;
-            else
-                currentPreloadData["data"] = "";
+                if(dataArray[i].hasOwnProperty("data"))
+                    currentPreloadData["data"] = dataArray[i].data;
+                else
+                    currentPreloadData["data"] = "";
 
-            if(dataArray[i].hasOwnProperty("editable"))
-                currentPreloadData["editable"] = dataArray[i].editable;
-            else
-                currentPreloadData["editable"] = true;
+                if(dataArray[i].hasOwnProperty("editable"))
+                    currentPreloadData["editable"] = dataArray[i].editable;
+                else
+                    currentPreloadData["editable"] = true;
 
-            this.preloadData.push(currentPreloadData);
+                this.preloadData.push(currentPreloadData);
+            }else{
+                if(dataArray[i].hasOwnProperty("name")){
+                    currentPreloadData["id"] = this.createIDTag(dataArray[i].name);
+                    currentPreloadData["name"] = dataArray[i].name;
+
+                    if(dataArray[i].hasOwnProperty("data"))
+                        currentPreloadData["data"] = dataArray[i].data;
+                    else
+                        currentPreloadData["data"] = "";
+
+                    if(dataArray[i].hasOwnProperty("editable"))
+                        currentPreloadData["editable"] = dataArray[i].editable;
+                    else
+                        currentPreloadData["editable"] = true;
+
+                    this.preloadData.push(currentPreloadData);
+                }
+
+            }
+            
         }
     };
 
@@ -195,24 +236,32 @@ var SIDEBAR = function() {
         menu.appendChild(li);
     };
 
-    this.deleteElement = function(index) {
-        var elementsData = this.getElements();
+    this.deleteElement = function(id) {
 
-        //Deleting Element
-        elementsData.splice(index, 1);
+        window.location = "#sidebarDeleteElement";
+        document.getElementById("deleteSidebarButton").onclick = function(e) {
+            var elementsData = this.getElements();
+            
+            elementsData.splice(this.getElementIndexByID(id), 1);
 
-        //Reindexing Items
-        for (var i = 0, l = elementsData.length; i < l; i++) {
-            elementsData[i].id = i;
-        }
+            //Set Current Element
+            this.currentElement = elementsData.length-1;
 
-        //Set Current Element
-        this.currentElement = elementsData.length-1;
-
-        //Saving Elements
-        this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData)); 
-        this.selectedElement(null);
+            //Saving Elements
+            this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData)); 
+            this.refreshElements();
+            this.selectedElement(null);
+            window.location = "#close";
+        }.bind(this);
     };
+    
+    this.getElementIndexByID = function(id) {
+    	var elementsData = this.getElements();
+    	for(var i = 0; i < elementsData.length; i++){
+    		if(elementsData[i].id == id)
+    			return i;
+    	}
+    }
 
     this.addElements = function() {
         var elementsData = this.getElements();
@@ -221,7 +270,7 @@ var SIDEBAR = function() {
         for (var i = 0; i < elementsData.length; i++) {
             var li = document.createElement("li");
             var div = document.createElement("div");
-            li.value = elementsData[i].id;
+            li.id = elementsData[i].id;
 
             div.classList.add("list");
 
@@ -236,7 +285,7 @@ var SIDEBAR = function() {
             div.onclick = function(e) {
                 e.stopImmediatePropagation();
                 if (e.target.contentEditable == "false") {
-                    this.currentElement = e.target.parentNode.parentNode.value;
+                    this.currentElement = this.getElementIndexByID(e.target.parentNode.parentNode.id);
                     elementsData = this.getElements();
                     if (typeof this.selectedElement === "function") {
                         this.selectedElement(elementsData[this.currentElement]);
@@ -252,7 +301,7 @@ var SIDEBAR = function() {
                 span2.classList.add("glyphicon-minus");
                 span2.onclick = function(e) {
                     e.stopImmediatePropagation();
-                    this.deleteElement(e.target.parentNode.parentNode.value);
+                    this.deleteElement(e.target.parentNode.parentNode.id);
                     window.setTimeout(function() {
                         this.refreshElements();
                     }.bind(this), 1);
@@ -267,7 +316,7 @@ var SIDEBAR = function() {
                 span.classList.add("glyphicon-pencil");
                 span.onclick = function(e) {
                     e.stopImmediatePropagation();
-                    
+
                     this.exitEditMode();
 
                     e.target.style.display = "none";
@@ -345,20 +394,25 @@ var SIDEBAR = function() {
 
         li.onclick = function(e) {
             e.stopImmediatePropagation();
-            elementsData.push({
-                "id": this.getElements().length,
-                "name": this.getNewElementName(),
-                "data":"",
-                "editable":true
-            });
-            this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
-            this.refreshElements();
+            window.location = '#sidebarAddElement';
+            document.getElementById("addScriptSidebarButton").onclick = function(e){
+                elementsData.push({
+                    "id": document.getElementById("inputID").value,
+                    "name": document.getElementById("inputName").value,
+                    "data":"",
+                    "editable":true
+                });
+                this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
+                this.refreshElements();
 
-            this.currentElement = elementsData.length-1;
+                this.currentElement = elementsData.length-1;
 
-            if (typeof this.addElementEnded === "function") {
-                this.addElementEnded(elementsData[elementsData.length]);
-            }
+                if (typeof this.addElementEnded === "function") {
+                    this.addElementEnded(elementsData[elementsData.length]);
+                }
+                window.location = "#close";
+            }.bind(this);
+            
         }.bind(this);
 
         li.appendChild(div);

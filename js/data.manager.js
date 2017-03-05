@@ -18,13 +18,13 @@
 
 // Global variables
 var debug;
-
+var currentVersion = "2.3.0~beta1"
 function inElectron() {
     return navigator.userAgent.indexOf("Electron")!=-1;
 }
 
 var dataManager = {
-    getItem: function(key,item,local,force){
+	getItem: function(key,item,local,force){
 		if (local === 'undefined')
 		    local = 0;
 		if (inElectron() && local == 2)
