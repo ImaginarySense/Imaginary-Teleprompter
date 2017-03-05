@@ -33,6 +33,7 @@
   "main": "main.js",
   "dependencies": {
     "bonjour": "3.5.0",
+    "deb-version-compare": "git+https://github.com/sdumetz/node-deb-version-compare.git",
     "debug": "^2.6.1",
     "electron": "^1.6.1",
     "electron-squirrel-startup": "^1.0.0",

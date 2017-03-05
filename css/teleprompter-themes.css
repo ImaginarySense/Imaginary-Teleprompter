@@ -65,6 +65,9 @@ This is has been moved to the teleprompter-theme.js
     width: 10%;
 }
 
+.modalDialog p {
+    margin:0;
+}
 .modalDialog {
     position: fixed;
     font-family: Arial, Helvetica, sans-serif;
@@ -91,18 +94,18 @@ This is has been moved to the teleprompter-theme.js
     position: relative;
     margin: 5% auto;
     padding: 5px 20px 13px 20px;
-    border-radius: 10px;
+    /*border-radius: 10px;
     background: #fff;
     background: -moz-linear-gradient(#fff, #999);
     background: -webkit-linear-gradient(#fff, #999);
-    background: -o-linear-gradient(#fff, #999);
+    background: -o-linear-gradient(#fff, #999);*/
 }
 .close {
     background: #606061;
     color: #FFFFFF;
     line-height: 25px;
     position: absolute;
-    right: -12px;
+    right: 5px;
     text-align: center;
     top: -10px;
     width: 24px;
@@ -153,4 +156,10 @@ This is has been moved to the teleprompter-theme.js
     display: inline-block;
     vertical-align: middle;
     line-height: normal;
+}
+
+.vcenter {
+    display: inline-block;
+    vertical-align: middle;
+    float: none;
 }

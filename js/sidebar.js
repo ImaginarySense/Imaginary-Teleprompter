@@ -412,6 +412,7 @@ var SIDEBAR = function() {
                 }
                 window.location = "#close";
             }.bind(this);
+            
         }.bind(this);
 
         li.appendChild(div);
