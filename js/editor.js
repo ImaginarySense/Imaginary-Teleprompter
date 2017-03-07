@@ -51,6 +51,9 @@ function toggleDebugMode() {
     var domain, tic, instance = [false, false],
     htmldata, editorFocused=false;
 
+    //SideBar
+    var sidebar = new SIDEBAR();
+
     // Enums
     var command = Object.freeze({
         "incVelocity": 1,
@@ -174,8 +177,28 @@ function toggleDebugMode() {
     //Apply migration by versions
     function applyMigration(version){
         //Teleprompter 2.2.0 and previous versions
-        if(version == null){
+        if(version == null || version == "2.2.0" || version == "0"){
+            dataManager.getItem("IFTeleprompterSideBar",function(dataToMigrate){
+                if(dataToMigrate){
+                    //Convert Data
+                    dataToMigrate = JSON.parse(dataToMigrate);
 
+                    if(dataToMigrate.length > 0){
+                    //Fix to not do more dirty work
+                    dataToMigrate[0]["id"] = sidebar.createIDTag(dataToMigrate[0].name, true);
+                    sidebar.getSaveMode().setItem(sidebar.getDataKey(), JSON.stringify(dataToMigrate));
+
+                //Continue with rest of the data
+                for(var i = 1; i < dataToMigrate.length; i++){
+                    if(dataToMigrate[i].hasOwnProperty("name")){
+                        dataToMigrate[i]["id"] = sidebar.createIDTag(dataToMigrate[i].name);
+                        sidebar.getSaveMode().setItem(sidebar.getDataKey(), JSON.stringify(dataToMigrate));
+                    }
+                } 
+            }
+        }
+
+    },0,0);
         }
     }
 
@@ -985,8 +1008,7 @@ function setDomain() {
 
     // Teleprompter Scripts File Manager
     function initScripts() {
-
-        var sidebar = new SIDEBAR();
+        //initialize SideBar
         var sid = sidebar.on('scripts',{
             "name":"Files",
             "addElementName":"New Script",
@@ -1041,21 +1063,21 @@ CKEDITOR.on('instanceReady', function(event) {
 });
 
 var menuToggle = document.querySelector("#menu-toggle");
-    menuToggle.onclick = function(event) {
-        event.preventDefault();
-        document.querySelector("#wrapper").classList.toggle("toggled");
-    };
+menuToggle.onclick = function(event) {
+    event.preventDefault();
+    document.querySelector("#wrapper").classList.toggle("toggled");
+};
 }
 
 
 // Initialize objects after DOM is loaded
 if (document.readyState === "interactive" || document.readyState === "complete")
     // Call init if the DOM (interactive) or document (complete) is ready.
-    init();              
+init();              
 else
     // Set init as a listener for the DOMContentLoaded event.
-    document.addEventListener("DOMContentLoaded", init);
-    }());
+document.addEventListener("DOMContentLoaded", init);
+}());
 
 // On change Prompter Style
 function setStyleEvent(prompterStyle) {

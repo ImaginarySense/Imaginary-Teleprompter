@@ -45,9 +45,29 @@ var SIDEBAR = function() {
         }.bind(this);
     }
 
-    this.createIDTag = function(name){
+    this.getIDs = function(){
+        var elementsData = this.getElements();
+        var ids = [];
+        for(var i = 0; i < elementsData.length; i++){
+            ids.push(elementsData[i]["id"]);
+        }
+        return ids;
+    }
+
+    this.createIDTag = function(name, noCheck){
         name = name.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-        return 'id' + name.replace(/\s/g, '');
+        var id = 'id' + name.replace(/\s/g, '');
+        if(typeof noCheck == 'undefined' || noCheck == false){
+            var ids = this.getIDs();
+            if(ids.indexOf(id) != -1){
+                var base = id.replace(/-\d+$/,"");
+                var cnt = ids[base] || 1;
+                do{
+                    id = base + "-" + cnt++;
+                }while(ids.indexOf(id) != -1);
+            }
+        }
+        return id;
     }
 
     this.setEvent = function(event, element, method){
@@ -402,6 +422,10 @@ var SIDEBAR = function() {
                     "data":"",
                     "editable":true
                 });
+                //Clean Input
+                document.getElementById("inputName").value = "";
+                document.getElementById("inputID").value = "";
+                //Save
                 this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
                 this.refreshElements();
 
