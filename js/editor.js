@@ -40,8 +40,8 @@ function toggleDebugMode() {
     // Import Electron libraries.
     if (inElectron()){
         var {ipcRenderer} = require('electron'),
-        remote = require('electron').remote, //Returns the object returned by require(electron) in the main process.
-        elecScreen = require('electron').screen; //Returns the object returned by require(electron.screen) in the main process.
+        remote = require('electron').remote, // Allows IPC with main process in Electron.
+        elecScreen = require('electron').screen; // Allows Smart Fullscreens in Electron.
     }
     
     // Global objects
@@ -713,7 +713,7 @@ function setDomain() {
                 if (debug)
                     refresh();
                 else
-                    console.log("Debug mode must be active to use 'F5' refresh in Electron. 'F12' enters and leaves debug mode.");
+                    console.log("Debug mode must be active to use 'F5' refresh in Electron. 'F10' enters and leaves debug mode.");
                 break;
                 case 117:
                 case "F6":
