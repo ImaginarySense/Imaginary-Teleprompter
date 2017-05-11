@@ -9,7 +9,7 @@
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See theRemote 
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -23,14 +23,25 @@ http://stackoverflow.com/questions/18240107/make-background-follow-the-cursor
 https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 */
 
+// Use JavaScript Strict Mode.
+"use strict";
+
+
 // Encapsulate the code in an anonymous self-invoking function.
 (function () {
-    // Use JavaScript Strict Mode.
-    "use strict";
+    // Include Electron libraries
+        if (inElectron() && !inIframe()) {
+            window.jQuery = require('./js/jquery.min.js');
+            // Manually import jQuery from javascript when running in a CommonsJS environment.
+            // Ref: https://github.com/electron/electron/issues/254 
+            window.$ = window.jQuery;
+            remote = require('electron').remote; // Allow IPC with main process in Electron.
+        }
     // Global objects
-    var settings, session, prompt, pointer, flipArea, overlay, overlayFocus, styleElement, styleSheet, editor, timer;
+    var settings, session, prompt, pointer, flipArea, overlay, overlayFocus, styleElement, styleSheet, editor, timer, remote;
     // Global variables
     var unit, x, velocity, sensitivity, speedMultip, relativeLimit, steps, play, timeoutStatus, invertedWheel, focus, promptStyleOption, customStyle, flipV, flipH, fontSize, previousPromptHeight, previousScreenHeight, previousScreenWidth, previousVerticalDisplacementCorrector, domain, debug, closing, cap, syncDelay, isMobileApp;
+
     // Enums
     var command = Object.freeze({
         "incVelocity":1,
@@ -75,9 +86,9 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         flipArea = document.querySelector("#flipArea");
         overlay = document.querySelector("#overlay");
         overlayFocus = document.querySelector("#overlayFocus");
-        timer = $('.clock').timer({ stopVal: 10000 });
         pointer = {};
 
+        timer = $('.clock').timer({ stopVal: 10000 });
         timer.resetTimer();
 
         // Initialize CSS
@@ -88,6 +99,11 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         debug = getUrlVars()["debug"];
         // Evaluate it to boolean expresion.
         debug = debug>0||debug=="true";
+        // Load debug tools if debug is enabled.
+        if (debug) {
+            debug = false;
+            toggleDebug();
+        }
 
         // Init variables. Do not change these unless you know what you are doing.
         x = 0;
@@ -112,8 +128,12 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         setDomain();
 
         // Locate and set editor
-        if (window.opener)
+        console.log("Editor window:");
+        console.log(window.opener);
+        console.log(window);
+        if (window.opener) {
             editor = window.opener;
+        }
         else if (window.top)
             editor = window.top;
 
@@ -297,6 +317,8 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         }
         else {
             debug = true;
+            if (inElectron() && !inIframe())
+                remote.getCurrentWindow().toggleDevTools();
             console.log("Entering debug mode.");
         }
     }
@@ -339,14 +361,6 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
     function getDomain() {
         return domain;
-    }
-
-    function inIframe() {
-        try {
-            return window.self !== window.top;
-        } catch (e) {
-            return true;
-        }
     }
 
     function setFlips() {
@@ -980,11 +994,12 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
             case 27: // ESC
                 closeInstance();
                 break;
-            case 119:
-            case "F8":
+            case 121:
+            case "F10":
             case 123:
             case "F12":
-                toggleDebug();
+                if (!inIframe())
+                    toggleDebug();
                 break;
             case 8:
             case "Backspace":
@@ -1033,10 +1048,6 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
             return false;
     }
 
-    function inElectron() {
-        return navigator.userAgent.indexOf("Electron")!=-1;
-    }
-
     // Initialize objects after DOM is loaded
     if (document.readyState === "interactive" || document.readyState === "complete")
         // Call init if the DOM (interactive) or document (complete) is ready.
@@ -1046,3 +1057,15 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         document.addEventListener("DOMContentLoaded", init);
 
 }());
+
+function inIframe() {
+    try {
+        return window.self !== window.top;
+    } catch (e) {
+        return true;
+    }
+}
+
+function inElectron() {
+    return navigator.userAgent.indexOf("Electron")!=-1;
+}
