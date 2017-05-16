@@ -15,27 +15,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-var debug;
-
-// Global functions, to be accessed from Electron's main process.
-function enterDebug() {
-    debug = true;
-    console.log("Entering debug mode.");
-}
-function exitDebug() {
-    debug = false;
-    console.log("Leaving debug mode.");
-}
-function toggleDebugMode() {
-    if (debug) 
-        exitDebug();
-    else
-        enterDebug();
-}
+"use strict";
+var debug = false;
 
 (function() {
     // Use JavaScript Strict Mode.
-    "use strict";
 
     // Import Electron libraries.
     if (inElectron()){
@@ -45,11 +29,14 @@ function toggleDebugMode() {
     }
     
     // Global objects
-    var promptIt, updateIt, prompterWindow, frame, currentScript;
+    var promptIt, updateIt, prompterWindow, frame, currentScript, canvas, canvasContext
+        syncMethods = {"instance":0, "canvas":1, "follow":2};
 
     // Global variables
-    var domain, tic, instance = [false, false],
-    htmldata, editorFocused=false;
+    var syncMethod = syncMethods.instance,
+        forceSecondaryDisplay = true,
+        domain, tic, instance = [false, false],
+        htmldata, editorFocused=false;
 
     //SideBar
     var sidebar = new SIDEBAR();
@@ -76,7 +63,6 @@ function toggleDebugMode() {
 
     function init() {
         // Set globals
-        debug = false;
         tic = false;
 
         // Set DOM javascript controls
@@ -88,6 +74,8 @@ function toggleDebugMode() {
         document.getElementById("credits-link").onclick = credits;
 
         frame = document.getElementById("teleprompterframe");
+        canvas = document.getElementById("telepromptercanvas");
+        canvasContext = canvas.getContext('2d');
         // Set default style and option style
         //setStyle(document.getElementById("prompterStyle").value);
         // Set initial configuration to prompter style
@@ -101,13 +89,13 @@ function toggleDebugMode() {
             const remote = require('electron').remote;
 
             //Check, Update and Migrate Teleprompter Data
-            dataManager.getItem("IFTeleprompterVersion",function(item){
-                if(item == null || compare(currentVersion, item) == 1){ 
+            dataManager.getItem("IFTeleprompterVersion",function(item) {
+                if (item == null || compare(currentVersion, item) == 1) {
                     //fix 
                     item = "0";
 
                     //check if is going to use a develoment version 
-                    if(!isADevVersion(item) && isADevVersion(currentVersion)){
+                    if (!isADevVersion(item) && isADevVersion(currentVersion)) {
                         //migrarate from official version to a development version
                         window.location = "#devWarning";
                         document.getElementById("agreeWarningButton").onclick = function(e){
@@ -119,7 +107,7 @@ function toggleDebugMode() {
                             var window = remote.getCurrentWindow();
                             window.close();
                         };
-                    }else{
+                    } else {
                         //migrate from previous versions 
                         applyMigration(item);
                         dataManager.setItem("IFTeleprompterVersion",currentVersion);
@@ -129,7 +117,7 @@ function toggleDebugMode() {
                         window.location = "#close";  
                     }
                     
-                }else if(compare(item, currentVersion) == 1){
+                } else if(compare(item, currentVersion) == 1) {
                     window.location = "#devNewestVersion";
                     document.getElementById("cancelNewestButton").onclick = function(e){
                         var window = remote.getCurrentWindow();
@@ -137,15 +125,59 @@ function toggleDebugMode() {
                     };
                 } 
             },0,0);
-            // Initiate QRs for Remote Control.
             // When asynchronous reply from main process, run function to...
             ipcRenderer.on('asynchronous-reply', function(event, arg) {
+                // Update Canvas
+                if (arg.option === "c") {
+                    // Render picture as is
+                    resizeCanvas(arg.size);
+                    var clampedArray = new Uint8ClampedArray(arg.bitmap),
+                        imageData;
+                    try {
+                        imageData = new ImageData(clampedArray, arg.size[0], arg.size[1]);
+                    }
+                    catch (err) {
+                        // Remove error from command line by passing blank frame.
+                        imageData = new ImageData(arg.size[0], arg.size[1]);
+                        // Attempt to prevent blank frame by calculating correct width and height using total area and aspect ratio.
+                        // var area = arg.bitmap.length/4,
+                        //     aspectRatio = arg.size[1]/arg.size[0],
+                        //     height = Math.sqrt(area*aspectRatio),
+                        //     width = area/height;
+                        // imageData = new ImageData(clampedArray, width, height);
+                    }
+                    requestAnimationFrame(function() {
+                        canvasContext.putImageData(imageData, 0, 0);
+                    });
+                    // Render dirty area only. (Deprecated as inneficient. Uncomment for cool VFX on resize)
+                    // resizeCanvas(arg.size);
+                    // var width = arg.size[0],
+                    //     height = arg.size[1],
+                    //     croppedImage = new Uint8ClampedArray(arg.dirty.width*arg.dirty.height*4),
+                    //     yProcessLength = arg.dirty.height+arg.dirty.y,
+                    //     xProcessLength = arg.dirty.width+arg.dirty.x,
+                    //     count = 0;
+                    // for (var i=arg.dirty.y; i<yProcessLength; i++)
+                    //     for (var j=arg.dirty.x; j<xProcessLength; j++) {
+                    //         var curr = (i*width+j)*4;
+                    //         croppedImage[count+0] = arg.bitmap[curr+0];
+                    //         croppedImage[count+1] = arg.bitmap[curr+1];
+                    //         croppedImage[count+2] = arg.bitmap[curr+2];
+                    //         croppedImage[count+3] = 255;
+                    //         count+=4;
+                    //     }
+                    // requestAnimationFrame(function() {
+                    //     canvasContext.putImageData(new ImageData(croppedImage, arg.dirty.width, arg.dirty.height), arg.dirty.x, arg.dirty.y);
+                    // });
+                }
                 // Show QR Codes.
-                if(arg.option === "qr")
+                // Initiate QRs for Remote Control.
+                else if (arg.option === "qr")
                     addQRConnection(arg.data);
                 // Forward remote control commands.
                 else if (arg.option === "command")
                     document.onkeydown(arg.data);
+                // 
                 // Get the "exteral" classes and update each link to load on an actual browser.
                 else if (arg.option === "prepareLinks") {
                     var classTags = document.getElementsByClassName('external');
@@ -155,8 +187,8 @@ function toggleDebugMode() {
                             classTags[i].href = "#";
                             classTags[i].target = "_parent";
                         }
-                    }
-                });
+                }
+            });
             // Scan network for remote control.
             ipcRenderer.send('asynchronous-message', 'prepareLinks');
             //ipcRenderer.send('asynchronous-message', 'network');
@@ -165,41 +197,43 @@ function toggleDebugMode() {
         // Initialize file management features.
         initScripts();
         //initImages();
-
     } // end init()
 
-    function isADevVersion(version){
+    // Resize canvas size
+    function resizeCanvas(size) {
+        if ( !(canvas.width===size[0] && canvas.height===size[1]) ) {
+            canvas.width = size[0];
+            canvas.height = size[1];
+        }
+    }
+
+    function isADevVersion(version) {
         if(version.includes("rc") || version.includes("alpha") || version.includes("beta"))
             return true;
         return false;
     }
 
     //Apply migration by versions
-    function applyMigration(version){
+    function applyMigration(version) {
         //Teleprompter 2.2.0 and previous versions
-        if(version == null || version == "2.2.0" || version == "0"){
-            dataManager.getItem("IFTeleprompterSideBar",function(dataToMigrate){
-                if(dataToMigrate){
+        if(version == null || version == "2.2.0" || version == "0")
+            dataManager.getItem("IFTeleprompterSideBar",function(dataToMigrate) {
+                if (dataToMigrate) {
                     //Convert Data
                     dataToMigrate = JSON.parse(dataToMigrate);
-
-                    if(dataToMigrate.length > 0){
-                    //Fix to not do more dirty work
-                    dataToMigrate[0]["id"] = sidebar.createIDTag(dataToMigrate[0].name, true);
-                    sidebar.getSaveMode().setItem(sidebar.getDataKey(), JSON.stringify(dataToMigrate));
-
-                //Continue with rest of the data
-                for(var i = 1; i < dataToMigrate.length; i++){
-                    if(dataToMigrate[i].hasOwnProperty("name")){
-                        dataToMigrate[i]["id"] = sidebar.createIDTag(dataToMigrate[i].name);
+                    if (dataToMigrate.length > 0) {
+                        //Fix to not do more dirty work
+                        dataToMigrate[0]["id"] = sidebar.createIDTag(dataToMigrate[0].name, true);
                         sidebar.getSaveMode().setItem(sidebar.getDataKey(), JSON.stringify(dataToMigrate));
                     }
-                } 
-            }
-        }
-
-    },0,0);
-        }
+                    //Continue with rest of the data
+                    for (var i = 1; i < dataToMigrate.length; i++)
+                        if (dataToMigrate[i].hasOwnProperty("name")) {
+                            dataToMigrate[i]["id"] = sidebar.createIDTag(dataToMigrate[i].name);
+                            sidebar.getSaveMode().setItem(sidebar.getDataKey(), JSON.stringify(dataToMigrate));
+                        }
+                }
+            }, 0, 0);
     }
 
     // Initialize postMessage event listener.
@@ -275,24 +309,24 @@ function toggleDebugMode() {
                 block: 'h4'
             }, ],
             //image_list: [
-            //	{title: 'My image 1', value: 'http://www.tinymce.com/my1.gif'},
-            //	{title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
+            //  {title: 'My image 1', value: 'http://www.tinymce.com/my1.gif'},
+            //  {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
             //],
             save_enablewhendirty: false,
             save_onsavecallback: save,
             nonbreaking_force_tab: true
         });
-}
+    }
 
-function save() {
-    if (debug) console.log("Save pressed");
-}
+    function save() {
+        if (debug) console.log("Save pressed");
+    }
 
-function inElectron() {
-    return navigator.userAgent.indexOf("Electron") != -1;
-}
+    function inElectron() {
+        return navigator.userAgent.indexOf("Electron") != -1;
+    }
 
-function setDomain() {
+    function setDomain() {
         // Get current domain from browser
         domain = document.domain;
         // If not running on a server, return catchall.
@@ -345,8 +379,16 @@ function setDomain() {
                 document.getElementById("content").style.display = "none";
                 document.getElementById("editorcontainer").style.display = "none";
                 document.getElementById("footer").style.display = "none";
-                // Show prompter frame
+                // Show prompter instance
                 document.getElementById("framecontainer").style.display = "block";
+                if (instance[1] && syncMethod===syncMethods.canvas) {
+                    canvas.style.display = "block";
+                    frame.style.display = "none";
+                }
+                else {
+                    frame.style.display = "block";
+                    canvas.style.display = "none";
+                }
                 launchIntoFullscreen(document.documentElement);
             } else if (instance[1]) {
                 updateIt.classList.remove("hidden");
@@ -362,6 +404,10 @@ function setDomain() {
                 document.getElementById("footer").style.display = "";
                 // Hide prompter frame
                 document.getElementById("framecontainer").style.display = "none";
+                if (instance[1] && syncMethod===syncMethods.canvas)
+                    canvas.style.display = "none";
+                else
+                    frame.style.display = "none";
                 exitFullscreen();
             } else if (instance[1]) {
                 updateIt.classList.add("hidden");
@@ -468,41 +514,53 @@ function setDomain() {
         if (inElectron()) {
             // Check display availabillity.
             var displays = elecScreen.getAllDisplays(), // Returns an array of displays that are currently  available.
-            primaryDisplay = elecScreen.getPrimaryDisplay(),
+                primaryDisplay = elecScreen.getPrimaryDisplay(),
                 currentDisplay = 0, // 0 means primary and 1 means secondary
-                cursorLocation = elecScreen.getCursorScreenPoint();                // Find the first display that isn't the primary display.
-                if (debug) console.log("Displays amount: "+displays.length);
-                for (var i=0; i<displays.length; i++) {
-                  if ( !(displays[i].bounds.x===primaryDisplay.bounds.x && displays[i].bounds.y===primaryDisplay.bounds.y) ) {
-                secondaryDisplay = displays[i]; // externalDisplay recives all available displays.
-                break;
+                cursorLocation = elecScreen.getCursorScreenPoint();
+            // Find the first display that isn't the primary display.
+            if (debug) console.log("Displays amount: "+displays.length);
+            for (var i=0; i<displays.length; i++) {
+                if ( !(displays[i].bounds.x===primaryDisplay.bounds.x && displays[i].bounds.y===primaryDisplay.bounds.y) ) {
+                    secondaryDisplay = displays[i]; // externalDisplay recives all available displays.
+                    break;
+                }
             }
-        }
-        if (debug) console.log( "Primary display:" );
-        if (debug) console.log( primaryDisplay );
-        if (debug) console.log( "Secondary display:" );
-        if (debug) console.log( secondaryDisplay );
+            if (debug) console.log( "Primary display:" );
+            if (debug) console.log( primaryDisplay );
+            if (debug) console.log( "Secondary display:" );
+            if (debug) console.log( secondaryDisplay );
             // Determine the display in which the main window is at.
             if ( (cursorLocation.x < primaryDisplay.bounds.x) || (cursorLocation.x > primaryDisplay.bounds.width) || (cursorLocation.y < primaryDisplay.bounds.y) || (cursorLocation.y > primaryDisplay.bounds.height) )
                 currentDisplay = 1;
             // If there are any externalDisplay; then create a new window for the display.
             if (instance[1]) {
-                if (secondaryDisplay) {
+                if (secondaryDisplay || forceSecondaryDisplay) {
                     // Open external prompter on a display where the editor is not located at.
                     if (currentDisplay===0) {
                         if (debug) console.log("Displaying external on secondary display.");
-                        prompterWindow = window.open("teleprompter.html?debug=1", 'TelePrompter Output', 'height=' + (secondaryDisplay.workArea.height-50) + ',width=' + (secondaryDisplay.workArea.width-50) + ',top='+ (secondaryDisplay.workArea.y+50) +',left=' + (secondaryDisplay.workArea.x+50) + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0' );
+                        // Load external instance if in-frame prompter wont run.
+                        if (instance[0] && syncMethod===syncMethods.canvas)
+                            openCanvasPrompter();
+                        // Otherwise run perfect sync painter.
+                        else
+                            prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + (secondaryDisplay.workArea.height-50) + ',width=' + (secondaryDisplay.workArea.width-50) + ',top='+ (secondaryDisplay.workArea.y+50) +',left=' + (secondaryDisplay.workArea.x+50) + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0' );
                     }
                     else if (currentDisplay>0) {
                         if (debug) console.log("Displaying external on primary display.");
-                        prompterWindow = window.open("teleprompter.html?debug=1", 'TelePrompter Output', 'height=' + (primaryDisplay.workArea.height-50) + ',width=' + (primaryDisplay.workArea.width-50) + ',top='+ (primaryDisplay.workArea.y+50) +',left=' + (primaryDisplay.workArea.x+50) + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0');
+                        // Load external instance if in-frame prompter wont run.
+                        if (instance[0] && syncMethod===syncMethods.canvas)
+                            openCanvasPrompter();
+                        // Otherwise run perfect sync painter.
+                        else
+                            prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + (primaryDisplay.workArea.height-50) + ',width=' + (primaryDisplay.workArea.width-50) + ',top='+ (primaryDisplay.workArea.y+50) +',left=' + (primaryDisplay.workArea.x+50) + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0');
                     }
+                }
                 // If currentDisplay isn't the primaryDisplay or if there is no secondaryDisplay and the primary is unnocupied... Display on primaryDisplay.
-            } else if (!instance[0]) {
-                if (debug) console.log("Displaying external on primary display.");
-                prompterWindow = window.open("teleprompter.html?debug=1", 'TelePrompter Output', 'height=' + (primaryDisplay.workArea.height-50) + ',width=' + (primaryDisplay.workArea.width-50) + ',top='+ (primaryDisplay.workArea.y+50) +',left=' + (primaryDisplay.workArea.x+50) + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0');
+                else if (!instance[0]) {
+                    if (debug) console.log("Displaying external on primary display.");
+                    prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + (primaryDisplay.workArea.height-50) + ',width=' + (primaryDisplay.workArea.width-50) + ',top='+ (primaryDisplay.workArea.y+50) +',left=' + (primaryDisplay.workArea.x+50) + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0');
+                }
             }
-        }
             // Load InFrame prompter only if there's more than one screen or if the only screen available is free.
             if ( instance[0] && ( !instance[1] || secondaryDisplay ) )
                 frame.src = "teleprompter.html" + (debug ? "?debug=1" : "");
@@ -514,14 +572,14 @@ function setDomain() {
         }
         
         // If an external prompt is openned, focus on it.        
-        if ( prompterWindow!=undefined && window.focus )
+        if (prompterWindow!=undefined && window.focus)
             // Adviced to launch as separate event on a delay.
-        prompterWindow.focus();
+            prompterWindow.focus();
         else
             frame.focus();
 
         // In case of both instances active and not enough screens...
-        if (inElectron() && !secondaryDisplay && instance[0] && instance[1] ) {
+        if (!forceSecondaryDisplay && (inElectron() && !secondaryDisplay && instance[0] && instance[1])) {
             window.alert("You don't have any external Display.");
             instance[0] = false;
             instance[1] = false;
@@ -531,6 +589,12 @@ function setDomain() {
             window.alert("You must prompt at least to one display.");
         else
             togglePromptIt();
+    }
+
+    function openCanvasPrompter() {
+        // Opening experimental prompter...
+        if (debug) console.log("Opening experimental prompter.");
+        ipcRenderer.send('asynchronous-message', 'openInstance');
     }
 
     function updateTeleprompter(event) {
@@ -550,9 +614,8 @@ function setDomain() {
     function toggleDebug() {
         if (inElectron())
             remote.getCurrentWindow().toggleDevTools();
-        else {
+        else
             toggleDebugMode();
-        }
     }
 
     function toc() {
@@ -574,12 +637,12 @@ function setDomain() {
         // Message data. Uncommenting will give you valuable information and decrease performance dramatically.
         /*
         setTimeout(function() {
-        if (debug) {
-        	console.log("Editor:");
-        	console.log(event);
-        }
+            if (debug) {
+                console.log("Editor:");
+                console.log(event);
+            }
         }, 0);
-*/
+        */
         // If the event comes from the same domain...
         if (!event.domain || event.domain === getDomain()) {
             var message = event.data;
@@ -587,42 +650,48 @@ function setDomain() {
             if (message.request === command.restoreEditor)
                 restoreEditor();
             else {
-                // If this isn't a instant sync command, follow normal procedure.
-                if (!(message.request === command.iSync || message.request === command.sync)) {
-                    // Tic toc mechanism symmetricaly distributes message request lag.
-                    if (tic) {
-                        // Redirect message to each prompter instance.
-                        if (instance[1])
-                            prompterWindow.postMessage(message, getDomain());
-                        if (instance[0])
-                            frame.contentWindow.postMessage(message, getDomain());
-                    } else {
-                        // Redirect message to each prompter instance.
-                        if (instance[0])
-                            frame.contentWindow.postMessage(message, getDomain());
-                        if (instance[1])
-                            prompterWindow.postMessage(message, getDomain());
+                if (inElectron() && !(instance[0] && instance[1])) {
+                    // If this isn't a instant sync command, follow normal procedure.
+                    if (!(message.request === command.iSync || message.request === command.sync)) {
+                        // Tic toc mechanism symmetricaly distributes message request lag.
+                        if (tic) {
+                            // Redirect message to each prompter instance.
+                            if (instance[1])
+                                prompterWindow.postMessage(message, getDomain());
+                            if (instance[0])
+                                frame.contentWindow.postMessage(message, getDomain());
+                        } else {
+                            // Redirect message to each prompter instance.
+                            if (instance[0])
+                                frame.contentWindow.postMessage(message, getDomain());
+                            if (instance[1])
+                                prompterWindow.postMessage(message, getDomain());
+                        }
                     }
-                }
-                // If requesting for sync, ensure both instances are open. Otherwise do nothing.
-                else if (instance[0] && instance[1]) {
-                    // Tic toc mechanism symmetricaly distributes message request lag.
-                    if (tic) {
-                        // Redirect message to each prompter instance.
-                        if (instance[1])
-                            prompterWindow.postMessage(message, getDomain());
-                        if (instance[0])
-                            frame.contentWindow.postMessage(message, getDomain());
-                    } else {
-                        // Redirect message to each prompter instance.
-                        if (instance[0])
-                            frame.contentWindow.postMessage(message, getDomain());
-                        if (instance[1])
-                            prompterWindow.postMessage(message, getDomain());
+                    // If requesting for sync, ensure both instances are open. Otherwise do nothing.
+                    else if (instance[0] && instance[1]) {
+                        // Tic toc mechanism symmetricaly distributes message request lag.
+                        if (tic) {
+                            // Redirect message to each prompter instance.
+                            if (instance[1])
+                                prompterWindow.postMessage(message, getDomain());
+                            if (instance[0])
+                                frame.contentWindow.postMessage(message, getDomain());
+                        } else {
+                            // Redirect message to each prompter instance.
+                            if (instance[0])
+                                frame.contentWindow.postMessage(message, getDomain());
+                            if (instance[1])
+                                prompterWindow.postMessage(message, getDomain());
+                        }
                     }
+                    // Update tic-toc bit.
+                    setTimeout(toc, 10);
                 }
-                // Update tic-toc bit.
-                setTimeout(toc, 10);
+                else {
+                    // IPC between main process directly.
+                    ipcRenderer.send('asynchronous-message', message);
+                }
             }
         }
     }
@@ -736,81 +805,82 @@ function setDomain() {
                 case "Escape":
                 restoreEditor();
                 break;
-                    // Electron Commands
-                    /*
-                    case 17, 91, 70:
-                    case "ctrl" + "" + "f":
-                    if(inElectron()){
-                    event.preventDefault();
-                    toggleFullscreen();
-                    break;
-                    } else{
-                    break;
-                    }
-                    */
-                    default:
-                    var key;
-                    // If key is not a string
-                    if (!isFunction(event.key.indexOf))
-                        key = String.fromCharCode(event.key);
-                    else
-                        key = event.key;
-                    //if ( key.indexOf("Key")===0 || key.indexOf("Digit")===0 )
-                    //		key = key.charAt(key.length-1);
-                    if (!is_int(key))
-                        key = key.toLowerCase();
-                    if (debug) console.log(key);
-                    listener({
-                        data: {
-                            request: command.anchor,
-                            data: key
-                        }
-                    });
+                // Electron Commands
+                /*
+                case 17, 91, 70:
+                case "ctrl" + "" + "f":
+                if(inElectron()){
+                event.preventDefault();
+                toggleFullscreen();
+                break;
+                } else{
+                break;
                 }
+                */
+                default:
+                var key;
+                // If key is not a string
+                if (!isFunction(event.key.indexOf))
+                    key = String.fromCharCode(event.key);
+                else
+                    key = event.key;
+                //if ( key.indexOf("Key")===0 || key.indexOf("Digit")===0 )
+                //      key = key.charAt(key.length-1);
+                if (!is_int(key))
+                    key = key.toLowerCase();
+                if (debug) console.log(key);
+                listener({
+                    data: {
+                        request: command.anchor,
+                        data: key
+                    }
+                });
             }
-        };
-
-        function isFunction(possibleFunction) {
-            return typeof(possibleFunction) === typeof(Function)
         }
+    };
 
-        function is_int(value) {
-            if (parseFloat(value) == parseInt(value) && !isNaN(value))
-                return true;
-            else
-                return false;
-        }
+    function isFunction(possibleFunction) {
+        return typeof(possibleFunction) === typeof(Function)
+    }
+
+    function is_int(value) {
+        if (parseFloat(value) == parseInt(value) && !isNaN(value))
+            return true;
+        else
+            return false;
+    }
+
     /*function insertAtCaret(el,text){
-    	var element = document.getElementById(el);
-    	var scrollPos = element.scrollTop;
-    	var strPos = 0;
-    	var br = ((element.selectionStart || element.selectionStart == '0') ? "ff" : (document.selection ? "ie" : "false"));
-    	if(br == "ie"){
-    		element.focus();
-    		var range = document.selection.createRange();
-    		range.moveStart('character',-element.value.length);
-    		strPos = range.text.length;
-    	}else if(br == "ff")
-    		strPos = element.selectionStart;
+        var element = document.getElementById(el);
+        var scrollPos = element.scrollTop;
+        var strPos = 0;
+        var br = ((element.selectionStart || element.selectionStart == '0') ? "ff" : (document.selection ? "ie" : "false"));
+        if(br == "ie"){
+            element.focus();
+            var range = document.selection.createRange();
+            range.moveStart('character',-element.value.length);
+            strPos = range.text.length;
+        }else if(br == "ff")
+            strPos = element.selectionStart;
 
-    	var front = (element.value).substring(0,strPos);
-    	var back = (element.value).substring(strPos,element.value.length);
-    	element.value=front+text+back;
-    	strPos = strPos + text.length;
+        var front = (element.value).substring(0,strPos);
+        var back = (element.value).substring(strPos,element.value.length);
+        element.value=front+text+back;
+        strPos = strPos + text.length;
 
-    	if(br == "ie"){
-    		element.focus();
-    		var range = document.selection.createRange();
-    		range.moveStart('character',-element.value.length);
-    		range.moveStart('character',strPos);
-    		range.moveEnd('character',0);
-    		range.select();
-    	}else if(br == "ff"){
-    		element.selectionStart = strPos;
-    		element.selectionEnd = strPos;
-    		element.focus();
-    	}
-    	element.scrollTop = scrollPos;
+        if(br == "ie"){
+            element.focus();
+            var range = document.selection.createRange();
+            range.moveStart('character',-element.value.length);
+            range.moveStart('character',strPos);
+            range.moveEnd('character',0);
+            range.select();
+        }else if(br == "ff"){
+            element.selectionStart = strPos;
+            element.selectionEnd = strPos;
+            element.focus();
+        }
+        element.scrollTop = scrollPos;
     }*/
 
     function insertTextAtCursor(node) {
@@ -838,9 +908,8 @@ function setDomain() {
             var slice = byteCharacters.slice(offset, offset + sliceSize);
 
             var byteNumbers = new Array(slice.length);
-            for (var i = 0; i < slice.length; i++) {
+            for (var i = 0; i < slice.length; i++)
                 byteNumbers[i] = slice.charCodeAt(i);
-            }
 
             var byteArray = new Uint8Array(byteNumbers);
 
@@ -1021,64 +1090,79 @@ function setDomain() {
             }],
 
         });
-sid.selectedElement = function(element) {
-    var scriptsData = sid.getElements();
-    if(scriptsData[sid.currentElement].hasOwnProperty('data'))
-        document.getElementById("prompt").innerHTML = scriptsData[sid.currentElement]['data'];
-    else
-        document.getElementById("prompt").innerHTML = "";
-    document.querySelector("#wrapper").classList.toggle("toggled");
-}
 
-sid.addElementEnded = function(element) {
-    if (debug) console.log(element);
-    sid.selectedElement(element);
-}
+        sid.selectedElement = function(element) {
+            var scriptsData = sid.getElements();
+            if(scriptsData[sid.currentElement].hasOwnProperty('data'))
+                document.getElementById("prompt").innerHTML = scriptsData[sid.currentElement]['data'];
+            else
+                document.getElementById("prompt").innerHTML = "";
+            document.querySelector("#wrapper").classList.toggle("toggled");
+        }
 
-sid.setEvent('input','prompt',function() {
-    if (sid.currentElement != 0) {
-        var scriptsData = sid.getElements();
-        scriptsData[sid.currentElement]["data"] = document.getElementById("prompt").innerHTML;
-        sid.getSaveMode().setItem(sid.getDataKey(), JSON.stringify(scriptsData));
+        sid.addElementEnded = function(element) {
+            if (debug) console.log(element);
+            sid.selectedElement(element);
+        }
+
+        sid.setEvent('input','prompt',function() {
+            if (sid.currentElement != 0) {
+                var scriptsData = sid.getElements();
+                scriptsData[sid.currentElement]["data"] = document.getElementById("prompt").innerHTML;
+                sid.getSaveMode().setItem(sid.getDataKey(), JSON.stringify(scriptsData));
+            }
+        });
+
+        CKEDITOR.on('instanceReady', function(event) {
+            var editor = event.editor,
+            scriptsData = sid.getElements();
+            if (scriptsData[sid.currentElement].hasOwnProperty('data'))
+                document.getElementById("prompt").innerHTML = scriptsData[sid.currentElement]['data'];
+            else
+                document.getElementById("prompt").innerHTML = "";
+
+            editor.on('focus', function() {
+                editorFocused = true;
+                if (debug) console.log('Editor focused.');
+            });
+
+            editor.on('blur', function() {
+                editorFocused = false;
+                if (debug) console.log('Editor out of focus.');
+            });
+        });
+
+        var menuToggle = document.querySelector("#menu-toggle");
+        menuToggle.onclick = function(event) {
+            event.preventDefault();
+            document.querySelector("#wrapper").classList.toggle("toggled");
+        };
     }
-});
 
-CKEDITOR.on('instanceReady', function(event) {
-    var editor = event.editor,
-    scriptsData = sid.getElements();
-    if (scriptsData[sid.currentElement].hasOwnProperty('data'))
-        document.getElementById("prompt").innerHTML = scriptsData[sid.currentElement]['data'];
+    // Initialize objects after DOM is loaded
+    if (document.readyState === "interactive" || document.readyState === "complete")
+        // Call init if the DOM (interactive) or document (complete) is ready.
+        init();              
     else
-        document.getElementById("prompt").innerHTML = "";
-
-    editor.on('focus', function() {
-        editorFocused = true;
-        if (debug) console.log('Editor focused.');
-    });
-
-    editor.on('blur', function() {
-        editorFocused = false;
-        if (debug) console.log('Editor out of focus.');
-    });
-});
-
-var menuToggle = document.querySelector("#menu-toggle");
-menuToggle.onclick = function(event) {
-    event.preventDefault();
-    document.querySelector("#wrapper").classList.toggle("toggled");
-};
-}
-
-
-// Initialize objects after DOM is loaded
-if (document.readyState === "interactive" || document.readyState === "complete")
-    // Call init if the DOM (interactive) or document (complete) is ready.
-init();              
-else
-    // Set init as a listener for the DOMContentLoaded event.
-document.addEventListener("DOMContentLoaded", init);
+        // Set init as a listener for the DOMContentLoaded event.
+        document.addEventListener("DOMContentLoaded", init);
 }());
 
+// Global functions, to be accessed from Electron's main process.
+function enterDebug() {
+    debug = true;
+    console.log("Entering debug mode.");
+}
+function exitDebug() {
+    debug = false;
+    console.log("Leaving debug mode.");
+}
+function toggleDebugMode() {
+    if (debug) 
+        exitDebug();
+    else
+        enterDebug();
+}
 // On change Prompter Style
 function setStyleEvent(prompterStyle) {
     if (setStyle) {
