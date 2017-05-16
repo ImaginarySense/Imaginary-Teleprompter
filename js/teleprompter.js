@@ -26,17 +26,17 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 // Use JavaScript Strict Mode.
 "use strict";
 
-
 // Encapsulate the code in an anonymous self-invoking function.
 (function () {
-    // Include Electron libraries
-        if (inElectron() && !inIframe()) {
-            window.jQuery = require('./js/jquery.min.js');
-            // Manually import jQuery from javascript when running in a CommonsJS environment.
-            // Ref: https://github.com/electron/electron/issues/254 
-            window.$ = window.jQuery;
-            remote = require('electron').remote; // Allow IPC with main process in Electron.
-        }
+    // Import Electron libraries.
+    if (inElectron() && !inIframe()) {
+        var {ipcRenderer} = require('electron');
+        window.jQuery = require('./js/jquery.min.js');
+        window.$ = window.jQuery;
+        // Manually import jQuery from javascript when running in a CommonsJS environment.
+        // Ref: https://github.com/electron/electron/issues/254 
+        remote = require('electron').remote; // Allow IPC with main process in Electron.
+    }
     // Global objects
     var settings, session, prompt, pointer, flipArea, overlay, overlayFocus, styleElement, styleSheet, editor, timer, remote;
     // Global variables
@@ -131,13 +131,16 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         console.log("Editor window:");
         console.log(window.opener);
         console.log(window);
-        if (window.opener) {
+        if (window.opener)
             editor = window.opener;
-        }
         else if (window.top)
             editor = window.top;
-
-        // Sync delay control.
+        // else {
+        //     editor = {};
+        //     editor.postMessage = function(event, domain) {
+        //         ipcRenderer.send('asynchronous-message', event);
+        //     }
+        // }
         resetSteps();
         // Get focus mode
         focus = settings.data.focusMode;
@@ -931,6 +934,16 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     }
 
     // Initialize postMessage event listener.
+    addEventListener("message", listener, false);
+
+    // When calling from main process, run function to...
+    if (ipcRenderer!==undefined)
+        ipcRenderer.on('asynchronous-reply', function(event, arg) {
+            if (arg.option === "message") {
+                listener( {data:arg.data, domain:getDomain()} );
+            }
+        });
+
     addEventListener("message", listener, false);
 
     function resetCap() {

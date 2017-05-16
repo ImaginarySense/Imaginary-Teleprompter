@@ -26,7 +26,9 @@ const { electron,
 	globalShortcut // Module can register/unregister a global keyboard shortcut with the operating system so that you can customize the operations for various shortcuts.
 	// Keep a global reference of the window object, if you don't, the window will be closed automatically when the JavaScript object is garbage collected.
 } = require('electron');
-
+const nativeImage = require('electron').nativeImage;
+const path = require('path');
+const url = require('url');
 // This should be placed at top of main.js to handle setup events quickly
 if (handleSquirrelEvent()) {
   // squirrel event handled and app will exit in 1000ms, so don't do anything else
@@ -39,7 +41,6 @@ function handleSquirrelEvent() {
   }
 
   const ChildProcess = require('child_process');
-  const path = require('path');
 
   const appFolder = path.resolve(process.execPath, '..');
   const rootAtomFolder = path.resolve(appFolder, '..');
@@ -96,21 +97,25 @@ function handleSquirrelEvent() {
 };
 
 // Set Global window variable.
-let mainWindow = null;
+let mainWindow = null,
+    externalPrompt = null,
+    tic = 0,
+	toc = 1;
 
 // This method will be called when Electron has finished initialization and is ready to create browser windows.
 app.on('ready', () => {
 	// Create the browser window.
-	mainWindow = new BrowserWindow({width: 1280, height: 800, javascript: true, title: 'Teleprompter', useContentSize: true, nodeIntegration: true, icon: __dirname + '/icon.ico'});
-
+	mainWindow = new BrowserWindow({show: false, width: 1280, height: 800, javascript: true, title: 'Teleprompter', useContentSize: true, nodeIntegration: true, icon: __dirname + '/icon.ico'});
   	// Disables menu in systems where it can be disabled.
     Menu.setApplicationMenu(null);
 
 	// and load the index.html of app.
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
+	mainWindow.once('ready-to-show', () => {
+		mainWindow.show()
+	})
+	// Global vars
 	let contents = mainWindow.webContents;
-
-	// IPC interaction
 
 	// Debug tools
 	contents.on('devtools-opened', () => {
@@ -172,11 +177,66 @@ app.on('ready', () => {
 
 	// Send a message to the renderer process...
 	ipcMain.on('asynchronous-message', (event, arg) => {
+		// console.log(arg);
 		if (arg === "network")
 	  		runSocket(event);
+	  	else if (arg === "openInstance") {
+			externalPrompt = new BrowserWindow({
+				webPreferences: {
+					title: 'Teleprompter Instance',
+					// blinkFeatures: 'KeyboardEventKey',
+					// titleBarStyle: 'hidden-inset',
+					offscreen: true
+				}
+			});
+			const indexPath = path.resolve(__dirname, '.', 'teleprompter.html')
+			const indexURL = url.format({
+				protocol: 'file',
+				pathname: indexPath,
+				slashes: true,
+				// hash: encodeURIComponent(JSON.stringify(someArgs))
+			})
+			console.log(indexPath);
+			console.log(indexURL);
+			externalPrompt.loadURL(indexURL);
+			externalPrompt.setIgnoreMouseEvents(false);
+			externalPrompt.webContents.setFrameRate(30);
+			externalPrompt.webContents.on('paint', (updateEvent, dirty, image) => {
+				// Frame sipping on canvas
+				if (frameSkip()) {
+					// Get pointer to image from canvas.
+					const size = externalPrompt.getSize(),
+						bitmap = image.getBitmap();
+			        // Send image contents to corresponding canvas.
+					event.sender.send('asynchronous-reply',{ 'option':'c', 'dirty':dirty, 'size':size, 'bitmap':bitmap });
+					// Documentation
+					// https://electron.atom.io/docs/tutorial/offscreen-rendering/
+					// Known issues
+					// https://github.com/electron/electron/issues/7350
+					// https://github.com/electron/electron/issues/8051
+				}
+			});
+			externalPrompt.on('closed', () =>{
+				externalPrompt = null;
+				mainWindow.webContents.send('asynchronous-reply', {option:'message', data:arg} );
+			});
+		}
 		else if (arg === "prepareLinks")
-	  		event.sender.send('asynchronous-reply',{'option':'prepareLinks'});;
+	  		event.sender.send('asynchronous-reply',{'option':'prepareLinks'});
+	  	else {
+	  		if (externalPrompt!==null) {
+	  			console.log(arg);
+	  			externalPrompt.webContents.send('asynchronous-reply', {option:'message', data:arg} );
+	  		}
+	  	}
 	});
+
+    function frameSkip() {
+        tic--;
+        if (tic<0)
+        	tic=toc;
+        return tic===toc;
+    }
 
 	// Close Window
 	mainWindow.on('closed', () =>{
