@@ -29,11 +29,11 @@ var debug = false;
     }
     
     // Global objects
-    var promptIt, updateIt, prompterWindow, frame, currentScript, canvas, canvasContext
+    var promptIt, updateIt, prompterWindow, frame, currentScript, canvas, canvasContext,
         syncMethods = {"instance":0, "canvas":1, "follow":2};
 
     // Global variables
-    var syncMethod = syncMethods.instance,
+    var syncMethod = syncMethods.canvas,
         forceSecondaryDisplay = true,
         domain, tic, instance = [false, false],
         htmldata, editorFocused=false;
@@ -139,41 +139,48 @@ var debug = false;
                     catch (err) {
                         // Remove error from command line by passing blank frame.
                         imageData = new ImageData(arg.size[0], arg.size[1]);
+                        /*
                         // Attempt to prevent blank frame by calculating correct width and height using total area and aspect ratio.
-                        // var area = arg.bitmap.length/4,
-                        //     aspectRatio = arg.size[1]/arg.size[0],
-                        //     height = Math.sqrt(area*aspectRatio),
-                        //     width = area/height;
-                        // imageData = new ImageData(clampedArray, width, height);
+                        var area = arg.bitmap.length/4,
+                            aspectRatio = arg.size[1]/arg.size[0],
+                            height = Math.sqrt(area*aspectRatio),
+                            width = area/height;
+                        imageData = new ImageData(clampedArray, width, height);
+                        */
                     }
                     requestAnimationFrame(function() {
                         canvasContext.putImageData(imageData, 0, 0);
                     });
+                    /*
                     // Render dirty area only. (Deprecated as inneficient. Uncomment for cool VFX on resize)
-                    // resizeCanvas(arg.size);
-                    // var width = arg.size[0],
-                    //     height = arg.size[1],
-                    //     croppedImage = new Uint8ClampedArray(arg.dirty.width*arg.dirty.height*4),
-                    //     yProcessLength = arg.dirty.height+arg.dirty.y,
-                    //     xProcessLength = arg.dirty.width+arg.dirty.x,
-                    //     count = 0;
-                    // for (var i=arg.dirty.y; i<yProcessLength; i++)
-                    //     for (var j=arg.dirty.x; j<xProcessLength; j++) {
-                    //         var curr = (i*width+j)*4;
-                    //         croppedImage[count+0] = arg.bitmap[curr+0];
-                    //         croppedImage[count+1] = arg.bitmap[curr+1];
-                    //         croppedImage[count+2] = arg.bitmap[curr+2];
-                    //         croppedImage[count+3] = 255;
-                    //         count+=4;
-                    //     }
-                    // requestAnimationFrame(function() {
-                    //     canvasContext.putImageData(new ImageData(croppedImage, arg.dirty.width, arg.dirty.height), arg.dirty.x, arg.dirty.y);
-                    // });
+                    resizeCanvas(arg.size);
+                    var width = arg.size[0],
+                        height = arg.size[1],
+                        croppedImage = new Uint8ClampedArray(arg.dirty.width*arg.dirty.height*4),
+                        yProcessLength = arg.dirty.height+arg.dirty.y,
+                        xProcessLength = arg.dirty.width+arg.dirty.x,
+                        count = 0;
+                    for (var i=arg.dirty.y; i<yProcessLength; i++)
+                        for (var j=arg.dirty.x; j<xProcessLength; j++) {
+                            var curr = (i*width+j)*4;
+                            croppedImage[count+0] = arg.bitmap[curr+0];
+                            croppedImage[count+1] = arg.bitmap[curr+1];
+                            croppedImage[count+2] = arg.bitmap[curr+2];
+                            croppedImage[count+3] = 255;
+                            count+=4;
+                        }
+                    requestAnimationFrame(function() {
+                        canvasContext.putImageData(new ImageData(croppedImage, arg.dirty.width, arg.dirty.height), arg.dirty.x, arg.dirty.y);
+                    });
+                    */
                 }
                 // Show QR Codes.
                 // Initiate QRs for Remote Control.
                 else if (arg.option === "qr")
                     addQRConnection(arg.data);
+                // Restore instances
+                else if (arg.option === "restoreEditor")
+                    restoreEditor();
                 // Forward remote control commands.
                 else if (arg.option === "command")
                     document.onkeydown(arg.data);
@@ -485,6 +492,8 @@ var debug = false;
                 prompterWindow.postMessage({
                     'request': command.close
                 }, getDomain());
+            if (syncMethod === syncMethods.canvas)
+                ipcRenderer.send('asynchronous-message', 'closeInstance');
             // Clear contents from frame
             frame.src = "about:blank";
             // Stops the event but continues executing current function.

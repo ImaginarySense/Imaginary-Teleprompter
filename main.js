@@ -37,7 +37,7 @@ if (handleSquirrelEvent()) {
 
 function handleSquirrelEvent() {
   if (process.argv.length === 1) {
-    return false;
+	return false;
   }
 
   const ChildProcess = require('child_process');
@@ -48,66 +48,66 @@ function handleSquirrelEvent() {
   const exeName = path.basename(process.execPath);
 
   const spawn = function(command, args) {
-    let spawnedProcess, error;
+	let spawnedProcess, error;
 
-    try {
-      spawnedProcess = ChildProcess.spawn(command, args, {detached: true});
-    } catch (error) {}
+	try {
+	  spawnedProcess = ChildProcess.spawn(command, args, {detached: true});
+	} catch (error) {}
 
-    return spawnedProcess;
+	return spawnedProcess;
   };
 
   const spawnUpdate = function(args) {
-    return spawn(updateDotExe, args);
+	return spawn(updateDotExe, args);
   };
 
   const squirrelEvent = process.argv[1];
   switch (squirrelEvent) {
-    case '--squirrel-install':
-    case '--squirrel-updated':
-      // Optionally do things such as:
-      // - Add your .exe to the PATH
-      // - Write to the registry for things like file associations and
-      //   explorer context menus
+	case '--squirrel-install':
+	case '--squirrel-updated':
+	  // Optionally do things such as:
+	  // - Add your .exe to the PATH
+	  // - Write to the registry for things like file associations and
+	  //   explorer context menus
 
-      // Install desktop and start menu shortcuts
-      spawnUpdate(['--createShortcut', exeName]);
+	  // Install desktop and start menu shortcuts
+	  spawnUpdate(['--createShortcut', exeName]);
 
-      setTimeout(app.quit, 1000);
-      return true;
+	  setTimeout(app.quit, 1000);
+	  return true;
 
-    case '--squirrel-uninstall':
-      // Undo anything you did in the --squirrel-install and
-      // --squirrel-updated handlers
+	case '--squirrel-uninstall':
+	  // Undo anything you did in the --squirrel-install and
+	  // --squirrel-updated handlers
 
-      // Remove desktop and start menu shortcuts
-      spawnUpdate(['--removeShortcut', exeName]);
+	  // Remove desktop and start menu shortcuts
+	  spawnUpdate(['--removeShortcut', exeName]);
 
-      setTimeout(app.quit, 1000);
-      return true;
+	  setTimeout(app.quit, 1000);
+	  return true;
 
-    case '--squirrel-obsolete':
-      // This is called on the outgoing version of your app before
-      // we update to the new version - it's the opposite of
-      // --squirrel-updated
+	case '--squirrel-obsolete':
+	  // This is called on the outgoing version of your app before
+	  // we update to the new version - it's the opposite of
+	  // --squirrel-updated
 
-      app.quit();
-      return true;
+	  app.quit();
+	  return true;
   }
 };
 
 // Set Global window variable.
 let mainWindow = null,
-    externalPrompt = null,
-    tic = 0,
+	externalPrompt = null,
+	tic = 0,
 	toc = 1;
 
 // This method will be called when Electron has finished initialization and is ready to create browser windows.
 app.on('ready', () => {
 	// Create the browser window.
 	mainWindow = new BrowserWindow({show: false, width: 1280, height: 800, javascript: true, title: 'Teleprompter', useContentSize: true, nodeIntegration: true, icon: __dirname + '/icon.ico'});
-  	// Disables menu in systems where it can be disabled.
-    Menu.setApplicationMenu(null);
+	// Disables menu in systems where it can be disabled.
+	Menu.setApplicationMenu(null);
 
 	// and load the index.html of app.
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
@@ -119,68 +119,68 @@ app.on('ready', () => {
 
 	// Debug tools
 	contents.on('devtools-opened', () => {
-	    contents.executeJavaScript('enterDebug()');
+		contents.executeJavaScript('enterDebug()');
 	});
 	contents.on('devtools-closed', () => {
-	    contents.executeJavaScript('exitDebug()');
+		contents.executeJavaScript('exitDebug()');
 	});
 
 	// Get computer IPs for remote control
-    function getIP() {
-	    var os = require('os');
-	    var nets = os.networkInterfaces();
-	    for ( var a in nets) {
-	      var ifaces = nets[a];
-	      for ( var o in ifaces) {
-	        if (ifaces[o].family == "IPv4" && !ifaces[o].internal) {
-	          return ifaces[o].address;
-	        }
-	      }
-	    }
-	    return null;
+	function getIP() {
+		var os = require('os');
+		var nets = os.networkInterfaces();
+		for ( var a in nets) {
+		  var ifaces = nets[a];
+		  for ( var o in ifaces) {
+			if (ifaces[o].family == "IPv4" && !ifaces[o].internal) {
+			  return ifaces[o].address;
+			}
+		  }
+		}
+		return null;
 	}
 
 	// Remote control server
 	function runSocket(event) {
-	    var ip = getIP();
-	    if(ip){
-	      var app2 = require('express')();
-	      var http = require('http').Server(app2);
-	      var bonjour = require('bonjour')();
-	      var io = require('socket.io')(http);
+		var ip = getIP();
+		if(ip){
+		  var app2 = require('express')();
+		  var http = require('http').Server(app2);
+		  var bonjour = require('bonjour')();
+		  var io = require('socket.io')(http);
 
-	      io.sockets.on('connection', function (socket) {
-	        socket.on('command',function(res){
-	            if(res.hasOwnProperty('key') > 0){
-	              event.sender.send('asynchronous-reply',{'option':'command','data':res});
-	            }
-	        });
-	        socket.on('disconnect', function () {});
-	      });
+		  io.sockets.on('connection', function (socket) {
+			socket.on('command',function(res){
+				if(res.hasOwnProperty('key') > 0){
+				  event.sender.send('asynchronous-reply',{'option':'command','data':res});
+				}
+			});
+			socket.on('disconnect', function () {});
+		  });
 
-	      http.listen(3000, function(){
-	        event.sender.send('asynchronous-reply',{'option':'qr','data':ip});
-	        //console.log('http://' + ip + ':3000/');
-	      });
+		  http.listen(3000, function(){
+			event.sender.send('asynchronous-reply',{'option':'qr','data':ip});
+			//console.log('http://' + ip + ':3000/');
+		  });
 
-	      bonjour.publish({ name: 'Teleprompter', type: 'http', port: 3000 });
-	      bonjour.find({ type: 'http' }, function (service) {
-	        //console.log('Found an HTTP server:'+ service);
-	        event.sender.send('asynchronous-reply',{'option':'qr','data':service.host});
-	      });
-	    }else{
-	      setTimeout(function(){
-	        runSocket(event);
-	      }, 1000);
-	    }
+		  bonjour.publish({ name: 'Teleprompter', type: 'http', port: 3000 });
+		  bonjour.find({ type: 'http' }, function (service) {
+			//console.log('Found an HTTP server:'+ service);
+			event.sender.send('asynchronous-reply',{'option':'qr','data':service.host});
+		  });
+		}else{
+		  setTimeout(function(){
+			runSocket(event);
+		  }, 1000);
+		}
 	}
 
 	// Send a message to the renderer process...
 	ipcMain.on('asynchronous-message', (event, arg) => {
 		// console.log(arg);
 		if (arg === "network")
-	  		runSocket(event);
-	  	else if (arg === "openInstance") {
+			runSocket(event);
+		else if (arg === "openInstance") {
 			externalPrompt = new BrowserWindow({
 				webPreferences: {
 					title: 'Teleprompter Instance',
@@ -207,7 +207,26 @@ app.on('ready', () => {
 					// Get pointer to image from canvas.
 					const size = externalPrompt.getSize(),
 						bitmap = image.getBitmap();
-			        // Send image contents to corresponding canvas.
+					/*
+					// Cropping in the main process just adds delay to all processes.
+					// Maybe running the following code in a worker could help.
+					let width = size[0],
+						height = size[1],
+						croppedImage = new Array(dirty.width*dirty.height*4),
+						yProcessLength = dirty.height+dirty.y,
+						xProcessLength = dirty.width+dirty.x,
+						count = 0;
+					for (let i=dirty.y; i<yProcessLength; i++)
+						for (let j=dirty.x; j<xProcessLength; j++) {
+							let curr = (i*width+j)*4;
+							croppedImage[count+0] = bitmap[curr+0];
+							croppedImage[count+1] = bitmap[curr+1];
+							croppedImage[count+2] = bitmap[curr+2];
+							croppedImage[count+3] = 255;
+							count+=4;
+						}
+					event.sender.send('asynchronous-reply',{ 'option':'c', 'dirty':dirty, 'size':size, 'bitmap':croppedImage });
+					*/
 					event.sender.send('asynchronous-reply',{ 'option':'c', 'dirty':dirty, 'size':size, 'bitmap':bitmap });
 					// Documentation
 					// https://electron.atom.io/docs/tutorial/offscreen-rendering/
@@ -218,31 +237,37 @@ app.on('ready', () => {
 			});
 			externalPrompt.on('closed', () =>{
 				externalPrompt = null;
-				mainWindow.webContents.send('asynchronous-reply', {option:'message', data:arg} );
+				if (mainWindow!==null)
+					mainWindow.webContents.send('asynchronous-reply', {option:'restoreEditor'});
 			});
 		}
+		else if (arg === "closeInstance") {
+			if (externalPrompt!==null)
+				externalPrompt.close();
+		}
 		else if (arg === "prepareLinks")
-	  		event.sender.send('asynchronous-reply',{'option':'prepareLinks'});
-	  	else {
-	  		if (externalPrompt!==null) {
-	  			console.log(arg);
-	  			externalPrompt.webContents.send('asynchronous-reply', {option:'message', data:arg} );
-	  		}
-	  	}
+			event.sender.send('asynchronous-reply',{'option':'prepareLinks'});
+		else {
+			if (externalPrompt!==null) {
+				console.log(arg);
+				externalPrompt.webContents.send('asynchronous-reply', {option:'message', data:arg} );
+			}
+		}
 	});
 
-    function frameSkip() {
-        tic--;
-        if (tic<0)
-        	tic=toc;
-        return tic===toc;
-    }
+	function frameSkip() {
+		tic--;
+		if (tic<0)
+			tic=toc;
+		return tic===toc;
+	}
 
 	// Close Window
 	mainWindow.on('closed', () =>{
-        // Dereference the windows object, usually you would store  windows
-        // in an array if your app supports multi windows, this is the time
-        // when you should delete the corresponding element.
+		externalPrompt.close();
+		// Dereference the windows object, usually you would store  windows
+		// in an array if your app supports multi windows, this is the time
+		// when you should delete the corresponding element.
 		mainWindow = null;
 	});
 });
