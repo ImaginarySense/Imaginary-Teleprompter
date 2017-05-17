@@ -135,12 +135,13 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
             editor = window.opener;
         else if (window.top)
             editor = window.top;
-        // else {
-        //     editor = {};
-        //     editor.postMessage = function(event, domain) {
-        //         ipcRenderer.send('asynchronous-message', event);
-        //     }
-        // }
+        else if (ipcRenderer!==undefined) {
+            // Untested code
+            editor = {};
+            editor.postMessage = function(event, domain) {
+                ipcRenderer.send('asynchronous-message', event);
+            }
+        }
         resetSteps();
         // Get focus mode
         focus = settings.data.focusMode;
@@ -332,6 +333,8 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         // If we have normal access to the editor, request it to restore the prompters.
         if (editor)
             editor.postMessage( {'request':command.restoreEditor}, getDomain() );
+        else if (!inIframe() && ipcRenderer!==undefined)
+            ipcRenderer.send('asynchronous-message', 'restoreEditor');
         // In all cases, clean emulated session storage before leaving.
         dataManager.removeItem('IFTeleprompterSession',1);
     }
