@@ -33,15 +33,17 @@
   "main": "main.js",
   "dependencies": {
     "bonjour": "3.5.0",
+    "connect-multiparty": "^2.0.0",
+    "cors": "^2.8.3",
     "deb-version-compare": "git+https://github.com/sdumetz/node-deb-version-compare.git",
     "debug": "^2.6.1",
     "electron": "^1.6.7",
     "electron-squirrel-startup": "^1.0.0",
     "express": "^4.14.0",
+    "shelljs": "^0.7.7",
     "socket.io": "^1.7.2"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "engine": "node >= 7.4.0",
   "preferGlobal": "false"
 }

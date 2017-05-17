@@ -29,6 +29,7 @@ const { electron,
 const nativeImage = require('electron').nativeImage;
 const path = require('path');
 const url = require('url');
+const appDataFolder = app.getPath('appData') + '/ImaginarySense/Teleprompter';
 // This should be placed at top of main.js to handle setup events quickly
 if (handleSquirrelEvent()) {
   // squirrel event handled and app will exit in 1000ms, so don't do anything else
@@ -45,7 +46,7 @@ function handleSquirrelEvent() {
   const appFolder = path.resolve(process.execPath, '..');
   const rootAtomFolder = path.resolve(appFolder, '..');
   const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'));
-  const exeName = path.basename(process.execPath);
+  const exeName = path.basename(process.execPath); 
 
   const spawn = function(command, args) {
 	let spawnedProcess, error;
@@ -103,9 +104,9 @@ let mainWindow = null,
 	toc = 1;
 
 // This method will be called when Electron has finished initialization and is ready to create browser windows.
-app.on('ready', () => {
+app.on('ready', () => { 
 	// Create the browser window.
-	mainWindow = new BrowserWindow({show: false, width: 1280, height: 800, javascript: true, title: 'Teleprompter', useContentSize: true, nodeIntegration: true, icon: __dirname + '/icon.ico'});
+	mainWindow = new BrowserWindow({show: false, webPreferences: {webSecurity: false},width: 1280, height: 800, javascript: true, title: 'Teleprompter', useContentSize: true, nodeIntegration: true, icon: __dirname + '/icon.ico'});
 	// Disables menu in systems where it can be disabled.
 	Menu.setApplicationMenu(null);
 
@@ -116,6 +117,65 @@ app.on('ready', () => {
 	})
 	// Global vars
 	let contents = mainWindow.webContents;
+
+		//express server for image upload
+	var express = require('express');
+	var cors = require('cors') 
+	var app = express();
+
+	var multipart = require('connect-multiparty');
+	var multipartMiddleware = multipart();
+
+	var fs = require('fs'); 
+	var shell = require('shelljs');
+
+	var uploadPath = appDataFolder + '/uploads/';
+	var imageServerPort = 3001;
+	var imageServerURL = 'http://localhost:' + imageServerPort + '/image/';
+
+	//Make sure directories exist
+	shell.mkdir('-p', uploadPath);
+
+	app.use(cors()); 
+
+	app.post('/upload', multipartMiddleware, function(req, res) {
+	    fs.readFile(req.files.upload.path, function (err, data) {
+	        var newPath = uploadPath + req.files.upload.name;
+	        fs.writeFile(newPath, data, function (err) { 
+	        	 if (err) console.log({err: err});
+	            else {  
+	            	if(req.query.command == "QuickUpload"){
+	            		res.send({
+	    							"uploaded": 1,
+	    							"fileName": req.files.upload.name,
+	    							"url": newPath
+						});
+	            	}else{
+	            		var html;
+		                html = "";
+		                html += "<script type='text/javascript'>";
+		                html += "    var funcNum = " + req.query.CKEditorFuncNum + ";";
+		                html += "    var url     = \" " + imageServerURL + req.files.upload.name + "\";";
+		                html += "    var message = \"Uploaded file successfully\";";
+		                html += "";
+		                html += "    window.parent.CKEDITOR.tools.callFunction(funcNum, url, message);";
+		                html += "</script>";
+
+		 				res.send(html);
+	            	} 
+	            }
+	        });
+	    });
+	});
+
+
+	app.use('/image', express.static(uploadPath));
+
+	//If port changes from 3000, need to be also change in the ckeditor config.js
+	app.listen(imageServerPort, function () {
+	  console.log('Image Upload Server running at port ' + imageServerPort + '!');
+	  console.log('Image Upload Path: '+ uploadPath);
+	});
 
 	// Debug tools
 	contents.on('devtools-opened', () => {
