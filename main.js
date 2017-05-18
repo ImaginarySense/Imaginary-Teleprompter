@@ -324,7 +324,8 @@ app.on('ready', () => {
 
 	// Close Window
 	mainWindow.on('closed', () =>{
-		externalPrompt.close();
+		if (externalPrompt!==null)
+			externalPrompt.close();
 		// Dereference the windows object, usually you would store  windows
 		// in an array if your app supports multi windows, this is the time
 		// when you should delete the corresponding element.
