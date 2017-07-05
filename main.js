@@ -118,7 +118,8 @@ app.on('ready', () => {
 	// Global vars
 	let contents = mainWindow.webContents;
 
-		//express server for image upload
+	/*
+	//express server for image upload
 	var express = require('express');
 	var cors = require('cors') 
 	var app = express();
@@ -137,7 +138,6 @@ app.on('ready', () => {
 	shell.mkdir('-p', uploadPath);
 
 	app.use(cors()); 
-
 	app.post('/upload', multipartMiddleware, function(req, res) {
 	    fs.readFile(req.files.upload.path, function (err, data) {
 	        var newPath = uploadPath + req.files.upload.name;
@@ -176,6 +176,7 @@ app.on('ready', () => {
 	  console.log('Image Upload Server running at port ' + imageServerPort + '!');
 	  console.log('Image Upload Path: '+ uploadPath);
 	});
+	*/
 
 	// Debug tools
 	contents.on('devtools-opened', () => {

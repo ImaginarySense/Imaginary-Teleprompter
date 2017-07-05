@@ -34,9 +34,11 @@ var SIDEBAR = function() {
     this.loadDialog = function(){
         //Close Dialog
         document.getElementById("cancelSidebarButton").onclick = function(e){
+            e.preventDefault();
             window.location = '#close';
         };
         document.getElementById("cancelSidebarButton2").onclick = function(e){
+            e.preventDefault();
             window.location = '#close';
         };
         //Script Add Input Event
@@ -259,6 +261,7 @@ var SIDEBAR = function() {
     this.deleteElement = function(id) {
 
         window.location = "#sidebarDeleteElement";
+        document.getElementById("deleteSidebarButton").focus();
         document.getElementById("deleteSidebarButton").onclick = function(e) {
             var elementsData = this.getElements();
             
@@ -416,6 +419,7 @@ var SIDEBAR = function() {
             e.stopImmediatePropagation();
             window.location = '#sidebarAddElement';
             document.getElementById("addScriptSidebarButton").onclick = function(e){
+                e.preventDefault();
                 elementsData.push({
                     "id": document.getElementById("inputID").value,
                     "name": document.getElementById("inputName").value,
@@ -436,7 +440,7 @@ var SIDEBAR = function() {
                 }
                 window.location = "#close";
             }.bind(this);
-            
+            document.getElementById("inputName").focus();
         }.bind(this);
 
         li.appendChild(div);

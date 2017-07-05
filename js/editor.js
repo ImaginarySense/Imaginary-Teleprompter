@@ -33,10 +33,14 @@ var debug = false;
         syncMethods = {"instance":0, "canvas":1, "follow":2};
 
     // Global variables
-    var syncMethod = syncMethods.canvas,
-        forceSecondaryDisplay = true,
+    var syncMethod = syncMethods.instance,
+        forceSecondaryDisplay = false,
         domain, tic, instance = [false, false],
         htmldata, editorFocused=false;
+
+    if ( syncMethod === syncMethods.canvas ) {
+        forceSecondaryDisplay = true;
+    }
 
     //SideBar
     var sidebar = new SIDEBAR();
@@ -98,15 +102,15 @@ var debug = false;
                     if (!isADevVersion(item) && isADevVersion(currentVersion)) {
                         //migrarate from official version to a development version
                         window.location = "#devWarning";
-                        document.getElementById("agreeWarningButton").onclick = function(e){
+                        var agreeButton = document.getElementById("agreeWarningButton");
+                        agreeButton.onclick = function(e) {
                             applyMigration(item);
                             dataManager.setItem("IFTeleprompterVersion",currentVersion);
                             window.location = "#close";
-                        }; 
-                        document.getElementById("cancelWarningButton").onclick = function(e){
-                            var window = remote.getCurrentWindow();
-                            window.close();
                         };
+                        document.getElementById("cancelWarningButton").onclick = closeWindow;
+                        document.getElementById("closeWarning").onclick = closeWindow;
+                        agreeButton.focus();
                     } else {
                         //migrate from previous versions 
                         applyMigration(item);
@@ -119,10 +123,12 @@ var debug = false;
                     
                 } else if(compare(item, currentVersion) == 1) {
                     window.location = "#devNewestVersion";
-                    document.getElementById("cancelNewestButton").onclick = function(e){
+                    var cancelButton = document.getElementById("cancelNewestButton");
+                    cancelButton.onclick = function(e){
                         var window = remote.getCurrentWindow();
                         window.close();
                     };
+                    cancelButton.focus();
                 } 
             },0,0);
             // When asynchronous reply from main process, run function to...
@@ -205,6 +211,11 @@ var debug = false;
         initScripts();
         //initImages();
     } // end init()
+
+    function closeWindow() {
+        var window = remote.getCurrentWindow();
+        window.close();
+    }
 
     // Resize canvas size
     function resizeCanvas(size) {
@@ -813,6 +824,7 @@ var debug = false;
                 case 27: // ESC
                 case "Escape":
                 restoreEditor();
+                window.location = "#close";
                 break;
                 // Electron Commands
                 /*
