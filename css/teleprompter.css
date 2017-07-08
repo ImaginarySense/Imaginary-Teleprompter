@@ -1,4 +1,4 @@
-/*
+/* Example of <custom-ident> *//*
 	Teleprompter
 	Copyright (C) 2015 Imaginary Films LLC and contributors
 
@@ -43,6 +43,7 @@ body {
 	width: 100vh;
 	height: 100vh;
 	border: none;
+	/*will-change: opacity;*/
 	opacity: 0.5;
 }
 
@@ -92,6 +93,10 @@ body {
 	position: relative;
 	padding: 100vh 0px 100vh 0px;
 	top: 0px;
+}
+
+#prompt {
+	will-change: transform;
 }
 
 #overlayFocus {

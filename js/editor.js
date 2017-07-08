@@ -670,7 +670,7 @@ var debug = false;
             if (message.request === command.restoreEditor)
                 restoreEditor();
             else {
-                if (inElectron() && !(instance[0] && instance[1])) {
+                if (!(instance[0] && instance[1])&&inElectron()) {
                     // If this isn't a instant sync command, follow normal procedure.
                     if (!(message.request === command.iSync || message.request === command.sync)) {
                         // Tic toc mechanism symmetricaly distributes message request lag.
@@ -710,7 +710,8 @@ var debug = false;
                 }
                 else {
                     // IPC between main process directly.
-                    ipcRenderer.send('asynchronous-message', message);
+                    if (inElectron())
+                        ipcRenderer.send('asynchronous-message', message);
                 }
             }
         }
@@ -825,6 +826,7 @@ var debug = false;
                 case "Escape":
                 restoreEditor();
                 window.location = "#close";
+                getElementById("prompt").focus();
                 break;
                 // Electron Commands
                 /*
@@ -1114,7 +1116,7 @@ var debug = false;
 
         sid.selectedElement = function(element) {
             var scriptsData = sid.getElements();
-            if(scriptsData[sid.currentElement].hasOwnProperty('data'))
+            if (scriptsData[sid.currentElement].hasOwnProperty('data'))
                 document.getElementById("prompt").innerHTML = scriptsData[sid.currentElement]['data'];
             else
                 document.getElementById("prompt").innerHTML = "";
@@ -1141,6 +1143,14 @@ var debug = false;
                 document.getElementById("prompt").innerHTML = scriptsData[sid.currentElement]['data'];
             else
                 document.getElementById("prompt").innerHTML = "";
+
+            editor.on('key', function() {
+                if (debug) console.log('Typing in editor.');
+                if (sid.instructionsAreLoaded()) {
+                    window.location = '#sidebarAddElement';
+                    document.getElementById("inputName").focus();
+                }
+            });
 
             editor.on('focus', function() {
                 editorFocused = true;

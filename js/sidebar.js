@@ -1,5 +1,7 @@
-    
+
 var SIDEBAR = function() {
+    this.instructionsLoaded = true;
+
     this.on = function(nameElement, config) {
         this.menu = nameElement;
         if (typeof config !== 'undefined' && config !== null) {
@@ -72,7 +74,11 @@ var SIDEBAR = function() {
         return id;
     }
 
-    this.setEvent = function(event, element, method){
+    this.instructionsAreLoaded = function() {
+        return this.instructionsLoaded;
+    }
+
+    this.setEvent = function(event, element, method) {
         document.getElementById(element).addEventListener(event,function(e){
             method(e.target);
             this.refreshElements();
@@ -284,12 +290,19 @@ var SIDEBAR = function() {
     		if(elementsData[i].id == id)
     			return i;
     	}
+    };
+
+    this.setInstructions = function() {
+        if (this.currentElement === 0)
+            this.instructionsLoaded = true;
+        else
+            this.instructionsLoaded = false;
     }
 
     this.addElements = function() {
         var elementsData = this.getElements();
         var menuNode = document.getElementById(this.menu);
-
+        this.setInstructions();
         for (var i = 0; i < elementsData.length; i++) {
             var li = document.createElement("li");
             var div = document.createElement("div");
@@ -309,6 +322,7 @@ var SIDEBAR = function() {
                 e.stopImmediatePropagation();
                 if (e.target.contentEditable == "false") {
                     this.currentElement = this.getElementIndexByID(e.target.parentNode.parentNode.id);
+                    this.setInstructions();
                     elementsData = this.getElements();
                     if (typeof this.selectedElement === "function") {
                         this.selectedElement(elementsData[this.currentElement]);
@@ -373,7 +387,7 @@ var SIDEBAR = function() {
                             if (text.length > 0) {
                                 e.target.innerHTML = text;
 
-                                elementsData[e.target.parentNode.parentNode.value]['name'] = text;
+                                elementsData[this.getElementIndexByID(e.target.parentNode.parentNode.id)]['name'] = text;
                                 this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
                                 this.exitEditMode();
                                 return true;
@@ -418,31 +432,32 @@ var SIDEBAR = function() {
         li.onclick = function(e) {
             e.stopImmediatePropagation();
             window.location = '#sidebarAddElement';
-            document.getElementById("addScriptSidebarButton").onclick = function(e){
-                e.preventDefault();
-                elementsData.push({
-                    "id": document.getElementById("inputID").value,
-                    "name": document.getElementById("inputName").value,
-                    "data":"",
-                    "editable":true
-                });
-                //Clean Input
-                document.getElementById("inputName").value = "";
-                document.getElementById("inputID").value = "";
-                //Save
-                this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
-                this.refreshElements();
-
-                this.currentElement = elementsData.length-1;
-
-                if (typeof this.addElementEnded === "function") {
-                    this.addElementEnded(elementsData[elementsData.length]);
-                }
-                window.location = "#close";
-            }.bind(this);
             document.getElementById("inputName").focus();
         }.bind(this);
+        
+        document.getElementById("addScriptSidebarButton").onclick = function(e){
+            e.preventDefault();
+            elementsData.push({
+                "id": document.getElementById("inputID").value,
+                "name": document.getElementById("inputName").value,
+                "data":"",
+                "editable":true
+            });
+            //Clean Input
+            document.getElementById("inputName").value = "";
+            document.getElementById("inputID").value = "";
+            //Save
+            this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
+            this.refreshElements();
 
+            this.currentElement = elementsData.length-1;
+
+            if (typeof this.addElementEnded === "function") {
+                this.addElementEnded(elementsData[elementsData.length]);
+            }
+            window.location = "#close";
+        }.bind(this);
+        
         li.appendChild(div);
         menuNode.appendChild(li);
     };
