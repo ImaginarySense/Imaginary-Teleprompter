@@ -456,14 +456,8 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     }
 */
     // Solve for time to reach end.
-    function getRemainingTime(destination) {
-        if ( destination===undefined )
-            destination = getDestination();
-        var paddingDifference = 0,
-            time = Math.abs(1000*(destination-getCurrPos())/(velocity*unit));
-        if ( isNaN(time) )
-            time = 0;
-        return time;
+    function getRemainingTime( destination, currPos ) {
+        return (velocity ? Math.abs(1000*(destination-currPos)/(velocity*unit)) : 0 );
     }
 
     function getScreenHeight() {
@@ -501,23 +495,20 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
             return prompt.getBoundingClientRect().top;
     }
 
-    function setCurrPosStill( theCurrPos, obj ) {
-        if (obj===undefined)
-            obj = prompt;
+    function setCurrPosStill( theCurrPos ) {
         if (theCurrPos===undefined)
             theCurrPos = getCurrPos();
+        prompt.style.transform = 'translateY('+theCurrPos+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+')';
         // If animation is running...
-        //prompt.style.top = theCurrPos+'px';
-        obj.style.transform = 'translateY('+theCurrPos+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+')';
         if (prompt.classList.contains("move")) {
             // Stop animation by removing move class.
-            obj.classList.remove("move");
+            prompt.classList.remove("move");
             // Delete animation rules before setting new ones.
             styleSheet.deleteRule(0);
         }
     }
 
-    function getDestination() {
+    function getDestination( currPos ) {
         // Set animation destination
         var whereTo;
         if (velocity>0) {
@@ -534,7 +525,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         }
         else
             // Destination equals current position in animation.
-            whereTo = getCurrPos();
+            whereTo = currPos;
         return whereTo;
     }
 
@@ -542,9 +533,9 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         // Resumes animation with new destination and time values.
         if (play) {
             // Get new style variables.
-            var destination = getDestination(),
-                time = getRemainingTime(destination);
-            
+            var currPos = getCurrPos(),
+                destination = getDestination(currPos),
+                time = getRemainingTime(destination, currPos);
             animate( time, destination );
         }
     }
@@ -566,12 +557,13 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
         // Resume animation by re adding the class.
         prompt.classList.add("move");
-        if (debug) setTimeout( function(){ console.log("Curr: "+getCurrPos()+"\nDest: "+destination+"\nRemTime "+time) && false; }, 0);
+        if (debug) setTimeout( function(){ console.log(/*"Curr: "+getCurrPos()+"\n*/"Dest: "+destination+"\nRemTime "+time) && false; }, 0);
     }
     //https://css-tricks.com/controlling-css-animations-transitions-javascript/
 
     function hack() {
-        return prompt.offsetTop;
+        return prompt.getBoundingClientRect().top;
+        // return prompt.offsetTop;
     }
 
     function focusVerticalDisplacementCorrector() {

@@ -826,7 +826,7 @@ var debug = false;
                 case "Escape":
                 restoreEditor();
                 window.location = "#close";
-                getElementById("prompt").focus();
+                document.getElementById("prompt").focus();
                 break;
                 // Electron Commands
                 /*
