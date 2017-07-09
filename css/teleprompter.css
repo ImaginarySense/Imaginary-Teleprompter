@@ -93,9 +93,6 @@ body {
 	position: relative;
 	padding: 100vh 0px 100vh 0px;
 	top: 0px;
-}
-
-#prompt {
 	will-change: transform;
 }
 
