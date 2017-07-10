@@ -61,6 +61,7 @@
 						<a class="external navbar-brand" href="http://imaginary.tech/teleprompter" target="_blank"><img src="img/logo.png" alt="Teleprompter" ></a>
 					</div>
 					<ul class="nav navbar-nav navbar-right">
+						<li><a id="advConfig" href="#content" style="font-size: 1.8em;" data-toggle="collapse">&#9881;</a></li>
 						<li><a id="updateIt" class="hidden" href=" ">Update</a></li>
 						<li><a id="promptIt" href=" ">Prompt It!</a></li>
 					</ul>
@@ -68,7 +69,7 @@
 			</div>
 		</header>
 		<!-- Controls -->
-		<div class="bs-docs-header" id="content" tabindex="-1">
+		<div class="collapse bs-docs-header" id="content" tabindex="-1" >
 			<div class="container">
 				<div class='row'>
 					<div class='col-md-3 col-sm-6'>
@@ -347,7 +348,7 @@
 		<div style="width: 84%;">
 
 			<div class="panel panel-default">
-				<a href="#close" title="Close" class="close">X</a>
+				<a title="Close" class="close" onclick="closePromptStyles();">X</a>
 				<div class="panel-heading">
 					<h1>Custom Styles <small>Administration Panel</small></h1>
 				</div>
@@ -421,13 +422,13 @@
 	</div>
 </body>
 <script src="js/jquery.min.js"></script>
-<!-- <script src="js/bootstrap.min.js"></script> -->
+<script src="js/bootstrap.min.js"></script>
 <script src="js/bootstrap-slider.min.js"></script>
 <script src="js/data.manager.js"></script>
 <script src="js/sidebar.js"></script>
 <!--<script src="js/jquery.qrcode.js"></script>-->
-<script src="js/editor.js"></script>
 <script src="js/teleprompter-themes.js"></script>
+<script src="js/editor.js"></script>
 <script src="js/jscolor.min.js"></script>
 <script type="text/javascript">
 if (inElectron()){

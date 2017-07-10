@@ -882,11 +882,16 @@ var debug = false;
     };
 
     function closeModal() {
-        window.location = "#close";
+        if(window.location.hash.slice(1) == "openCustomStyles")
+            closePromptStyles();
+        else
+            window.location = "#close";
+
         document.getElementById("prompt").focus();
         var sideBar = document.querySelector("#wrapper");
         if (!sideBar.classList.contains("toggled"))
             sideBar.classList.toggle("toggled");
+
     }
 
     function isFunction(possibleFunction) {
