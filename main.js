@@ -107,8 +107,27 @@ let mainWindow = null,
 app.on('ready', () => { 
 	// Create the browser window.
 	mainWindow = new BrowserWindow({show: false, webPreferences: {webSecurity: false},width: 1280, height: 800, javascript: true, title: 'Teleprompter', useContentSize: true, nodeIntegration: true, icon: __dirname + '/icon.ico'});
-	// Disables menu in systems where it can be disabled.
-	Menu.setApplicationMenu(null);
+  	if (process.platform === 'darwin') {
+		// Create our menu entries so that we can use MAC shortcuts
+		Menu.setApplicationMenu(Menu.buildFromTemplate([
+			{
+				label: 'Edit',
+				submenu: [
+					{ role: 'undo' },
+					{ role: 'redo' },
+					{ type: 'separator' },
+					{ role: 'cut' },
+					{ role: 'copy' },
+					{ role: 'paste' }, 
+					{ role: 'delete' },
+					{ role: 'selectall' }
+				]
+		}
+		]));
+	} else {
+		// Disables menu in systems where it can be disabled and doesn't need it'.
+    	Menu.setApplicationMenu(null);
+	}
 
 	// and load the index.html of app.
 	mainWindow.loadURL('file://' + __dirname + '/index.html');

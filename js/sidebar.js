@@ -2,6 +2,11 @@
 var SIDEBAR = function() {
     this.instructionsLoaded = true;
 
+    this.closeModal =  function() {
+        window.location = "#close";
+        document.getElementById("prompt").focus();
+    }
+
     this.on = function(nameElement, config) {
         this.menu = nameElement;
         if (typeof config !== 'undefined' && config !== null) {
@@ -35,11 +40,11 @@ var SIDEBAR = function() {
 
     this.loadDialog = function(){
         //Close Dialog
-        document.getElementById("cancelSidebarButton").onclick = function(e){
+        document.getElementById("cancelSidebarButton2").onclick = function(e){
             e.preventDefault();
             window.location = '#close';
         };
-        document.getElementById("cancelSidebarButton2").onclick = function(e){
+        document.getElementById("cancelSidebarButton").onclick = function(e){
             e.preventDefault();
             window.location = '#close';
         };
@@ -251,6 +256,7 @@ var SIDEBAR = function() {
         var span = document.createElement("span");
         span.classList.add("glyphicon");
         span.classList.add("glyphicon-chevron-left");
+        span.setAttribute("tabindex","0");
         span.onclick = function(e) {
             e.stopImmediatePropagation();
             this.exitEditMode();
@@ -286,7 +292,7 @@ var SIDEBAR = function() {
     
     this.getElementIndexByID = function(id) {
     	var elementsData = this.getElements();
-    	for(var i = 0; i < elementsData.length; i++){
+    	for (var i=0; i<elementsData.length; i++) {
     		if(elementsData[i].id == id)
     			return i;
     	}
@@ -307,18 +313,19 @@ var SIDEBAR = function() {
             var li = document.createElement("li");
             var div = document.createElement("div");
             li.id = elementsData[i].id;
-
+        
             div.classList.add("list");
 
             var p = document.createElement("p");
             p.id = "textBlock";
             p.style.display = "inline";
             p.setAttribute("contentEditable", false);
+            p.setAttribute("tabindex","0");
 
             p.appendChild(document.createTextNode(elementsData[i].name));
             div.appendChild(p);
 
-            div.onclick = function(e) {
+            li.onclick = function(e) {
                 e.stopImmediatePropagation();
                 if (e.target.contentEditable == "false") {
                     this.currentElement = this.getElementIndexByID(e.target.parentNode.parentNode.id);
@@ -336,6 +343,7 @@ var SIDEBAR = function() {
                 span2.id = "deleteMode";
                 span2.classList.add("glyphicon");
                 span2.classList.add("glyphicon-minus");
+                span2.setAttribute("tabindex","0");
                 span2.onclick = function(e) {
                     e.stopImmediatePropagation();
                     this.deleteElement(e.target.parentNode.parentNode.id);
@@ -349,6 +357,7 @@ var SIDEBAR = function() {
 
                 var span = document.createElement("span");
                 span.id = "editMode";
+                span.setAttribute("tabindex","0");
                 span.classList.add("glyphicon");
                 span.classList.add("glyphicon-pencil");
                 span.onclick = function(e) {
@@ -394,13 +403,12 @@ var SIDEBAR = function() {
                             } else {
                                 return false;
                             }
-
-
                         } else if (e.keyCode == 8) {
                             if (e.target.innerHTML.length - 1 === 0) {
                                 e.target.innerHTML = "&nbsp;";
                             }
                         }
+
                         return true;
                     }.bind(this);
 
@@ -415,7 +423,7 @@ var SIDEBAR = function() {
         var li = document.createElement("li");
         var div = document.createElement("div");
         div.classList.add("addOption");
-
+        div.setAttribute("tabindex","0");
         var span2 = document.createElement("span");
         span2.id = "addMode";
         span2.classList.add("glyphicon");
@@ -455,7 +463,12 @@ var SIDEBAR = function() {
             if (typeof this.addElementEnded === "function") {
                 this.addElementEnded(elementsData[elementsData.length]);
             }
-            window.location = "#close";
+            this.closeModal();
+            window.setTimeout(function() {
+                var sideBar = document.querySelector("#wrapper");
+                if (!sideBar.classList.contains("toggled"))
+                    sideBar.classList.toggle("toggled");
+            }, 2000);
         }.bind(this);
         
         li.appendChild(div);
