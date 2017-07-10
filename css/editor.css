@@ -73,7 +73,7 @@ a#updateIt {
 	top: 0px;
 	bottom: 0px;
 	width: 100%;
-	min-height: 64vh;
+	min-height: 61vh;
 	height: calc(100% - 69px);	
 	/* Cancel 3D transform from intergalactic theme. */
 	transform: rotateX(0deg) translate3d(0px,0px,0px) !important;
@@ -174,7 +174,8 @@ a:active {
 	font-size:11px;
 	height:118px;
 	line-height:15px;
-	overflow:hidden;width:300px;
+	overflow:hidden;
+	width:300px;
 }
 .carbonad-img {
 	border:none;
@@ -245,6 +246,10 @@ a:active {
     padding: 15px;
 }
 
+#wrapper {
+	will-change: margin-right;
+}
+
 #wrapper.toggled #page-content-wrapper {
     position: absolute;
     margin-right: -250px;
@@ -283,17 +288,26 @@ a:active {
     color: #fff;
     background: rgba(255,255,255,0.2);
 }
+.sidebar-nav li div.list p:hover {
+    cursor: pointer;
+}
+.glyphicon.glyphicon-chevron-left,
+.glyphicon.glyphicon-pencil {
+    cursor: pointer;
+}
 
 .sidebar-nav li div.addOption:hover {
     text-decoration: none;
     color: #fff;
     background: rgba(255,255,255,0.2);
+    cursor: pointer;
 }
 
 .editableMode {
     text-decoration: none;
     color: #fff;
     background: rgba(255,255,255,0.2);
+    cursor: pointer;
 }
 
 .sidebar-nav li div.list:active,
@@ -338,6 +352,10 @@ a:active {
         position: relative;
         margin-right: 0;
     }
+}
+
+.slider.slider-horizontal {
+	width: 90%;
 }
 
 .disabled {

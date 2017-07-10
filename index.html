@@ -30,6 +30,7 @@
 	<link rel="stylesheet" href="css/reset.css">
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/docs.min.css">
+	<link rel="stylesheet" href="css/bootstrap-slider.min.css">
 	<link rel="stylesheet" href="css/editor.css">
 	<link rel="stylesheet" href="css/prompt.css">
 	<link rel="stylesheet" href="css/teleprompter-themes.css">
@@ -46,191 +47,6 @@
 				<!--<ul class="sidebar-nav" id="images">
 					<li class="sidebar-brand">Images</li>
 				</ul>-->
-		</div>
-	</div>
-		<div id="devWarning" class="modalDialog">
-			<div style="width: 50%;">
-				<div class="panel panel-default">
-					<a href="#close" title="Close" id="closeWarning" class="close">X</a>
-					<div class="panel-heading">
-						<h1>Warning <small>Teleprompter</small></h1>
-					</div>
-					<div class="panel-body">
-						<p class="text-center">You're about to use a development version of Teleprompter. This means you may find bugs, incomplete and experimental features. You may even suffer from data lost. By agreeing to these terms your previous data will migrate to this version and older versions won't be able to access it.</p>
-						<br>
-						<p class="text-center">Do you agree to these terms in order to use our development version?</p>
-					</div>
-					<div class="panel-footer">
-						<ul class="pager" style="margin:0;">
-							<li><button type="button" class="btn btn-success" id="agreeWarningButton">Agree</button></li>
-							<li><button type="button" class="btn btn-danger" id="cancelWarningButton">Cancel</button></li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div id="devNewestVersion" class="modalDialog">
-			<div style="width: 50%;">
-				<div class="panel panel-default">
-					<a href="#close" title="Close" class="close">X</a>
-					<div class="panel-heading">
-						<h1>Warning <small>Teleprompter</small></h1>
-					</div>
-					<div class="panel-body">
-						<p class="text-center">A newer version of the Teleprompter was already in use,<br> please use the lastest version instead of this one.</p>
-					</div>
-					<div class="panel-footer">
-						<ul class="pager" style="margin:0;">
-							<li><button type="button" class="btn btn-danger" id="cancelNewestButton">Exit App</button></li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div id="sidebarDeleteElement" class="modalDialog">
-			<div style="width: 50%;">
-				<div class="panel panel-default">
-					<a href="#close" title="Close" class="close">X</a>
-					<div class="panel-heading">
-						<h1>Delete <small>Teleprompter</small></h1>
-					</div>
-					<div class="panel-body">
-						<p class="text-center">Are you sure do you want to delete the script?</p>
-					</div>
-					<div class="panel-footer">
-						<ul class="pager" style="margin:0;">
-								<li><button type="button" class="btn btn-default" id="cancelSidebarButton">Cancel</button></li>
-								<li><button type="button" class="btn btn-danger" id="deleteSidebarButton">Delete</button></li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div id="sidebarAddElement" class="modalDialog">
-			<div style="width: 50%;">
-				<div class="panel panel-default">
-					<a href="#close" title="Close" class="close">X</a>
-					<div class="panel-heading">
-						<h1>Scripts <small>Teleprompter</small></h1>
-					</div>
-					<div class="panel-body">
-						<div class="row">
-							<div class="col-md-12">
-								<form class="form-horizontal">
-									<div class="form-group">
-										<label for="inputName" class="col-sm-2 control-label">Title</label>
-										<div class="col-sm-10">
-											<input type="text" class="form-control" id="inputName" placeholder="Title" pattern="/([ -z])+/g" required>
-										</div>
-									</div>
-									<div class="form-group hidden">
-										<label for="inputID" class="col-sm-2 control-label">ID</label>
-										<div class="col-sm-10">
-											<input type="text" class="form-control" id="inputID" placeholder="title" disabled>
-										</div>
-									</div>
-									<!-- Remove hidden class to use these debugging fields. -->
-									<div class="form-group hidden">
-										<div class="col-sm-offset-2 col-sm-10">
-											<div class="checkbox">
-												<label>
-													<input type="checkbox" checked> Deletable
-												</label>
-												<label>
-													<input type="checkbox" checked> Editable
-												</label>
-											</div>
-										</div>
-									</div>
-									<div class="panel-footer">
-										<ul class="pager" style="margin:0;">
-											<li><input type="submit" class="btn btn-default" id="addScriptSidebarButton" value="Add Script"></li>
-											<li><button class="btn btn-danger" id="cancelSidebarButton2">Cancel</button></li>
-										</ul>
-									</div>
-								</form>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<!-- ColorPicker modal dialog -->
-		<div id="openCustomStyles" class="modalDialog">
-			<div style="width: 84%;">
-
-				<div class="panel panel-default">
-					<a href="#close" title="Close" class="close">X</a>
-					<div class="panel-heading">
-						<h1>Custom Styles <small>Administration Panel</small></h1>
-					</div>
-					<div class="panel-body" style="padding-top: 0px;">
-						<div class="row" style="margin-top: -10px;">
-							<div class="col-md-3">
-								<h1><small>Styles</small></h1>
-								<div class="panel panel-default">
-									<table class="table table-bordered" id="stylesTable" >
-										<tbody>
-											<tr>
-												<th class="table-item"><span>No Styles</span></th>
-											</tr>
-										</tbody>
-									</table>
-								</div>
-							</div>
-							<div class="col-md-9">
-								<h1><small>Properties</small></h1>
-								<div class='row'>
-									<div class='col-md-4'>
-										<label>Body</label>
-										<input type="text" class="form-control jscolor" onchange="updateColorOnPreview(this)" id="bodyColor" value="" >
-									</div>
-									<div class='col-md-4'>
-										<label>Overlay</label>
-										<input type="text" class="form-control jscolor" onchange="updateColorOnPreview(this)" id="overlayColor" value="" >
-									</div>
-									<div class='col-md-4'>
-										<label>Text Color</label>
-										<input type="text" class="form-control jscolor" onchange="updateColorOnPreview(this)" id="textColor" value="" >
-									</div>
-								</div>
-								<h1><small>Preview</small></h1>
-								<div id="promptPreviewColor">
-									<!-- #overlay layers focus area on top of the prompt. -->
-									<table cellpadding="0" cellspacing="0" id="overlayPreview" >
-										<tbody>
-											<tr id="overlayTop" style = "background-color:#000;opacity:0.5;">
-												<td>Text</td>
-											</tr>
-											<tr id="overlayFocus" >
-												<td>Text</td>
-											</tr>
-											<tr id="overlayBottom" class="overlayBg" style = "background-color:#000;opacity:0.5;">
-												<td>Text</td>
-											</tr>
-										</tbody>
-									</table>
-								</div>
-							</br>
-							<div class='row'>
-								<div class='col-md-4'>
-									<div class="input-group">
-										<span class="input-group-addon" id="basic-addon1">Style Name</span>
-										<input type="text"  class="form-control" placeholder="name" aria-describedby="basic-addon1" id="nameStyle">
-									</div>
-								</div>
-								<div class='col-md-8'>
-									<button class="btn btn-default" id="editStyleButton" disabled>Update Style</button>
-									<button class="btn btn-default" id="addStyleButton" disabled>New Style</button>
-									<button class="btn btn-default" id="removeStyleButton" disabled>Delete Style</button>
-									<button class="btn btn-default" id="defaultStyleButton">Set As Default</button>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-			</div>
 		</div>
 	</div>
 	<form>
@@ -257,7 +73,7 @@
 				<div class='row'>
 					<div class='col-md-3 col-sm-6'>
 						<!--<label for="basic-url">Flip mode</label>-->
-						<label for="basic-url">In-frame prompter</label>
+						<label for="primary">In-frame prompter</label>
 						<select class="form-control" id="primary" name="primary">
 							<option value="0" title="Don't prompt on this window">Disabled (Don't prompt on this window)</option>
 							<option value="1" title="Normal screen" selected="selected">No Flip (Normal screen)</option>
@@ -267,7 +83,7 @@
 						</select>
 					</div>
 					<div class='col-md-3 col-sm-6'>
-						<label for="basic-url">External prompter</label>
+						<label for="secondary">External prompter</label>
 						<select class="form-control" id="secondary" name="secondary">
 							<option value="0" title="Don't prompt to a second window" selected="selected">Disabled (Don't prompt to a second window)</option>
 							<option value="1" title="Normal screen">No Flip (Normal screen)</option>
@@ -277,7 +93,7 @@
 						</select>
 					</div>
 					<div class='col-md-3 col-sm-6'>
-						<label for="basic-url">Prompter style</label>
+						<label for="prompterStyle">Prompter style</label>
 						<select class="form-control" id="prompterStyle" name="prompterStyle">
 							<option value="0" selected="selected">Blackboard</option>
 							<option value="1">Whiteboard</option>
@@ -286,13 +102,50 @@
 						</select>
 					</div>
 					<div class='col-md-3 col-sm-6'>
-						<label for="basic-url">Focus area</label>
+						<label for="focus">Focus area</label>
 						<select class="form-control" id="focus" name="focus">
 							<option value="3" title="You can interact with prompter elements, such as hyperlinks and videos, by disabling focus area.">None</option>
 							<option value="1">Top (Webcam mode)</option>
 							<option value="0" selected="selected">Middle (Professional prompter)</option>
 							<option value="2">Bottom (Screen over camera)</option>
 						</select>
+					</div>
+				</div>
+			</div>
+			<div class="container /*hidden*/">
+				<div class='row'>
+					<div class='col-md-10 col-sm-10'>
+						<div class='col-md-4 col-sm-4'>
+							<small>
+								<label for="speed">Speed:</label>
+								<label for="speed" id="speedValue">13</label>
+							</small>
+							<input type="range" id="speed" name="speed" data-slider-value="13" data-slider-step="1" data-slider-min="2" data-slider-max="25">
+						</div>
+						<div class='col-md-4 col-sm-4'>
+							<small>
+								<label for="acceleration">Acceleration curve:</label>
+								<label for="acceleration" id="accelerationValue">1.2</label>
+							</small>
+							<input type="range" id="acceleration" name="acceleration" data-slider-value="1.2" data-slider-min="0.4" data-slider-max="2.0" data-slider-step="0.1">
+						</div>
+						<div class='col-md-4 col-sm-4'>
+							<small>
+								<label for="fontSize">Font scale:</label>
+								<label for="fontSize" id="fontSizeValue">100</label><label for="fontSize">%</label>
+							</small>
+							<input type="range" id="fontSize" name="fontSize" data-slider-value="100" data-slider-min="70" data-slider-max="300" data-slider-step="10">
+						</div>
+					</div>
+					<div class='col-md-2 col-sm-2'>
+						<small>
+							<label for="timer">Timer</label>
+						</small><br>
+						<div id="timer" class="btn-group btn-toggle"> 
+						    <button class="btn btn-default">On</button>
+						    <button class="btn btn-primary active">Off</button>
+						</div>
+						<!-- <input type="checkbox" id="timer"> -->
 					</div>
 				</div>
 			</div>
@@ -382,13 +235,200 @@
 		<iframe id="teleprompterframe" src="blank.html" class="fullsize"></iframe><!--   -->
 		<canvas id="telepromptercanvas" width="800" height="600" class="fullsize"></canvas>
 	</div>
+	<div id="devWarning" class="modalDialog">
+		<div style="width: 50%;">
+			<div class="panel panel-default">
+				<a href="#close" title="Close" id="closeWarning" class="close">X</a>
+				<div class="panel-heading">
+					<h1>Warning <small>Teleprompter</small></h1>
+				</div>
+				<div class="panel-body">
+					<p class="text-center">You're about to use a development version of Teleprompter. This means you may find bugs, incomplete and experimental features. You may even suffer from data lost. By agreeing to these terms your previous data will migrate to this version and older versions won't be able to access it.</p>
+					<br>
+					<p class="text-center">Do you agree to these terms in order to use our development version?</p>
+				</div>
+				<div class="panel-footer">
+					<ul class="pager" style="margin:0;">
+						<li><button type="button" class="btn btn-success" id="agreeWarningButton">Agree</button></li>
+						<li><button type="button" class="btn btn-danger" id="cancelWarningButton">Cancel</button></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="devNewestVersion" class="modalDialog">
+		<div style="width: 50%;">
+			<div class="panel panel-default">
+				<a href="#close" title="Close" class="close">X</a>
+				<div class="panel-heading">
+					<h1>Warning <small>Teleprompter</small></h1>
+				</div>
+				<div class="panel-body">
+					<p class="text-center">A newer version of the Teleprompter was already in use,<br> please use the lastest version instead of this one.</p>
+				</div>
+				<div class="panel-footer">
+					<ul class="pager" style="margin:0;">
+						<li><button type="button" class="btn btn-danger" id="cancelNewestButton">Exit App</button></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="sidebarDeleteElement" class="modalDialog">
+		<div style="width: 50%;">
+			<div class="panel panel-default">
+				<a href="#close" title="Close" class="close">X</a>
+				<div class="panel-heading">
+					<h1>Delete <small>Teleprompter</small></h1>
+				</div>
+				<div class="panel-body">
+					<p class="text-center">Are you sure do you want to delete the script?</p>
+				</div>
+				<div class="panel-footer">
+					<ul class="pager" style="margin:0;">
+							<li><button type="button" class="btn btn-default" id="cancelSidebarButton">Cancel</button></li>
+							<li><button type="button" class="btn btn-danger" id="deleteSidebarButton">Delete</button></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="sidebarAddElement" class="modalDialog">
+		<div style="width: 50%;">
+			<div class="panel panel-default">
+				<a href="#close" title="Close" class="close">X</a>
+				<div class="panel-heading">
+					<h1>Scripts <small>Teleprompter</small></h1>
+				</div>
+				<div class="panel-body">
+					<div class="row">
+						<div class="col-md-12">
+							<form class="form-horizontal">
+								<div class="form-group">
+									<label for="inputName" class="col-sm-2 control-label">Title</label>
+									<div class="col-sm-10">
+										<input type="text" class="form-control" id="inputName" placeholder="Title" pattern="/([ -z])+/g" required>
+									</div>
+								</div>
+								<div class="form-group hidden">
+									<label for="inputID" class="col-sm-2 control-label">ID</label>
+									<div class="col-sm-10">
+										<input type="text" class="form-control" id="inputID" placeholder="title" disabled>
+									</div>
+								</div>
+								<!-- Remove hidden class to use these debugging fields. -->
+								<div class="form-group hidden">
+									<div class="col-sm-offset-2 col-sm-10">
+										<div class="checkbox">
+											<label>
+												<input type="checkbox" checked> Deletable
+											</label>
+											<label>
+												<input type="checkbox" checked> Editable
+											</label>
+										</div>
+									</div>
+								</div>
+								<div class="panel-footer">
+									<ul class="pager" style="margin:0;">
+										<li><input type="submit" class="btn btn-default" id="addScriptSidebarButton" value="Add Script"></li>
+										<li><button class="btn btn-danger" id="cancelSidebarButton2">Cancel</button></li>
+									</ul>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- ColorPicker modal dialog -->
+	<div id="openCustomStyles" class="modalDialog">
+		<div style="width: 84%;">
+
+			<div class="panel panel-default">
+				<a href="#close" title="Close" class="close">X</a>
+				<div class="panel-heading">
+					<h1>Custom Styles <small>Administration Panel</small></h1>
+				</div>
+				<div class="panel-body" style="padding-top: 0px;">
+					<div class="row" style="margin-top: -10px;">
+						<div class="col-md-3">
+							<h1><small>Styles</small></h1>
+							<div class="panel panel-default">
+								<table class="table table-bordered" id="stylesTable" >
+									<tbody>
+										<tr>
+											<th class="table-item"><span>No Styles</span></th>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="col-md-9">
+							<h1><small>Properties</small></h1>
+							<div class='row'>
+								<div class='col-md-4'>
+									<label>Body</label>
+									<input type="text" class="form-control jscolor" onchange="updateColorOnPreview(this)" id="bodyColor" value="" >
+								</div>
+								<div class='col-md-4'>
+									<label>Overlay</label>
+									<input type="text" class="form-control jscolor" onchange="updateColorOnPreview(this)" id="overlayColor" value="" >
+								</div>
+								<div class='col-md-4'>
+									<label>Text Color</label>
+									<input type="text" class="form-control jscolor" onchange="updateColorOnPreview(this)" id="textColor" value="" >
+								</div>
+							</div>
+							<h1><small>Preview</small></h1>
+							<div id="promptPreviewColor">
+								<!-- #overlay layers focus area on top of the prompt. -->
+								<table cellpadding="0" cellspacing="0" id="overlayPreview" >
+									<tbody>
+										<tr id="overlayTop" style = "background-color:#000;opacity:0.5;">
+											<td>Text</td>
+										</tr>
+										<tr id="overlayFocus" >
+											<td>Text</td>
+										</tr>
+										<tr id="overlayBottom" class="overlayBg" style = "background-color:#000;opacity:0.5;">
+											<td>Text</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							</br>
+							<div class='row'>
+								<div class='col-md-4'>
+									<div class="input-group">
+										<span class="input-group-addon" id="basic-addon1">Style Name</span>
+										<input type="text"  class="form-control" placeholder="name" aria-describedby="basic-addon1" id="nameStyle">
+									</div>
+								</div>
+								<div class='col-md-8'>
+									<button class="btn btn-default" id="editStyleButton" disabled>Update Style</button>
+									<button class="btn btn-default" id="addStyleButton" disabled>New Style</button>
+									<button class="btn btn-default" id="removeStyleButton" disabled>Delete Style</button>
+									<button class="btn btn-default" id="defaultStyleButton">Set As Default</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
-<script type="text/javascript" src="js/data.manager.js"></script>
-<script type="text/javascript" src="js/sidebar.js"></script>
+<script src="js/jquery.min.js"></script>
+<!-- <script src="js/bootstrap.min.js"></script> -->
+<script src="js/bootstrap-slider.min.js"></script>
+<script src="js/data.manager.js"></script>
+<script src="js/sidebar.js"></script>
 <!--<script src="js/jquery.qrcode.js"></script>-->
-<script type="text/javascript" src="js/editor.js"></script>
-<script type="text/javascript" src="js/teleprompter-themes.js"></script>
-<script type="text/javascript" src="js/jscolor.min.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/teleprompter-themes.js"></script>
+<script src="js/jscolor.min.js"></script>
 <script type="text/javascript">
 if (inElectron()){
 	var {ipcMain} = require('electron');

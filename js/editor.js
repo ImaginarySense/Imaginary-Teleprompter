@@ -26,6 +26,9 @@ var debug = false;
         var {ipcRenderer} = require('electron'),
         remote = require('electron').remote, // Allows IPC with main process in Electron.
         elecScreen = require('electron').screen; // Allows Smart Fullscreens in Electron.
+        window.jQuery = require('./js/jquery.min.js');
+        window.$ = window.jQuery;
+        window.Slider = require('./js/bootstrap-slider.min.js');
     }
     
     // Global objects
@@ -84,6 +87,23 @@ var debug = false;
         //setStyle(document.getElementById("prompterStyle").value);
         // Set initial configuration to prompter style
         styleInit(document.getElementById("prompterStyle"));
+        var slider = [
+            new Slider("#speed", {}),
+            new Slider("#acceleration", {}),
+            new Slider("#fontSize", {})
+        ];
+        // Data binding for advanced options
+        slider[0].on("change", function(input) {
+            document.getElementById("speedValue").textContent = input.newValue;
+        });
+        slider[1].on("change", function(input) {
+            document.getElementById("accelerationValue").textContent = input.newValue;
+        });
+        slider[2].on("change", function(input) {
+            document.getElementById("fontSizeValue").textContent = input.newValue;
+        });
+        // Set credits button
+        document.getElementById("credits-link").onclick = credits;
         // Set domain to current domain.
         setDomain();
 
@@ -106,7 +126,7 @@ var debug = false;
                         agreeButton.onclick = function(e) {
                             applyMigration(item);
                             dataManager.setItem("IFTeleprompterVersion",currentVersion);
-                            window.location = "#close";
+                            closeModal();
                         };
                         document.getElementById("cancelWarningButton").onclick = closeWindow;
                         document.getElementById("closeWarning").onclick = closeWindow;
@@ -118,7 +138,7 @@ var debug = false;
 
                         //make sure all modal closes after reload the page
                         //place this here to avoid problems with the warning and the newest modal
-                        window.location = "#close";  
+                        closeModal();
                     }
                     
                 } else if(compare(item, currentVersion) == 1) {
@@ -670,7 +690,7 @@ var debug = false;
             if (message.request === command.restoreEditor)
                 restoreEditor();
             else {
-                if (!(instance[0] && instance[1])&&inElectron()) {
+                if (!(instance[0] && instance[1])) {
                     // If this isn't a instant sync command, follow normal procedure.
                     if (!(message.request === command.iSync || message.request === command.sync)) {
                         // Tic toc mechanism symmetricaly distributes message request lag.
@@ -825,8 +845,7 @@ var debug = false;
                 case 27: // ESC
                 case "Escape":
                 restoreEditor();
-                window.location = "#close";
-                document.getElementById("prompt").focus();
+                closeModal();
                 break;
                 // Electron Commands
                 /*
@@ -861,6 +880,14 @@ var debug = false;
             }
         }
     };
+
+    function closeModal() {
+        window.location = "#close";
+        document.getElementById("prompt").focus();
+        var sideBar = document.querySelector("#wrapper");
+        if (!sideBar.classList.contains("toggled"))
+            sideBar.classList.toggle("toggled");
+    }
 
     function isFunction(possibleFunction) {
         return typeof(possibleFunction) === typeof(Function)
@@ -1177,6 +1204,30 @@ var debug = false;
     else
         // Set init as a listener for the DOMContentLoaded event.
         document.addEventListener("DOMContentLoaded", init);
+
+    // Toogle control
+    $('.btn-toggle').click(function() {
+        $(this).find('.btn').toggleClass('active');  
+        
+        if ($(this).find('.btn-primary').length>0) {
+            $(this).find('.btn').toggleClass('btn-primary');
+        }
+        if ($(this).find('.btn-danger').length>0) {
+            $(this).find('.btn').toggleClass('btn-danger');
+        }
+        if ($(this).find('.btn-success').length>0) {
+            $(this).find('.btn').toggleClass('btn-success');
+        }
+        if ($(this).find('.btn-info').length>0) {
+            $(this).find('.btn').toggleClass('btn-info');
+        }
+        
+        $(this).find('.btn').toggleClass('btn-default');
+           
+    });
+    $('form').submit(function(){
+        return false;
+    });
 }());
 
 // Global functions, to be accessed from Electron's main process.
