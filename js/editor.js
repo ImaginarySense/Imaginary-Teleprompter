@@ -886,7 +886,6 @@ var debug = false;
             closePromptStyles();
         else
             window.location = "#close";
-
         document.getElementById("prompt").focus();
         var sideBar = document.querySelector("#wrapper");
         if (!sideBar.classList.contains("toggled"))
