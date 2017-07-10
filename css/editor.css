@@ -73,7 +73,7 @@ a#updateIt {
 	top: 0px;
 	bottom: 0px;
 	width: 100%;
-	min-height: 61vh;
+	min-height: 78vh;
 	height: calc(100% - 69px);	
 	/* Cancel 3D transform from intergalactic theme. */
 	transform: rotateX(0deg) translate3d(0px,0px,0px) !important;
