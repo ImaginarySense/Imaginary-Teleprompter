@@ -136,7 +136,7 @@ footer #imaginary {
 	text-align: center;
 	text-shadow: 0 1px 0 rgba(0,0,0,.1);
 	background-color: #6f5499;
-	background-image: url("images/overlay.png"), linear-gradient(45deg, #4A4771 0%, #7C3875 100%);
+	background-image: linear-gradient(45deg, #4A4771 0%, #7C3875 100%);
 	/*background-image: linear-gradient(to bottom,#563d7c 0,#6f5499 100%);*/
 	background-repeat: repeat-x;
 	color: #CCF;
@@ -370,4 +370,8 @@ a:active {
 
 .hidden {
 	display: none;
+}
+
+.slider-handle {
+	cursor: pointer;
 }

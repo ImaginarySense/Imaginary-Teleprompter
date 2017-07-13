@@ -38,7 +38,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         remote = require('electron').remote; // Allow IPC with main process in Electron.
     }
     // Global objects
-    var settings, session, prompt, pointer, flipArea, overlay, overlayFocus, styleElement, styleSheet, editor, timer, remote;
+    var settings, session, prompt, pointer, overlay, overlayFocus, styleSheet, editor, timer, clock, remote;
     // Global variables
     var unit, x, velocity, sensitivity, speedMultip, relativeLimit, steps, play, timeoutStatus, invertedWheel, focus, promptStyleOption, customStyle, flipV, flipH, fontSize, previousPromptHeight, previousScreenHeight, previousScreenWidth, previousVerticalDisplacementCorrector, domain, debug, closing, cap, syncDelay, isMobileApp;
 
@@ -69,9 +69,9 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         limit = 2600;
     
     function initCSS() {
-        // Create style element.
-        styleElement = document.createElement('style');
-        // Append style element to head.
+        // Create style elements.
+        var styleElement = document.createElement('style');
+        // Append style elements to head.
         document.head.appendChild(styleElement);
         // Grab element's style sheet.
         styleSheet = styleElement.sheet;
@@ -82,17 +82,12 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         var flip;
 
         // Initialize objects
-        prompt = document.querySelector(".prompt");
-        flipArea = document.querySelector("#flipArea");
-        overlay = document.querySelector("#overlay");
-        overlayFocus = document.querySelector("#overlayFocus");
+        prompt = document.getElementsByClassName("prompt")[0];
+        overlay = document.getElementById("overlay");
+        overlayFocus = document.getElementById("overlayFocus");
+        clock = document.getElementsByClassName("clock")[0];
+
         pointer = {};
-
-        timer = $('.clock').timer({ stopVal: 10000 });
-        timer.resetTimer();
-
-        // Initialize CSS
-        initCSS();
 
         // Initialize variables
         // HTTP GET debug option...
@@ -113,11 +108,6 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         syncDelay = 12;
         isMobileApp = false;
         
-        // Animation settings
-        play = true;
-        sensitivity = 1.2;
-        speedMultip = 13;
-
         // Local Storage and Session data
         updateDatamanager();
 
@@ -126,6 +116,9 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         
         // Initialize domain for interprocess communication
         setDomain();
+
+        // Initialize CSS
+        initCSS();
 
         // Locate and set editor
         console.log("Editor window:");
@@ -143,6 +136,15 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
             }
         }
         resetSteps();
+        // Animation settings
+        play = true;
+        speedMultip = settings.data.speed;
+        sensitivity = settings.data.acceleration;
+        // Enable timer
+        if (settings.data.timer){
+            timer = $('.clock').timer({ stopVal: 10000 });
+            timer.resetTimer();
+        }
         // Get focus mode
         focus = settings.data.focusMode;
         // Get and set prompter text
@@ -158,6 +160,8 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
             case 2:
                 document.querySelector("#overlayBottom").classList.add("disable");
                 break;
+            case 4:
+                document.querySelector("#touchOverlay").classList.add("hide");
             case 3:
                 document.querySelector("#overlay").classList.add("hide");
                 break;
@@ -171,8 +175,6 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         
         // Wheel settings
         invertedWheel = false;//settings.data.invertedWheel;
-        // Font Size
-        fontSize = 100;
 
         // Initialize flip values
         flipH = false;
@@ -195,6 +197,10 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         styleInit();
         setStyle( promptStyleOption );
 
+        // Font Size
+        fontSize = settings.data.fontSize/100;
+        updateFont();
+
         // Save current screen position related settings for when resize and screen rotation ocurrs.
         previousPromptHeight = getPromptHeight();
         previousScreenHeight = getScreenHeight();
@@ -203,10 +209,11 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
         // Add pointer controls
         // Stop animation while pressing on the screen, resume on letting go.
-        overlay.addEventListener( "pointerdown", pointerActive );
-        overlay.addEventListener( "pointerup", pointerInactive );
-        overlay.addEventListener( "pointerleave", pointerInactive );
-        overlay.addEventListener( "pointermove", pointerMove );
+        var touchOverlay = document.getElementById("touchOverlay");
+        touchOverlay.addEventListener( "pointerdown", pointerActive );
+        touchOverlay.addEventListener( "pointerup", pointerInactive );
+        touchOverlay.addEventListener( "pointerleave", pointerInactive );
+        touchOverlay.addEventListener( "pointermove", pointerMove );
 
         // Wait a moment to prevent possible asynchronic CSS issues.
         window.setTimeout( function() {
@@ -217,8 +224,9 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
             // Sync prompter positions to smallest at start.
             syncPrompters();
 
-            // Begin animation
-            internalIncreaseVelocity();
+            // Begin animation at i speed.
+            for (var i=0; i<4; i++)
+                internalIncreaseVelocity();
 
             //Init Remote Controllers
             if (isMobileApp)
@@ -373,18 +381,15 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         //dev@javi: Add support for real-time flipping.
         // Both flips
         if (flipH&&flipV) {
-            //prompt.classList.add("flipHV");
-            flipArea.classList.add("flipHV"); // Uncomment if overlay isn't symetric.
+            prompt.classList.add("flipHV");
         }
         // Vertical flip
         else if (flipV) {
-            //prompt.classList.add("flipV"); // Not necesary if using css transform based animations.
-            flipArea.classList.add("flipV");
+            prompt.classList.add("flipV");
         }
         // Horizontal flip
         else if (flipH) {
-            //prompt.classList.add("flipH"); // Not necesary if using css transform based animations.
-            flipArea.classList.add("flipH"); // Uncomment if overlay isn't symetric.
+            prompt.classList.add("flipH");
         }
     }
 
@@ -433,12 +438,16 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         x=0;
         updateVelocity();
         updateAnimation();
-        timer.stopTimer();
+        if (timer!==undefined)
+            timer.stopTimer();
     }
 
     document.addEventListener( 'transitionend', function() {
-        if(atStart()||atEnd())
+        if(atStart()||atEnd()) {
             stopAll();
+            if (timer!==undefined)
+                timer.resetTimer();
+        }
         if (debug) console.log("Reached end") && false;
     }, false);
 
@@ -699,13 +708,14 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         });
     }
 
-    window.addEventListener("resize", function() {
+    function onResize() {
         if (debug) console.log("Resize") && false;
         // In case of resolution change, update density unit.
         updateUnit();
         // You can guess what the next line does.
-        correctVerticalDisplacement();
-    }, false);
+        correctVerticalDisplacement();        
+    }
+    window.addEventListener("resize", onResize, false);
 
     window.addEventListener("orientationchange", function() {
         //http://stackoverflow.com/questions/5284878/how-do-i-correctly-detect-orientation-change-using-javascript-and-phonegap-in-io
@@ -715,6 +725,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     }, false);
 
     window.addEventListener("wheel", function(event) {
+        if (debug) console.log(event);
         if (invertedWheel) {
             if (event.deltaY>0)
                 increaseVelocity();
@@ -734,18 +745,23 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
     // FONT SIZE
     function increaseFontSize() {
-        fontSize++;
+        if (debug) console.log("Increasing font size.");
+        if (fontSize<2.5)
+            fontSize+=0.05;
         updateFont();
     }
 
     function decreaseFontSize() {
-        fontSize--;
+        if (debug) console.log("Decreasing font size.");
+        if (fontSize>0.5)
+        fontSize-=0.05;
         updateFont();
     }
 
     function updateFont() {
-        //dev: ToDo
-        //prompt.classList.add();
+        prompt.style.fontSize = fontSize+'em' ;
+        overlayFocus.style.fontSize = fontSize+'em' ;
+        onResize();
     }
 
     function decreaseVelocity() {
@@ -822,16 +838,20 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
     function localPauseAnimation() {
         animate(0, getCurrPos());
-        timer.stopTimer();
+        if (timer!==undefined)
+            timer.stopTimer();
     }
 
     function localPlayAnimation() {
         updateAnimation();
-        timer.startTimer();
+        if (timer!==undefined) {
+            timer.startTimer();
+        }
     }
 
     function resetTimer() {
-        timer.resetTimer();
+        if (timer!==undefined)
+            timer.resetTimer();
         playAnimation();
         if (debug) console.log("Timer reset.");
     }
