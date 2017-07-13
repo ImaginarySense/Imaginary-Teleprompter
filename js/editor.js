@@ -32,7 +32,7 @@ var debug = false;
     }
     
     // Global objects
-    var promptIt, updateIt, prompterWindow, frame, currentScript, canvas, canvasContext,
+    var promptIt, updateIt, prompterWindow, frame, currentScript, canvas, canvasContext, slider,
         syncMethods = {"instance":0, "canvas":1, "follow":2};
 
     // Global variables
@@ -87,20 +87,21 @@ var debug = false;
         //setStyle(document.getElementById("prompterStyle").value);
         // Set initial configuration to prompter style
         styleInit(document.getElementById("prompterStyle"));
-        var slider = [
+        slider = [
             new Slider("#speed", {}),
             new Slider("#acceleration", {}),
             new Slider("#fontSize", {})
         ];
         // Data binding for advanced options
         slider[0].on("change", function(input) {
-            document.getElementById("speedValue").textContent = input.newValue;
+            document.getElementById("speedValue").textContent = parseFloat(Math.round(input.newValue * 10) / 10).toFixed(1);
         });
         slider[1].on("change", function(input) {
-            document.getElementById("accelerationValue").textContent = input.newValue;
+            document.getElementById("accelerationValue").textContent = parseFloat(Math.round(input.newValue * 100) / 100).toFixed(2);
         });
         slider[2].on("change", function(input) {
             document.getElementById("fontSizeValue").textContent = input.newValue;
+            updateFont(input.newValue);
         });
         // Set credits button
         document.getElementById("credits-link").onclick = credits;
@@ -230,6 +231,7 @@ var debug = false;
         // Initialize file management features.
         initScripts();
         //initImages();
+        loadLastUseSettings();
     } // end init()
 
     function closeWindow() {
@@ -470,8 +472,8 @@ var debug = false;
         togglePromptIt();
 
         // Set data to send.
-        var settings = '{ "data": {"secondary":0,"primary":1,"prompterStyle":2,"focusMode":3,"background":"#3CC","color":"#333","overlayBg":"#333"}}',
-        session = '{ "html":"' + encodeURIComponent(htmldata) + '" }';
+        var settings = '{ "data": {"secondary":0,"primary":1,"prompterStyle":2,"focusMode":3,"background":"#3CC","color":"#333","overlayBg":"#333","speed":"13","acceleration":"1.2","fontSize":"100","timer":"false","voice":"false"}}',
+            session = '{ "html":"' + encodeURIComponent(htmldata) + '" }';
 
         // Store data locally for prompter to use
         dataManager.setItem("IFTeleprompterSettings", settings, 1);
@@ -497,11 +499,23 @@ var debug = false;
             htmldata = CKEDITOR.instances.prompt.getData()
         else if (typeof tinymce !== "undefined")
             htmldata = tinymce.get("prompt").getContent();
-        // Get remaining form data
-        var settings = '{ "data": {"secondary":' + document.getElementById("secondary").value + ',"primary":' + document.getElementById("primary").value + ',"prompterStyle":' + document.getElementById("prompterStyle").value + ',"background":"#3CC","color":"#333", "overlayBg":"#333","focusMode":' + document.getElementById("focus").value + '}}',
-        session = '{ "html":"' + encodeURIComponent(htmldata) + '" }',
-        // Declare secondaryDisplay in this scope.
-        secondaryDisplay = null;
+        // Get form values
+        var primary = document.getElementById("primary").value,
+            secondary = document.getElementById("secondary").value,
+            style = document.getElementById("prompterStyle").value,
+            focusArea = document.getElementById("focus").value,
+            speed = slider[0].getValue(),
+            acceleration = slider[1].getValue(),
+            fontSize = slider[2].getValue(),
+            voice = false,
+            timer;
+        if ( document.getElementById("timer").children[0].classList.contains("btn-primary") )
+            timer = true;
+        else
+            timer = false;
+        // Merge all settings into one.
+        var settings = '{ "data": {"primary":'+primary+',"secondary":'+secondary+',"prompterStyle":'+style+',"focusMode":'+focusArea+',"speed":'+speed+',"acceleration":'+acceleration+',"fontSize":'+fontSize+',"timer":'+timer+',"voice":'+voice+'}}',
+        session = '{ "html":"' + encodeURIComponent(htmldata) + '" }';
 
         // Store data locally for prompter to use
         dataManager.setItem("IFTeleprompterSettings", settings, 1);
@@ -669,6 +683,7 @@ var debug = false;
     function clearAllRequest() {
         if (confirm("You've pressed F6. Do you wish to perform a factory reset of Teleprompter? You will loose all saved scripts and custom styles.") ) {
             dataManager.clearAll();
+            window.removeEventListener("beforeunload", updatePrompterData);
             refresh();
         }
     }
@@ -786,7 +801,7 @@ var debug = false;
                 case 65: // A
                 listener({
                     data: {
-                        request: command.decVelocity
+                        request: command.decFont
                     }
                 });
                 break;
@@ -882,15 +897,57 @@ var debug = false;
     };
 
     function closeModal() {
-        if(window.location.hash.slice(1) == "openCustomStyles")
+        if (window.location.hash.slice(1) === "openCustomStyles")
             closePromptStyles();
+        else if (window.location.hash.slice(1) === "devWarning") {
+            var version = function(thisVersion) {
+                console.log(thisVersion);
+                if (thisVersion === currentVersion)
+                    window.location = "#close";
+                else
+                    window.close();
+            };
+            dataManager.getItem("IFTeleprompterVersion",version,1);
+        }
         else
             window.location = "#close";
         document.getElementById("prompt").focus();
         var sideBar = document.querySelector("#wrapper");
         if (!sideBar.classList.contains("toggled"))
             sideBar.classList.toggle("toggled");
+    }
 
+    window.addEventListener("beforeunload", updatePrompterData);
+
+    function updateFont(value) {
+        console.log("Updating font.");
+        document.getElementById("prompt").style.fontSize = "calc(5vw * "+(value/100+0.05)+")";
+    }
+
+    function loadLastUseSettings() {
+        // Get last used settings.
+        var settings = function ( lastSettings ) {
+            if (lastSettings!==undefined && lastSettings!==null) {
+                if (debug) console.log(lastSettings);
+                lastSettings = JSON.parse(lastSettings);
+                document.getElementById("primary").value = lastSettings.data.primary;
+                document.getElementById("secondary").value = lastSettings.data.secondary;
+                document.getElementById("prompterStyle").value = lastSettings.data.prompterStyle;
+                document.getElementById("focus").value = lastSettings.data.focusMode;
+                slider[0].setValue(lastSettings.data.speed);
+                slider[1].setValue(lastSettings.data.acceleration);
+                slider[2].setValue(lastSettings.data.fontSize);
+                document.getElementById("speedValue").textContent = parseFloat(Math.round(lastSettings.data.speed * 10) / 10).toFixed(1);
+                document.getElementById("accelerationValue").textContent = parseFloat(Math.round(lastSettings.data.acceleration * 100) / 100).toFixed(2);
+                document.getElementById("fontSizeValue").textContent = lastSettings.data.fontSize;
+                updateFont(lastSettings.data.fontSize);
+                // Set timer value
+                var timer = document.getElementById("timer")
+                // lastSettings.data.timer;
+                // document.getElementById("voice").value = lastSettings.data.voice;
+            }
+        };
+        dataManager.getItem("IFTeleprompterSettings", settings, 1);
     }
 
     function isFunction(possibleFunction) {
@@ -1139,7 +1196,7 @@ var debug = false;
             "dataKey":"IFTeleprompterSideBar",
             "preloadData":[{
                 "name": "Instructions",
-                "data": "\n\t<h3>Welcome to Teleprompter!</h3>\n\t<p>Are you ready to tell your story?</p>\n\t<br>\n\t<p>\"Teleprompter\" is a professional grade, multi-platform, free software teleprompter for anyone to use. Click on \"Prompt It!\" whenever you're ready and control the speed with the arrow keys.</p>\n\t<br>\n\t<h3>Here are some of our features:</h3>\n\t<ol>\n\t\t<li>Control the speed with the Arrow keys, WASD keys or the mouse wheel. You may pause at anytime with the 'spacebar'.</li>\n\t\t<li>Different focus areas allow you to easily use Teleprompter with a webcam, a tablet, or professional teleprompter equipment.</li>\n\t\t<li>Flip modes allow <em>mirroring</em> the prompter in every possible way.</li>\n\t\t<li>You can use one or two instances. Mirror one, monitor on the other one.</li>\n\t\t<li><a id=\"5\" name=\"5\">Set almost any key as an Anchor and instantly jump to any part of the script. Try pressing '5' now!</a></li>\n\t\t<li>The Rich Text Editor gives unlimited possibilities on what you can prompt.</li>\n\t\t<ul>\n\t\t\t<li>You can generate and display mathematical equations.<br>\n\t\t\t\t<table border=\"1\" cellpadding=\"1\" cellspacing=\"1\">\n\t\t\t\t\t<tbody>\n\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t<td>&nbsp;</td>\n\t\t\t\t\t\t\t<td><img alt=\"\\bg_white \\huge \\sum_{\\Theta+\\Pi }^{80} sin(\\Theta)\" src=\"http://latex.codecogs.com/gif.latex?%5Cdpi%7B300%7D%20%5Cbg_white%20%5Chuge%20%5Csum_%7B%5CTheta&amp;plus;%5CPi%20%7D%5E%7B80%7D%20sin%28%5CTheta%29\"></td>\n\t\t\t\t\t\t\t<td>&nbsp;</td>\n\t\t\t\t\t\t</tr>\n\t\t\t\t\t</tbody>\n\t\t\t\t</table>\n\t\t\t</li>\n\t\t\t<li>Insert images from the web or copy and paste them into the prompter.\n\t\t\t\t<img alt=\"Picture: Arecibo Sky\" src=\"img/arecibo-sky.jpg\">\n\t\t\t</li>\n\t\t</ul>\n\t\t<li>There are various Prompter Styles to choose from. You may also create your own.</li>\n\t\t<li>Text can be pasted from other word processors like Microsoft Word® or Libre Office Writer™.</li>\n\t\t<li>Animations are hardware accelerated for a smooth result.</li>\n\t\t<li>Press 'F11' to enter and leave fullscreen.</li>\n\t\t<li>All data is managed locally. No data is stored on our servers.</li>\n\t\t<li>An offline version can be downloaded for Windows, OS X, Linux and Chrome OS.</li>\n\t\t<li>Enjoy the ease of a smart fullscreen in the local version.</li>\n\t\t<li>Close prompts and return to the editor by pressing 'ESC'.</li>\n\t</ol>\n\t<hr>\n\t<h4>How to use anchor shortcuts:</h4>\n\t<ol>\n\t\t<li>Select a keyword or line you want to jump to on your text in the editor.</li>\n\t\t<li>Click on the <strong>Flag Icon</strong> on the editor's tool bar.</li>\n\t\t<li>A box named \"Anchor Properties\" should have appeared. Type any single key of your choice and click 'Ok'.<br>Note preassigned keys, such as WASD and Spacebar will be ignored.</li>\n\t\t<li>Repeat as many times as you wish.</li>\n\t\t<li>When prompting, press on the shortcut key to jump into the desired location.</li>\n\t</ol>\n\t<p>###</p>\n\t\t\t\t",
+                "data": "\n\t<h3>Welcome to Teleprompter!</h3>\n\t<p>Are you ready to tell a story?</p>\n\t<br>\n\t<p>\"Teleprompter\" is a professional grade, multi-platform, free software teleprompter for anyone to use. Click on \"Prompt It!\" whenever you're ready and control the speed with the arrow keys.</p>\n\t<br>\n\t<h3>Here are some of our features:</h3>\n\t<ol>\n\t\t<li>Control the speed with the Arrow keys, WASD keys or the mouse wheel. You may pause at anytime with the 'spacebar'.</li>\n\t\t<li>Different focus areas allow you to easily use Teleprompter with a webcam, a tablet, or professional teleprompter equipment.</li>\n\t\t<li>Flip modes allow <em>mirroring</em> the prompter in every possible way.</li>\n\t\t<li>You can use one or two instances. Mirror one, monitor on the other one.</li>\n\t\t<li><a id=\"5\" name=\"5\">Set almost any key as an Anchor and instantly jump to any part of the script. Try pressing '5' now!</a></li>\n\t\t<li>The Rich Text Editor gives unlimited possibilities on what you can prompt.</li>\n\t\t<ul>\n\t\t\t<li>You can generate and display mathematical equations.<br>\n\t\t\t\t<table border=\"1\" cellpadding=\"1\" cellspacing=\"1\">\n\t\t\t\t\t<tbody>\n\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t<td>&nbsp;</td>\n\t\t\t\t\t\t\t<td><img alt=\"\\bg_white \\huge \\sum_{\\Theta+\\Pi }^{80} sin(\\Theta)\" src=\"http://latex.codecogs.com/gif.latex?%5Cdpi%7B300%7D%20%5Cbg_white%20%5Chuge%20%5Csum_%7B%5CTheta&amp;plus;%5CPi%20%7D%5E%7B80%7D%20sin%28%5CTheta%29\"></td>\n\t\t\t\t\t\t\t<td>&nbsp;</td>\n\t\t\t\t\t\t</tr>\n\t\t\t\t\t</tbody>\n\t\t\t\t</table>\n\t\t\t</li>\n\t\t\t<li>Insert images from the web or copy and paste them into the prompter.\n\t\t\t\t<img alt=\"Picture: Arecibo Sky\" src=\"img/arecibo-sky.jpg\">\n\t\t\t</li>\n\t\t</ul>\n\t\t<li>There are various Prompter Styles to choose from. You may also create your own.</li>\n\t\t<li>Text can be pasted from other word processors like Microsoft Word® or Libre Office Writer™.</li>\n\t\t<li>Animations are hardware accelerated for a smooth result.</li>\n\t\t<li>Press 'F11' to enter and leave fullscreen.</li>\n\t\t<li>All data is managed locally. No data is stored on our servers.</li>\n\t\t<li>An offline version can be downloaded for Windows, OS X, Linux and Chrome OS.</li>\n\t\t<li>Enjoy the ease of a smart fullscreen in the local version.</li>\n\t\t<li>Close prompts and return to the editor by pressing 'ESC'.</li>\n\t</ol>\n\t<hr>\n\t<h4>How to use anchor shortcuts:</h4>\n\t<ol>\n\t\t<li>Select a keyword or line you want to jump to on your text in the editor.</li>\n\t\t<li>Click on the <strong>Flag Icon</strong> on the editor's tool bar.</li>\n\t\t<li>A box named \"Anchor Properties\" should have appeared. Type any single key of your choice and click 'Ok'.<br>Note preassigned keys, such as WASD and Spacebar will be ignored.</li>\n\t\t<li>Repeat as many times as you wish.</li>\n\t\t<li>When prompting, press on the shortcut key to jump into the desired location.</li>\n\t</ol>\n\t<p>###</p>\n\t\t\t\t",
                 "editable": false
             }],
 
@@ -1175,12 +1232,19 @@ var debug = false;
             else
                 document.getElementById("prompt").innerHTML = "";
 
-            editor.on('key', function() {
-                if (debug) console.log('Typing in editor.');
-                if (sid.instructionsAreLoaded()) {
+            editor.on('key', function(event) {
+                if (event.key === undefined)
+                    event.key = event.data.keyCode;
+                if (debug) console.log(event.key);
+                if (sid.instructionsAreLoaded() && -1===[1114129,1114121,5570578,1114337,4456466,2228240,91,225,27,112,113,114,115,116,117,118,119,120,121,122,123,45,20,33,34,35,36,37,38,39,40].indexOf(event.key)) {
                     window.location = '#sidebarAddElement';
                     document.getElementById("inputName").focus();
+                } else if (event.key===122 || event.key==="F11") {
+                    toggleFullscreen();
+                } else if (event.key===119 || event.key==="F8") {
+                    togglePrompter();
                 }
+                return true;
             });
 
             editor.on('focus', function() {
@@ -1237,7 +1301,11 @@ var debug = false;
 // Global functions, to be accessed from Electron's main process.
 function enterDebug() {
     debug = true;
-    console.log("Entering debug mode.");
+    console.log("Entering debug mode.");    function updateFont() {
+        prompt.style.fontSize = fontSize+'em' ;
+        overlayFocus.style.fontSize = fontSize+'em' ;
+        onResize();
+    }
 }
 function exitDebug() {
     debug = false;

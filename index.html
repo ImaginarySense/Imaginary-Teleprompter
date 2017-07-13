@@ -105,37 +105,38 @@
 					<div class='col-md-3 col-sm-6'>
 						<label for="focus">Focus area</label>
 						<select class="form-control" id="focus" name="focus">
-							<option value="3" title="You can interact with prompter elements, such as hyperlinks and videos, by disabling focus area.">None</option>
-							<option value="1">Top (Webcam mode)</option>
-							<option value="0" selected="selected">Middle (Professional prompter)</option>
-							<option value="2">Bottom (Screen over camera)</option>
+							<option value="3" title="No focus area for increased efficiency.">None</option>
+							<option value="1">Top Focus (for Webcams)</option>
+							<option value="0" selected="selected">Middle Focus (for Professional prompters)</option>
+							<option value="2">Bottom Focus (for Screens over cameras)</option>
+							<option value="4" title="Dissable touch to enable interaction with HTML contents.">Interactive mode (interact with HTML contents)</option>
 						</select>
 					</div>
 				</div>
 			</div>
-			<div class="container /*hidden*/">
+			<div class="container">
 				<div class='row'>
 					<div class='col-md-10 col-sm-10'>
 						<div class='col-md-4 col-sm-4'>
 							<small>
 								<label for="speed">Speed:</label>
-								<label for="speed" id="speedValue">13</label>
+								<label for="speed" id="speedValue">4.0</label>
 							</small>
-							<input type="range" id="speed" name="speed" data-slider-value="13" data-slider-step="1" data-slider-min="2" data-slider-max="25">
+							<input type="range" id="speed" name="speed" data-slider-value="4.0" data-slider-step="0.5" data-slider-min="1" data-slider-max="20" data-slider-ticks="[1,4,20]" data-slider-ticks-snap-bounds="0">
 						</div>
 						<div class='col-md-4 col-sm-4'>
 							<small>
 								<label for="acceleration">Acceleration curve:</label>
-								<label for="acceleration" id="accelerationValue">1.2</label>
+								<label for="acceleration" id="accelerationValue">1.45</label>
 							</small>
-							<input type="range" id="acceleration" name="acceleration" data-slider-value="1.2" data-slider-min="0.4" data-slider-max="2.0" data-slider-step="0.1">
+							<input type="range" id="acceleration" name="acceleration" data-slider-value="1.45" data-slider-min="0.5" data-slider-max="1.8" data-slider-step="0.05" data-slider-ticks="[0.5,1.45,1.8]" data-slider-ticks-snap-bounds="0">
 						</div>
 						<div class='col-md-4 col-sm-4'>
 							<small>
 								<label for="fontSize">Font scale:</label>
-								<label for="fontSize" id="fontSizeValue">100</label><label for="fontSize">%</label>
+								<label for="fontSize" id="fontSizeValue">120</label><label for="fontSize">%</label>
 							</small>
-							<input type="range" id="fontSize" name="fontSize" data-slider-value="100" data-slider-min="70" data-slider-max="300" data-slider-step="10">
+							<input type="range" id="fontSize" name="fontSize" data-slider-value="120" data-slider-min="50" data-slider-max="250" data-slider-step="5" data-slider-ticks="[50,120,250]" data-slider-ticks-snap-bounds="0">
 						</div>
 					</div>
 					<div class='col-md-2 col-sm-2'>
@@ -174,7 +175,7 @@
 			<div id="promptcontainer">
 				<div id="prompt" contenteditable="true">
 					<h3>Welcome to Teleprompter!</h3>
-					<p>Are you ready to tell your story?</p>
+					<p>Are you ready to tell a story?</p>
 					<br>
 					<p>"Teleprompter" is a professional grade, multi-platform, free software teleprompter for anyone to use. Click on "Prompt It!" whenever you're ready and control the speed with the arrow keys.</p>
 					<br>
