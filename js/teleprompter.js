@@ -138,44 +138,22 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         resetSteps();
         // Animation settings
         play = true;
-        speedMultip = settings.data.speed;
-        sensitivity = settings.data.acceleration;
-        // Enable timer
-        if (settings.data.timer){
-            timer = $('.clock').timer({ stopVal: 10000 });
-            timer.resetTimer();
-        }
         // Get focus mode
         focus = settings.data.focusMode;
+
+        timer = $('.clock').timer({ stopVal: 10000 });
         // Get and set prompter text
         updateContents();
+        
         // Get prompter style
         promptStyleOption = settings.data.prompterStyle;
         customStyle = { "background": settings.data.background, "color": settings.data.color, "overlayBg": settings.data.overlayBg };
-        // Set focus area according to settings.
-        switch (focus) {
-            case 1:
-                document.querySelector("#overlayTop").classList.add("disable");
-                break;
-            case 2:
-                document.querySelector("#overlayBottom").classList.add("disable");
-                break;
-            case 4:
-                document.querySelector("#touchOverlay").classList.add("hide");
-            case 3:
-                document.querySelector("#overlay").classList.add("hide");
-                break;
-        }
-
         // Get flip settings
         if (inIframe())
             flip = settings.data.primary;
         else
             flip = settings.data.secondary;
         
-        // Wheel settings
-        invertedWheel = false;//settings.data.invertedWheel;
-
         // Initialize flip values
         flipH = false;
         flipV = false;
@@ -192,14 +170,33 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                 flipV = true;
                 break;
         }
+        // Set focus area according to settings.
+        switch (focus) {
+            case 1:
+                if (flipV)
+                    document.querySelector("#overlayBottom").classList.add("disable");
+                else
+                    document.querySelector("#overlayTop").classList.add("disable");
+                break;
+            case 2:
+                if (flipV)
+                    document.querySelector("#overlayTop").classList.add("disable");
+                else
+                    document.querySelector("#overlayBottom").classList.add("disable");
+                break;
+            case 4:
+                document.querySelector("#touchOverlay").classList.add("hide");
+            case 3:
+                document.querySelector("#overlay").classList.add("hide");
+                break;
+        }
         // Set flip and styles to values from settings.
         setFlips();
         styleInit();
         setStyle( promptStyleOption );
 
-        // Font Size
-        fontSize = settings.data.fontSize/100;
-        updateFont();
+        // Wheel settings
+        invertedWheel = false;//settings.data.invertedWheel;
 
         // Save current screen position related settings for when resize and screen rotation ocurrs.
         previousPromptHeight = getPromptHeight();
@@ -250,11 +247,29 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     function updateContents() {
         if (debug) console.log("Updating prompter");
         updateDatamanager();
-        internalPauseAnimation();
-        //var currProgress = getProgress();
+        speedMultip = settings.data.speed;
+        sensitivity = settings.data.acceleration;
+        fontSize = settings.data.fontSize/100;
+        updateFont();
         prompt.innerHTML = decodeURIComponent(session.html);
-        //correctVerticalDisplacement( currProgress );
-        internalPlayAnimation();
+        updateVelocity();
+        updateAnimation();
+
+        // Enable timer
+        if (settings.data.timer) {
+            // console.log(timer.data().timer.currentVal!==0);
+            if (timer.data().timer.currentVal===0)
+            timer.startTimer();
+            clock.style.opacity = '1';
+        }
+        else { //if (timer!==undefined) {
+            clock.style.opacity = '0';
+            setTimeout(function() {
+                timer.resetTimer();
+                timer.stopTimer();
+                // timer.destroyTimer();
+            }, 800);
+        }
     }
 
     function pointerActive(event) {
@@ -482,7 +497,10 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     }
 
     function getFocusHeight() {
-        return overlayFocus.clientHeight;
+        if (overlayFocus!==undefined)
+            return overlayFocus.clientHeight;
+        else
+            return 0;
     }
     
     function getCurrPos(obj) {
@@ -744,14 +762,22 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     // CONTROL RELATED FUNCTIONS
 
     // FONT SIZE
+
     function increaseFontSize() {
+        editor.postMessage( {'request':11, 'data':getProgress()}, getDomain() );
+    }
+    function decreaseFontSize() {
+        editor.postMessage( {'request':12, 'data':getProgress()}, getDomain() );
+    }
+
+    function internalIncreaseFontSize() {
         if (debug) console.log("Increasing font size.");
         if (fontSize<2.5)
             fontSize+=0.05;
         updateFont();
     }
 
-    function decreaseFontSize() {
+    function internalDecreaseFontSize() {
         if (debug) console.log("Decreasing font size.");
         if (fontSize>0.5)
         fontSize-=0.05;
@@ -930,10 +956,10 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                     });
                     break;
                 case command.incFont :
-                    increaseFontSize();
+                    internalIncreaseFontSize();
                     break;
                 case command.decFont :
-                    decreaseFontSize();
+                    internalDecreaseFontSize();
                     break;
                 case command.update :
                     updateContents();

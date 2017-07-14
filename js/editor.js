@@ -705,7 +705,11 @@ var debug = false;
             if (message.request === command.restoreEditor)
                 restoreEditor();
             else {
-                if (!(instance[0] && instance[1])) {
+                if ( syncMethod===syncMethods.canvas && instance[0] && instance[1] && inElectron() ) {
+                    // IPC between main process directly.
+                    ipcRenderer.send('asynchronous-message', message);
+                }
+                else {
                     // If this isn't a instant sync command, follow normal procedure.
                     if (!(message.request === command.iSync || message.request === command.sync)) {
                         // Tic toc mechanism symmetricaly distributes message request lag.
@@ -742,11 +746,6 @@ var debug = false;
                     }
                     // Update tic-toc bit.
                     setTimeout(toc, 10);
-                }
-                else {
-                    // IPC between main process directly.
-                    if (inElectron())
-                        ipcRenderer.send('asynchronous-message', message);
                 }
             }
         }
@@ -1236,7 +1235,7 @@ var debug = false;
                 if (event.key === undefined)
                     event.key = event.data.keyCode;
                 if (debug) console.log(event.key);
-                if (sid.instructionsAreLoaded() && -1===[1114129,1114121,5570578,1114337,4456466,2228240,91,225,27,112,113,114,115,116,117,118,119,120,121,122,123,45,20,33,34,35,36,37,38,39,40].indexOf(event.key)) {
+                if (sid.instructionsAreLoaded() && -1===[1114129,1114177,1114179,1114121,5570578,1114337,4456466,2228240,91,225,27,112,113,114,115,116,117,118,119,120,121,122,123,45,20,33,34,35,36,37,38,39,40].indexOf(event.key)) {
                     window.location = '#sidebarAddElement';
                     document.getElementById("inputName").focus();
                 } else if (event.key===122 || event.key==="F11") {

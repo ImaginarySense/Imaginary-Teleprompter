@@ -50,6 +50,8 @@ body {
 	-khtml-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
+	opacity: 0;
+    transition: opacity 800ms linear;
 }
 
 #overlay {
