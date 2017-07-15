@@ -27,6 +27,7 @@
 
 body {
 	overflow: hidden;
+	background: #151613;
 /*	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
@@ -41,7 +42,7 @@ body {
 	bottom: 0px;
 	left: 0px;
 	right: 0px;
-	font-family: monospace;
+	font-family: courier, monospace;
 	background: rgba(0,0,0,0.22);
 	color: #FFF;
 	font-size: 20.5vmin;

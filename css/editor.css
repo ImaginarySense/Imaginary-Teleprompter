@@ -34,6 +34,12 @@ body {
 	padding-bottom: 10px;
 }
 
+#menu-toggle, #advConfig {
+	padding: 12px 11px 11px 11px;
+	margin: 0px;
+	/*top: 0px;*/
+}
+
 a#promptIt {
 	background:#EEE;
 	font-weight: bold;
