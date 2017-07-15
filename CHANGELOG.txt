@@ -1,5 +1,12 @@
 CHANGELOG
 
+ver 2.3.0 (x.7.2017)
+> Performance improvements.
+> Improved sidebar and teleprompter usability.
+> Added advanced velocity controls, font-size adjustments and timer functionality.
+> Updated Introduction
+> Updated Copyright holders
+
 ver 2.2.x (16.5.2017)
 > Implemented canvas based prommpter for use in Electron. Smart fullscreen implemention remains still pending.
 

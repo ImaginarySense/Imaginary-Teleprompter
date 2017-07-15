@@ -1,6 +1,6 @@
 /*
 	Teleprompter
-	Copyright (C) 2015 Imaginary Films LLC and contributors
+	Copyright (C) 2015 Imaginary Sense, Imaginary Films LLC and contributors
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -14,152 +14,120 @@
 
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
-
-This is has been moved to the teleprompter-theme.js
-.darkBody {
-	background: #272822;
-	color:#FFF;
-}
-
-.darkOverlay {
-	background: #000;
-}
-
-.lightBody {
-	background: #FFF;
-	color: #272822;
-}
-
-.lightOverlay {
-	background: #CCC;
-}
-
-.yellowBody {
-	color: #FF0;
-	background: #000;
-}
-
-.theForce {
-    //Use the force...
-	color: yellow;
-	background: black;
-	transform-origin: 50% 100%;
-	transform: perspective(300px) rotateX(30deg) translate3d(0px,-115px,-180px);
-	// https://www.youtube.com/watch?v=ZTLAx3VDX7g
-}*/
 #prompt * a {
-    color: inherit !important;
+	color: inherit !important;
 }
 
 #prompt * img {
-    width: 100% !important;
-    height: auto !important;
+	width: 100% !important;
+	height: auto !important;
 }
 
 #prompt * table {
-    table-layout: fixed;
+	table-layout: fixed;
 }
 
 #prompt * td {
-    width: 10%;
+	width: 10%;
 }
 
 .modalDialog p {
-    margin:0;
+	margin:0;
 }
 .modalDialog {
-    position: fixed;
-    font-family: Arial, Helvetica, sans-serif;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 1000;
-    opacity:0;
-    -webkit-transition: opacity 400ms ease-in;
-    -moz-transition: opacity 400ms ease-in;
-    transition: opacity 400ms ease-in;
-    pointer-events: none;
-    overflow-y:scroll;
-    overflow-x: hidden;
+	position: fixed;
+	font-family: Arial, Helvetica, sans-serif;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: rgba(0, 0, 0, 0.8);
+	z-index: 1000;
+	opacity:0;
+	-webkit-transition: opacity 400ms ease-in;
+	-moz-transition: opacity 400ms ease-in;
+	transition: opacity 400ms ease-in;
+	pointer-events: none;
+	overflow-y:scroll;
+	overflow-x: hidden;
 }
 .modalDialog:target {
-    opacity:1;
-    pointer-events: auto;
+	opacity:1;
+	pointer-events: auto;
 }
 .modalDialog > div {
-    width: 400px;
-    position: relative;
-    margin: 5% auto;
-    padding: 5px 20px 13px 20px;
-    /*border-radius: 10px;
-    background: #fff;
-    background: -moz-linear-gradient(#fff, #999);
-    background: -webkit-linear-gradient(#fff, #999);
-    background: -o-linear-gradient(#fff, #999);*/
+	width: 400px;
+	position: relative;
+	margin: 5% auto;
+	padding: 5px 20px 13px 20px;
+	/*border-radius: 10px;
+	background: #fff;
+	background: -moz-linear-gradient(#fff, #999);
+	background: -webkit-linear-gradient(#fff, #999);
+	background: -o-linear-gradient(#fff, #999);*/
 }
 .close {
-    background: #606061;
-    color: #FFFFFF;
-    line-height: 25px;
-    position: absolute;
-    right: 5px;
-    text-align: center;
-    top: -10px;
-    width: 24px;
-    text-decoration: none;
-    font-weight: bold;
-    -webkit-border-radius: 12px;
-    -moz-border-radius: 12px;
-    border-radius: 12px;
-    -moz-box-shadow: 1px 1px 3px #000;
-    -webkit-box-shadow: 1px 1px 3px #000;
-    box-shadow: 1px 1px 3px #000;
+	background: #606061;
+	color: #FFFFFF;
+	line-height: 25px;
+	position: absolute;
+	right: 5px;
+	text-align: center;
+	top: -10px;
+	width: 24px;
+	text-decoration: none;
+	font-weight: bold;
+	-webkit-border-radius: 12px;
+	-moz-border-radius: 12px;
+	border-radius: 12px;
+	-moz-box-shadow: 1px 1px 3px #000;
+	-webkit-box-shadow: 1px 1px 3px #000;
+	box-shadow: 1px 1px 3px #000;
 }
 .close:hover {
-    color: #FFFFFF;
-    background: #000;
+	color: #FFFFFF;
+	background: #000;
 }
 #promptPreviewColor {
-    position: relative;
-    left: 8%;
-    width: 84%;
-    font-size: 5vw;
-    line-height: 1.1;
-    text-align: center;
-    list-style-position: inside;
-    font-family: sans-serif, Arial, Verdana, "Trebuchet MS";
+	position: relative;
+	left: 8%;
+	width: 84%;
+	font-size: 5vw;
+	line-height: 1.1;
+	text-align: center;
+	list-style-position: inside;
+	font-family: sans-serif, Arial, Verdana, "Trebuchet MS";
 }
 #promptPreviewColor table {
-    width: 100%;
+	width: 100%;
 }
 
 #stylesTable th:hover{
-    background-color:#f5f5f5;
-    border-color:#f5f5f5;
-    color:#555;
+	background-color:#f5f5f5;
+	border-color:#f5f5f5;
+	color:#555;
 }
 
 #stylesTable tr.active th{
-    background-color:#337ab7;
-    border-color:#337ab7;
-    color:#fff;
+	background-color:#337ab7;
+	border-color:#337ab7;
+	color:#fff;
 }
 #stylesTable .table-item{
-    color:#555;
-    font-weight: normal;
+	color:#555;
+	font-weight: normal;
 }
 
 #stylesTable span {
-    display: inline-block;
-    vertical-align: middle;
-    line-height: normal;
+	display: inline-block;
+	vertical-align: middle;
+	line-height: normal;
 }
 
 .vcenter {
-    display: inline-block;
-    vertical-align: middle;
-    float: none;
+	display: inline-block;
+	vertical-align: middle;
+	float: none;
 }

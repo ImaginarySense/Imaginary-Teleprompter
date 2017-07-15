@@ -1,17 +1,22 @@
 FEATURE REQUESTS
 
-NEXT RELEASES
-Implement teleprompter live updates
-Add custom "Fullscreen" button to CKEditor
-Implement touch controls in teleprompter.html
-Implement variable sensitivity controls
-Implement font resize operations
-Implement touch let-go inertia
-Implement Software Translations
+	NEXT RELEASES
+Javier - Improve Custom Styles usability
+Javier - Add custom "Fullscreen" button to CKEditor
+Javier,Victor - Improve keyboard and assistive technologies usability
+Rafael - SVG Emoticon Support
+Rafael - Implement software translations
+Victor - Implement "Download" and "Import" HTML scripts
+Victor - Finish implementing image uploads manager
+
+MOBILE SUPPORT
+Javier - Fix mobile in-frame intercom
+Javier - Implement touch controls
+Javier - Implement touch let-go inertia and friction
+Victor - Remote control
+Victor - Mobile image support
 
 LONG TERM FEATURES
-Improve multi-screen synchronization
-Image file manager
-Spell Check
-Engineer Plug-in API
-Voice controls
+Victor - Implement download and import entire scripts as archives
+Javier - Voice control
+Rafael - Spell Check

@@ -1,6 +1,6 @@
 /*
     Teleprompter
-    Copyright (C) 2015 Imaginary Films LLC and contributors
+    Copyright (C) 2015 Imaginary Sense, Imaginary Films LLC and contributors
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,7 +15,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 /*  References:
 https://github.com/jquery/PEP
 https://github.com/briangonzalez/jquery.pep.js/
@@ -253,7 +252,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         updateFont();
         prompt.innerHTML = decodeURIComponent(session.html);
         updateVelocity();
-        updateAnimation();
+        // updateAnimation();
 
         // Enable timer
         if (settings.data.timer) {
@@ -641,7 +640,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         editor.postMessage( {'request':command.anchor,'data':theAnchor}, getDomain() );
     }
 
-    // Update unit and unit related meassurements
+    // Update unit and unit related measurements
     function updateUnit() {
         unit = getFocusHeight()/80;
         relativeLimit = limit*unit;
