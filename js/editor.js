@@ -380,12 +380,14 @@ var debug = false;
 
     function launchIntoFullscreen(element) {
         var requestFullscreen = element.requestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen || element.msRequestFullscreen;
-        requestFullscreen.call(element);
+        if (requestFullscreen!==undefined)
+            requestFullscreen.call(element);
     }
 
     function exitFullscreen() {
         var exitFullscreen = document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen;
-        exitFullscreen.call(document);
+        if (exitFullscreen!==undefined)
+            exitFullscreen.call(document);
     }
 
     function toggleFullscreen() {
@@ -942,8 +944,19 @@ var debug = false;
                 updateFont(lastSettings.data.fontSize);
                 // Set timer value
                 var timer = document.getElementById("timer")
-                // lastSettings.data.timer;
-                // document.getElementById("voice").value = lastSettings.data.voice;
+                if (lastSettings.data.timer) {
+                    timer.children[0].classList.add("btn-primary");
+                    timer.children[0].classList.remove("btn-default");
+                    timer.children[1].classList.add('btn-default');
+                    timer.children[1].classList.remove('btn-primary');
+                }
+                // Set voice value
+                // var voice = document.getElementById("voice")
+                // if (lastSettings.data.timer) {
+                //     voice.children[0].classList.toggle("btn-primary");
+                //     voice.children[0].classList.toggle("btn-default");
+                //     voice.children[0].classList.innerHTML("Active");
+                // }
             }
         };
         dataManager.getItem("IFTeleprompterSettings", settings, 1);

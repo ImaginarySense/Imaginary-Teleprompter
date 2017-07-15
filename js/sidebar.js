@@ -445,15 +445,22 @@ var SIDEBAR = function() {
         
         document.getElementById("addScriptSidebarButton").onclick = function(e){
             e.preventDefault();
+            var inputName = document.getElementById("inputName"),
+                inputID = document.getElementById("inputID");
+            if (inputName.value.length===0) {
+                window.alert("Every script needs a title.");
+                inputName.focus();
+                return;
+            }
             elementsData.push({
-                "id": document.getElementById("inputID").value,
-                "name": document.getElementById("inputName").value,
+                "id": inputID.value,
+                "name": inputName.value,
                 "data":"",
                 "editable":true
             });
             //Clean Input
-            document.getElementById("inputName").value = "";
-            document.getElementById("inputID").value = "";
+            inputName.value = "";
+            inputID.value = "";
             //Save
             this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
             this.refreshElements();
