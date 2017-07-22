@@ -1,11 +1,14 @@
 CHANGELOG
 
 ver 2.3.0 (x.7.2017)
+> Import and export basic HTML files
 > Performance improvements.
 > Improved sidebar and teleprompter usability.
-> Added advanced velocity controls, font-size adjustments and timer functionality.
+> New advanced velocity controls
+> New font-size adjustments
+> New timer functionality.
 > Updated Introduction
-> Updated Copyright holders
+> Updated Copyright holders information
 
 ver 2.2.x (16.5.2017)
 > Implemented canvas based prommpter for use in Electron. Smart fullscreen implemention remains still pending.

@@ -921,7 +921,7 @@ var debug = false;
     window.addEventListener("beforeunload", updatePrompterData);
 
     function updateFont(value) {
-        console.log("Updating font.");
+        if (debug) console.log("Updating font.");
         document.getElementById("prompt").style.fontSize = "calc(5vw * "+(value/100+0.05)+")";
     }
 
@@ -1203,7 +1203,7 @@ var debug = false;
         //initialize SideBar
         var sid = sidebar.on('scripts',{
             "name":"Files",
-            "addElementName":"New Script",
+            "elementName":"Script",
             "newElementName":"Untitled",
             "dataKey":"IFTeleprompterSideBar",
             "preloadData":[{
