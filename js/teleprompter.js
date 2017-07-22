@@ -256,18 +256,16 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         // resumeAnimation();
 
         // Enable timer
-        if (settings.data.timer) {
-            // console.log(timer.data().timer.currentVal!==0);
+        if (settings.data.timer===true) {
             if (timer.data().timer.currentVal===0)
             timer.startTimer();
             clock.style.opacity = '1';
         }
-        else { //if (timer!==undefined) {
+        else {
             clock.style.opacity = '0';
             setTimeout(function() {
                 timer.resetTimer();
                 timer.stopTimer();
-                // timer.destroyTimer();
             }, 800);
         }
     }
@@ -453,15 +451,13 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         x=0;
         updateVelocity();
         resumeAnimation();
-        if (timer!==undefined)
-            timer.stopTimer();
+        timer.stopTimer();
     }
 
     document.addEventListener( 'transitionend', function() {
         if(atStart()||atEnd()) {
             stopAll();
-            if (timer!==undefined)
-                timer.resetTimer();
+            timer.resetTimer();
         }
         if (debug) console.log("Reached end") && false;
     }, false);
@@ -879,22 +875,10 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     }
 
     function internalResetTimer() {
-        if (timer!==undefined)
-            timer.resetTimer();
+        timer.resetTimer();
         playAnimation();
         if (debug) console.log("Timer reset.");
     }
-
-    /*
-    function storageEvents(event) {
-        switch (event.key) {
-            case 'html' :
-                //updateContents(event.newValue);
-                break;
-        }
-    }
-    window.addEventListener("storage", storageEvents, true);
-    */
 
     function listener(event) {
         // Message data. Uncommenting will give you valuable information and decrease performance dramatically.
