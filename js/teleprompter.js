@@ -457,7 +457,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     document.addEventListener( 'transitionend', function() {
         if(atStart()||atEnd()) {
             stopAll();
-            timer.resetTimer();
+            resetTimer();
         }
         if (debug) console.log("Reached end") && false;
     }, false);
