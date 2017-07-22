@@ -39,7 +39,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     // Global objects
     var settings, session, prompt, pointer, overlay, overlayFocus, styleSheet, editor, timer, clock, remote;
     // Global variables
-    var unit, x, velocity, sensitivity, speedMultip, relativeLimit, steps, play, timeoutStatus, invertedWheel, focus, promptStyleOption, customStyle, flipV, flipH, fontSize, previousPromptHeight, previousScreenHeight, previousScreenWidth, previousVerticalDisplacementCorrector, domain, debug, closing, cap, syncDelay, isMobileApp;
+    var unit, x, velocity, sensitivity, speedMultip, relativeLimit, steps, play, timeoutStatus, invertedWheel, focus, promptStyleOption, customStyle, flipV, flipH, fontSize, previousPromptHeight, previousScreenHeight, previousScreenWidth, previousVerticalDisplacementCorrector, domain, debug, closing, cap, syncDelay, isMobileApp, acceptInput;
 
     // Enums
     var command = Object.freeze({
@@ -106,6 +106,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         cap = false;
         syncDelay = 12;
         isMobileApp = false;
+        acceptInput = false;
         
         // Local Storage and Session data
         updateDatamanager();
@@ -252,7 +253,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         updateFont();
         prompt.innerHTML = decodeURIComponent(session.html);
         updateVelocity();
-        // updateAnimation();
+        // resumeAnimation();
 
         // Enable timer
         if (settings.data.timer) {
@@ -272,7 +273,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     }
 
     function pointerActive(event) {
-        if (!pointer.active) {
+        if (acceptInput && !pointer.active) {
             if (debug) console.log("Pointer active") && false;
             internalPauseAnimation();
             pointer.prompterstart = getCurrPos();
@@ -283,7 +284,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     }
 
     function pointerInactive() {
-        if (pointer.active) {
+        if (acceptInput && pointer.active) {
             if ( !pointer.moved )
                 toggleTouchControls();
             if (debug) console.log("Pointer inactive") && false;
@@ -302,7 +303,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     }
 
     function pointerMove(event) {
-        if (pointer.active) {
+        if (acceptInput && pointer.active) {
             // Get current point location
             var argument,
                 pointerCurrPos = event.clientY,
@@ -451,7 +452,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     function stopInstance() {
         x=0;
         updateVelocity();
-        updateAnimation();
+        resumeAnimation();
         if (timer!==undefined)
             timer.stopTimer();
     }
@@ -555,9 +556,11 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         return whereTo;
     }
 
-    function updateAnimation() {
+    function resumeAnimation() {
         // Resumes animation with new destination and time values.
         if (play) {
+            // Restart timer.
+            timer.startTimer();
             // Get new style variables.
             var currPos = getCurrPos(),
                 destination = getDestination(currPos),
@@ -584,6 +587,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         // Resume animation by re adding the class.
         prompt.classList.add("move");
         if (debug) setTimeout( function(){ console.log(/*"Curr: "+getCurrPos()+"\n*/"Dest: "+destination+"\nRemTime "+time) && false; }, 0);
+        acceptInput = true;
     }
     //https://css-tricks.com/controlling-css-animations-transitions-javascript/
 
@@ -625,7 +629,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         // Jump to anchor
         animate(0, jump);
         // Resume animation
-        updateAnimation();
+        resumeAnimation();
     }
 
     function internalMoveToAnchor( theAnchor ) {
@@ -645,7 +649,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         unit = getFocusHeight()/80;
         relativeLimit = limit*unit;
         if (debug) setTimeout( function(){ console.log("Unit updated: "+unit) && false; });
-        updateAnimation();
+        resumeAnimation();
     }
 
     function animationTimeout(time, func) {
@@ -815,7 +819,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
             if (velocity>relativeLimit*-1) {
                 x--;
                 updateVelocity();
-                updateAnimation();
+                resumeAnimation();
                 incSteps();
             }
         }
@@ -828,7 +832,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
             if (velocity<relativeLimit) {
                 x++;
                 updateVelocity();
-                updateAnimation();
+                resumeAnimation();
                 incSteps();
             }
         }
@@ -849,32 +853,32 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     }
 
     function playAnimation() {
-        editor.postMessage( {'request':command.play}, getDomain() );    
+        editor.postMessage( {'request':command.play}, getDomain() );
         if (debug) console.log("Playing") && false;
     }
     
     function internalPauseAnimation() {
-        editor.postMessage( {'request':command.internalPause}, getDomain() );   
+        editor.postMessage( {'request':command.internalPause}, getDomain() );
     }
 
     function internalPlayAnimation() {
-        editor.postMessage( {'request':command.internalPlay}, getDomain() );    
+        editor.postMessage( {'request':command.internalPlay}, getDomain() );
     }
 
     function localPauseAnimation() {
         animate(0, getCurrPos());
-        if (timer!==undefined)
-            timer.stopTimer();
+        timer.stopTimer();
     }
 
     function localPlayAnimation() {
-        updateAnimation();
-        if (timer!==undefined) {
-            timer.startTimer();
-        }
+        resumeAnimation();
     }
 
     function resetTimer() {
+        editor.postMessage( {'request':command.resetTimer}, getDomain() );
+    }
+
+    function internalResetTimer() {
         if (timer!==undefined)
             timer.resetTimer();
         playAnimation();
@@ -923,6 +927,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                     });
                     break;
                 case command.sync :
+                    acceptInput = false;
                     requestAnimationFrame(function(){
                         correctVerticalDisplacement(message.data);
                     });
@@ -947,7 +952,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                     toggleAnimation();
                     break;
                 case command.resetTimer :
-                    resetTimer();
+                    internalResetTimer();
                     break;
                 case command.anchor :
                     requestAnimationFrame(function(){
@@ -1000,77 +1005,79 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     }
 
     document.onkeydown = function( event ) {
-        var key;
-        // keyCode is announced to be deprecated but not all browsers support key as of 2016.
-        if (event.key === undefined)
-            event.key = event.keyCode;
-        if (debug) console.log("Key: "+event.key) && false;
-        switch ( event.key ) {
-            case "s":
-            case "S":
-            case "ArrowDown":
-            case 40: // Down
-            case 68: // S
-                increaseVelocity();
-                break;
-            case "w":
-            case "W":
-            case "ArrowUp":
-            case 38: // Up
-            case 87: // W
-                decreaseVelocity();
-                break;
-            case "d":
-            case "D":
-            case "ArrowRight":
-            case 83: // S
-            case 39: // Right
-                increaseFontSize();
-                break;
-            case "a":
-            case "A":
-            case "ArrowLeft":
-            case 37: // Left
-            case 65: // A
-                decreaseFontSize();
-                break;
-            case " ":           
-            case 32: // Spacebar
-                toggleAnimation();
-                break;
-            case ".":
-            case 110: // Numpad dot
-            case 190: // Dot
-                syncPrompters();
-                break;
-            case "Escape":
-            case 27: // ESC
-                closeInstance();
-                break;
-            case 121:
-            case "F10":
-            case 123:
-            case "F12":
-                if (!inIframe())
-                    toggleDebug();
-                break;
-            case 8:
-            case "Backspace":
-            case "backspace":
-                resetTimer();
-                break;
-            default: // Move to anchor.
-                // If key is not a string
-                if(!isFunction(event.key.indexOf))
-                    key = String.fromCharCode(event.key);
-                else
-                    key = event.key;
-                //if ( key.indexOf("Key")===0 || key.indexOf("Digit")===0 )
-                //      key = key.charAt(key.length-1);
-                if ( !is_int(key) )
-                    key = key.toLowerCase();
-                if (debug) console.log(key);
-                moveToAnchor( key );
+        if (acceptInput) {
+            var key;
+            // keyCode is announced to be deprecated but not all browsers support key as of 2016.
+            if (event.key === undefined)
+                event.key = event.keyCode;
+            if (debug) console.log("Key: "+event.key) && false;
+            switch ( event.key ) {
+                case "s":
+                case "S":
+                case "ArrowDown":
+                case 40: // Down
+                case 68: // S
+                    increaseVelocity();
+                    break;
+                case "w":
+                case "W":
+                case "ArrowUp":
+                case 38: // Up
+                case 87: // W
+                    decreaseVelocity();
+                    break;
+                case "d":
+                case "D":
+                case "ArrowRight":
+                case 83: // S
+                case 39: // Right
+                    increaseFontSize();
+                    break;
+                case "a":
+                case "A":
+                case "ArrowLeft":
+                case 37: // Left
+                case 65: // A
+                    decreaseFontSize();
+                    break;
+                case " ":           
+                case 32: // Spacebar
+                    toggleAnimation();
+                    break;
+                case ".":
+                case 110: // Numpad dot
+                case 190: // Dot
+                    syncPrompters();
+                    break;
+                case "Escape":
+                case 27: // ESC
+                    closeInstance();
+                    break;
+                case 121:
+                case "F10":
+                case 123:
+                case "F12":
+                    if (!inIframe())
+                        toggleDebug();
+                    break;
+                case 8:
+                case "Backspace":
+                case "backspace":
+                    resetTimer();
+                    break;
+                default: // Move to anchor.
+                    // If key is not a string
+                    if(!isFunction(event.key.indexOf))
+                        key = String.fromCharCode(event.key);
+                    else
+                        key = event.key;
+                    //if ( key.indexOf("Key")===0 || key.indexOf("Digit")===0 )
+                    //      key = key.charAt(key.length-1);
+                    if ( !is_int(key) )
+                        key = key.toLowerCase();
+                    if (debug) console.log(key);
+                    moveToAnchor( key );
+            }
         }
         // Prevent arrow and spacebar scroll bug.
         if ([" ","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(event.key) > -1 && event.preventDefault)
