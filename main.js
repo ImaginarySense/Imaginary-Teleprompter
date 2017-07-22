@@ -224,45 +224,46 @@ app.on('ready', () => {
 	}
 
 	// Remote control server
-	function runSocket(event) {
-		var ip = getIP();
-		if(ip){
-		  var app2 = require('express')();
-		  var http = require('http').Server(app2);
-		  var bonjour = require('bonjour')();
-		  var io = require('socket.io')(http);
+	// function runSocket(event) {
+	// 	var ip = getIP();
+	// 	if(ip){
+	// 	  var app2 = require('express')();
+	// 	  var http = require('http').Server(app2);
+	// 	  var bonjour = require('bonjour')();
+	// 	  var io = require('socket.io')(http);
 
-		  io.sockets.on('connection', function (socket) {
-			socket.on('command',function(res){
-				if(res.hasOwnProperty('key') > 0){
-				  event.sender.send('asynchronous-reply',{'option':'command','data':res});
-				}
-			});
-			socket.on('disconnect', function () {});
-		  });
+	// 	  io.sockets.on('connection', function (socket) {
+	// 		socket.on('command',function(res){
+	// 			if(res.hasOwnProperty('key') > 0){
+	// 			  event.sender.send('asynchronous-reply',{'option':'command','data':res});
+	// 			}
+	// 		});
+	// 		socket.on('disconnect', function () {});
+	// 	  });
 
-		  http.listen(3000, function(){
-			event.sender.send('asynchronous-reply',{'option':'qr','data':ip});
-			//console.log('http://' + ip + ':3000/');
-		  });
+	// 	  http.listen(3000, function(){
+	// 		event.sender.send('asynchronous-reply',{'option':'qr','data':ip});
+	// 		//console.log('http://' + ip + ':3000/');
+	// 	  });
 
-		  bonjour.publish({ name: 'Teleprompter', type: 'http', port: 3000 });
-		  bonjour.find({ type: 'http' }, function (service) {
-			//console.log('Found an HTTP server:'+ service);
-			event.sender.send('asynchronous-reply',{'option':'qr','data':service.host});
-		  });
-		}else{
-		  setTimeout(function(){
-			runSocket(event);
-		  }, 1000);
-		}
-	}
+	// 	  bonjour.publish({ name: 'Teleprompter', type: 'http', port: 3000 });
+	// 	  bonjour.find({ type: 'http' }, function (service) {
+	// 		//console.log('Found an HTTP server:'+ service);
+	// 		event.sender.send('asynchronous-reply',{'option':'qr','data':service.host});
+	// 	  });
+	// 	}else{
+	// 	  setTimeout(function(){
+	// 		runSocket(event);
+	// 	  }, 1000);
+	// 	}
+	// }
 
 	// Send a message to the renderer process...
 	ipcMain.on('asynchronous-message', (event, arg) => {
 		// console.log(arg);
-		if (arg === "network")
-			runSocket(event);
+		if (arg === "network") {
+			// runSocket(event);
+		}
 		else if (arg === "openInstance") {
 			externalPrompt = new BrowserWindow({
 				webPreferences: {
@@ -290,26 +291,6 @@ app.on('ready', () => {
 					// Get pointer to image from canvas.
 					const size = externalPrompt.getSize(),
 						bitmap = image.getBitmap();
-					/*
-					// Cropping in the main process just adds delay to all processes.
-					// Maybe running the following code in a worker could help.
-					let width = size[0],
-						height = size[1],
-						croppedImage = new Array(dirty.width*dirty.height*4),
-						yProcessLength = dirty.height+dirty.y,
-						xProcessLength = dirty.width+dirty.x,
-						count = 0;
-					for (let i=dirty.y; i<yProcessLength; i++)
-						for (let j=dirty.x; j<xProcessLength; j++) {
-							let curr = (i*width+j)*4;
-							croppedImage[count+0] = bitmap[curr+0];
-							croppedImage[count+1] = bitmap[curr+1];
-							croppedImage[count+2] = bitmap[curr+2];
-							croppedImage[count+3] = 255;
-							count+=4;
-						}
-					event.sender.send('asynchronous-reply',{ 'option':'c', 'dirty':dirty, 'size':size, 'bitmap':croppedImage });
-					*/
 					event.sender.send('asynchronous-reply',{ 'option':'c', 'dirty':dirty, 'size':size, 'bitmap':bitmap });
 					// Documentation
 					// https://electron.atom.io/docs/tutorial/offscreen-rendering/

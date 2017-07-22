@@ -23,6 +23,142 @@ var SIDEBAR = function() {
         document.getElementById("prompt").focus();
     }
 
+    this.maxFileSize = function() {
+        return Math.floor(255/2-5); // Return 122. Could be increased depending on the Filesystem and the charset encoding.
+    }
+
+    this.download = function( currentDocument, index ) {
+        if (debug) {
+            console.log("Downloading:");
+            console.log(currentDocument);
+        }
+        var filename = currentDocument.name+"_"+index+".html",
+            contents = currentDocument.data,
+            element = document.createElement("a");
+        element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(contents));
+        element.setAttribute("download", filename);
+
+        element.style.display = "none";
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
+    };
+
+    this.addScript = function( evt ) {
+        if (evt.preventDefault!==undefined)
+            evt.preventDefault();
+        if (debug) console.log(evt);
+        var elementsData = this.getElements(),
+            inputName = document.getElementById("inputName"),
+            inputID = document.getElementById("inputID");
+        if (inputName.value.length===0) {
+            window.alert("Every script needs a title.");
+            inputName.focus();
+            return;
+        } else if ( inputName.value.length>this.maxFileSize() ) {
+            window.alert("That filename is too long...");
+            inputName.focus();
+            return;
+        }
+        elementsData.push({
+            "id": inputID.value,
+            "name": inputName.value,
+            "data": "",
+            "editable": true
+        });
+        // Clean Input
+        inputName.value = "";
+        inputID.value = "";
+        // Save
+        this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
+        this.refreshElements();
+
+        this.currentElement = elementsData.length-1;
+
+        if (typeof this.addElementEnded === "function") {
+            this.addElementEnded(elementsData[elementsData.length]);
+        }
+        this.closeModal();
+        window.setTimeout(function() {
+            var sideBar = document.querySelector("#wrapper");
+            if (!sideBar.classList.contains("toggled"))
+                sideBar.classList.toggle("toggled");
+        }, 2000);
+    };
+
+    this.handleFileSelect = function(evt) {
+        var files = evt.target.files, // FileList object
+            supportedFileFound = false,
+            unsuportedFiles = new Array();
+        // files is a FileList of File objects. List some properties.
+        if (debug) console.log("Importing files...");
+        for (var i=0, f; f = files[i]; i++) {
+            if (debug) console.log(i+1);
+            if (f.type==="text/html") {
+                supportedFileFound = true;
+                var filename = escape(f.name),
+                    reader = new FileReader();
+                if (debug) console.log( filename );
+                var elementsData = this.getElements();
+                // Closure to capture the file information.
+                reader.onload = ( function(theFile, sidebar) {
+                    return function(evt) {
+                        // Like with addScript, process files here...
+                        var elementsData = sidebar.getElements(),
+                            inputName = theFile.name,
+                            inputID = sidebar.createIDTag(inputName),
+                            maxLength = sidebar.maxFileSize();
+                        // Slicing name at lastIndexOf '.htm' works most common HTML file extensions. 
+                        inputName = inputName.slice( 0, inputName.lastIndexOf(".htm") );
+                        // Truncate file name.
+                        if ( inputName.length>maxLength ) {
+                            if (debug) console.log("Name will be truncated. Maximum allowed length: "+maxLength+" characters.");
+                            alert("The following file's name is too long and will be truncated: "+inputName);
+                            inputName = inputName.slice(0, maxLength);
+                        }
+                        elementsData.push({
+                            "id": inputID,
+                            "name": inputName,
+                            "data": evt.target.result,
+                            "editable": true
+                        });
+                        // Save
+                        // sidebar.currentElement = elementsData.length-1;
+                        sidebar.getSaveMode().setItem(sidebar.getDataKey(), JSON.stringify(elementsData));
+                        sidebar.refreshElements();
+                        // Load last imported file.
+                        sidebar.currentElement = elementsData.length-1;
+                        if (typeof sidebar.addElementEnded === "function") {
+                            sidebar.addElementEnded(elementsData[elementsData.length]);
+                        }
+                    };
+                }) (f, this);
+                // Begin reading the file's contents.
+                reader.readAsText(f);
+            }
+            // Add support for more formats here...
+            // Add unsuported file to unsuported file list.
+            else
+                unsuportedFiles.push(escape(f.name));
+        }
+        // List unsuported files
+        var length = unsuportedFiles.length-1;
+        if (length!==-1) {
+            var unsuportedAlert = "The following files could not be imported: ";
+            for (var i=0; i<length; i++)
+                unsuportedAlert += unsuportedFiles[i] + ", ";
+            unsuportedAlert += unsuportedFiles[length] + ".";
+            // Notify if no supported files where found.
+            alert(unsuportedAlert);
+        }
+        delete unsuportedFiles;
+        if (!supportedFileFound)
+            // Notify no files were imported.
+            alert("Import failed. No supported file found.");
+    }
+
     this.on = function(nameElement, config) {
         this.menu = nameElement;
         if (typeof config !== 'undefined' && config !== null) {
@@ -38,8 +174,8 @@ var SIDEBAR = function() {
             if (config.hasOwnProperty('addElementName'))
                 this.setAddElementName(config['addElementName']);
 
-            if (config.hasOwnProperty('newElementName'))
-                this.setNewElementName(config['newElementName']);
+            if (config.hasOwnProperty('elementName'))
+                this.setNewElementName(config['elementName']);
 
             if (config.hasOwnProperty('preloadData') && config['preloadData'].constructor === Array)
                 this.setPreloadData(config['preloadData']);
@@ -130,13 +266,19 @@ var SIDEBAR = function() {
     };
 
     this.setAddElementName = function(name) {
-        this.addElementName = name;
+        this.elementName = name;
     };
 
     this.getAddElementName = function() {
-        if (typeof this.addElementName !== 'undefined' && this.addElementName !== null)
-            return " " + this.addElementName;
+        if (typeof this.elementName !== 'undefined' && this.elementName !== null)
+            return " Add " + this.elementName;
         return " Add " + this.getName();
+    };
+
+    this.getImportElementName = function() {
+        if (typeof this.elementName !== 'undefined' && this.elementName !== null)
+            return " Import " + this.elementName;
+        return " Import " + this.getName();
     };
 
     this.setNewElementName = function(name) {
@@ -307,11 +449,11 @@ var SIDEBAR = function() {
     };
     
     this.getElementIndexByID = function(id) {
-    	var elementsData = this.getElements();
-    	for (var i=0; i<elementsData.length; i++) {
-    		if(elementsData[i].id == id)
-    			return i;
-    	}
+        var elementsData = this.getElements();
+        for (var i=0; i<elementsData.length; i++) {
+            if(elementsData[i].id == id)
+                return i;
+        }
     };
 
     this.setInstructions = function() {
@@ -370,7 +512,6 @@ var SIDEBAR = function() {
                 span2.style.display = "none";
                 div.appendChild(span2);
 
-
                 var span = document.createElement("span");
                 span.id = "editMode";
                 span.setAttribute("tabindex","0");
@@ -387,7 +528,6 @@ var SIDEBAR = function() {
                     e.target.parentNode.classList.remove("disabled");
                     var textBlock = e.target.parentNode.querySelector("#textBlock");
                     textBlock.setAttribute("contentEditable", true);
-
                     textBlock.focus();
                     if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
                         var range = document.createRange();
@@ -406,6 +546,9 @@ var SIDEBAR = function() {
                     textBlock.onkeydown = function(e) {
                         if (e.keyCode == 13) {
                             e.stopImmediatePropagation();
+
+                            if (e.target.innerHTML.length>this.maxFileSize())
+                                return false;
 
                             var text = e.target.innerHTML.replace("&nbsp;", '');
                             text = text.replace("<br>", '');
@@ -431,10 +574,73 @@ var SIDEBAR = function() {
                     return false;
                 }.bind(this);
                 div.appendChild(span);
+
+                var downloadButton = document.createElement("span");
+                downloadButton.id = "download";
+                // span3.setAttribute("tabindex","3");
+                downloadButton.classList.add("glyphicon");
+                downloadButton.classList.add("glyphicon-download");
+                downloadButton.onclick = function(e) {
+                    e.stopImmediatePropagation();
+                    this.currentElement = this.getElementIndexByID(e.target.parentNode.parentNode.id);
+                    elementsData = this.getElements();
+                    if (typeof this.selectedElement === "function") {
+                        // Download document
+                        this.download(elementsData[this.currentElement], this.currentElement);
+                    }
+                // Insert download code here...
+                }.bind(this);
+                div.appendChild(downloadButton);
             }
             li.appendChild(div);
             menuNode.appendChild(li);
         }
+
+        // Import button
+        var importLi = document.createElement("li");
+        importLi.style.position = "relative";
+        var input = document.createElement("input");
+        input.id = "files";
+        input.setAttribute("type","file");
+        input.setAttribute("name","files[]");
+        input.setAttribute("multiple", "");
+        input.setAttribute("readonly", "");
+        input.setAttribute("tabindex","0");
+        input.classList.add("addOption");
+        input.addEventListener('change', this.handleFileSelect.bind(this), false);
+        input.style.position = "absolute";
+        input.style.opacity = "0";
+        // Emulate CSS mouse hover
+        input.style.cursor = "pointer";
+        input.addEventListener("mouseenter", function () {
+            importLi.style.background = "rgba(255,255,255,0.2)";
+            importDiv.style.color = "#FFFFFF";
+        });
+        input.addEventListener("mouseleave", function () {
+            importLi.style.background = "initial";
+            importDiv.style.color = "#999";
+        });
+        input.style.zIndex = "2";
+        // Add real button
+        importLi.appendChild(input);
+        // Create fake styled import button.
+        var importDiv = document.createElement("div");
+        importDiv.classList.add("addOption");
+        var span2 = document.createElement("span");
+        span2.id = "addMode";
+        span2.classList.add("glyphicon");
+        span2.classList.add("glyphicon-folder-open");
+        importDiv.appendChild(span2);
+        importDiv.style.position = "relative";
+        var p = document.createElement("p");
+        p.id = "textBlock";
+        p.style.display = "inline";
+        p.setAttribute("contentEditable", false);
+        p.appendChild(document.createTextNode(this.getImportElementName()));
+        importDiv.appendChild(p);
+        // Add fake button
+        importLi.appendChild(importDiv);
+        menuNode.appendChild(importLi);
 
         var li = document.createElement("li");
         var div = document.createElement("div");
@@ -459,40 +665,7 @@ var SIDEBAR = function() {
             document.getElementById("inputName").focus();
         }.bind(this);
         
-        document.getElementById("addScriptSidebarButton").onclick = function(e){
-            e.preventDefault();
-            var inputName = document.getElementById("inputName"),
-                inputID = document.getElementById("inputID");
-            if (inputName.value.length===0) {
-                window.alert("Every script needs a title.");
-                inputName.focus();
-                return;
-            }
-            elementsData.push({
-                "id": inputID.value,
-                "name": inputName.value,
-                "data":"",
-                "editable":true
-            });
-            //Clean Input
-            inputName.value = "";
-            inputID.value = "";
-            //Save
-            this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
-            this.refreshElements();
-
-            this.currentElement = elementsData.length-1;
-
-            if (typeof this.addElementEnded === "function") {
-                this.addElementEnded(elementsData[elementsData.length]);
-            }
-            this.closeModal();
-            window.setTimeout(function() {
-                var sideBar = document.querySelector("#wrapper");
-                if (!sideBar.classList.contains("toggled"))
-                    sideBar.classList.toggle("toggled");
-            }, 2000);
-        }.bind(this);
+        document.getElementById("addScriptSidebarButton").onclick = this.addScript.bind(this);
         
         li.appendChild(div);
         menuNode.appendChild(li);

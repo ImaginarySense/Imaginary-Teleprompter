@@ -2,11 +2,10 @@ FEATURE REQUESTS
 
 	NEXT RELEASES
 Javier - Improve Custom Styles usability
-Javier - Add custom "Fullscreen" button to CKEditor
-Javier,Victor - Improve keyboard and assistive technologies usability
+Javier - Improve keyboard and assistive technologies usability
+Rafael - Add custom "Fullscreen" button to CKEditor
 Rafael - SVG Emoticon Support
 Rafael - Implement software translations
-Victor - Implement "Download" and "Import" HTML scripts
 Victor - Finish implementing image uploads manager
 
 MOBILE SUPPORT
@@ -14,9 +13,9 @@ Javier - Fix mobile in-frame intercom
 Javier - Implement touch controls
 Javier - Implement touch let-go inertia and friction
 Victor - Remote control
-Victor - Mobile image support
+Victor - Image support on mobiles
 
 LONG TERM FEATURES
-Victor - Implement download and import entire scripts as archives
+Victor - Implement download and import scripts with images as archives
 Javier - Voice control
 Rafael - Spell Check
