@@ -57,33 +57,47 @@ function styleInit(prompterStyleElement) {
 
     if (!themeStyles) {
         themeStyles = [{
-	    id:0,
+        id:0,
+            name: "Azure Light",
+            type: 0,
+            className: "azureLight",
+            bgOverlay: "azureLightO",
+            cssText: ".azureLight {color: #229FFF; background: #000000;}.azureLightO {background: #202020;}"
+        }, {
+        id:1,
             name: "Blackboard",
             type: 0,
             className: "darkBody",
             bgOverlay: "darkOverlay",
             cssText: ".darkBody {background: #272822;color:#FFF;}.darkOverlay {background: #000;}"
         }, {
-	    id:1,
-            name: "Whiteboard",
-            type: 0,
-            className: "lightBody",
-            bgOverlay: "lightOverlay",
-            cssText: ".lightBody {background: #FFF;color: #272822;}.lightOverlay {background: #CCC;}"
-        }, {
-	    id:2,
+        id:2,
             name: "Classic Yellow",
             type: 0,
             className: "yellowBody",
             bgOverlay: "darkOverlay",
             cssText: ".yellowBody {color: #FF0;background: #000;}.darkOverlay {background: #000;}"
         }, {
-	    id:3,
+        id:3,
+            name: "Dark Matter",
+            type: 0,
+            className: "darkMatter",
+            bgOverlay: "darkMatterO",
+            cssText: ".darkMatter {color: #FFFFFF; background: #222222;}.darkMatterO {background: #000000;}"
+        }, {
+        id:4,
             name: "Intergalactic",
             type: 0,
             className: "theForce",
             bgOverlay: "darkOverlay",
             cssText: ".theForce {color: #FF0;background: #000;transform-origin: 50% 100%;transform: perspective(300px) rotateX(30deg) translate3d(0px,-115px,-180px);}.darkOverlay {background: #000;}"
+        }, {
+        id:5,
+            name: "Whiteboard",
+            type: 0,
+            className: "lightBody",
+            bgOverlay: "lightOverlay",
+            cssText: ".lightBody {background: #FFF;color: #272822;}.lightOverlay {background: #CCC;}"
         }];
     }
     if (!themeSheet) {
@@ -97,10 +111,10 @@ function styleInit(prompterStyleElement) {
         themeSheet = themeStyle;
     }
     
-    defaultStyle = 0;
+    defaultStyle = 1;
     dataManager.getItem('IFTeleprompterThemeDefaultStyle',function(data){
         if(JSON.parse(data) !== "undefined")
-            defaultStyle = JSON.parse(data);
+            defaultStyle = JSON.parse(data)+1;
     },0,false);
 
     ///Maybe will need a fix in the future...
