@@ -303,8 +303,18 @@ a:active {
     cursor: pointer;
 }
 .glyphicon.glyphicon-chevron-left,
-.glyphicon.glyphicon-pencil {
+.glyphicon.glyphicon-pencil,
+.glyphicon.glyphicon-download {
     cursor: pointer;
+}
+.glyphicon.glyphicon-folder-open {
+	right:4px;
+}
+.glyphicon.glyphicon-plus {
+	right:1px;
+}
+.list #textBlock {
+	word-wrap: break-word;
 }
 
 .sidebar-nav li div.addOption:hover {
