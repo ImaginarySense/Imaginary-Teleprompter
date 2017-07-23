@@ -502,7 +502,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     function getCurrPos(obj) {
         // There's more than a way to calculate the current position.
         // This is the original method, slower and more reliable. Used only for Intergalactic Style, where the other method fails.
-        if (promptStyleOption===3) {
+        if (promptStyleOption===4) {
             if (!obj)
                 obj=prompt;
             var computedStyle = window.getComputedStyle(obj, null),
