@@ -933,7 +933,7 @@ var debug = false;
                 lastSettings = JSON.parse(lastSettings);
                 document.getElementById("primary").value = lastSettings.data.primary;
                 document.getElementById("secondary").value = lastSettings.data.secondary;
-                document.getElementById("prompterStyle").value = lastSettings.data.prompterStyle;
+                // document.getElementById("prompterStyle").value = lastSettings.data.prompterStyle;
                 document.getElementById("focus").value = lastSettings.data.focusMode;
                 slider[0].setValue(lastSettings.data.speed);
                 slider[1].setValue(lastSettings.data.acceleration);
