@@ -1,5 +1,30 @@
 CHANGELOG
 
+ver 2.2.0 (23.1.2017)
+> Improved and fixed bug with latest Electron on debug tools. Now you press F12 to both enter debug mode and load Developer Tools.
+> Mayor improvements to Electron's main.js.
+> Load icon for window on Windows and Linux.
+> Fixed broken external links.
+> Updated credits.
+> Improved IPC documentation.
+> Set togglePrompter on 'F8' key.
+
+ver 2.1.2 (22.1.2017)
+> Incorporated factory reset. Press F6 to try it.
+> Improved debug tools. Press F12 to enter debug mode, F8 to load Developer Tools, and 'F5' to refresh, but only when debug mode is active.
+
+ver 2.1.1 (22.1.2017)
+> Fixed bug preventing debugger activation.
+
+ver 2.1.0 (13.1.2017)
+> Reprogrammed Smart Fullscreens. Now they're really smart!
+> Added "Update Prompt" feature for use with secondary display.
+> Added editor onFocus behavior for when updating text.
+> Fixed horrendous Windows crash bug. Why does it always has to be Windows?
+> Improved index layout for small screens.
+> Sidebar CSS improvements.
+> Commented pre-alpha Remote Control features to merge with master branch.
+
 ver 2.0.1, (14.11.16)
 > Missing dependency in package.json.
 > Duplicate variable in main.js

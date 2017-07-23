@@ -14,120 +14,133 @@
 */
 
 "use strict";
+
+// IMPORT MAIN PROGRAM MODULES
 if (require('electron-squirrel-startup')) return;
-const {
-    electron
-} = require('electron');
-const {
-    app
-} = require('electron'); // Module to control application life.
-const {
-    BrowserWindow
-} = require('electron'); // Module to create native browser window.
-
-//The ipcMain module, when used in the main process,
-//handles asynchronous and synchronous messages sent from a renderer process (web page).
-const {
-    ipcMain
-} = require('electron');
-const {
-    shell
-} = require('electron'); // Module that provides functions related to desktop integration.
-const {
-    globalShortcut
-} = require('electron'); // module can register/unregister a global keyboard shortcut with the operating system so that you can customize the operations for various shortcuts.
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let mainWindow = null;
-// The menu class is used to create native menus that can be used as application menus and context menus.
-const {
-    Menu
+const { electron,
+	app, // Module to control application's life.
+	BrowserWindow, // Module to create native browser window.
+	Menu, // The menu class is used to create native menus that can be used as application menus and context menus.
+	ipcMain, // The ipcMain module, when used in the main process, handles asynchronous and synchronous messages sent from a renderer process (web page).
+	shell, // Module that provides functions related to desktop integration.
+	globalShortcut // Module can register/unregister a global keyboard shortcut with the operating system so that you can customize the operations for various shortcuts.
+	// Keep a global reference of the window object, if you don't, the window will be closed automatically when the JavaScript object is garbage collected.
 } = require('electron');
 
-//const app = require('app');
-
-// this should be placed at top of main.js to handle setup events quickly
+// This should be placed at top of main.js to handle setup events quickly
 if (handleSquirrelEvent()) {
-    // squirrel event handled and app will exit in 1000ms, so don't do anything else
-    return;
+  // squirrel event handled and app will exit in 1000ms, so don't do anything else
+  return;
 }
 
 function handleSquirrelEvent() {
-    if (process.argv.length === 1) {
-        return false;
-    }
+  if (process.argv.length === 1) {
+    return false;
+  }
 
-    const ChildProcess = require('child_process');
-    const path = require('path');
+  const ChildProcess = require('child_process');
+  const path = require('path');
 
-    const appFolder = path.resolve(process.execPath, '..');
-    const rootAtomFolder = path.resolve(appFolder, '..');
-    const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'));
-    const exeName = path.basename(process.execPath);
+  const appFolder = path.resolve(process.execPath, '..');
+  const rootAtomFolder = path.resolve(appFolder, '..');
+  const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'));
+  const exeName = path.basename(process.execPath);
 
-    const spawn = function(command, args) {
-        let spawnedProcess, error;
+  const spawn = function(command, args) {
+    let spawnedProcess, error;
 
-        try {
-            spawnedProcess = ChildProcess.spawn(command, args, {
-                detached: true
-            });
-        } catch (error) {}
+    try {
+      spawnedProcess = ChildProcess.spawn(command, args, {detached: true});
+    } catch (error) {}
 
-        return spawnedProcess;
-    };
+    return spawnedProcess;
+  };
 
-    const spawnUpdate = function(args) {
-        return spawn(updateDotExe, args);
-    };
+  const spawnUpdate = function(args) {
+    return spawn(updateDotExe, args);
+  };
 
-    const squirrelEvent = process.argv[1];
-    switch (squirrelEvent) {
-        case '--squirrel-install':
-        case '--squirrel-updated':
-            // Optionally do things such as:
-            // - Add your .exe to the PATH
-            // - Write to the registry for things like file associations and
-            //   explorer context menus
+  const squirrelEvent = process.argv[1];
+  switch (squirrelEvent) {
+    case '--squirrel-install':
+    case '--squirrel-updated':
+      // Optionally do things such as:
+      // - Add your .exe to the PATH
+      // - Write to the registry for things like file associations and
+      //   explorer context menus
 
-            // Install desktop and start menu shortcuts
-            spawnUpdate(['--createShortcut', exeName]);
+      // Install desktop and start menu shortcuts
+      spawnUpdate(['--createShortcut', exeName]);
 
-            setTimeout(app.quit, 1000);
-            return true;
+      setTimeout(app.quit, 1000);
+      return true;
 
-        case '--squirrel-uninstall':
-            // Undo anything you did in the --squirrel-install and
-            // --squirrel-updated handlers
+    case '--squirrel-uninstall':
+      // Undo anything you did in the --squirrel-install and
+      // --squirrel-updated handlers
 
-            // Remove desktop and start menu shortcuts
-            spawnUpdate(['--removeShortcut', exeName]);
+      // Remove desktop and start menu shortcuts
+      spawnUpdate(['--removeShortcut', exeName]);
 
-            setTimeout(app.quit, 1000);
-            return true;
+      setTimeout(app.quit, 1000);
+      return true;
 
-        case '--squirrel-obsolete':
-            // This is called on the outgoing version of your app before
-            // we update to the new version - it's the opposite of
-            // --squirrel-updated
+    case '--squirrel-obsolete':
+      // This is called on the outgoing version of your app before
+      // we update to the new version - it's the opposite of
+      // --squirrel-updated
 
-            app.quit();
-            return true;
-    }
-}
+      app.quit();
+      return true;
+  }
+};
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
+// Set Global window variable.
+let mainWindow = null;
+
+// This method will be called when Electron has finished initialization and is ready to create browser windows.
 app.on('ready', () => {
 	// Create the browser window.
-	mainWindow = new BrowserWindow({width: 1280, height: 800, javascritp: true, title: 'Teleprompter', useContentSize: true, nodeIntegration: true});
+	mainWindow = new BrowserWindow({width: 1280, height: 800, javascript: true, title: 'Teleprompter', useContentSize: true, nodeIntegration: true, icon: __dirname + '/icon.ico'});
+
+  	if (process.platform === 'darwin') {
+		// Create our menu entries so that we can use MAC shortcuts
+		Menu.setApplicationMenu(Menu.buildFromTemplate([
+			{
+				label: 'Edit',
+				submenu: [
+					{ role: 'undo' },
+					{ role: 'redo' },
+					{ type: 'separator' },
+					{ role: 'cut' },
+					{ role: 'copy' },
+					{ role: 'paste' }, 
+					{ role: 'delete' },
+					{ role: 'selectall' }
+				]
+			}
+		]));
+	}else{
+		// Disables menu in systems where it can be disabled and doesn't need it'.
+    	Menu.setApplicationMenu(null);
+	}
+
 
 	// and load the index.html of app.
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
+	let contents = mainWindow.webContents;
 
-  	// Disables menu in systems where it can be disabled.
-    Menu.setApplicationMenu(null);
+	// IPC interaction
 
+	// Debug tools
+	contents.on('devtools-opened', () => {
+	    contents.executeJavaScript('enterDebug()');
+	});
+	contents.on('devtools-closed', () => {
+	    contents.executeJavaScript('exitDebug()');
+	});
+
+	// Get computer IPs for remote control
     function getIP() {
 	    var os = require('os');
 	    var nets = os.networkInterfaces();
@@ -142,14 +155,15 @@ app.on('ready', () => {
 	    return null;
 	}
 
-	function runSocket(event){
+	// Remote control server
+	function runSocket(event) {
 	    var ip = getIP();
 	    if(ip){
 	      var app2 = require('express')();
 	      var http = require('http').Server(app2);
 	      var bonjour = require('bonjour')();
-
 	      var io = require('socket.io')(http);
+
 	      io.sockets.on('connection', function (socket) {
 	        socket.on('command',function(res){
 	            if(res.hasOwnProperty('key') > 0){
@@ -172,39 +186,19 @@ app.on('ready', () => {
 	    }else{
 	      setTimeout(function(){
 	        runSocket(event);
-	      },1000);
+	      }, 1000);
 	    }
 	}
 
 	// Send a message to the renderer process...
 	ipcMain.on('asynchronous-message', (event, arg) => {
-		if(arg === "network"){
+		if (arg === "network")
 	  		runSocket(event);
-		}else
-	  		event.sender.send('asynchronous-reply', 'Done');
+		else if (arg === "prepareLinks")
+	  		event.sender.send('asynchronous-reply',{'option':'prepareLinks'});;
 	});
 
-	// Register a 'F8' shortcut listener.
-	let ret = globalShortcut.register('F8', () => {
-		mainWindow.openDevTools();
-	});
-
-	if (!ret) {
-		console.log('registration failed');
-	}
-
-	// Check whether a shortcut is registered.
-	console.log(globalShortcut.isRegistered('F8'));
-
-	app.on('will-quit', () => {
-		// Unregister a shortcut.
-		globalShortcut.unregister('F8');
-
-		// Unregister all shortcuts.
-		globalShortcut.unregisterAll();
-	});
-
-	// Emitted when the window is closed.
+	// Close Window
 	mainWindow.on('closed', () =>{
         // Dereference the windows object, usually you would store  windows
         // in an array if your app supports multi windows, this is the time

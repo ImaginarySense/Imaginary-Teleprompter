@@ -131,13 +131,13 @@ var SIDEBAR = function() {
         li.classList.add("sidebar-brand");
 
         var div = document.createElement("div");
-        div.classList.add("col-md-6");
+        div.classList.add("col-xs-6");
         div.style.paddingLeft = '0px';
         div.innerHTML = this.getName();
         li.appendChild(div);
 
         div = document.createElement("div");
-        div.classList.add("col-md-6");
+        div.classList.add("col-xs-6");
 
         var span = document.createElement("span");
         span.classList.add("glyphicon");

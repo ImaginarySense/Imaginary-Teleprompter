@@ -25,42 +25,55 @@ function inElectron() {
 
 var dataManager = {
     getItem: function(key,item,local,force){
-	if(local === 'undefined')
-	    local = 0;
-	if(inElectron() && local == 2){
-	    httpRequest("GET", key, item,force);
-	}else if (inElectron() || local == 1)
-	    item(localStorage.getItem(key));
-	else
-	    item(sessionStorage.getItem(key));
+		if (local === 'undefined')
+		    local = 0;
+		if (inElectron() && local == 2)
+		    httpRequest("GET", key, item,force);
+		else if (inElectron() || local == 1)
+		    item(localStorage.getItem(key));
+		else
+		    item(sessionStorage.getItem(key));
     },
     setItem: function (key,item,local) {
-	if(local === 'undefined')
-	    local = 0;
-	if(inElectron() && local == 2){
-	    httpRequest("POST",key,item,true);
-	}else if (inElectron() || local == 1)
-	    localStorage.setItem(key, item);
-	else
-	    sessionStorage.setItem(key, item);
+		if (local === 'undefined')
+		    local = 0;
+		if (inElectron() && local == 2)
+		    httpRequest("POST",key,item,true);
+		else if (inElectron() || local == 1)
+		    localStorage.setItem(key, item);
+		else
+		    sessionStorage.setItem(key, item);
+    },
+    removeItem: function (key,local) {
+		if (local === 'undefined')
+		    local = 0;
+		if (inElectron() && local == 2)
+		    httpRequest("POST",key,item,true);
+		else if (inElectron() || local == 1)
+		    localStorage.removeItem(key);
+		else
+		    sessionStorage.removeItem(key);
+    },
+    clearAll: function () {
+    	sessionStorage.clear();
+    	localStorage.clear();
     }
 };
 
 
-function httpRequest(type,theUrl,data,force)
-{
-    if(data === 'undefined')
+function httpRequest(type,theUrl,data,force) {
+    if (data === 'undefined')
 	    data = "";
     var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
     xmlhttp.open(type, theUrl, force);
     xmlhttp.setRequestHeader("Content-Type", "application/json");
     
     xmlhttp.onreadystatechange = function() {
-	if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-	    if (type == "GET"){
-			data(xmlhttp.responseText);
-	    }
-	}
+		if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+		    if (type == "GET") {
+				data(xmlhttp.responseText);
+		    }
+		}
     }
     xmlhttp.send(data);
 }
