@@ -1,30 +1,30 @@
 /*
-	Teleprompter
-	Copyright (C) 2015 Imaginary Films LLC and contributors
+    Teleprompter
+    Copyright (C) 2015 Imaginary Sense, Imaginary Films LLC and contributors
 
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // Global variables
 var debug;
-
+var currentVersion = "2.3.0"
 function inElectron() {
     return navigator.userAgent.indexOf("Electron")!=-1;
 }
 
 var dataManager = {
-    getItem: function(key,item,local,force){
+	getItem: function(key,item,local,force){
 		if (local === 'undefined')
 		    local = 0;
 		if (inElectron() && local == 2)

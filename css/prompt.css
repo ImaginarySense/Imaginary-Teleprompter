@@ -1,6 +1,6 @@
 /*
 	Teleprompter
-	Copyright (C) 2015 Imaginary Films LLC and contributors
+	Copyright (C) 2015 Imaginary Sense, Imaginary Films LLC and contributors
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 	line-height: 1.1;
 	text-align: center;
 	list-style-position: inside;
-	font-family: sans-serif, Arial, Verdana, "Trebuchet MS";
+	font-family: Arial, Verdana, sans-serif, "Trebuchet MS";
 }
 
 #prompt h6 {
@@ -40,15 +40,15 @@
 }
 
 #prompt h3 {
-	font-size: 1.16666em;
+	font-size: 1.1em;
 }
 
 #prompt h2 {
-	font-size: 1.33333em;
+	font-size: 1.2em;
 }
 
 #prompt h1 {
-	font-size: 1.5em;
+	font-size: 1.3em;
 }
 
 #prompt a {
