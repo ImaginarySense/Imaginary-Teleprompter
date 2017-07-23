@@ -1,5 +1,24 @@
 CHANGELOG
 
+ver 2.3.0 (x.7.2017)
+> Import and export basic HTML files
+> Performance improvements.
+> Improved sidebar and teleprompter usability.
+> New advanced velocity controls
+> New font-size adjustments
+> New timer functionality
+> New styles: Dark Matter & Azure Light
+> Updated Introduction
+> Updated Copyright holders information
+
+ver 2.2.x (16.5.2017)
+> Implemented canvas based prommpter for use in Electron. Smart fullscreen implemention remains still pending.
+
+ver 2.2.x (12 commits)
+> Version management implemented by va2ron1
+> Electron jQuery issues fixed by javiercordero
+> Other small code improvements
+
 ver 2.2.0 (23.1.2017)
 > Improved and fixed bug with latest Electron on debug tools. Now you press F12 to both enter debug mode and load Developer Tools.
 > Mayor improvements to Electron's main.js.

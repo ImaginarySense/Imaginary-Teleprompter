@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <!--
 	Teleprompter
-	Copyright (C) 2015 Imaginary Films LLC and contributors
-
+	Copyright (C) 2015 Imaginary Sense, Imaginary Films LLC and contributors
+	
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
-
+	
 	This program is distributed in the hope that it will be useful,
-	buunityt WITHOUT ANY WARRANTY; without even the implied warranty of
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
-
+	
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
@@ -25,10 +25,6 @@
 	<link rel="stylesheet" href="css/teleprompter.css">
 	<link rel="stylesheet" href="css/prompt.css">
 	<link rel="stylesheet" href="css/teleprompter-themes.css">
-	<script src="js/pep.min.js"></script>
-	<script src="js/data.manager.js"></script>
-	<script src="js/teleprompter.js"></script>
-	<script src="js/teleprompter-themes.js"></script>
 </head>
 <!-- Prompt id brings text formating -->
 <body id="promptcontainer">
@@ -47,8 +43,12 @@
 	</header>
 	<!-- #prompt contains formating, which is shared with the overlay. -->
 	<div id="prompt">
+		<!-- #touchOverlay allows for scroll controls. -->
+		<div id="touchOverlay"></div>
 		<!-- .prompt helps us identify and manipulate the prompt itself. -->
 		<article class="prompt"></article>
+		<!-- .clock load timer instances. -->
+		<div class="clock"></div>
 		<!-- #overlay layers focus area on top of the prompt. -->
 		<table border="0" cellpadding="0" cellspacing="0" touch-action="none" id="overlay">
 			<tbody>
@@ -64,4 +64,10 @@
 			</tbody>
 		</table>
 	</div>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/pep.min.js"></script>
+	<script src="js/data.manager.js"></script>
+	<script src="js/teleprompter.js"></script>
+	<script src="js/teleprompter-themes.js"></script>
+	<script src="js/jquery.timer.js"></script>
 </body>
