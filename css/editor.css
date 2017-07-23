@@ -1,6 +1,6 @@
 /*
 	Teleprompter
-	Copyright (C) 2015 Imaginary Films LLC and contributors
+	Copyright (C) 2015 Imaginary Sense, Imaginary Films LLC and contributors
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -34,11 +34,18 @@ body {
 	padding-bottom: 10px;
 }
 
+#menu-toggle, #advConfig {
+	padding: 12px 11px 11px 11px;
+	margin: 0px;
+	/*top: 0px;*/
+}
+
 a#promptIt {
 	background:#EEE;
 	font-weight: bold;
 	font-size: 1.4em;
 }
+
 
 a#updateIt {
 	font-size: 1.2em;
@@ -48,7 +55,6 @@ a#updateIt {
 #updateIt:hover {
 	background:#EEE;
 }
-
 
 #editorcontainer:-webkit-full-screen {
 	width: 100%;
@@ -64,6 +70,10 @@ a#updateIt {
 	height: auto;
 }
 
+footer #imaginary {
+	font-weight: bold;
+}
+
 #promptcontainer {
 	position: relative;
 	overflow: auto;
@@ -73,7 +83,7 @@ a#updateIt {
 	top: 0px;
 	bottom: 0px;
 	width: 100%;
-	min-height: 64vh;
+	min-height: 78vh;
 	height: calc(100% - 69px);	
 	/* Cancel 3D transform from intergalactic theme. */
 	transform: rotateX(0deg) translate3d(0px,0px,0px) !important;
@@ -86,6 +96,18 @@ a#updateIt {
 	background: #F0F0F0;
 }
 
+#prompt {
+	top:0;
+	bottom:0;
+	left:0;
+	right:0;
+}
+/*
+#prompt > * {
+	border-left: dashed 1pt #CCC;
+	border-right: dashed 1pt #CCC;
+}
+*/
 #statusbar {
 	position: absolute;
 	bottom: 0px;
@@ -120,7 +142,8 @@ a#updateIt {
 	text-align: center;
 	text-shadow: 0 1px 0 rgba(0,0,0,.1);
 	background-color: #6f5499;
-	background-image: linear-gradient(to bottom,#563d7c 0,#6f5499 100%);
+	background-image: linear-gradient(45deg, #4A4771 0%, #7C3875 100%);
+	/*background-image: linear-gradient(to bottom,#563d7c 0,#6f5499 100%);*/
 	background-repeat: repeat-x;
 	color: #CCF;
 }
@@ -162,7 +185,8 @@ a:active {
 	font-size:11px;
 	height:118px;
 	line-height:15px;
-	overflow:hidden;width:300px;
+	overflow:hidden;
+	width:300px;
 }
 .carbonad-img {
 	border:none;
@@ -233,6 +257,10 @@ a:active {
     padding: 15px;
 }
 
+#wrapper {
+	will-change: margin-right;
+}
+
 #wrapper.toggled #page-content-wrapper {
     position: absolute;
     margin-right: -250px;
@@ -271,17 +299,26 @@ a:active {
     color: #fff;
     background: rgba(255,255,255,0.2);
 }
+.sidebar-nav li div.list p:hover {
+    cursor: pointer;
+}
+.glyphicon.glyphicon-chevron-left,
+.glyphicon.glyphicon-pencil {
+    cursor: pointer;
+}
 
 .sidebar-nav li div.addOption:hover {
     text-decoration: none;
     color: #fff;
     background: rgba(255,255,255,0.2);
+    cursor: pointer;
 }
 
 .editableMode {
     text-decoration: none;
     color: #fff;
     background: rgba(255,255,255,0.2);
+    cursor: pointer;
 }
 
 .sidebar-nav li div.list:active,
@@ -328,6 +365,10 @@ a:active {
     }
 }
 
+.slider.slider-horizontal {
+	width: 90%;
+}
+
 .disabled {
     pointer-events:none;
     opacity:0.4;
@@ -335,4 +376,8 @@ a:active {
 
 .hidden {
 	display: none;
+}
+
+.slider-handle {
+	cursor: pointer;
 }

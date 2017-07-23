@@ -2,20 +2,25 @@
   "name": "imaginary-teleprompter",
   "email": "support@imaginary.tech",
   "homepage": "http://imaginary.tech/teleprompter/",
-  "description": "The most complete and professional free software teleprompter app on the web.",
+  "description": "The most complete and professional free software teleprompter application.",
   "license": "GPL-3.0+",
-  "version": "2.2.1b",
+  "version": "2.3.0",
   "keywords": [
     "teleprompter",
-    "imaginary",
     "television",
-    "online",
+    "news",
+    "multiplatform",
     "portable",
-    "local"
+    "software",
+    "local",
+    "online",
+    "imaginary sense",
+    "imaginary films",
+    "imaginary"
   ],
-  "author": "Imaginary Films LLC <support@imaginary.tech> (http://imaginary.tech)",
+  "author": "Imaginary Sense <support@imaginary.tech> (http://imaginary.tech)",
   "contributors": [
-    "Javier O. Cordero-Pérez <javier@imaginary.tech> (https://www.linkedin.com/in/javier-oscar-cordero-p%25C3%25A9rez-70658033)",
+    "Javier O. Cordero-Pérez <javier@imaginary.tech> (http://javiercordero.info)",
     "Victor A. Ortiz-Alvarado <va2ron1@gmail.com> (https://twitter.com/Va2ron1)",
     "Rafael J. Sierra-Soto <rafael.sierra2@upr.edu> (https://www.facebook.com/rafael.jose.7737)",
     "Keyvan Pérez Pérez <keyvan.perez2@gmail.com> (https://github.com/keyvanp)"
@@ -25,20 +30,20 @@
     "url": "https://github.com/imaginaryfilms/Teleprompter"
   },
   "bugs": {
-    "url": "http://imaginary.tech/support/"
+    "url": "https://github.com/imaginaryfilms/Teleprompter-Core/issues"
   },
   "scripts": {
-    "start": "electron main.js"
+    "start": "electron main.js",
+    "postinstall": "npm start"
   },
   "main": "main.js",
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
-    "socket.io": "^1.7.2",
-    "express": "^4.14.0",
-    "bonjour": "3.5.0"
+    "shelljs": "^0.7.8",
+    "deb-version-compare": "git+https://github.com/sdumetz/node-deb-version-compare.git"
   },
   "devDependencies": {
-    "electron": "^1.4.15"
+    "electron": "^1.6.11"
   },
   "engine": "node >= 7.4.0",
   "preferGlobal": "false"

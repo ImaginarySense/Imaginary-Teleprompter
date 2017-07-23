@@ -1,6 +1,6 @@
 /*
 	Teleprompter
-	Copyright (C) 2015 Imaginary Films LLC and contributors
+    Copyright (C) 2015 Imaginary Sense, Imaginary Films LLC and contributors
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 */
 
 #touchControls {
-	z-index: 30;
+	z-index: 50;
 	position: fixed;
 	width: 100%;
 	height: 100%;
@@ -27,12 +27,32 @@
 
 body {
 	overflow: hidden;
+	background: #151613;
+/*	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+*/	/*user-select: none;*/
+}
+
+.clock {
+	z-index: 30;
+	position: fixed;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	font-family: courier, monospace;
+	background: rgba(0,0,0,0.22);
+	color: #FFF;
+	font-size: 20.5vmin;
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
-	/*user-select: none;*/
+	opacity: 0;
+    transition: opacity 800ms linear;
 }
 
 #overlay {
@@ -43,7 +63,21 @@ body {
 	width: 100vh;
 	height: 100vh;
 	border: none;
-	opacity: 0.5;
+	opacity: 0.45;
+	cursor: crosshair;
+}
+
+#touchOverlay {
+	z-index: 40;
+	position: fixed;
+	top: 0px;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;	
+	margin: 0;
+	padding: 0;
+	cursor: crosshair;
+	background: rgba(0,0,0,0);
 }
 
 .disable {
@@ -92,9 +126,9 @@ body {
 	position: relative;
 	padding: 100vh 0px 100vh 0px;
 	top: 0px;
+	will-change: transform;
 }
 
 #overlayFocus {
-	height: 1.6em;
+	height: 1.8em;
 }
-
