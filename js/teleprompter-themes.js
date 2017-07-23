@@ -113,8 +113,10 @@ function styleInit(prompterStyleElement) {
     
     defaultStyle = 1;
     dataManager.getItem('IFTeleprompterThemeDefaultStyle',function(data){
-        if(JSON.parse(data) !== "undefined")
-            defaultStyle = JSON.parse(data)+1;
+        if(JSON.parse(data) != undefined) {
+            defaultStyle = JSON.parse(data);
+            console.log(defaultStyle);
+        }
     },0,false);
 
     ///Maybe will need a fix in the future...
@@ -158,7 +160,7 @@ function editThemeStyle(name2, objName, bodyColor, overlayColor, textColor) {
 
 function removeStyleFromPromptStyles() {
     if (defaultStyle == themeStyles[lastStyleSelected]["id"])
-        defaultStyle = 0;
+        defaultStyle = 1;
     
     themeStyles.splice(lastStyleSelected, 1);
 
