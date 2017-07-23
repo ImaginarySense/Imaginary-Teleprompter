@@ -109,7 +109,7 @@ let mainWindow = null,
 // This method will be called when Electron has finished initialization and is ready to create browser windows.
 app.on('ready', () => { 
 	// Create the browser window.
-	mainWindow = new BrowserWindow({show: false, width: 1280, height: 800, javascript: true, title: 'Teleprompter', useContentSize: true, nodeIntegration: true, icon: __dirname + '/icon.ico'});
+	mainWindow = new BrowserWindow({show: false, width: 1280, height: 800, javascript: true, title: 'Teleprompter by Imaginary Sense', useContentSize: true, nodeIntegration: true, icon: __dirname + '/icon.ico'});
 
   	if (process.platform === 'darwin') {
 		// Create our menu entries so that we can use MAC shortcuts
