@@ -6,7 +6,8 @@ ver 2.3.0 (x.7.2017)
 > Improved sidebar and teleprompter usability.
 > New advanced velocity controls
 > New font-size adjustments
-> New timer functionality.
+> New timer functionality
+> New styles: Dark Matter & Azure Light
 > Updated Introduction
 > Updated Copyright holders information
 
