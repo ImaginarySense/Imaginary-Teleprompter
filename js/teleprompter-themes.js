@@ -85,14 +85,14 @@ function styleInit(prompterStyleElement) {
             bgOverlay: "darkMatterO",
             cssText: ".darkMatter {color: #FFFFFF; background: #222222;}.darkMatterO {background: #000000;}"
         }, {
+        // id:4,
+        //     name: "Intergalactic",
+        //     type: 0,
+        //     className: "theForce",
+        //     bgOverlay: "darkOverlay",
+        //     cssText: ".theForce {color: #FD1;background: #000;transform-origin: 50% 50%; transform: perspective(100px) rotateX(90deg) translate3d(0px,0px,-100vh);}.darkOverlay {background: #000;}"
+        // }, {
         id:4,
-            name: "Intergalactic",
-            type: 0,
-            className: "theForce",
-            bgOverlay: "darkOverlay",
-            cssText: ".theForce {color: #FF0;background: #000;transform-origin: 50% 100%;transform: perspective(300px) rotateX(30deg) translate3d(0px,-115px,-180px);}.darkOverlay {background: #000;}"
-        }, {
-        id:5,
             name: "Whiteboard",
             type: 0,
             className: "lightBody",
