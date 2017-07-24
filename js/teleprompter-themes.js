@@ -216,6 +216,7 @@ function refreshPromptStyles(promptStyleElement) {
     opt.innerHTML = "Custom Style";
 
     promptStyleElement.appendChild(opt);
+    setStyle(defaultStyle);
 }
 
 // Set Teleprompter Style.
