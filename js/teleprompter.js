@@ -39,7 +39,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     // Global objects
     var settings, session, prompt, pointer, overlay, overlayFocus, styleSheet, editor, timer, clock, remote;
     // Global variables
-    var unit, x, velocity, sensitivity, speedMultip, relativeLimit, steps, play, timeoutStatus, invertedWheel, focus, promptStyleOption, customStyle, flipV, flipH, fontSize, previousPromptHeight, previousScreenHeight, previousScreenWidth, previousVerticalDisplacementCorrector, domain, debug, closing, cap, syncDelay, isMobileApp, acceptInput;
+    var unit, x, velocity, sensitivity, speedMultip, relativeLimit, steps, play, timeoutStatus, invertedWheel, focus, promptStyleOption, customStyle, flipV, flipH, fontSize, focusHeight, promptHeight, previousPromptHeight, screenHeight, previousScreenHeight, previousScreenWidth, previousVerticalDisplacementCorrector, domain, debug, closing, cap, syncDelay, isMobileApp;
 
     // Enums
     var command = Object.freeze({
@@ -106,12 +106,14 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         cap = false;
         syncDelay = 12;
         isMobileApp = false;
-        acceptInput = false;
         
         // Local Storage and Session data
         updateDatamanager();
 
-        // Set values relative to unit size.
+        // Set initial relative values.
+        setFocusHeight();
+        setScreenHeight();
+        // setScreenWidth();
         updateUnit();
         
         // Initialize domain for interprocess communication
@@ -144,6 +146,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         timer = $('.clock').timer({ stopVal: 10000 });
         // Get and set prompter text
         updateContents();
+        setPromptHeight();
         
         // Get prompter style
         promptStyleOption = settings.data.prompterStyle;
@@ -199,9 +202,9 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         invertedWheel = false;//settings.data.invertedWheel;
 
         // Save current screen position related settings for when resize and screen rotation ocurrs.
-        previousPromptHeight = getPromptHeight();
-        previousScreenHeight = getScreenHeight();
-        previousScreenHeight = getScreenHeight();
+        previousPromptHeight = promptHeight;
+        previousScreenHeight = screenHeight;
+        previousScreenHeight = screenHeight;
         previousVerticalDisplacementCorrector = focusVerticalDisplacementCorrector();
 
         // Add pointer controls
@@ -216,7 +219,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         window.setTimeout( function() {
             // If flipped vertically, set start at inverted top.
             if (flipV)
-                animate(0,-getPromptHeight()+getScreenHeight());
+                animate(0,-promptHeight+screenHeight);
             
             // Sync prompter positions to smallest at start.
             syncPrompters();
@@ -271,7 +274,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     }
 
     function pointerActive(event) {
-        if (acceptInput && !pointer.active) {
+        if (!pointer.active) {
             if (debug) console.log("Pointer active") && false;
             internalPauseAnimation();
             pointer.prompterstart = getCurrPos();
@@ -282,7 +285,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     }
 
     function pointerInactive() {
-        if (acceptInput && pointer.active) {
+        if (pointer.active) {
             if ( !pointer.moved )
                 toggleTouchControls();
             if (debug) console.log("Pointer inactive") && false;
@@ -301,7 +304,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     }
 
     function pointerMove(event) {
-        if (acceptInput && pointer.active) {
+        if (pointer.active) {
             // Get current point location
             var argument,
                 pointerCurrPos = event.clientY,
@@ -410,11 +413,9 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         editor.postMessage( {'request':command.sync,'data':getProgress()}, getDomain() );
     }
 
-    function instaSync( forceSync ) {
-        if (forceSync||steps>syncDelay) {
+    function instaSync() {
+        if (steps>syncDelay)
             editor.postMessage( {'request':command.iSync,'data':getProgress()}, getDomain() );
-            resetSteps();
-        }
     }
 
     function updateVelocity() {
@@ -428,7 +429,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         if (flipV)
             flag = getCurrPos() >= 0;
         else
-            flag = getCurrPos() <= -(getPromptHeight()-getScreenHeight());
+            flag = getCurrPos() <= -(promptHeight-screenHeight);
         if (debug&&flag) console.log("At top") && false;
         return flag;
     }
@@ -436,7 +437,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     function atStart() {
         var flag;
         if (flipV)
-            flag = getCurrPos() <= -(getPromptHeight()-getScreenHeight());
+            flag = getCurrPos() <= -(promptHeight-screenHeight);
         else
             flag = getCurrPos() >= 0;
         if (debug&&flag) console.log("At bottom") && false;
@@ -472,7 +473,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     }
 /*
     function getAspectRatio() {
-        return getScreenWidth()/getScreenHeight();
+        return screenWidth/screenHeight;
     }
 */
     // Solve for time to reach end.
@@ -480,23 +481,23 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         return (velocity ? Math.abs(1000*(destination-currPos)/(velocity*unit)) : 0 );
     }
 
-    function getScreenHeight() {
-        return overlay.clientHeight;
+    function setScreenHeight( ) {
+        screenHeight = overlay.clientHeight;
     }
 
-    function getScreenWidth() {
-        return overlay.clientWidth;
+    function setScreenWidth( ) {
+        screenWidth = overlay.clientWidth;
     }
 
-    function getPromptHeight() {
-        return prompt.clientHeight;
+    function setPromptHeight( ) {
+        promptHeight = prompt.clientHeight;
     }
 
-    function getFocusHeight() {
+    function setFocusHeight( ) {
         if (overlayFocus!==undefined)
-            return overlayFocus.clientHeight;
+            focusHeight = overlayFocus.clientHeight;
         else
-            return 0;
+            focusHeight = 0;
     }
     
     function getCurrPos(obj) {
@@ -538,11 +539,11 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
             if (flipV)
                 whereTo = 0;
             else
-                whereTo = -(getPromptHeight()-getScreenHeight());
+                whereTo = -(promptHeight-screenHeight);
         }
         else if (velocity<0) {
             if (flipV)
-                whereTo = -(getPromptHeight()-getScreenHeight());
+                whereTo = -(promptHeight-screenHeight);
             else
                 whereTo = 0;
         }
@@ -583,7 +584,6 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         // Resume animation by re adding the class.
         prompt.classList.add("move");
         if (debug) setTimeout( function(){ console.log(/*"Curr: "+getCurrPos()+"\n*/"Dest: "+destination+"\nRemTime "+time) && false; }, 0);
-        acceptInput = true;
     }
     //https://css-tricks.com/controlling-css-animations-transitions-javascript/
 
@@ -599,16 +599,16 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
             case 3:
             // Sync to "Top".
             case 1:
-                vDisp = getFocusHeight()/2;
+                vDisp = focusHeight/2;
                 break;
             // Sync to "Bottom".
             case 2:
-                vDisp = getScreenHeight()-getFocusHeight()/2;
+                vDisp = screenHeight-focusHeight/2;
                 break;
             // Sync to "Center" by default
             default:
                 // If center and flip. Take a little above center
-                vDisp = getScreenHeight()/2;
+                vDisp = screenHeight/2;
                 break;
         }
         //if (debug) window.setTimeout( function() { console.log("Vertical displacement: "+vDisp) && false; };
@@ -618,7 +618,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     function moveToCSSAnchor( theAnchor ) {
         var jump;
         if (flipV)
-            jump = -getPromptHeight()+document.getElementById(theAnchor).offsetTop + getScreenHeight()-focusVerticalDisplacementCorrector();
+            jump = -promptHeight+document.getElementById(theAnchor).offsetTop + screenHeight-focusVerticalDisplacementCorrector();
         else
             jump = -document.getElementById(theAnchor).offsetTop + focusVerticalDisplacementCorrector();
         if (debug) console.log("Jumped to: "+jump) && false;
@@ -642,7 +642,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
     // Update unit and unit related measurements
     function updateUnit() {
-        unit = getFocusHeight()/80;
+        unit = focusHeight/80;
         relativeLimit = limit*unit;
         if (debug) setTimeout( function(){ console.log("Unit updated: "+unit) && false; });
         resumeAnimation();
@@ -685,12 +685,12 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         }   
         else
             delay = transitionDelay/2;
-        internalPauseAnimation();
+        setPromptHeight();
+        setScreenHeight();
+        // internalPauseAnimation();
         animationTimeout( delay, function() {
             // Get current screen settings. To be used multiple times.
             var updatedPos,
-                promptHeight = getPromptHeight(),
-                screenHeight = getScreenHeight(),
                 valToCenterAtFocusArea = focusVerticalDisplacementCorrector();
             if (percentage===undefined)
                 percentage = getProgress();
@@ -703,6 +703,8 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
             previousPromptHeight = promptHeight;
             previousScreenHeight = screenHeight;
             previousVerticalDisplacementCorrector = valToCenterAtFocusArea;
+            // Reset steps
+            resetSteps();
             // Correct vertical displacement with a smooth animation.
             animate( transitionDelay, updatedPos, 'ease' );
             // After that animation is done...
@@ -728,6 +730,10 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     function onResize() {
         if (debug) console.log("Resize") && false;
         // In case of resolution change, update density unit.
+        setPromptHeight();
+        setFocusHeight();
+        setScreenHeight();
+        // setScreenWidth();
         updateUnit();
         // You can guess what the next line does.
         correctVerticalDisplacement();        
@@ -799,10 +805,8 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
     function incSteps() {
         steps++;
-        if (steps>40) {
+        if (steps>140)
             instaSync();
-            resetSteps();
-        }
         timeout(250, instaSync);
     }
 
@@ -911,7 +915,6 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                     });
                     break;
                 case command.sync :
-                    acceptInput = false;
                     requestAnimationFrame(function(){
                         correctVerticalDisplacement(message.data);
                     });
@@ -989,79 +992,77 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     }
 
     document.onkeydown = function( event ) {
-        if (acceptInput) {
-            var key;
-            // keyCode is announced to be deprecated but not all browsers support key as of 2016.
-            if (event.key === undefined)
-                event.key = event.keyCode;
-            if (debug) console.log("Key: "+event.key) && false;
-            switch ( event.key ) {
-                case "s":
-                case "S":
-                case "ArrowDown":
-                case 40: // Down
-                case 68: // S
-                    increaseVelocity();
-                    break;
-                case "w":
-                case "W":
-                case "ArrowUp":
-                case 38: // Up
-                case 87: // W
-                    decreaseVelocity();
-                    break;
-                case "d":
-                case "D":
-                case "ArrowRight":
-                case 83: // S
-                case 39: // Right
-                    increaseFontSize();
-                    break;
-                case "a":
-                case "A":
-                case "ArrowLeft":
-                case 37: // Left
-                case 65: // A
-                    decreaseFontSize();
-                    break;
-                case " ":           
-                case 32: // Spacebar
-                    toggleAnimation();
-                    break;
-                case ".":
-                case 110: // Numpad dot
-                case 190: // Dot
-                    syncPrompters();
-                    break;
-                case "Escape":
-                case 27: // ESC
-                    closeInstance();
-                    break;
-                case 121:
-                case "F10":
-                case 123:
-                case "F12":
-                    if (!inIframe())
-                        toggleDebug();
-                    break;
-                case 8:
-                case "Backspace":
-                case "backspace":
-                    resetTimer();
-                    break;
-                default: // Move to anchor.
-                    // If key is not a string
-                    if(!isFunction(event.key.indexOf))
-                        key = String.fromCharCode(event.key);
-                    else
-                        key = event.key;
-                    //if ( key.indexOf("Key")===0 || key.indexOf("Digit")===0 )
-                    //      key = key.charAt(key.length-1);
-                    if ( !is_int(key) )
-                        key = key.toLowerCase();
-                    if (debug) console.log(key);
-                    moveToAnchor( key );
-            }
+        var key;
+        // keyCode is announced to be deprecated but not all browsers support key as of 2016.
+        if (event.key === undefined)
+            event.key = event.keyCode;
+        if (debug) console.log("Key: "+event.key) && false;
+        switch ( event.key ) {
+            case "s":
+            case "S":
+            case "ArrowDown":
+            case 40: // Down
+            case 68: // S
+                increaseVelocity();
+                break;
+            case "w":
+            case "W":
+            case "ArrowUp":
+            case 38: // Up
+            case 87: // W
+                decreaseVelocity();
+                break;
+            case "d":
+            case "D":
+            case "ArrowRight":
+            case 83: // S
+            case 39: // Right
+                increaseFontSize();
+                break;
+            case "a":
+            case "A":
+            case "ArrowLeft":
+            case 37: // Left
+            case 65: // A
+                decreaseFontSize();
+                break;
+            case " ":           
+            case 32: // Spacebar
+                toggleAnimation();
+                break;
+            case ".":
+            case 110: // Numpad dot
+            case 190: // Dot
+                syncPrompters();
+                break;
+            case "Escape":
+            case 27: // ESC
+                closeInstance();
+                break;
+            case 121:
+            case "F10":
+            case 123:
+            case "F12":
+                if (!inIframe())
+                    toggleDebug();
+                break;
+            case 8:
+            case "Backspace":
+            case "backspace":
+                resetTimer();
+                break;
+            default: // Move to anchor.
+                // If key is not a string
+                if(!isFunction(event.key.indexOf))
+                    key = String.fromCharCode(event.key);
+                else
+                    key = event.key;
+                //if ( key.indexOf("Key")===0 || key.indexOf("Digit")===0 )
+                //      key = key.charAt(key.length-1);
+                if ( !is_int(key) )
+                    key = key.toLowerCase();
+                if (debug) console.log(key);
+                moveToAnchor( key );
         }
         // Prevent arrow and spacebar scroll bug.
         if ([" ","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(event.key) > -1 && event.preventDefault)
