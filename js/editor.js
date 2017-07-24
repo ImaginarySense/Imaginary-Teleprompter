@@ -628,12 +628,9 @@ var debug = false;
         }
         
         // If an external prompt is openned, focus on it.        
-        if (prompterWindow!=undefined && window.focus) {
+        if (prompterWindow!=undefined && window.focus)
             // Adviced to launch as separate event on a delay.
             prompterWindow.focus();
-            console.log("THA FYUCK            prompterWindow");
-            console.log(prompterWindow);
-        }
         else
             frame.focus();
 
