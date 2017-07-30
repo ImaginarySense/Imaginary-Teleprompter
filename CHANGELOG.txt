@@ -8,7 +8,9 @@ ver 2.3.0 (x.7.2017)
 > New font-size adjustments
 > New timer functionality
 > New styles: Dark Matter & Azure Light
+> Updated releases migration script
 > Updated Introduction
+> Updated branding from "Imaginary Films" to "Imaginary Sense" 
 > Updated Copyright holders information
 
 ver 2.2.x (16.5.2017)
