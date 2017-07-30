@@ -255,25 +255,35 @@ var debug = false;
 
     //Apply migration by versions
     function applyMigration(version) {
-        //Teleprompter 2.2.0 and previous versions
-        if(version == null || version == "2.2.0" || version == "0")
-            dataManager.getItem("IFTeleprompterSideBar",function(dataToMigrate) {
-                if (dataToMigrate) {
-                    //Convert Data
-                    dataToMigrate = JSON.parse(dataToMigrate);
-                    if (dataToMigrate.length > 0) {
-                        //Fix to not do more dirty work
-                        dataToMigrate[0]["id"] = sidebar.createIDTag(dataToMigrate[0].name, true);
-                        sidebar.getSaveMode().setItem(sidebar.getDataKey(), JSON.stringify(dataToMigrate));
-                    }
-                    //Continue with rest of the data
-                    for (var i = 1; i < dataToMigrate.length; i++)
-                        if (dataToMigrate[i].hasOwnProperty("name")) {
-                            dataToMigrate[i]["id"] = sidebar.createIDTag(dataToMigrate[i].name);
+        switch (version) {
+            // "default" at top for unnacaunted developer versions. I didn't thought this was possible! xD
+            default:
+            // 2.2 or bellow
+            case null:
+            case "0":
+            case "2.2.0":
+                dataManager.getItem("IFTeleprompterSideBar",function(dataToMigrate) {
+                    if (dataToMigrate) {
+                        // Convert Data
+                        dataToMigrate = JSON.parse(dataToMigrate);
+                        if (dataToMigrate.length > 0) {
+                            // Fix to not do more dirty work
+                            dataToMigrate[0]["id"] = sidebar.createIDTag(dataToMigrate[0].name, true);
                             sidebar.getSaveMode().setItem(sidebar.getDataKey(), JSON.stringify(dataToMigrate));
                         }
-                }
-            }, 0, 0);
+                        // Continue with rest of the data
+                        for (var i = 1; i < dataToMigrate.length; i++)
+                            if (dataToMigrate[i].hasOwnProperty("name")) {
+                                dataToMigrate[i]["id"] = sidebar.createIDTag(dataToMigrate[i].name);
+                                sidebar.getSaveMode().setItem(sidebar.getDataKey(), JSON.stringify(dataToMigrate));
+                            }
+                    }
+                }, 0, 0);
+            case "2.3.0": // Nothing to do here, issues solved elsewhere.
+            // Next itteration
+            case "2.4.0":
+            break;
+        }
     }
 
     // Initialize postMessage event listener.
@@ -495,26 +505,58 @@ var debug = false;
         toggleFullscreen();
     }
 
-    function updatePrompterData() {
+    function updatePrompterData( override ) {
         // Get html from editor
         if (typeof CKEDITOR !== "undefined")
             htmldata = CKEDITOR.instances.prompt.getData()
         else if (typeof tinymce !== "undefined")
             htmldata = tinymce.get("prompt").getContent();
+        // Define possible values
+        var primary, secondary, style, focusArea, speed, acceleration, fontSize, timer, voice;
         // Get form values
-        var primary = document.getElementById("primary").value,
-            secondary = document.getElementById("secondary").value,
-            style = document.getElementById("prompterStyle").value,
-            focusArea = document.getElementById("focus").value,
-            speed = slider[0].getValue(),
-            acceleration = slider[1].getValue(),
-            fontSize = slider[2].getValue(),
-            voice = false,
-            timer;
-        if ( document.getElementById("timer").children[0].classList.contains("btn-primary") )
-            timer = true;
+        if (override!==undefined && typeof override==='string' || override instanceof String)
+            override = JSON.parse(override);
+        // Set corresponding values.
+        if (override!==undefined && override.primary!==undefined)
+            primary = override.primary;
         else
-            timer = false;
+            primary = document.getElementById("primary").value;
+        if (override!==undefined && override.secondary!==undefined)
+            secondary = override.secondary;
+        else
+            secondary = document.getElementById("secondary").value;
+        if (override!==undefined && override.style!==undefined)
+            style = override.style;
+        else
+            style = document.getElementById("prompterStyle").value;
+        if (override!==undefined && override.focusArea!==undefined)
+            focusArea = override.focusArea;
+        else
+            focusArea = document.getElementById("focus").value;
+        if (override!==undefined && override.speed!==undefined)
+            speed = override.speed;
+        else
+            speed = slider[0].getValue();
+        if (override!==undefined && override.acceleration!==undefined)
+            acceleration = override.acceleration;
+        else
+            acceleration = slider[1].getValue();
+        if (override!==undefined && override.fontSize!==undefined)
+            fontSize = override.fontSize;
+        else
+            fontSize = slider[2].getValue();
+        if (override!==undefined && override.timer!==undefined)
+            timer = override.timer;
+        else {
+            if ( document.getElementById("timer").children[0].classList.contains("btn-primary") )
+                timer = true;
+            else
+                timer = false;
+        }
+        if (override!==undefined && override.voice!==undefined)
+            voice = override.voice;
+        else
+            voice = false;
         // Merge all settings into one.
         var settings = '{ "data": {"primary":'+primary+',"secondary":'+secondary+',"prompterStyle":'+style+',"focusMode":'+focusArea+',"speed":'+speed+',"acceleration":'+acceleration+',"fontSize":'+fontSize+',"timer":'+timer+',"voice":'+voice+'}}',
         session = '{ "html":"' + encodeURIComponent(htmldata) + '" }';
@@ -918,6 +960,7 @@ var debug = false;
             sideBar.classList.toggle("toggled");
     }
 
+    // Save last use settings
     window.addEventListener("beforeunload", updatePrompterData);
 
     function updateFont(value) {
@@ -935,9 +978,13 @@ var debug = false;
                 document.getElementById("secondary").value = lastSettings.data.secondary;
                 // document.getElementById("prompterStyle").value = lastSettings.data.prompterStyle;
                 document.getElementById("focus").value = lastSettings.data.focusMode;
-                slider[0].setValue(lastSettings.data.speed);
-                slider[1].setValue(lastSettings.data.acceleration);
-                slider[2].setValue(lastSettings.data.fontSize);
+                // If no last used value, leave default values.
+                if (isNaN(lastSettings.data.speed))
+                    slider[0].setValue(lastSettings.data.speed);
+                if (isNaN(lastSettings.data.acceleration))
+                    slider[1].setValue(lastSettings.data.acceleration);
+                if (isNaN(lastSettings.data.fontSize))
+                    slider[2].setValue(lastSettings.data.fontSize);
                 document.getElementById("speedValue").textContent = parseFloat(Math.round(lastSettings.data.speed * 10) / 10).toFixed(1);
                 document.getElementById("accelerationValue").textContent = parseFloat(Math.round(lastSettings.data.acceleration * 100) / 100).toFixed(2);
                 document.getElementById("fontSizeValue").textContent = lastSettings.data.fontSize;
