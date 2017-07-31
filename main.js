@@ -100,111 +100,208 @@ function handleSquirrelEvent() {
   }
 };
 
+// TELEPROMPTER CODE BEGINS
+
 // Set Global window variable.
 let mainWindow = null,
 	externalPrompt = null,
 	tic = 0,
 	toc = 1;
 
-// This method will be called when Electron has finished initialization and is ready to create browser windows.
-app.on('ready', () => { 
-	// Create the browser window.
+function createMainWindow () {
 	mainWindow = new BrowserWindow({show: false, width: 1280, height: 800, javascript: true, title: 'Teleprompter by Imaginary Sense', useContentSize: true, nodeIntegration: true, icon: __dirname + '/icon.ico'});
-
-const {app, Menu} = require('electron')
-
-const template = [
-  {
-    label: 'Edit',
-    submenu: [
-      {role: 'undo'},
-      {role: 'redo'},
-      {type: 'separator'},
-      {role: 'cut'},
-      {role: 'copy'},
-      {role: 'paste'},
-      {role: 'pasteandmatchstyle'},
-      {role: 'delete'},
-      {role: 'selectall'}
-    ]
-  },
-  {
-    label: 'View',
-    submenu: [
-      {type: 'separator'},
-      {type: 'separator'},
-      {role: 'togglefullscreen'}
-    ]
-  },
-  {
-    role: 'window',
-    submenu: [
-      {role: 'minimize'},
-      {role: 'close'}
-    ]
-  },
-  {
-    role: 'help',
-    submenu: [
-      {
-        label: 'Learn More',
-        click () { require('electron').shell.openExternal('https://electron.atom.io') }
-      }
-    ]
-  }
-]
-
-if (process.platform === 'darwin') {
-  template.unshift({
-    label: app.getName(),
-    submenu: [
-      {role: 'about'},
-      {role: 'quit'}
-    ]
-  })
-
-  // Window menu
-  template[3].submenu = [
-    {role: 'close'},
-    {role: 'minimize'},
-    {type: 'separator'},
-    {role: 'front'}
-  ]
-}
-
-const menu = Menu.buildFromTemplate(template)
-Menu.setApplicationMenu(menu)
-
-  	// if (process.platform === 'darwin') {
-	// 	// Create our menu entries so that we can use MAC shortcuts
-	// 	Menu.setApplicationMenu(Menu.buildFromTemplate([
-	// 		{
-	// 			label: 'Edit',
-	// 			submenu: [
-	// 				{ role: 'undo' },
-	// 				{ role: 'redo' },
-	// 				{ type: 'separator' },
-	// 				{ role: 'cut' },
-	// 				{ role: 'copy' },
-	// 				{ role: 'paste' }, 
-	// 				{ role: 'delete' },
-	// 				{ role: 'selectall' }
-	// 			]
-	// 	}
-	// 	]));
-	// } else {
-	// 	// Disables menu in systems where it can be disabled and doesn't need it'.
-    // 	Menu.setApplicationMenu(null);
-	// }
-
-	// and load the index.html of app.
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
 	mainWindow.once('ready-to-show', () => {
-		mainWindow.show()
-	})
-	// Global vars
-	let contents = mainWindow.webContents;
+		mainWindow.show();
+	});
+	// Close Window
+	mainWindow.on('closed', () =>{
+		if (externalPrompt!==null)
+			externalPrompt.close();
+		// Dereference the windows object, usually you would store  windows
+		// in an array if your app supports multi windows, this is the time
+		// when you should delete the corresponding element.
+		mainWindow = null;
+	});
 
+	// Debug tools
+	let contents = mainWindow.webContents;
+	contents.on('devtools-opened', () => {
+		contents.executeJavaScript('enterDebug()');
+	});
+	contents.on('devtools-closed', () => {
+		contents.executeJavaScript('exitDebug()');
+	});
+}
+
+app.on('activate', () => {
+	if (!mainWindow)
+		createMainWindow();
+});
+
+// This method will be called when Electron has finished initialization and is ready to create browser windows.
+app.on('ready', () => { 
+
+	// Create the browser window.
+	createMainWindow();
+
+	// Setup menu
+	setupMenu();
+
+	// Image Server
+	imageServer();
+
+	// Remote Control Server
+	//remoteControl();
+});
+
+// Frame skip forlternative sync
+function frameSkip() {
+	tic--;
+	if (tic<0)
+		tic=toc;
+	return tic===toc;
+}
+
+// Inter Process Communication
+// Send a message to the renderer process...
+ipcMain.on('asynchronous-message', (event, arg) => {
+	// console.log(arg);
+	if (arg === "network") {
+		// runSocket(event);
+	}
+	else if (arg === "openInstance") {
+		externalPrompt = new BrowserWindow({
+			webPreferences: {
+				title: 'Teleprompter Instance',
+				// blinkFeatures: 'KeyboardEventKey',
+				// titleBarStyle: 'hidden-inset',
+				offscreen: true
+			}
+		});
+		const indexPath = path.resolve(__dirname, '.', 'teleprompter.html')
+		const indexURL = url.format({
+			protocol: 'file',
+			pathname: indexPath,
+			slashes: true,
+			// hash: encodeURIComponent(JSON.stringify(someArgs))
+		})
+		console.log(indexPath);
+		console.log(indexURL);
+		externalPrompt.loadURL(indexURL);
+		externalPrompt.setIgnoreMouseEvents(false);
+		externalPrompt.webContents.setFrameRate(30);
+		externalPrompt.webContents.on('paint', (updateEvent, dirty, image) => {
+			// Frame sipping on canvas
+			if (frameSkip()) {
+				// Get pointer to image from canvas.
+				const size = externalPrompt.getSize(),
+					bitmap = image.getBitmap();
+				event.sender.send('asynchronous-reply',{ 'option':'c', 'dirty':dirty, 'size':size, 'bitmap':bitmap });
+				// Documentation
+				// https://electron.atom.io/docs/tutorial/offscreen-rendering/
+				// Known issues
+				// https://github.com/electron/electron/issues/7350
+				// https://github.com/electron/electron/issues/8051
+			}
+		});
+		externalPrompt.on('closed', () =>{
+			externalPrompt = null;
+			if (mainWindow!==null)
+				mainWindow.webContents.send('asynchronous-reply', {option:'restoreEditor'});
+		});
+	}
+	else if (arg === "closeInstance") {
+		if (externalPrompt!==null)
+			externalPrompt.close();
+	}
+	else if (arg === "prepareLinks")
+		event.sender.send('asynchronous-reply',{'option':'prepareLinks'});
+	else {
+		if (externalPrompt!==null) {
+			console.log(arg);
+			externalPrompt.webContents.send('asynchronous-reply', {option:'message', data:arg} );
+		}
+	}
+});
+
+// Multiplatform menu configurations
+
+function setupMenu() {
+	// Create our menu entries so that we can use MAC shortcuts
+	const {app, Menu} = require('electron')
+
+	if (process.platform === 'darwin') {
+	// Remove Start Dictation, Emoji & Symbols from Edit submenu
+	const {systemPreferences} = require('electron')
+
+	systemPreferences.setUserDefault('NSDisabledDictationMenuItem', 'boolean', true)
+	systemPreferences.setUserDefault('NSDisabledCharacterPaletteMenuItem', 'boolean', true)
+
+	}
+
+	const template = [
+	{
+		label: 'Edit',
+		submenu: [
+			{role: 'undo'},
+			{role: 'redo'},
+			{type: 'separator'},
+			{role: 'cut'},
+			{role: 'copy'},
+			{role: 'paste'},
+			{role: 'pasteandmatchstyle'},
+			{role: 'delete'},
+			{role: 'selectall'}
+		]
+	},
+	{
+		label: 'View',
+		submenu: [
+			{role: 'togglefullscreen'}
+		]
+	},
+	{
+		role: 'window',
+		submenu: [
+			{role: 'minimize'},
+			{role: 'close'}
+		]
+	},
+	{
+		role: 'help',
+		submenu: [
+			{
+				label: 'More About Electron',
+				click () { require('electron').shell.openExternal('https://electron.atom.io') }
+			},
+			{
+			label: 'Learn More About Imaginary Sense',
+		click () { require('electron').shell.openExternal('http://imaginary.tech') }
+			}
+		]
+	},
+	]
+
+	if (process.platform === 'darwin') {
+	template.unshift({
+		label: app.getName(),
+		submenu: [
+			{role: 'about'},
+			{role: 'quit'}
+		]
+	})
+
+	const menu = Menu.buildFromTemplate(template)
+	Menu.setApplicationMenu(menu)
+
+	} else {
+	// Disables menu in systems where it can be disabled and doesn't need it'.
+	Menu.setApplicationMenu(null)
+	}
+}
+
+function imageServer() {
 	/*
 	//express server for image upload
 	var express = require('express');
@@ -226,178 +323,95 @@ Menu.setApplicationMenu(menu)
 
 	app.use(cors()); 
 	app.post('/upload', multipartMiddleware, function(req, res) {
-	    fs.readFile(req.files.upload.path, function (err, data) {
-	        var newPath = uploadPath + req.files.upload.name;
-	        fs.writeFile(newPath, data, function (err) { 
-	        	 if (err) console.log({err: err});
-	            else {  
-	            	if(req.query.command == "QuickUpload"){
-	            		res.send({
-	    							"uploaded": 1,
-	    							"fileName": req.files.upload.name,
-	    							"url": newPath
+			fs.readFile(req.files.upload.path, function (err, data) {
+					var newPath = uploadPath + req.files.upload.name;
+					fs.writeFile(newPath, data, function (err) { 
+						if (err) console.log({err: err});
+							else {  
+								if(req.query.command == "QuickUpload"){
+									res.send({
+										"uploaded": 1,
+										"fileName": req.files.upload.name,
+										"url": newPath
 						});
-	            	}else{
-	            		var html;
-		                html = "";
-		                html += "<script type='text/javascript'>";
-		                html += "    var funcNum = " + req.query.CKEditorFuncNum + ";";
-		                html += "    var url     = \" " + imageServerURL + req.files.upload.name + "\";";
-		                html += "    var message = \"Uploaded file successfully\";";
-		                html += "";
-		                html += "    window.parent.CKEDITOR.tools.callFunction(funcNum, url, message);";
-		                html += "</script>";
+								}else{
+									var html;
+										html = "";
+										html += "<script type='text/javascript'>";
+										html += "    var funcNum = " + req.query.CKEditorFuncNum + ";";
+										html += "    var url     = \" " + imageServerURL + req.files.upload.name + "\";";
+										html += "    var message = \"Uploaded file successfully\";";
+										html += "";
+										html += "    window.parent.CKEDITOR.tools.callFunction(funcNum, url, message);";
+										html += "</script>";
 
-		 				res.send(html);
-	            	} 
-	            }
-	        });
-	    });
+						res.send(html);
+								} 
+							}
+					});
+			});
 	});
-
 
 	app.use('/image', express.static(uploadPath));
 
 	//If port changes from 3000, need to be also change in the ckeditor config.js
 	app.listen(imageServerPort, function () {
-	  console.log('Image Upload Server running at port ' + imageServerPort + '!');
-	  console.log('Image Upload Path: '+ uploadPath);
+		console.log('Image Upload Server running at port ' + imageServerPort + '!');
+		console.log('Image Upload Path: '+ uploadPath);
 	});
 	*/
+}
 
-	// Debug tools
-	contents.on('devtools-opened', () => {
-		contents.executeJavaScript('enterDebug()');
-	});
-	contents.on('devtools-closed', () => {
-		contents.executeJavaScript('exitDebug()');
-	});
+// REMOTE CONTROL BEGINS
 
-	// Get computer IPs for remote control
-	function getIP() {
-		var os = require('os');
-		var nets = os.networkInterfaces();
-		for ( var a in nets) {
-		  var ifaces = nets[a];
-		  for ( var o in ifaces) {
-			if (ifaces[o].family == "IPv4" && !ifaces[o].internal) {
-			  return ifaces[o].address;
-			}
-		  }
+// Get computer IPs for remote control
+function getIP() {
+	var os = require('os');
+	var nets = os.networkInterfaces();
+	for ( var a in nets) {
+		var ifaces = nets[a];
+		for ( var o in ifaces) {
+		if (ifaces[o].family == "IPv4" && !ifaces[o].internal) {
+			return ifaces[o].address;
 		}
-		return null;
+		}
 	}
+	return null;
+}
 
-	// Remote control server
-	// function runSocket(event) {
-	// 	var ip = getIP();
-	// 	if(ip){
-	// 	  var app2 = require('express')();
-	// 	  var http = require('http').Server(app2);
-	// 	  var bonjour = require('bonjour')();
-	// 	  var io = require('socket.io')(http);
+// Remote control server
+// function runSocket(event) {
+// 	var ip = getIP();
+// 	if(ip){
+// 	  var app2 = require('express')();
+// 	  var http = require('http').Server(app2);
+// 	  var bonjour = require('bonjour')();
+// 	  var io = require('socket.io')(http);
 
-	// 	  io.sockets.on('connection', function (socket) {
-	// 		socket.on('command',function(res){
-	// 			if(res.hasOwnProperty('key') > 0){
-	// 			  event.sender.send('asynchronous-reply',{'option':'command','data':res});
-	// 			}
-	// 		});
-	// 		socket.on('disconnect', function () {});
-	// 	  });
+// 	  io.sockets.on('connection', function (socket) {
+// 		socket.on('command',function(res){
+// 			if(res.hasOwnProperty('key') > 0){
+// 			  event.sender.send('asynchronous-reply',{'option':'command','data':res});
+// 			}
+// 		});
+// 		socket.on('disconnect', function () {});
+// 	  });
 
-	// 	  http.listen(3000, function(){
-	// 		event.sender.send('asynchronous-reply',{'option':'qr','data':ip});
-	// 		//console.log('http://' + ip + ':3000/');
-	// 	  });
+// 	  http.listen(3000, function(){
+// 		event.sender.send('asynchronous-reply',{'option':'qr','data':ip});
+// 		//console.log('http://' + ip + ':3000/');
+// 	  });
 
-	// 	  bonjour.publish({ name: 'Teleprompter', type: 'http', port: 3000 });
-	// 	  bonjour.find({ type: 'http' }, function (service) {
-	// 		//console.log('Found an HTTP server:'+ service);
-	// 		event.sender.send('asynchronous-reply',{'option':'qr','data':service.host});
-	// 	  });
-	// 	}else{
-	// 	  setTimeout(function(){
-	// 		runSocket(event);
-	// 	  }, 1000);
-	// 	}
-	// }
+// 	  bonjour.publish({ name: 'Teleprompter', type: 'http', port: 3000 });
+// 	  bonjour.find({ type: 'http' }, function (service) {
+// 		//console.log('Found an HTTP server:'+ service);
+// 		event.sender.send('asynchronous-reply',{'option':'qr','data':service.host});
+// 	  });
+// 	}else{
+// 	  setTimeout(function(){
+// 		runSocket(event);
+// 	  }, 1000);
+// 	}
+// }
 
-	// Send a message to the renderer process...
-	ipcMain.on('asynchronous-message', (event, arg) => {
-		// console.log(arg);
-		if (arg === "network") {
-			// runSocket(event);
-		}
-		else if (arg === "openInstance") {
-			externalPrompt = new BrowserWindow({
-				webPreferences: {
-					title: 'Teleprompter Instance',
-					// blinkFeatures: 'KeyboardEventKey',
-					// titleBarStyle: 'hidden-inset',
-					offscreen: true
-				}
-			});
-			const indexPath = path.resolve(__dirname, '.', 'teleprompter.html')
-			const indexURL = url.format({
-				protocol: 'file',
-				pathname: indexPath,
-				slashes: true,
-				// hash: encodeURIComponent(JSON.stringify(someArgs))
-			})
-			console.log(indexPath);
-			console.log(indexURL);
-			externalPrompt.loadURL(indexURL);
-			externalPrompt.setIgnoreMouseEvents(false);
-			externalPrompt.webContents.setFrameRate(30);
-			externalPrompt.webContents.on('paint', (updateEvent, dirty, image) => {
-				// Frame sipping on canvas
-				if (frameSkip()) {
-					// Get pointer to image from canvas.
-					const size = externalPrompt.getSize(),
-						bitmap = image.getBitmap();
-					event.sender.send('asynchronous-reply',{ 'option':'c', 'dirty':dirty, 'size':size, 'bitmap':bitmap });
-					// Documentation
-					// https://electron.atom.io/docs/tutorial/offscreen-rendering/
-					// Known issues
-					// https://github.com/electron/electron/issues/7350
-					// https://github.com/electron/electron/issues/8051
-				}
-			});
-			externalPrompt.on('closed', () =>{
-				externalPrompt = null;
-				if (mainWindow!==null)
-					mainWindow.webContents.send('asynchronous-reply', {option:'restoreEditor'});
-			});
-		}
-		else if (arg === "closeInstance") {
-			if (externalPrompt!==null)
-				externalPrompt.close();
-		}
-		else if (arg === "prepareLinks")
-			event.sender.send('asynchronous-reply',{'option':'prepareLinks'});
-		else {
-			if (externalPrompt!==null) {
-				console.log(arg);
-				externalPrompt.webContents.send('asynchronous-reply', {option:'message', data:arg} );
-			}
-		}
-	});
-
-	function frameSkip() {
-		tic--;
-		if (tic<0)
-			tic=toc;
-		return tic===toc;
-	}
-
-	// Close Window
-	mainWindow.on('closed', () =>{
-		if (externalPrompt!==null)
-			externalPrompt.close();
-		// Dereference the windows object, usually you would store  windows
-		// in an array if your app supports multi windows, this is the time
-		// when you should delete the corresponding element.
-		mainWindow = null;
-	});
-});
+// REMOTE CONTROL ENDS
