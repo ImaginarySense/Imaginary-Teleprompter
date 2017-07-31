@@ -111,27 +111,91 @@ app.on('ready', () => {
 	// Create the browser window.
 	mainWindow = new BrowserWindow({show: false, width: 1280, height: 800, javascript: true, title: 'Teleprompter by Imaginary Sense', useContentSize: true, nodeIntegration: true, icon: __dirname + '/icon.ico'});
 
-  	if (process.platform === 'darwin') {
-		// Create our menu entries so that we can use MAC shortcuts
-		Menu.setApplicationMenu(Menu.buildFromTemplate([
-			{
-				label: 'Edit',
-				submenu: [
-					{ role: 'undo' },
-					{ role: 'redo' },
-					{ type: 'separator' },
-					{ role: 'cut' },
-					{ role: 'copy' },
-					{ role: 'paste' }, 
-					{ role: 'delete' },
-					{ role: 'selectall' }
-				]
-		}
-		]));
-	} else {
-		// Disables menu in systems where it can be disabled and doesn't need it'.
-    	Menu.setApplicationMenu(null);
-	}
+const {app, Menu} = require('electron')
+
+const template = [
+  {
+    label: 'Edit',
+    submenu: [
+      {role: 'undo'},
+      {role: 'redo'},
+      {type: 'separator'},
+      {role: 'cut'},
+      {role: 'copy'},
+      {role: 'paste'},
+      {role: 'pasteandmatchstyle'},
+      {role: 'delete'},
+      {role: 'selectall'}
+    ]
+  },
+  {
+    label: 'View',
+    submenu: [
+      {type: 'separator'},
+      {type: 'separator'},
+      {role: 'togglefullscreen'}
+    ]
+  },
+  {
+    role: 'window',
+    submenu: [
+      {role: 'minimize'},
+      {role: 'close'}
+    ]
+  },
+  {
+    role: 'help',
+    submenu: [
+      {
+        label: 'Learn More',
+        click () { require('electron').shell.openExternal('https://electron.atom.io') }
+      }
+    ]
+  }
+]
+
+if (process.platform === 'darwin') {
+  template.unshift({
+    label: app.getName(),
+    submenu: [
+      {role: 'about'},
+      {role: 'quit'}
+    ]
+  })
+
+  // Window menu
+  template[3].submenu = [
+    {role: 'close'},
+    {role: 'minimize'},
+    {type: 'separator'},
+    {role: 'front'}
+  ]
+}
+
+const menu = Menu.buildFromTemplate(template)
+Menu.setApplicationMenu(menu)
+
+  	// if (process.platform === 'darwin') {
+	// 	// Create our menu entries so that we can use MAC shortcuts
+	// 	Menu.setApplicationMenu(Menu.buildFromTemplate([
+	// 		{
+	// 			label: 'Edit',
+	// 			submenu: [
+	// 				{ role: 'undo' },
+	// 				{ role: 'redo' },
+	// 				{ type: 'separator' },
+	// 				{ role: 'cut' },
+	// 				{ role: 'copy' },
+	// 				{ role: 'paste' }, 
+	// 				{ role: 'delete' },
+	// 				{ role: 'selectall' }
+	// 			]
+	// 	}
+	// 	]));
+	// } else {
+	// 	// Disables menu in systems where it can be disabled and doesn't need it'.
+    // 	Menu.setApplicationMenu(null);
+	// }
 
 	// and load the index.html of app.
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
