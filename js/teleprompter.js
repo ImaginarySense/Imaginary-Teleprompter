@@ -224,9 +224,12 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
             // Sync prompter positions to smallest at start.
             syncPrompters();
 
-            // Begin animation at i speed.
-            for (var i=0; i<4; i++)
-                internalIncreaseVelocity();
+            window.setTimeout( function() {
+                // Begin animation at i speed.
+                for (var i=0; i<2; i++)
+                    increaseVelocity();
+                instaSync();
+            },transitionDelays*4.2);
 
             //Init Remote Controllers
             if (isMobileApp)
@@ -686,6 +689,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         else
             delay = transitionDelay/2;
         setPromptHeight();
+        setFocusHeight();
         setScreenHeight();
         // internalPauseAnimation();
         animationTimeout( delay, function() {
