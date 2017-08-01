@@ -979,12 +979,18 @@ var debug = false;
                 // document.getElementById("prompterStyle").value = lastSettings.data.prompterStyle;
                 document.getElementById("focus").value = lastSettings.data.focusMode;
                 // If no last used value, leave default values.
-                if (isNaN(lastSettings.data.speed))
+                if (!isNaN(lastSettings.data.speed))
                     slider[0].setValue(lastSettings.data.speed);
-                if (isNaN(lastSettings.data.acceleration))
+                else
+                    lastSettings.data.speed = slider[0].getValue();
+                if (!isNaN(lastSettings.data.acceleration))
                     slider[1].setValue(lastSettings.data.acceleration);
-                if (isNaN(lastSettings.data.fontSize))
+                else
+                    lastSettings.data.acceleration = slider[1].getValue();
+                if (!isNaN(lastSettings.data.fontSize))
                     slider[2].setValue(lastSettings.data.fontSize);
+                else
+                    lastSettings.data.fontSize = slider[2].getValue();
                 document.getElementById("speedValue").textContent = parseFloat(Math.round(lastSettings.data.speed * 10) / 10).toFixed(1);
                 document.getElementById("accelerationValue").textContent = parseFloat(Math.round(lastSettings.data.acceleration * 100) / 100).toFixed(2);
                 document.getElementById("fontSizeValue").textContent = lastSettings.data.fontSize;
