@@ -218,8 +218,11 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         // Wait a moment to prevent possible asynchronic CSS issues.
         window.setTimeout( function() {
             // If flipped vertically, set start at inverted top.
-            if (flipV)
+            if (flipV) {
+                setScreenHeight();
+                setPromptHeight();
                 animate(0,-promptHeight+screenHeight);
+            }
             
             // Sync prompter positions to smallest at start.
             syncPrompters();
@@ -689,7 +692,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         else
             delay = transitionDelay/2;
         setPromptHeight();
-        setFocusHeight();
+        // setFocusHeight();
         setScreenHeight();
         // internalPauseAnimation();
         animationTimeout( delay, function() {
