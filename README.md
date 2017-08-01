@@ -15,16 +15,16 @@ Help & Support
 -------------
 If you have an issue, please write it to us, we will help you or fix the bug.
 
-##Creators:
+## Creators:
 *  Javier O. Cordero Pérez <javier.cordero@upr.edu>
 *  Victor Ortiz <va2ron1@gmail.com>
 
-##Contributors:
+## Contributors:
 *  Keyvan Pérez <keyvan.perez2@gmail.com>
 *  Rafael Sierra <rafael.sierra2@upr.edu> 
 
-##Copyright: 
+## Copyright: 
 Imaginary Sense, Imaginary Films LLC & Contributors
 
-##License: 
+## License: 
 This software is under [GPL3](https://github.com/javiercordero/Teleprompter/blob/master/LICENSE) license.
