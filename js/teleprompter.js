@@ -123,9 +123,6 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         initCSS();
 
         // Locate and set editor
-        console.log("Editor window:");
-        console.log(window.opener);
-        console.log(window);
         if (window.opener)
             editor = window.opener;
         else if (window.top)
