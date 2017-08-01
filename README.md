@@ -1,9 +1,9 @@
-![Teleprompter](https://github.com/imaginaryfilms/Teleprompter-Electron/raw/master/build/install-spinner.png)
+![Teleprompter](https://github.com/ImaginarySense/Teleprompter-Electron/raw/master/build/install-spinner.png)
 
 # Teleprompter-Core
 Core files of our Teleprompter software. This repo contains all the features present in the standalone desktop version and necesary files for the mobile version to work.
 
-If you intend to make standalone executables and gain access to the Electron exclusive features, please see [Teleprompter-Electron](https://github.com/imaginaryfilms/Teleprompter-Electron). You may also test the latest release on your web browser at [https://imaginarysense.github.io/Teleprompter-Core/](https://imaginarysense.github.io/Teleprompter-Core/)
+If you intend to make standalone executables and gain access to the Electron exclusive features, please see [Teleprompter-Electron](https://github.com/ImaginarySense/Teleprompter-Electron). You may also test the latest release on your web browser at [https://imaginarysense.github.io/Teleprompter-Core/](https://imaginarysense.github.io/Teleprompter-Core/)
 
 Introduction
 -------------
