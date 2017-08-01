@@ -104,6 +104,22 @@
 	width: 100%;
 }
 
+.panel.panel-default {
+/*	top: 0px;
+	bottom: 0px;
+	position: relative;*/
+}
+
+#stylesContainer {
+	height: 55vh;
+	left: 0px;
+	right: 0px;
+	overflow: auto;
+}
+.table-item {
+	word-wrap: break-word;
+}
+
 #stylesTable th:hover{
 	background-color:#f5f5f5;
 	border-color:#f5f5f5;

@@ -105,11 +105,15 @@ function handleSquirrelEvent() {
 // Set Global window variable.
 let mainWindow = null,
 	externalPrompt = null,
+	licenseWindow = null,
 	tic = 0,
 	toc = 1;
 
 function createMainWindow () {
-	mainWindow = new BrowserWindow({show: false, width: 1280, height: 800, javascript: true, title: 'Teleprompter by Imaginary Sense', useContentSize: true, nodeIntegration: true, icon: __dirname + '/icon.ico'});
+	if (process.platform === 'win32')
+		mainWindow = new BrowserWindow({width: 1280, height: 800, javascript: true, title: 'Teleprompter by Imaginary Sense', useContentSize: true, nodeIntegration: true, icon: __dirname + '/icon.ico'});
+	else
+		mainWindow = new BrowserWindow({show: false, width: 1280, height: 800, javascript: true, title: 'Teleprompter by Imaginary Sense', useContentSize: true, nodeIntegration: true, icon: __dirname + '/icon.ico'});
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
 	mainWindow.once('ready-to-show', () => {
 		mainWindow.show();
@@ -150,9 +154,6 @@ app.on('ready', () => {
 
 	// Image Server
 	imageServer();
-
-	// Remote Control Server
-	//remoteControl();
 });
 
 // Frame skip forlternative sync
@@ -229,17 +230,9 @@ ipcMain.on('asynchronous-message', (event, arg) => {
 
 function setupMenu() {
 	// Create our menu entries so that we can use MAC shortcuts
-	const {app, Menu} = require('electron')
+	const {app, Menu} = require('electron');
 
-	if (process.platform === 'darwin') {
-	// Remove Start Dictation, Emoji & Symbols from Edit submenu
-	const {systemPreferences} = require('electron')
-
-	systemPreferences.setUserDefault('NSDisabledDictationMenuItem', 'boolean', true)
-	systemPreferences.setUserDefault('NSDisabledCharacterPaletteMenuItem', 'boolean', true)
-
-	}
-
+	// Prepare menu
 	const template = [
 	{
 		label: 'Edit',
@@ -272,32 +265,59 @@ function setupMenu() {
 		role: 'help',
 		submenu: [
 			{
-				label: 'More About Electron',
+				label: 'About Electron',
 				click () { require('electron').shell.openExternal('https://electron.atom.io') }
 			},
 			{
-			label: 'Learn More About Imaginary Sense',
-		click () { require('electron').shell.openExternal('http://imaginary.tech') }
+				label: 'About CKEditor',
+				click () { require('electron').shell.openExternal('http://ckeditor.com/') }
+			},
+			{type: 'separator'},
+			{
+				label: 'View License',
+				click () {
+					if (!licenseWindow) {
+						licenseWindow = new BrowserWindow({width: 640, height: 480, javascript: false, title: 'General Public License v3', useContentSize: false, nodeIntegration: false, icon: __dirname + '/icon.ico'});
+						licenseWindow.loadURL('file://' + __dirname + '/LICENSE');
+						licenseWindow.on('closed', () => {
+							licenseWindow = null;
+						});
+					}
+					else
+						licenseWindow.focus();
+				}
+			},
+			{
+				label: 'About Imaginary Sense',
+				click () { require('electron').shell.openExternal('http://imaginary.tech/teleprompter') }
 			}
 		]
 	},
-	]
-
+	];
+	
+	// Personalize menu for OS X
 	if (process.platform === 'darwin') {
-	template.unshift({
-		label: app.getName(),
-		submenu: [
-			{role: 'about'},
-			{role: 'quit'}
-		]
-	})
+		template.unshift({
+			label: app.getName(),
+			submenu: [
+				{role: 'about'},
+				{role: 'quit'}
+			]
+		})
+		// Remove Start Dictation, Emoji & Symbols from Edit submenu
+		const {systemPreferences} = require('electron');
 
-	const menu = Menu.buildFromTemplate(template)
-	Menu.setApplicationMenu(menu)
+		systemPreferences.setUserDefault('NSDisabledDictationMenuItem', 'boolean', true);
+		systemPreferences.setUserDefault('NSDisabledCharacterPaletteMenuItem', 'boolean', true);
+	}
 
+	// Enable menu on the following platforms
+	if (process.platform === 'darwin') {
+		const menu = Menu.buildFromTemplate(template);
+		Menu.setApplicationMenu(menu);
 	} else {
-	// Disables menu in systems where it can be disabled and doesn't need it'.
-	Menu.setApplicationMenu(null)
+		// Disables menu in systems where it can be disabled and doesn't need it'.
+		Menu.setApplicationMenu(null);
 	}
 }
 
