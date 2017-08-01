@@ -44,6 +44,6 @@
   "devDependencies": {
     "electron": "^1.6.11"
   },
-  "engine": "node >= 7.4.0",
+  "engine": "node >= 8.2.1",
   "preferGlobal": "false"
 }
