@@ -85,14 +85,14 @@ function styleInit(prompterStyleElement) {
             bgOverlay: "darkMatterO",
             cssText: ".darkMatter {color: #FFFFFF; background: #222222;}.darkMatterO {background: #000000;}"
         }, {
+        // id:4,
+        //     name: "Intergalactic",
+        //     type: 0,
+        //     className: "theForce",
+        //     bgOverlay: "darkOverlay",
+        //     cssText: ".theForce {color: #FD1;background: #000;transform-origin: 50% 50%; transform: perspective(100px) rotateX(90deg) translate3d(0px,0px,-100vh);}.darkOverlay {background: #000;}"
+        // }, {
         id:4,
-            name: "Intergalactic",
-            type: 0,
-            className: "theForce",
-            bgOverlay: "darkOverlay",
-            cssText: ".theForce {color: #FF0;background: #000;transform-origin: 50% 100%;transform: perspective(300px) rotateX(30deg) translate3d(0px,-115px,-180px);}.darkOverlay {background: #000;}"
-        }, {
-        id:5,
             name: "Whiteboard",
             type: 0,
             className: "lightBody",
@@ -113,8 +113,10 @@ function styleInit(prompterStyleElement) {
     
     defaultStyle = 1;
     dataManager.getItem('IFTeleprompterThemeDefaultStyle',function(data){
-        if(JSON.parse(data) !== "undefined")
-            defaultStyle = JSON.parse(data)+1;
+        if(JSON.parse(data) != undefined) {
+            defaultStyle = JSON.parse(data);
+            console.log(defaultStyle);
+        }
     },0,false);
 
     ///Maybe will need a fix in the future...
@@ -158,7 +160,7 @@ function editThemeStyle(name2, objName, bodyColor, overlayColor, textColor) {
 
 function removeStyleFromPromptStyles() {
     if (defaultStyle == themeStyles[lastStyleSelected]["id"])
-        defaultStyle = 0;
+        defaultStyle = 1;
     
     themeStyles.splice(lastStyleSelected, 1);
 
@@ -214,6 +216,7 @@ function refreshPromptStyles(promptStyleElement) {
     opt.innerHTML = "Custom Style";
 
     promptStyleElement.appendChild(opt);
+    setStyle(defaultStyle);
 }
 
 // Set Teleprompter Style.

@@ -27,14 +27,13 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/imaginaryfilms/Teleprompter"
+    "url": "https://github.com/ImaginarySense/Teleprompter-Core"
   },
   "bugs": {
-    "url": "https://github.com/imaginaryfilms/Teleprompter-Core/issues"
+    "url": "https://github.com/ImaginarySense/Teleprompter-Core/issues"
   },
   "scripts": {
-    "start": "electron main.js",
-    "postinstall": "npm start"
+    "start": "electron main.js"
   },
   "main": "main.js",
   "dependencies": {
@@ -45,6 +44,6 @@
   "devDependencies": {
     "electron": "^1.6.11"
   },
-  "engine": "node >= 7.4.0",
+  "engine": "node >= 8.2.1",
   "preferGlobal": "false"
 }
