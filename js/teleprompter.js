@@ -201,12 +201,6 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         // Wheel settings
         invertedWheel = false;//settings.data.invertedWheel;
 
-        // Save current screen position related settings for when resize and screen rotation ocurrs.
-        previousPromptHeight = promptHeight;
-        previousScreenHeight = screenHeight;
-        previousScreenHeight = screenHeight;
-        previousVerticalDisplacementCorrector = focusVerticalDisplacementCorrector();
-
         // Add pointer controls
         // Stop animation while pressing on the screen, resume on letting go.
         var touchOverlay = document.getElementById("touchOverlay");
@@ -223,6 +217,12 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                 setPromptHeight();
                 animate(0,-promptHeight+screenHeight);
             }
+
+            // Save current screen position related settings for when resize and screen rotation ocurrs.
+            previousPromptHeight = promptHeight;
+            previousScreenHeight = screenHeight;
+            previousScreenHeight = screenHeight;
+            previousVerticalDisplacementCorrector = focusVerticalDisplacementCorrector();
             
             // Sync prompter positions to smallest at start.
             syncPrompters();
@@ -256,14 +256,21 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     function updateContents() {
         if (debug) console.log("Updating prompter");
         updateDatamanager();
+        var oldFontSize = fontSize;
+        fontSize = settings.data.fontSize/100;
         speedMultip = settings.data.speed;
         sensitivity = settings.data.acceleration;
-        fontSize = settings.data.fontSize/100;
-        updateFont();
+        // If updating font, update it and resync
+        if (oldFontSize !== fontSize)
+            updateFont();
+        // If screen is vertically flipped, resync
+        else if (flipV) {
+            onResize();
+            window.setTimeout(onResize, transitionDelays*1.1);
+        }
         prompt.innerHTML = decodeURIComponent(session.html);
         updateVelocity();
-        // resumeAnimation();
-
+        
         // Enable timer
         if (settings.data.timer===true) {
             if (timer.data().timer.currentVal===0)
@@ -404,14 +411,17 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         // Both flips
         if (flipH&&flipV) {
             prompt.classList.add("flipHV");
+            clock.classList.add("flipHV");
         }
         // Vertical flip
         else if (flipV) {
             prompt.classList.add("flipV");
+            clock.classList.add("flipV");
         }
         // Horizontal flip
         else if (flipH) {
             prompt.classList.add("flipH");
+            clock.classList.add("flipH");
         }
     }
 
