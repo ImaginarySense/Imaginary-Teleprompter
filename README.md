@@ -7,6 +7,7 @@
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/ImaginarySense/Teleprompter-Core.svg)](http://isitmaintained.com/project/ImaginarySense/Teleprompter-Core "Percentage of issues still open")
 [![SourceForge](https://img.shields.io/sourceforge/dw/teleprompter-imaginary-films.svg)](https://sourceforge.net/projects/teleprompter-imaginary-films/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/imaginary_tech.svg?style=social&label=Follow)](http://twitter.com/user/imaginary_tech)
+
 # Teleprompter-Core
 Core files of our Teleprompter software. This repo contains all the features present in the standalone desktop version and necesary files for the mobile version to work.
 
