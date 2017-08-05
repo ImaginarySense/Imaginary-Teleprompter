@@ -208,10 +208,10 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
         // Wait a moment to prevent possible asynchronic CSS issues.
         window.setTimeout( function() {
+            setScreenHeight();
+            setPromptHeight();
             // If flipped vertically, set start at inverted top.
             if (flipV) {
-                setScreenHeight();
-                setPromptHeight();
                 animate(0,-promptHeight+screenHeight);
             }
 
