@@ -1,7 +1,7 @@
 ![Teleprompter](https://github.com/ImaginarySense/Teleprompter-Electron/raw/master/build/install-spinner.png)
 
 [![GitHub license](https://img.shields.io/badge/license-GPL3-blue.svg)](https://raw.githubusercontent.com/ImaginarySense/Teleprompter-Core/master/LICENSE)
-[![GitHub release](https://img.shields.io/github/release/qubyte/rubidium.svg)](https://github.com/ImaginarySense/Teleprompter-Electron/releases)
+[![GitHub release](https://img.shields.io/github/release/ImaginarySense/Teleprompter-Electron.svg)](https://github.com/ImaginarySense/Teleprompter-Electron/releases)
 [![GitHub contributors](https://img.shields.io/github/contributors/ImaginarySense/Teleprompter-Core.svg)](https://github.com/ImaginarySense/Teleprompter-Core/graphs/contributors)
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/ImaginarySense/Teleprompter-Core.svg)](http://isitmaintained.com/project/ImaginarySense/Teleprompter-Core "Average time to resolve an issue")
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/ImaginarySense/Teleprompter-Core.svg)](http://isitmaintained.com/project/ImaginarySense/Teleprompter-Core "Percentage of issues still open")
