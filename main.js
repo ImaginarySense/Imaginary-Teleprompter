@@ -126,6 +126,8 @@ function createMainWindow () {
 		// in an array if your app supports multi windows, this is the time
 		// when you should delete the corresponding element.
 		mainWindow = null;
+		if (process.platform !== 'darwin')
+			app.quit();
 	});
 
 	// Debug tools
