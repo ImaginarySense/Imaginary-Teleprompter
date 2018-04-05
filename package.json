@@ -4,7 +4,7 @@
   "homepage": "http://imaginary.tech/teleprompter/",
   "description": "The most complete and professional free software teleprompter application.",
   "license": "GPL-3.0+",
-  "version": "2.3.3",
+  "version": "2.3.4",
   "keywords": [
     "teleprompter",
     "television",
@@ -37,12 +37,12 @@
   },
   "main": "main.js",
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0",
-    "shelljs": "^0.7.8",
+    "electron-squirrel-startup": "1.0.0",
+    "shelljs": "0.8.1",
     "deb-version-compare": "git+https://github.com/sdumetz/node-deb-version-compare.git"
   },
   "devDependencies": {
-    "electron": "^1.8.2-beta.4"
+    "electron": "1.8.4"
   },
   "engine": "node >= 8.2.1",
   "preferGlobal": "false"
