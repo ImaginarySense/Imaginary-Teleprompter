@@ -18,7 +18,7 @@
 
 // Global variables
 var debug;
-var currentVersion = "2.3.1"
+var currentVersion = "2.3.4"
 function inElectron() {
     return navigator.userAgent.indexOf("Electron")!=-1;
 }
