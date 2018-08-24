@@ -37,9 +37,12 @@
   },
   "main": "main.js",
   "dependencies": {
+    "bonjour": "^3.5.0",
+    "deb-version-compare": "git+https://github.com/sdumetz/node-deb-version-compare.git",
     "electron-squirrel-startup": "1.0.0",
+    "express": "^4.16.3",
     "shelljs": "0.8.1",
-    "deb-version-compare": "git+https://github.com/sdumetz/node-deb-version-compare.git"
+    "socket.io": "^2.1.1"
   },
   "devDependencies": {
     "electron": "1.8.4"

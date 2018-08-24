@@ -108,6 +108,7 @@ let mainWindow = null,
 	licenseWindow = null,
 	tic = 0,
 	toc = 1;
+var io;
 
 function createMainWindow () {
 	if (process.platform === 'win32')
@@ -170,10 +171,7 @@ function frameSkip() {
 // Send a message to the renderer process...
 ipcMain.on('asynchronous-message', (event, arg) => {
 	// console.log(arg);
-	if (arg === "network") {
-		// runSocket(event);
-	}
-	else if (arg === "openInstance") {
+	if (arg === "openInstance") {
 		externalPrompt = new BrowserWindow({
 			webPreferences: {
 				title: 'Teleprompter Instance',
@@ -220,6 +218,11 @@ ipcMain.on('asynchronous-message', (event, arg) => {
 	}
 	else if (arg === "prepareLinks")
 		event.sender.send('asynchronous-reply',{'option':'prepareLinks'});
+	else if (arg === "socket-connect") {
+		startSocketServer(event);
+	}else if (arg === "socket-disconnect") {
+		stopSocketServer(event);
+	}
 	else {
 		if (externalPrompt!==null) {
 			console.log(arg);
@@ -393,12 +396,52 @@ function getIP() {
 	for ( var a in nets) {
 		var ifaces = nets[a];
 		for ( var o in ifaces) {
-		if (ifaces[o].family == "IPv4" && !ifaces[o].internal) {
-			return ifaces[o].address;
-		}
+			if (ifaces[o].family == "IPv4" && !ifaces[o].internal) {
+				return ifaces[o].address;
+			}
 		}
 	}
 	return null;
+}
+
+// Remote Control Server with Sockets
+function startSocketServer(event) {
+	var ip = getIP();
+	if(ip){
+	  var express = require('express')();
+	  var http = require('http').Server(express);
+	  io = require('socket.io')(http);
+
+	  io.sockets.on('connection', function (socket) {
+		socket.on('command',function(res){
+			if(res.hasOwnProperty('key') > 0){
+			  event.sender.send('asynchronous-reply',{'option':'command', 'cmd': 'keydown', 'data':res});
+			}
+		});
+		socket.on('disconnect', function () {});
+	  });
+
+	  http.listen(3000, function(){
+		event.sender.send('asynchronous-reply',{'option':'command','cmd': 'http-server','data':ip});
+		//console.log('http://' + ip + ':3000/');
+	  });
+
+
+	  // For Mac Compatibility
+	  // var bonjour = require('bonjour')();
+	  // bonjour.publish({ name: 'Teleprompter', type: 'http', port: 3000 });
+	  // bonjour.find({ type: 'http' }, function (service) {
+		// //console.log('Found an HTTP server:'+ service);
+		// event.sender.send('asynchronous-reply',{'option':'command','cmd': 'bonjour','data':service.host});
+	  // });
+	}else{
+		event.sender.send('asynchronous-reply',{'option':'command','cmd': 'no-ip'});
+	}
+}
+
+function stopSocketServer(event){
+	io.close();
+	event.sender.send('asynchronous-reply',{'option':'command','cmd': 'disconnect-server'});
 }
 
 // Remote control server

@@ -61,6 +61,7 @@
 						<a class="external navbar-brand" href="http://imaginary.tech/teleprompter/" target="_blank"><img src="img/logo.png" alt="Teleprompter" ></a>
 					</div>
 					<ul class="nav navbar-nav navbar-right">
+						<li><a id="socket" href=" " style="width: 10px;"></a></li>
 						<li><a id="advConfig" href="#content" data-toggle="collapse"><img style="width:26px;" src="fonts/noto-emoji-master/emoji_u2699.svg"></a></li>
 						<li><a id="updateIt" class="hidden" href=" ">Update</a></li>
 						<li><a id="promptIt" href=" ">Prompt It!</a></li>
@@ -373,6 +374,19 @@
 							</form>
 						</div>
 					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="socketDialog" class="modalDialog">
+		<div style="width: 50%;">
+			<div class="panel panel-default">
+				<a href="#close" title="Close" class="close">X</a>
+				<div class="panel-heading">
+					<h1>Connection Status <small>Teleprompter</small></h1>
+				</div>
+				<div class="panel-body">
+					<p class="text-center">Unable to create sockets server</p>
 				</div>
 			</div>
 		</div>

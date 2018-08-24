@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 "use strict";
-var debug = false;
+var debug = true;
 
 (function() {
     // Use JavaScript Strict Mode.
@@ -32,7 +32,7 @@ var debug = false;
     }
     
     // Global objects
-    var promptIt, updateIt, prompterWindow, frame, currentScript, canvas, canvasContext, slider,
+    var promptIt, updateIt, socket, prompterWindow, frame, currentScript, canvas, canvasContext, slider,
         syncMethods = {"instance":0, "canvas":1, "follow":2};
 
     // Global variables
@@ -47,6 +47,9 @@ var debug = false;
 
     //SideBar
     var sidebar = new SIDEBAR();
+
+    // IsSocket
+    var isSocket = false;
 
     // Enums
     var command = Object.freeze({
@@ -75,8 +78,10 @@ var debug = false;
         // Set DOM javascript controls
         promptIt = document.getElementById("promptIt");
         updateIt = document.getElementById("updateIt");
+        socket = document.getElementById("socket");
         promptIt.onclick = submitTeleprompter;
         updateIt.onclick = updateTeleprompter;
+        socket.onclick = toogleSocket;
         document.getElementById("prompterStyle").setAttribute("onchange", "setStyleEvent(value);");
         document.getElementById("credits-link").onclick = credits;
 
@@ -203,14 +208,37 @@ var debug = false;
                 }
                 // Show QR Codes.
                 // Initiate QRs for Remote Control.
-                else if (arg.option === "qr")
-                    addQRConnection(arg.data);
+                // else if (arg.option === "qr")
+                //     addQRConnection(arg.data);
                 // Restore instances
                 else if (arg.option === "restoreEditor")
                     restoreEditor();
                 // Forward remote control commands.
-                else if (arg.option === "command")
-                    document.onkeydown(arg.data);
+                else if (arg.option === "command"){
+                    switch(arg.cmd){
+                        case 'keydown':
+                            document.onkeydown(arg.data);
+                            break;
+                        case 'http-server':
+                            //addQRConnection(arg.data);
+                            console.log('http-server: http://' + arg.data + ':3000');
+                            connectedSocket();
+                            break;
+                        case 'bonjour':
+                            //addQRConnection(arg.data);
+                            console.log('bonjour: http://' + arg.data + ':3000');
+                            break;
+                        case 'no-ip':
+                            console.log('Testing No-IP');
+                            window.location = "#socketDialog";
+                            break;
+                        case 'disconnect-server':
+                            console.log('Disconnect Server');
+                            disconnectedSocket();
+                            break;
+
+                    }
+                }
                 // 
                 // Get the "exteral" classes and update each link to load on an actual browser.
                 else if (arg.option === "prepareLinks") {
@@ -223,15 +251,20 @@ var debug = false;
                         }
                 }
             });
-            // Scan network for remote control.
             ipcRenderer.send('asynchronous-message', 'prepareLinks');
-            //ipcRenderer.send('asynchronous-message', 'network');
         } // end if
 
         // Initialize file management features.
         initScripts();
+
+        // Setup Images
         //initImages();
+
+        // Load last settings
         loadLastUseSettings();
+
+        // Setup Socket
+        setupSocket();
     } // end init()
 
     function closeWindow() {
@@ -1328,6 +1361,38 @@ var debug = false;
             event.preventDefault();
             document.querySelector("#wrapper").classList.toggle("toggled");
         };
+    }
+
+    // Setup socket components
+    function setupSocket(){
+        if (inElectron()){
+            socket.style.backgroundColor = '#f44242';
+            socket.style.display = 'block';
+        } else {
+            socket.style.display = 'none';
+        }
+    }
+
+    // Connected Socket
+    function connectedSocket() {
+        socket.style.backgroundColor = '#42f46b';
+    }
+
+    // Diconnected Socket
+    function disconnectedSocket() {
+        socket.style.backgroundColor = '#f44242';
+    }
+
+    function toogleSocket(){
+        // Stops the event but continues executing the code.
+        if (!(event===undefined||event.preventDefault===undefined))
+            event.preventDefault();
+
+        isSocket = !isSocket;
+        if (isSocket)
+            ipcRenderer.send('asynchronous-message', 'socket-connect');
+        else
+            ipcRenderer.send('asynchronous-message', 'socket-disconnect');
     }
 
     // Initialize objects after DOM is loaded
