@@ -4,8 +4,15 @@
 
 Experimentation code for version 3.0
 
-## Copyright: 
+## Development Setup
+1. `npm install`
+2. `npm run develop`
+
+## Build Instructions
+1. `npm run build`
+
+## Copyright
 Imaginary Sense Inc.
 
-## License: 
+## License
 This software is under [GPL3](https://github.com/javiercordero/Teleprompter/blob/master/LICENSE) license.
