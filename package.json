@@ -1,15 +1,46 @@
 {
-  "name": "teleprompter",
-  "version": "3.0.0",
+  "name": "imaginary-teleprompter",
   "description": "",
-  "main": "index.js",
+  "version": "3.0.0",
+  "email": "teleprompter@imaginary.tech",
+  "homepage": "https://imaginary.tech/teleprompter/",
+  "license": "GPL-3.0+",
   "scripts": {
-    "build": "webpack"
+    "develop": "npx nodemon",
+    "start": "npm run build-dev",
+    "build-dev": "npx webpack -n --watch -n --mode development",
+    "build": "npx webpack -n --mode production"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Imaginary Sense <support@imaginary.tech> (http://imaginary.tech)",
+  "contributors": [
+    "Javier O. Cordero-Pérez <javier@imaginary.tech> (http://javiercordero.info)",
+    "Victor A. Ortiz-Alvarado <va2ron1@gmail.com> (https://twitter.com/Va2ron1)",
+    "Rafael J. Sierra-Soto <rafael.sierra2@upr.edu> (https://www.facebook.com/rafael.jose.7737)",
+    "Keyvan Pérez Pérez <keyvan.perez2@gmail.com> (https://github.com/keyvanp)"
+  ],
   "devDependencies": {
-    "webpack": "^4.29.6",
+    "browser-sync": "^2.26.3",
+    "browser-sync-webpack-plugin": "^2.2.2",
+    "nodemon": "^1.18.11",
+    "webpack": "^4.30.0",
     "webpack-cli": "^3.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ImaginarySense/Teleprompter-Core"
+  },
+  "bugs": {
+    "url": "https://github.com/ImaginarySense/Teleprompter-Core/issues"
+  },
+  "dependencies": {
+    "@ckeditor/ckeditor5-basic-styles": "^11.1.0",
+    "@ckeditor/ckeditor5-dev-utils": "^12.0.1",
+    "@ckeditor/ckeditor5-editor-classic": "^12.1.0",
+    "@ckeditor/ckeditor5-essentials": "^11.0.1",
+    "@ckeditor/ckeditor5-paragraph": "^11.0.1",
+    "@ckeditor/ckeditor5-theme-lark": "^13.0.1",
+    "postcss-loader": "^3.0.0",
+    "raw-loader": "^2.0.0",
+    "style-loader": "^0.23.1"
   }
 }

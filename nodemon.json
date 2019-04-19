@@ -1,0 +1,6 @@
+{
+  "verbose": true,
+  "watch": ["*"],
+  "ignore": ["./README.md", "./*.html", "app/*.js", "app/*.css", "dist/*.js", "dist/*.map"],
+  "delay": "2500"
+}

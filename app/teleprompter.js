@@ -11,8 +11,8 @@ class Teleprompter {
     }
     if (this._container && this._container.nodeType) {
       this._container.style.backgroundColor = "red";
-      this._container.style.width = '200px';
-      this._container.style.height = '300px';
+      this._container.style.width = '120px';
+      this._container.style.height = '150px';
     } else {
       console.log("container is undefined");
     }

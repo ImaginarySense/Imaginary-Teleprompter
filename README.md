@@ -2,7 +2,7 @@
 
 # v3-concept
 
-Just a proof of concept of what could be the teleprompter system for version 3.0
+Experimentation code for version 3.0
 
 ## Copyright: 
 Imaginary Sense Inc.
