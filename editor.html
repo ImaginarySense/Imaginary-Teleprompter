@@ -3,15 +3,349 @@
 <head>
   <meta charset="UTF-8">
   <title>Imaginary Teleprompter</title>
+  <link rel="icon" href="dist/img/logo_sm.png" type="image/png-icon">
 </head>
 <body>
-<button id="startPrompt">startPrompt</button>
+<!--   <button id="startPrompt">startPrompt</button>
   <div id="prompt">
-    <p>Welcome to Imaginary Teleprompter</p>
+    <p>1</p>
   </div>
   <div id="editor">
     <p>Welcome to Imaginary Teleprompter</p>
+  </div> -->
+  <div id="siteTop" class="container-fluid">
+    <div class="row">
+      <div class="col-12 col-lg-auto col-xl-8">
+        <nav class="navbar navbar-expand-md navbar-light bg-light">
+          <a class="navbar-brand" href="#">
+            <img src="dist/img/logo_sm.png" width="30" height="30" class="d-inline-block align-top" alt="">
+            Imaginary <span class="d-none d-sm-inline">Teleprompter</span>  
+          </a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">  
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">File</a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                  <a class="dropdown-item" href="#">New</a>
+                  <a class="dropdown-item" href="#">Open</a>
+                  <a class="dropdown-item" href="#">Recent document 1</a>
+                  <a class="dropdown-item" href="#">Recent document 2</a>
+                </div>
+              </li>
+              <!-- <li class="nav-item">
+                <a class="nav-link" href="#">Insert</a>
+              </li> -->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Remote</a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                  <a class="dropdown-item" href="#">Scan for Bluetooth Remotes</a>
+                  <a class="dropdown-item" href="#">Map Keys</a>
+                </div>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Preferences</a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                  <a class="dropdown-item" href="#">Custom Styles</a>
+                  <a class="dropdown-item" href="#">Enable Saving Within Teleprompter</a>
+                  <a class="dropdown-item disabled" href="#">Disable Saving Within Teleprompter</a>
+                </div>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Help</a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                  <a class="dropdown-item" href="#">Documentation</a>
+                  <a class="dropdown-item" href="#">Changelog</a>
+                  <a class="dropdown-item" href="#">GPL v3 License</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" target="_blank" href="http://imaginary.tech/">Visit Imaginary Sense's Website</a>
+                  <a class="dropdown-item" target="_blank" href="http://imaginary.tech/teleprompter/">Visit Teleprompter's Website</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="#about">About Imaginary Teleprompter</a>
+                  <a class="dropdown-item" href="#credits">Play Credits</a>
+                </div>
+              </li>
+            </ul>
+            <!-- <ul class="navbar-nav nav-pills ml-auto" id="promptControls"> -->
+    <!--          <li class="nav-item">
+                <a class="nav-link square" id="settings-tab" data-toggle="tab" role="tab" aria-controls="settings" aria-selected="false" href="#settings">S</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link square" id="emojis-tab" data-toggle="tab" role="tab" aria-selected="false" aria-controls="emojis" href="#emojis">E</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link square" id="images-tab" data-toggle="tab" role="tab" aria-selected="false" aria-controls="images" href="#images">I</a>
+              </li> -->
+              <!-- <li class="nav-item d-none">
+                <a class="nav-link" href="#update">Update</a>
+              </li>
+              <li class="nav-item active">
+                <a class="nav-link" href="#prompt">Prompt</a>
+              </li>
+            </ul> -->
+            <!-- <img src="#" width="30" height="30" class="d-inline-block align-top" alt=""> -->
+          </div>
+        </nav>
+      </div>
+      <div class="col-lg-auto col-xl-4 mr-auto">
+        <ul class="nav mr-auto nav-tabs ml-auto tab-bottom" id="setupTabs" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" role="tab" href="#tabs-closed" aria-controls="tabs-closed" aria-selected="true">X</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" role="tab" href="#settings" aria-controls="settings" aria-selected="false">S</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" role="tab" href="#emojis" aria-controls="emojis" aria-selected="false">E</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" role="tab" href="#images" aria-controls="images" aria-selected="false">I</a>
+          </li>
+          <li class="nav-item /*d-none*/">
+            <a class="nav-link" data-toggle="tab" role="tab" href="#update">
+              <span class="d-none d-sm-inline d-lg-none d-xl-inline">Update</span>
+              <span class="d-inline d-sm-none d-lg-inline d-xl-none">U</span>
+            </a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" data-toggle="tab" role="tab" href="#prompt">
+              <span class="d-none d-sm-inline d-lg-none d-xl-inline">Close</span>
+              <span class="d-inline d-sm-none d-lg-inline d-xl-none">C</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
+  <div class="tab-content" id="setupTabsContent">
+    <div id="tabs-closed" role="tabpanel" aria-labelledby="tabs-closed">
+    </div>
+    <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="home-tab">
+      <!-- Controls -->
+      <div class="container">
+        <div class='row'>
+          <div class='col-md-3 col-sm-6'>
+            <!--<label for="basic-url">Flip mode</label>-->
+            <label for="primary">In-frame prompter</label>
+            <select class="form-control" id="primary" name="primary">
+              <option value="0" title="Don't prompt on this window">Disabled (Don't prompt on this window)</option>
+              <option value="1" title="Normal screen" selected="selected">No Flip (Normal screen)</option>
+              <option value="2" title="Normal mirror">Horizontal Flip (Mirror)</option>
+              <option value="3" title="Miror plus 180&deg; rotation">Vertical Flip (Miror plus 180&deg; rotation)</option>
+              <option value="4" title="180&deg; screen rotation">Double Flip (180&deg; screen rotation)</option>
+            </select>
+          </div>
+          <div class='col-md-3 col-sm-6'>
+            <label for="secondary">External prompter</label>
+            <select class="form-control" id="secondary" name="secondary">
+              <option value="0" title="Don't prompt to a second window" selected="selected">Disabled (Don't prompt to a second window)</option>
+              <option value="1" title="Normal screen">No Flip (Normal screen)</option>
+              <option value="2" title="Normal mirror">Horizontal Flip (Mirror)</option>
+              <option value="3" title="Miror plus 180&deg; rotation">Vertical Flip (Miror plus 180&deg; rotation)</option>
+              <option value="4" title="180&deg; screen rotation">Double Flip  (180&deg; screen rotation)</option>
+            </select>
+          </div>
+          <div class='col-md-3 col-sm-6'>
+            <label for="prompterStyle">Prompter style</label>
+            <select class="form-control" id="prompterStyle" name="prompterStyle">
+              <option value="0">Azure Light</option>
+              <option value="1" selected="selected">Blackboard</option>
+              <option value="2">Classic Yellow</option>
+              <option value="3">Dark Matter</option>
+              <!-- <option value="4">Intergalactic</option> -->
+              <option value="4">Whiteboard</option>
+            </select>
+          </div>
+          <div class='col-md-3 col-sm-6'>
+            <label for="focus">Focus area</label>
+            <select class="form-control" id="focus" name="focus">
+              <option value="3" title="No focus area for increased efficiency.">None</option>
+              <option value="1">Top Focus (for Webcams)</option>
+              <option value="0" selected="selected">Middle Focus (for Professional prompters)</option>
+              <option value="2">Bottom Focus (for Screens over cameras)</option>
+              <option value="4" title="Dissable touch to enable interaction with HTML contents.">Interactive mode (interact with HTML contents)</option>
+            </select>
+          </div>
+        </div>
+        <div class='row'>
+          <div class='col-xs-12 col-sm-6 col-md-3'>
+            <small>
+              <label for="speed">Speed:</label>
+              <label for="speed" id="speedValue">4.0</label>
+            </small>
+            <input type="range" id="speed" name="speed" data-slider-value="4.0" data-slider-step="0.5" data-slider-min="1" data-slider-max="20" data-slider-ticks="[1,4,20]" data-slider-ticks-snap-bounds="0">
+          </div>
+          <div class='col-xs-12 col-sm-6 col-md-3'>
+            <small>
+              <label for="acceleration">Acceleration curve:</label>
+              <label for="acceleration" id="accelerationValue">1.45</label>
+            </small>
+            <input type="range" id="acceleration" name="acceleration" data-slider-value="1.45" data-slider-min="0.5" data-slider-max="1.8" data-slider-step="0.05" data-slider-ticks="[0.5,1.45,1.8]" data-slider-ticks-snap-bounds="0">
+          </div>
+          <div class='col-xs-12 col-sm-6 col-md-3'>
+            <small>
+              <label for="fontSize">Font scale:</label>
+              <label for="fontSize" id="fontSizeValue">120</label><label for="fontSize">%</label>
+            </small>
+            <input type="range" id="fontSize" name="fontSize" data-slider-value="120" data-slider-min="50" data-slider-max="250" data-slider-step="5" data-slider-ticks="[50,120,250]" data-slider-ticks-snap-bounds="0">
+          </div>
+          <div class='col-xs-12 col-sm-6 col-md-3'>
+            <small>
+              <label for="fontSize">Width margin:</label>
+              <label for="fontSize" id="fontSizeValue">80</label><label for="fontSize">%</label>
+            </small>
+            <input type="range" id="fontSize" name="fontSize" data-slider-value="20" data-slider-min="0" data-slider-max="50" data-slider-step="1" data-slider-ticks="[0,20,40]" data-slider-ticks-snap-bounds="0">
+          </div>
+          <div class='col-sm-3'>
+            <small>
+              <label for="timer">Timer</label>
+            </small><br>
+            <div id="timer" class="btn-group  btn-group-sm btn-toggle"> 
+              <button class="btn btn-default">On</button>
+              <button class="btn btn-primary active">Off</button>
+            </div>
+          </div>
+          <div class='col-sm-3'>
+            <small>
+              <label for="timer">Remote <span class="d-sm-none d-md-inline">Control</span></label>
+            </small><br>
+            <div id="timer" class="btn-group  btn-group-sm btn-toggle"> 
+              <button class="btn btn-default">On</button>
+              <button class="btn btn-primary active">Off</button>
+            </div>
+          </div>
+          <div class='col-sm-3'>
+            <small>
+              <label for="timer">Speech <span class="d-sm-none d-md-inline">Recognition</span></label>
+            </small><br>
+            <div id="timer" class="btn-group  btn-group-sm btn-toggle"> 
+              <button class="btn btn-default">On</button>
+              <button class="btn btn-primary active">Off</button>
+            </div>
+          </div>
+          <!--
+          <div class='col-md-1 col-sm-1'>
+            <small>
+              <label for="timer">Timer</label>
+            </small><br>
+            <div id="timer" class="btn-group  btn-group-sm btn-toggle"> 
+              <button class="btn btn-default">I</button>
+              <button class="btn btn-primary active">O</button>
+            </div>
+          </div>
+          <div class='col-md-1 col-sm-1'>
+            <small>
+              <label for="timer">Voice</label>
+            </small><br>
+            <div id="timer" class="btn-group btn-group-sm btn-toggle"> 
+              <button class="btn btn-default">Inactive</button>
+            </div>
+          </div>
+          -->
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane fade" id="emojis" role="tabpanel" aria-labelledby="profile-tab">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-12 col-md-4 col-lg-3">
+            <input class="full-width" type="text" name="emojis">
+          </div>
+          <div class="col-sm-12 col-md-8 col-lg-9">
+            Emojis list
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            Big Emojis
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane fade" id="images" role="tabpanel" aria-labelledby="contact-tab">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <input type="button" name="load_image">       
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            Images grid
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="promptercontainer">
+    <article id="prompter" contenteditable="true">
+      <h3>Welcome to Imaginary Teleprompter!</h3>
+      <p>Are you ready to tell a story?</p>
+      <br>
+      <p>"Teleprompter" is the most complete, free software, professional teleprompter for anyone to use. Click on "Prompt It!" whenever you're ready and control the speed with the arrow keys.</p>
+      <br>
+      <h3>Here are some of our features:</h3>
+      <ol>
+      <li>Control the speed and text-size with the 'Up' and 'Down' arrow keys, the 'W' and 'S' keys or the mouse wheel. You may press 'Spacebar' to pause at anytime.</li>
+      <li>Dynamically change the font-size by pressing 'Left' and 'Right' or the 'A' and 'D' keys.</li>
+      <li>Flip modes allow <em>mirroring</em> the prompter in every possible way.</li>
+      <li>You can use one or two instances. Mirror one, monitor on the other one.</li>
+      <li><a id="5" name="5">Set almost any key as an <em>anchor</em> and instantly jump to any part of the script. Try pressing '5' now!</a></li>
+      <li>Different focus areas allow you to easily use Teleprompter with a webcam, a tablet, or professional teleprompter equipment.</li>
+      <li>Time your segments with the built in <em>timer</em>. Press 'Backspace' to reset the timer.</li>
+      <li>Tweak the <em>Speed</em>, <em>Acceleration Curve</em> and <em>Font Size</em> settings to fit your hosts' needs.</li>
+      <li>The Rich Text Editor, derived from the highly customizable CKeditor, gives unlimited possibilities on what you can prompt.</li>
+      <ul>
+      <!--
+       <li>Add emoticons to indicate feelings and expressions to your hosts.
+      </li>
+      -->
+      <li>
+      You may generate and display mathematical equations using the integrated CodeCogs equation editor.<br>
+      <table border="1" cellpadding="1" cellspacing="1">
+      <tbody>
+      <tr>
+      <td>&nbsp;</td>
+      <td><img alt="\bg_white \huge \sum_{heta+\Pi }^{80} sin(heta)" src="http://latex.codecogs.com/gif.latex?%5Cdpi%7B300%7D%20%5Cbg_white%20%5Chuge%20%5Csum_%7B%5CTheta&amp;plus;%5CPi%20%7D%5E%7B80%7D%20sin%28%5CTheta%29" /></td>
+      <td>&nbsp;</td>
+      </tr>
+      </tbody>
+      </table>
+      </li>
+      <li>Insert images from the web or copy and paste them into the prompter.
+      <img alt="Picture: Arecibo Sky" src="dist/img/arecibo-sky.jpg">
+      </li>
+       </ul>
+      <li>There are various <em>Prompter Styles</em> to choose from. You may also create your own.</li>
+      <li>Press 'F11' to enter and leave fullscreen.
+      You may fullscreen the text editor for greater concentration.</li>
+      <!-- <li>Download our mobile app, <em>Teleprompter X</em>, to remote control Teleprompter instalations.</li> -->
+      <li>Run the "External prompter" on a second screen, add new contents into the editor, then "Update" your prompter in realtime without having to halt your script.</li>
+      <li>Teleprompter works across screens with different resolutions and aspect ratios.</li>
+      <li>Using calculus and relative measurement units, Teleprompter is built to age gracefully. Speed and contents remain consistent from your smallest screen up to 4k devices and beyond.</li>
+      <li>Animations are hardware accelerated for a smooth scroll. A quad-core computer with dedicated graphics and, at least, 2GB RAM is recommended for optimal results.</li>
+      <li>Teleprompter doesn't stretch a lower quality copy of your prompt for monitoring, instead it renders each instance individually at the highest quality possible. You should lower your resolution to increase performance on lower end machines.</li>
+      <li>Text can be pasted from other word processors such as Libre Office Writer&trade; and Microsoft Word&reg;.</li>
+      <li>All data is managed locally. We retain no user data.</li>
+      <li>Use the standalone installation for greater performance and automatic fullscreen prompting.</li>
+      <li>The standalone version comes for Linux, OS X, Microsoft Windows and Free BSD.</li>
+      <li>Close prompts and return to the editor by pressing 'ESC'.</li>
+      </ol>
+      <hr>
+      <h4>How to use anchor shortcuts:</h4>
+      <ol>
+      <li>Select a keyword or line you want to jump to on your text in the editor.</li>
+      <li>Click on the <strong>Flag Icon</strong> on the editor's tool bar.</li>
+      <li>A box named "Anchor Properties" should have appeared. Type any single key of your choice and click 'Ok'.<br>Note preassigned keys, such as WASD and Spacebar will be ignored.</li>
+      <li>Repeat as many times as you wish.</li>
+      <li>When prompting, press on the shortcut key to jump into the desired location.</li>
+      </ol>
+      <p>###</p>
+    </article>
+  </div>
+  <div id="statusbar"></div>
   <script src="dist/imaginary-teleprompter-app.js" type="text/javascript"></script>
 </body>
 </html>

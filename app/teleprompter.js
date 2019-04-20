@@ -10,7 +10,9 @@ class Teleprompter {
       this._container = document.getElementById(this._container);
     }
     if (this._container && this._container.nodeType) {
-      this._container.style.backgroundColor = "red";
+      // J: According to Keyvan's research, this is one of the least efficient ways to style DOM components and increases load times.
+      this._container.style.backgroundColor = "lightblue";
+      this._container.style.textAlign = 'center';
       this._container.style.width = '120px';
       this._container.style.height = '150px';
     } else {

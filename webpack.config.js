@@ -34,6 +34,31 @@ module.exports = {
 
   module: {
     rules: [
+      // Code to import Bootstrap styles
+      {
+        test: /\.(scss)$/,
+        use: [ {
+            loader: 'style-loader' // inject CSS to page with a `<style>` tag
+          }, {
+            loader: 'css-loader' // translates CSS into CommonJS modules
+          }, {
+            loader: 'postcss-loader', // loader for webpack, runs post css actions
+            options: {
+              plugins: function () { // post css plugins, can be exported to postcss.config.js
+                return [
+                  require('precss'),
+                  require('autoprefixer')
+                ];
+              }
+            }
+          },
+          {
+            // Loads a SASS/SCSS file and compiles it to CSS
+            loader: 'sass-loader'
+          }
+        ]
+      },
+      // Code to import CKEditor 5 styles
       {
         // Or /ckeditor5-[^/]+\/theme\/icons\/[^/]+\.svg$/ if you want to limit this loader
         // to CKEditor 5 icons only.
