@@ -59,31 +59,16 @@ body {
   padding: 12px 0;
   border-bottom: solid 1px lightblue;
 }
-article {
-  /*z-index: -100;*/
-}
-/* CKEDITOR 4 */
+/* CKEDITOR 5 */
 #editorcontainer:-webkit-full-screen {
   width: 100%;
   height: 100%;
   top: 0px;
   bottom: 0px;
 }
-#editorcontainer {
-  /*position: relative;*/
-  background: #EEE;
-  /*min-height: 320px;*/
-  /*height: auto;*/
-  width: 100%;
-  /*top: 56px;*/
-  bottom: 0px;
-}
 #toolbar {
-  /*position: relative;*/
-  /*top: 0px;*/
   width: 100%;
-  /*min-height: 70px;*/
-  background: #F0F0F0;
+  background: #fafafa;
   /*background: #f8f9fa;*/
   border-bottom-color: #CCC; 
 }
@@ -98,8 +83,6 @@ article {
   /*bottom: 0px;*/
   width: 100%;
   min-height: 70px;
-  /*height: calc(100vh - (56px + 70px));  */
-  /*transform: rotateX(0deg) translate3d(0px,0px,0px) !important;*/
 }
 #prompter {
   /*top:0;*/
@@ -131,12 +114,7 @@ article {
 #toolbar-container {
   top: 0px;
   position: sticky;
-
-  /*padding-top: 7px;*/
-  /*padding-bottom: 8px;*/
   z-index: 100;
-
-  /*border: 5px;*/
   background: linear-gradient(to bottom, rgba(255,255,255,1) 12%,rgba(255,255,255,0) 100%);
 }
 
@@ -181,45 +159,3 @@ article {
 /* X LARGE */
 @media screen and (min-width: 1200px) {
 }
-
-/* CKEDITOR 5 */
-/*
-.ck-editor__editable {
-  min-height:82px; max-height:calc(100vh - 140px);
-}
-#editorcontainer:-webkit-full-screen {
-  width: 100%;
-  height: 100%;
-  top: 0px;
-  bottom: 0px;
-}
-#editorcontainer {
-  max-height:calc(100vh - 140px + 42px);
-  overflow: hidden;
-  color: #272822;
-}
-#editorcontainer a:link {
-  color: #333;
-}
-#promptercontainer {
-  width: 100%;
-  background: #272822;
-}
-#toolbar {
-  width: 100%;
-  height: 42px;
-  background: #f8f9fa;
-  border-bottom-color: #CCC; 
-  z-index: 100;
-}
-#statusbar {
-  position: absolute;
-  bottom: 0px;
-  left: 0px;
-  min-width: 5px;
-  min-height: 5px; 
-}
-#statusbar div {
-  border-radius: 7px 6px 7px 0 !important;
-}
-*/
