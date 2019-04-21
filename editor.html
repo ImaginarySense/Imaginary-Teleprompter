@@ -13,6 +13,7 @@
   <div id="editor">
     <p>Welcome to Imaginary Teleprompter</p>
   </div> -->
+  <!-- BEGIN SETUP CONTROLS -->
   <div id="siteTop" class="container-fluid">
     <div class="row">
       <div class="col-12 col-lg-auto col-xl-8">
@@ -172,28 +173,28 @@
         <div class='row'>
           <div class='col-xs-12 col-sm-6 col-md-3'>
             <small>
-              <label for="speed">Speed:</label>
+              <label for="speed">Speed</label>
               <label for="speed" id="speedValue">4.0</label>
             </small>
             <input type="range" id="speed" name="speed" data-slider-value="4.0" data-slider-step="0.5" data-slider-min="1" data-slider-max="20" data-slider-ticks="[1,4,20]" data-slider-ticks-snap-bounds="0">
           </div>
           <div class='col-xs-12 col-sm-6 col-md-3'>
             <small>
-              <label for="acceleration">Acceleration curve:</label>
+              <label for="acceleration">Acceleration curve</label>
               <label for="acceleration" id="accelerationValue">1.45</label>
             </small>
             <input type="range" id="acceleration" name="acceleration" data-slider-value="1.45" data-slider-min="0.5" data-slider-max="1.8" data-slider-step="0.05" data-slider-ticks="[0.5,1.45,1.8]" data-slider-ticks-snap-bounds="0">
           </div>
           <div class='col-xs-12 col-sm-6 col-md-3'>
             <small>
-              <label for="fontSize">Font scale:</label>
+              <label for="fontSize">Font scale</label>
               <label for="fontSize" id="fontSizeValue">120</label><label for="fontSize">%</label>
             </small>
             <input type="range" id="fontSize" name="fontSize" data-slider-value="120" data-slider-min="50" data-slider-max="250" data-slider-step="5" data-slider-ticks="[50,120,250]" data-slider-ticks-snap-bounds="0">
           </div>
           <div class='col-xs-12 col-sm-6 col-md-3'>
             <small>
-              <label for="fontSize">Width margin:</label>
+              <label for="fontSize">Width margin</label>
               <label for="fontSize" id="fontSizeValue">80</label><label for="fontSize">%</label>
             </small>
             <input type="range" id="fontSize" name="fontSize" data-slider-value="20" data-slider-min="0" data-slider-max="50" data-slider-step="1" data-slider-ticks="[0,20,40]" data-slider-ticks-snap-bounds="0">
@@ -225,6 +226,14 @@
               <button class="btn btn-primary active">Off</button>
             </div>
           </div>
+          <div class='col-xs-12 col-sm-6 col-md-3'>
+            <small>
+              <label for="fontSize">X-axis offset</label>
+              <label for="fontSize" id="fontSizeValue">80</label><label for="fontSize">%</label>
+            </small>
+            <input type="range" id="fontSize" name="fontSize" data-slider-value="20" data-slider-min="0" data-slider-max="50" data-slider-step="1" data-slider-ticks="[0,20,40]" data-slider-ticks-snap-bounds="0">
+          </div>
+
           <!--
           <div class='col-md-1 col-sm-1'>
             <small>
@@ -279,6 +288,11 @@
       </div>
     </div>
   </div>
+  <!-- END SETUP CONTROLS -->
+  <!-- BEGIN EDITOR -->
+  <div class="container-fluid" id="toolbar-container">
+    <div id="toolbar"></div>
+  </div>
   <div id="promptercontainer">
     <article id="prompter" contenteditable="true">
       <h3>Welcome to Imaginary Teleprompter!</h3>
@@ -298,10 +312,6 @@
       <li>Tweak the <em>Speed</em>, <em>Acceleration Curve</em> and <em>Font Size</em> settings to fit your hosts' needs.</li>
       <li>The Rich Text Editor, derived from the highly customizable CKeditor, gives unlimited possibilities on what you can prompt.</li>
       <ul>
-      <!--
-       <li>Add emoticons to indicate feelings and expressions to your hosts.
-      </li>
-      -->
       <li>
       You may generate and display mathematical equations using the integrated CodeCogs equation editor.<br>
       <table border="1" cellpadding="1" cellspacing="1">
@@ -321,7 +331,6 @@
       <li>There are various <em>Prompter Styles</em> to choose from. You may also create your own.</li>
       <li>Press 'F11' to enter and leave fullscreen.
       You may fullscreen the text editor for greater concentration.</li>
-      <!-- <li>Download our mobile app, <em>Teleprompter X</em>, to remote control Teleprompter instalations.</li> -->
       <li>Run the "External prompter" on a second screen, add new contents into the editor, then "Update" your prompter in realtime without having to halt your script.</li>
       <li>Teleprompter works across screens with different resolutions and aspect ratios.</li>
       <li>Using calculus and relative measurement units, Teleprompter is built to age gracefully. Speed and contents remain consistent from your smallest screen up to 4k devices and beyond.</li>

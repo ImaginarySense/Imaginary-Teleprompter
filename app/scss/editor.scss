@@ -82,7 +82,7 @@ article {
   /*position: relative;*/
   /*top: 0px;*/
   width: 100%;
-  min-height: 70px;
+  /*min-height: 70px;*/
   background: #F0F0F0;
   /*background: #f8f9fa;*/
   border-bottom-color: #CCC; 
@@ -125,18 +125,21 @@ article {
 /* X SMALL */
 #siteTop {
   background-color: rgba(100,100,100,0);
-  /*background-color: #f8f9fa;*/
-  /*border-bottom: 1px #000;*/
+  background-color: #f8f9fa;
+  border-bottom: 1px #000;
 }
-.ck.ck-sticky-panel__content.ck-sticky-panel__content-sticky {
+#toolbar-container {
   top: 0px;
   position: sticky;
+
   /*padding-top: 7px;*/
   /*padding-bottom: 8px;*/
   z-index: 100;
+
   /*border: 5px;*/
-  /*background: linear-gradient(to bottom, rgba(255,255,255,1) 12%,rgba(255,255,255,0) 100%);*/
+  background: linear-gradient(to bottom, rgba(255,255,255,1) 12%,rgba(255,255,255,0) 100%);
 }
+
 /* SMALL */
 @media screen and (min-width: 576px) {
 }
@@ -151,9 +154,10 @@ article {
     position: sticky;
     top: 48px;
   }
-  .ck.ck-sticky-panel__content.ck-sticky-panel__content-sticky {
+  #toolbar-container {
     top: 48px;
   }
+
 }
 /* LARGE */
 @media screen and (min-width: 992px) {
@@ -165,9 +169,10 @@ article {
   #setupTabsContent {
     position: fixed;
   }
-  .ck.ck-sticky-panel__content.ck-sticky-panel__content-sticky {
+  #toolbar-container {
     top: 56px;
   }
+
   .tab-bottom {
     position: relative;
     bottom: -14px;
