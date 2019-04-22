@@ -6,13 +6,6 @@
   <link rel="icon" href="dist/img/logo_sm.png" type="image/png-icon">
 </head>
 <body>
-<!--   <button id="startPrompt">startPrompt</button>
-  <div id="prompt">
-    <p>1</p>
-  </div>
-  <div id="editor">
-    <p>Welcome to Imaginary Teleprompter</p>
-  </div> -->
   <!-- BEGIN SETUP CONTROLS -->
   <div id="siteTop" class="container-fluid">
     <div class="row">
@@ -107,13 +100,13 @@
             <a class="nav-link" data-toggle="tab" role="tab" href="#images" aria-controls="images" aria-selected="false">I</a>
           </li>
           <li class="nav-item /*d-none*/">
-            <a class="nav-link" data-toggle="tab" role="tab" href="#update">
+            <a class="nav-link" data-toggle="tab" role="tab" href="#start" id="start">
               <span class="d-none d-sm-inline d-lg-none d-xl-inline">Update</span>
               <span class="d-inline d-sm-none d-lg-inline d-xl-none">U</span>
             </a>
           </li>
           <li class="nav-item active">
-            <a class="nav-link" data-toggle="tab" role="tab" href="#prompt">
+            <a class="nav-link" data-toggle="tab" role="tab" href="#close" id="close">
               <span class="d-none d-sm-inline d-lg-none d-xl-inline">Close</span>
               <span class="d-inline d-sm-none d-lg-inline d-xl-none">C</span>
             </a>
@@ -295,6 +288,11 @@
   <div class="container-fluid" id="toolbar-container">
     <div id="toolbar"></div>
   </div>
+<!--
+  <div id="prompt">
+    <p>1</p>
+  </div>
+ -->
   <div id="promptercontainer">
     <article id="prompter" contenteditable="true">
       <h3>Welcome to Imaginary Teleprompter!</h3>

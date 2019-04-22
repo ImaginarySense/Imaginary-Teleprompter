@@ -10,11 +10,12 @@ class Teleprompter {
       this._container = document.getElementById(this._container);
     }
     if (this._container && this._container.nodeType) {
-      // J: According to Keyvan's research, this is one of the least efficient ways to style DOM components and increases load times.
-      this._container.style.backgroundColor = "lightblue";
+      // J: According to Keyvan's research, using JavaScript to change individual style properties is one of the least efficient ways to style DOM components and increases load times.
+      // this._container.style.backgroundColor = "lightblue";
+      // this._container.style.width = '120px';
+      // this._container.style.height = '150px';
+      // J: Align-left not working. Must fix.
       this._container.style.textAlign = 'center';
-      this._container.style.width = '120px';
-      this._container.style.height = '150px';
     } else {
       console.log("container is undefined");
     }
