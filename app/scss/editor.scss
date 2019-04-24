@@ -119,6 +119,12 @@ body {
   background: linear-gradient(to bottom, rgba(255,255,255,1) 12%,rgba(255,255,255,0) 100%);
 }
 
+.ck.ck-dropdown .ck-dropdown__panel .ck-list {
+  max-height: 80vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
 /* SMALL */
 @media screen and (min-width: 576px) {
 }
