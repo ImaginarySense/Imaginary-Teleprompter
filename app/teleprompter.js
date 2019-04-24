@@ -15,7 +15,7 @@ class Teleprompter {
       // this._container.style.width = '120px';
       // this._container.style.height = '150px';
       // J: Align-left not working. Must fix.
-      this._container.style.textAlign = 'center';
+      // this._container.style.textAlign = 'center';
     } else {
       console.log("container is undefined");
     }

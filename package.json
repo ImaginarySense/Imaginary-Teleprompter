@@ -33,14 +33,14 @@
     "webpack-cli": "^3.3.0"
   },
   "dependencies": {
-    "@ckeditor/ckeditor5-alignment": "^11.1.0",
+    "@ckeditor/ckeditor5-alignment": "github:ImaginarySense/ckeditor5-alignment#stable",
     "@ckeditor/ckeditor5-autosave": "^11.0.1",
     "@ckeditor/ckeditor5-basic-styles": "^11.1.0",
     "@ckeditor/ckeditor5-clipboard": "^11.0.1",
     "@ckeditor/ckeditor5-dev-utils": "^12.0.1",
     "@ckeditor/ckeditor5-editor-decoupled": "^12.1.0",
     "@ckeditor/ckeditor5-essentials": "^11.0.1",
-    "@ckeditor/ckeditor5-font": "^11.1.0",
+    "@ckeditor/ckeditor5-font": "github:ImaginarySense/ckeditor5-font#master",
     "@ckeditor/ckeditor5-heading": "^11.0.1",
     "@ckeditor/ckeditor5-highlight": "^11.0.1",
     "@ckeditor/ckeditor5-image": "^13.0.1",
