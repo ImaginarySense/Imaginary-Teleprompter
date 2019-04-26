@@ -1,37 +1,94 @@
-class Teleprompter {
-  constructor(container, settings) {
-    this.loadPromptWithContainer(container);
-  }
+/*
+  Imaginary Teleprompter
+  Copyright (C) 2019 Imaginary Sense Inc.
 
-  loadPromptWithContainer(container) {
-    // set container
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See theRemote 
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+'use strict';
+
+import DOMParser from './parser.js';
+
+class Teleprompter extends DOMParser {
+  constructor( container, settings={} ) {
+
+    // If pased container is a string, lookup DOM element.
+    if (typeof container === 'string') {
+      container = document.getElementById(container);
+    }
+    // Make sure container is a valid DOM element.
+    if ( !( container && container.nodeType ) ) {
+      console.err("container is undefined");
+      return;
+    }
+
+    // Initialize parser.
+    super();
+
+    // Set container.
     this._container = container;
-    if (typeof this._container === 'string') {
-      this._container = document.getElementById(this._container);
-    }
-    if (this._container && this._container.nodeType) {
-      // J: According to Keyvan's research, using JavaScript to change individual style properties is one of the least efficient ways to style DOM components and increases load times.
-      // this._container.style.backgroundColor = "lightblue";
-      // this._container.style.width = '120px';
-      // this._container.style.height = '150px';
-      // J: Align-left not working. Must fix.
-      // this._container.style.textAlign = 'center';
-    } else {
-      console.log("container is undefined");
-    }
+
+    // SETUP instance using settings attributes. If invalid setting found, set default
+    // For these input values, the range is possitives, greater than 0
+    this.speed = Math.abs(settings.speed) || 2;
+    this.acceleration = Math.abs(settings.acceleration) || 2;
+    this.width = Math.abs(settings.width) || 84;
+    this.focus = Math.abs(settings.focus) || 50;
+    // Ensure flip is within valid range
+    settings.flip = Math.floor(settings.flip);
+    this.flip = settings.flip>=0 && settings.flip<4 ? settings.flip : 0;
+    // On Booleans, make distinction between false and undefined
+    this.play = settings.play!==undefined ? settings.play : true;
+    this.timer = settings.timer!==undefined ? settings.timer : true;
   }
 
   startPrompt() {
+    
+    this.parse( this._container );
+
     // Do prompting stuff
-    if (this._action && typeof this._action.teleprompterStarted === "function") {
+    if ( this._action && typeof this._action.teleprompterStarted === "function" ) {
       this._action.teleprompterStarted();
     }
   }
 
-  set action(instance) { //Actions, Delegate, Responses, .....
+  increaseVelocity() {};
+  decreaseVelocity() {};
+  next() {};
+  previous() {};
+  togglePlay() {};
+  play() {};
+  pause() {};
+  stop() {};
+  animate() {};
+  increaseFont() {};
+  decreaseFont() {};
+  goTo(element) {};
+  get eta() {};
+  // atEnd() {};
+
+  set action( instance ) { //Actions, Delegate, Responses, .....
     this._action = instance;
   }
 
 }
+
+Teleprompter.prototype.transitionDelays = 500;
+Teleprompter.prototype.transitionDelays = 500;
+Teleprompter.prototype.timeoutDelay = 250;
+Teleprompter.prototype.inputCapDelay = 100;
+Teleprompter.prototype.limit = 2600;
+Teleprompter.prototype._debug = true;
 
 export default Teleprompter;
