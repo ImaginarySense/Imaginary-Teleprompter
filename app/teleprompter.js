@@ -55,7 +55,8 @@ class Teleprompter extends DOMParser {
 
   startPrompt() {
     
-    this.parse( this._container );
+    // Parse contents
+    // this.parse( this._container );
 
     // Do prompting stuff
     if ( this._action && typeof this._action.teleprompterStarted === "function" ) {
@@ -84,11 +85,11 @@ class Teleprompter extends DOMParser {
 
 }
 
-Teleprompter.prototype.transitionDelays = 500;
-Teleprompter.prototype.transitionDelays = 500;
-Teleprompter.prototype.timeoutDelay = 250;
-Teleprompter.prototype.inputCapDelay = 100;
-Teleprompter.prototype.limit = 2600;
+Teleprompter.prototype._transitionDelays = 500;
+Teleprompter.prototype._transitionDelays = 500;
+Teleprompter.prototype._timeoutDelay = 250;
+Teleprompter.prototype._inputCapDelay = 100;
+Teleprompter.prototype._limit = 2600;
 Teleprompter.prototype._debug = true;
 
 export default Teleprompter;
