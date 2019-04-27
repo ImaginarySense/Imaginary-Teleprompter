@@ -163,7 +163,7 @@
         "no-new-require": "error",
         "no-new-wrappers": "error",
         "no-octal-escape": "error",
-        "no-param-reassign": "off",
+        "no-param-reassign": "error",
         "no-path-concat": "error",
         "no-plusplus": [
             "error",
@@ -270,8 +270,12 @@
         "sort-keys": "off",
         "sort-vars": "off",
         "space-before-blocks": "error",
-        "space-before-function-paren": "off",
-        "space-in-parens": "off",
+        "space-before-function-paren": ["error", {
+            "anonymous": "never",
+            "named": "never",
+            "asyncArrow": "always"
+        }],
+        "space-in-parens": ["error", "always"],
         "space-infix-ops": "off",
         "space-unary-ops": "error",
         "spaced-comment": "off",

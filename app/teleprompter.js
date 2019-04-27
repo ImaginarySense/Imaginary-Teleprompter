@@ -21,15 +21,17 @@
 import DOMParser from './parser.js';
 
 class Teleprompter extends DOMParser {
-  constructor( container, settings={} ) {
+
+  constructor( containerIdent, settings={} ) {
 
     // If pased container is a string, lookup DOM element.
-    if (typeof container === 'string') {
-      container = document.getElementById(container);
+    let container;
+    if ( typeof containerIdent === 'string' ) {
+      container = document.getElementById( containerIdent );
     }
     // Make sure container is a valid DOM element.
     if ( !( container && container.nodeType ) ) {
-      console.err("container is undefined");
+      console.err( "container is undefined" );
       return;
     }
 
@@ -41,27 +43,33 @@ class Teleprompter extends DOMParser {
 
     // SETUP instance using settings attributes. If invalid setting found, set default
     // For these input values, the range is possitives, greater than 0
-    this.speed = Math.abs(settings.speed) || 2;
-    this.acceleration = Math.abs(settings.acceleration) || 2;
-    this.width = Math.abs(settings.width) || 84;
-    this.focus = Math.abs(settings.focus) || 50;
+    this.speed = Math.abs( settings.speed ) || 2;
+    this.acceleration = Math.abs( settings.acceleration ) || 2;
+    this.width = Math.abs( settings.width ) || 84;
+    this.focus = Math.abs( settings.focus ) || 50;
     // Ensure flip is within valid range
-    settings.flip = Math.floor(settings.flip);
+    settings.flip = Math.floor( settings.flip );
     this.flip = settings.flip>=0 && settings.flip<4 ? settings.flip : 0;
     // On Booleans, make distinction between false and undefined
     this.play = settings.play!==undefined ? settings.play : true;
     this.timer = settings.timer!==undefined ? settings.timer : true;
-  }
+  } // end Constructor
 
   startPrompt() {
     
     // Parse contents
     // this.parse( this._container );
 
+    console.log( this.fontUnit );
+
     // Do prompting stuff
     if ( this._action && typeof this._action.teleprompterStarted === "function" ) {
       this._action.teleprompterStarted();
     }
+  }
+
+  set action( instance ) { //Actions, Delegate, Responses, .....
+    this._action = instance;
   }
 
   increaseVelocity() {}
@@ -75,12 +83,15 @@ class Teleprompter extends DOMParser {
   animate() {}
   increaseFont() {}
   decreaseFont() {}
-  goTo(element) {}
+  goTo( element ) {}
   get eta() {}
-  // atEnd() {};
-
-  set action( instance ) { //Actions, Delegate, Responses, .....
-    this._action = instance;
+  atEnd() {}
+  
+  // Get fontSize multiplier unit based on container width.
+  get fontUnit() {
+    // fontSize is a hundreth of the outermost container's size times multiplier.
+    const multiplier = 5;
+    return multiplier * this._container.clientWidth / 100;
   }
 
 }

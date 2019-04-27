@@ -135,7 +135,7 @@ class DOMParser {
         }
         // Replace DOM's HTML
         object.innerHTML = tempHTML;
-      });
+      } );
     }
     return sentences;
   }

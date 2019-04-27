@@ -59,21 +59,21 @@ import Teleprompter from './teleprompter';
 
 class Main {
   constructor() {
-    this.teleprompter = new Teleprompter("prompter");
+    this.teleprompter = new Teleprompter( "prompter" );
     this.teleprompter.action = this;
 
-    document.getElementById("start").addEventListener('click', ()=> {
+    document.getElementById( "start" ).addEventListener( 'click', ()=> {
       this.teleprompter.startPrompt();
-    });
+    } );
   }
 
   teleprompterStarted() {
-    console.log("teleprompterStarted");
+    console.log( "teleprompterStarted" );
   }
 }
 
 DecoupledEditor
-  .create( document.getElementById('prompter'), {
+  .create( document.getElementById( 'prompter' ), {
     plugins: [
       Alignment,
       // Autosave,
@@ -124,7 +124,7 @@ DecoupledEditor
   } )
   .then( editor => {
     console.log( 'Editor was initialized', editor );
-    document.getElementById("toolbar").appendChild(editor.ui.view.toolbar.element);
+    document.getElementById( "toolbar" ).appendChild( editor.ui.view.toolbar.element );
   } )
   .catch( error => {
     console.error( error.stack );
