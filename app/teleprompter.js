@@ -64,19 +64,19 @@ class Teleprompter extends DOMParser {
     }
   }
 
-  increaseVelocity() {};
-  decreaseVelocity() {};
-  next() {};
-  previous() {};
-  togglePlay() {};
-  play() {};
-  pause() {};
-  stop() {};
-  animate() {};
-  increaseFont() {};
-  decreaseFont() {};
-  goTo(element) {};
-  get eta() {};
+  increaseVelocity() {}
+  decreaseVelocity() {}
+  next() {}
+  previous() {}
+  togglePlay() {}
+  play() {}
+  pause() {}
+  stop() {}
+  animate() {}
+  increaseFont() {}
+  decreaseFont() {}
+  goTo(element) {}
+  get eta() {}
   // atEnd() {};
 
   set action( instance ) { //Actions, Delegate, Responses, .....

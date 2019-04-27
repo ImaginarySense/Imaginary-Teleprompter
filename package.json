@@ -8,13 +8,15 @@
   "scripts": {
     "develop": "npx nodemon",
     "start": "npm run build-dev",
+    "lint": "npx eslint app/*.js ;exit 0",
+    "lint-fix": "npx eslint --fix app/*.js ;exit 0",
     "build-dev": "npx webpack -n --watch -n --mode development",
     "build": "npx webpack -n --mode production"
   },
-  "author": "Imaginary Sense <support@imaginary.tech> (http://imaginary.tech)",
+  "author": "Imaginary Sense <support@imaginary.tech> (https://imaginary.tech)",
   "contributors": [
-    "Javier O. Cordero-Pérez <javier@imaginary.tech> (http://javiercordero.info)",
-    "Victor A. Ortiz-Alvarado <va2ron1@gmail.com> (https://twitter.com/Va2ron1)",
+    "Javier O. Cordero-Pérez <javier@imaginary.tech> (https://javiercordero.info)",
+    "Victor A. Ortiz-Alvarado <va2ron1@gmail.com> (https://va2ron1.com)",
     "Rafael J. Sierra-Soto <rafael.sierra2@upr.edu> (https://www.facebook.com/rafael.jose.7737)",
     "Keyvan Pérez Pérez <keyvan.perez2@gmail.com> (https://github.com/keyvanp)"
   ],
@@ -23,6 +25,7 @@
     "browser-sync": "^2.26.3",
     "browser-sync-webpack-plugin": "^2.2.2",
     "css-loader": "^2.1.1",
+    "eslint": "^5.16.0",
     "node-sass": "^4.11.0",
     "nodemon": "^1.18.11",
     "postcss-loader": "^3.0.0",
