@@ -18,24 +18,20 @@
 
 /* Required */
 @import "~bootstrap/scss/bootstrap";
-/*
-// @import "~bootstrap/scss/functions";
-// @import "~bootstrap/scss/variables";
-// @import "~bootstrap/scss/mixins";
 
-// Optional
-// @import "~bootstrap/scss/reboot";
-// @import "~bootstrap/scss/type";
-// @import "~bootstrap/scss/images";
-// @import "~bootstrap/scss/code";
-// @import "~bootstrap/scss/grid";
-*/
+%clear {
+  padding: 0;
+  margin: 0;
+}
+
 body {
-  /*overflow: hidden;*/
+  overflow-x: hidden;
 }
 /* HEADER */
-.navbar-brand, .nav-item.nav-link {
-  font-family: Tahoma, Geneva, sans-serif;
+.navbar-brand {
+  .nav-item.nav-link {
+    font-family: Tahoma, Geneva, sans-serif;
+  }
 }
 .full-width {
   width: 100%;
@@ -43,8 +39,10 @@ body {
 /*.nav-item.dropdown {
   word-break: keep-all;
 }*/
-#promptControls .nav-link {
-  font-weight: bold;
+#promptControls {
+  .nav-link {
+    font-weight: bold;
+  }
 }
 #setupTabsContent {
   z-index: 200;
@@ -60,52 +58,81 @@ body {
   border-bottom: solid 1px lightblue;
 }
 /* CKEDITOR 5 */
+/*
 #editorcontainer:-webkit-full-screen {
   width: 100%;
   height: 100%;
   top: 0px;
   bottom: 0px;
 }
-#toolbar {
+*/
+#toolbar{
   width: 100%;
   background: #fafafa;
   /*background: #f8f9fa;*/
   border-bottom-color: #CCC; 
 }
-#promptercontainer {
-  left: 0;
-  right: 0;
-  /*position: relative;*/
-  /*overflow: auto;*/
-  overflow-x: hidden;
-  /*overflow-y: auto;*/
-  resize: none;
-  /*bottom: 0px;*/
+.teleprompter {
+  @extend %clear;
   width: 100%;
-  min-height: 70px;
+  &:nth-child(1n) {
+    @extend %clear;
+    left: 0;
+    right: 0;
+    text-align: center;
+    overflow-x: hidden;
+    list-style-position: inside;
+    ol {
+      @extend %clear;
+    }
+    ul {
+      @extend %clear;
+    }
+    p {
+      @extend %clear;
+    }
+    h1 {
+      @extend %clear;
+    }
+    h2 {
+      @extend %clear;
+    }
+    h3 {
+      @extend %clear;
+    }
+    h4 {
+      @extend %clear;
+    }
+    h5 {
+      @extend %clear;
+    }
+    h6 {
+      @extend %clear;
+    }
+  }
+  .ck {
+    &.ck-content {
+      &.ck-editor__editable_inline {
+        @extend %clear;
+      }
+    }
+  }
+/*  #statusbar {
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    min-width: 5px;
+    min-height: 5px;
+    div {
+      border-radius: 7px 6px 7px 0 !important;
+    }
+  }*/
 }
-#prompter {
-  text-align: center;
-  /*top:0;*/
-  /*bottom:0;*/
-  /*left:0;*/
-  /*right:0;*/
-}
-#statusbar {
-  position: fixed;
-  bottom: 0px;
-  left: 0px;
-  min-width: 5px;
-  min-height: 5px;
-}
-#statusbar div {
-  border-radius: 7px 6px 7px 0 !important;
-}
-.cke_path_item {
+/*.cke_path_item {
   font-size: 13pt !important;
   font-weight: 300 !important;
   font-family: Tahoma, Geneva, sans-serif !important;
-}
+}*/
 /* X SMALL */
 #siteTop {
   background-color: rgba(100,100,100,0);
@@ -119,10 +146,14 @@ body {
   background: linear-gradient(to bottom, rgba(255,255,255,1) 12%,rgba(255,255,255,0) 100%);
 }
 
-.ck.ck-dropdown .ck-dropdown__panel .ck-list {
-  max-height: 80vh;
-  overflow-x: hidden;
-  overflow-y: auto;
+.ck {
+  &.ck-dropdown {
+    .ck-dropdown__panel .ck-list {
+      max-height: 80vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+  }
 }
 
 /* SMALL */

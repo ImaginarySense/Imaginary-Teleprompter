@@ -20,7 +20,6 @@
 
 // Import Bootstrap and other CSS files
 import './scss/editor.scss';
-
 // Import Bootstrap's JavaScript
 import 'bootstrap';
 // Bootstrap's optionals
@@ -59,75 +58,89 @@ import Teleprompter from './teleprompter';
 
 class Main {
   constructor() {
-    this.teleprompter = new Teleprompter( "prompter" );
-    this.teleprompter.action = this;
+    // Get teleprompter element
+    let teleprompter = document.getElementsByClassName( "teleprompter" )[0];
+    
+    // Initialize Teleprompter object
+    this._teleprompter = new Teleprompter( teleprompter );
+    this._teleprompter.action = this;
 
-    document.getElementById( "start" ).addEventListener( 'click', ()=> {
-      this.teleprompter.startPrompt();
+    // Assign UI event actions
+    document.getElementById( "start" ).addEventListener( "click", ()=> {
+      this._teleprompter.startPrompt();
     } );
-  }
+
+    // Initialize CKEditor 5 class
+    DecoupledEditor.create( teleprompter.firstElementChild, {
+      plugins: [
+        Alignment,
+        // Autosave,
+        Bold,
+        Essentials,
+        Font,
+        Heading,
+        Highlight,
+        Image,
+        ImageUpload,
+        Italic,
+        Link,
+        List,
+        Paragraph,
+        PasteFromOffice,
+        RemoveFormat,
+        Strikethrough,
+        Subscript,
+        Superscript,
+        Table,
+        Underline,
+        Undo
+      ],
+      toolbar: {
+        items: [ /*'anchor', '|', */'undo', 'redo', '|', /*'heading', '|', */'bold', 'italic', 'underline', 'strikethrough', '|', 'subscript', 'superscript', '|', 'FontFamily', 'FontSize', '|', 'FontColor', /*'FontBackgroundColor', */'highlight', '|', 'removeFormat', '|', 'numberedList', 'bulletedList', '|', 'alignment', '|', 'link', '|', /*'imageupload', */'insertTable', '|' ]
+      },
+      alignment: {
+        options: [ 'center', 'left', 'right' ]
+      },
+      fontSize: {
+        options: [ '0.75', '0.80', '0.85', '0.90', '0.95', '1.00', '1.05', '1.10', '1.15', '1.20', '1.25', '1.30', '1.35', '1.40', '1.45', '1.50', '1.55', '1.60', '1.65', '1.70', '1.75', '1.80', '1.85', '1.90', '1.95', '2.00' ],
+        unit: 'em'
+      },
+      // lineHeight: {
+      //   options: [ '1.0', '1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8', '1.9', '2.0' ],
+      //   unit: 'em'
+      // },
+      image: {
+        toolbar: [ 'imageStyle:full', 'imageStyle:side', '|', 'imageTextAlternative' ],
+      },
+      autosave: {
+        save( editor ) {
+          // The saveData() function must return a promise
+          // which should be resolved when the data is successfully saved.
+          // return saveData( editor.getData() );
+        }
+      }
+    } )
+    // Editor created event passing editor object
+    .then( editor => {
+      // Assign toolbar element to DOM container.
+      document.getElementById( "toolbar" ).appendChild( editor.ui.view.toolbar.element );      
+      // Reference editor object from main class.
+      // this._teleprompter._editor = editor;
+      // this._editor = editor;
+      console.log( "Ready?" );
+      // On editor ready, lazy load teleprompter related code.
+      this._teleprompter.editorReady();
+      console.log( "Done!" );
+    } )
+    .catch( error => {
+      console.error( error.stack );
+    } );
+
+  } // End main
 
   teleprompterStarted() {
     console.log( "teleprompterStarted" );
   }
 }
-
-DecoupledEditor
-  .create( document.getElementById( 'prompter' ), {
-    plugins: [
-      Alignment,
-      // Autosave,
-      Bold,
-      Essentials,
-      Font,
-      Heading,
-      Highlight,
-      Image,
-      ImageUpload,
-      Italic,
-      Link,
-      List,
-      Paragraph,
-      PasteFromOffice,
-      RemoveFormat,
-      Strikethrough,
-      Subscript,
-      Superscript,
-      Table,
-      Underline,
-      Undo
-    ],
-    toolbar: {
-      items: [ /*'anchor', '|', */'undo', 'redo', '|', /*'heading', '|', */'bold', 'italic', 'underline', 'strikethrough', '|', 'subscript', 'superscript', '|', 'FontFamily', 'FontSize', '|', 'FontColor', /*'FontBackgroundColor', */'highlight', '|', 'removeFormat', '|', 'numberedList', 'bulletedList', '|', 'alignment', '|', 'link', '|', 'imageupload', 'insertTable', '|' ]
-    },
-    alignment: {
-      options: [ 'center', 'left', 'right' ]
-    },
-    fontSize: {
-      options: [ '0.75', '0.80', '0.85', '0.90', '0.95', '1.00', '1.05', '1.10', '1.15', '1.20', '1.25', '1.30', '1.35', '1.40', '1.45', '1.50', '1.55', '1.60', '1.65', '1.70', '1.75', '1.80', '1.85', '1.90', '1.95', '2.00' ],
-      unit: 'em'
-    },
-    // lineHeight: {
-    //   options: [ '1.0', '1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8', '1.9', '2.0' ],
-    //   unit: 'em'
-    // },
-    image: {
-      toolbar: [ 'imageStyle:full', 'imageStyle:side', '|', 'imageTextAlternative' ],
-    },
-    autosave: {
-      save( editor ) {
-          // The saveData() function must return a promise
-          // which should be resolved when the data is successfully saved.
-          // return saveData( editor.getData() );
-      }
-    }
-  } )
-  .then( editor => {
-    console.log( 'Editor was initialized', editor );
-    document.getElementById( "toolbar" ).appendChild( editor.ui.view.toolbar.element );
-  } )
-  .catch( error => {
-    console.error( error.stack );
-  } );
 
 new Main();
