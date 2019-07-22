@@ -63,7 +63,7 @@ class Main {
     
     // Initialize Teleprompter object
     this._teleprompter = new Teleprompter( teleprompter );
-    this._teleprompter.action = this;
+    this._teleprompter.context = this;
 
     // Assign UI event actions
     document.getElementById( "start" ).addEventListener( "click", ()=> {

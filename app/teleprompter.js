@@ -71,7 +71,7 @@ class Teleprompter extends DOMParser {
     // Initialize resize event
     // If browser does not support modern ResizeObserver, use a hacky alternative.
     if ( typeof ResizeObserver === "undefined" ) {
-      console.err("Instance resize operations have not yet been implemented for this browser.");
+      console.info("Instance resize operations have not yet been implemented for this browser.");
       // new ResizeSensor( this._teleprompter, this.onResize );
     }
     // If otherwise, use the modern ResizeObserver.
@@ -93,7 +93,7 @@ class Teleprompter extends DOMParser {
     const unit = this.fontUnit;
 
     // Make changes after an interuptable timeout to increase performance.
-    this.resizeTimeout.run( 50, function () {
+    this.resizeTimeout.run( 0.1, function () {
 
       // Update font size
       teleprompter.style.fontSize = `${unit}px`;
@@ -106,17 +106,17 @@ class Teleprompter extends DOMParser {
     // Parse contents
     // this.parse( this._contents );
 
-    console.log( this._editor );
-    console.log( this.fontUnit );
+    // console.log( this._editor );
+    // console.log( this.fontUnit );
 
-    // Do prompting stuff
-    if ( this._action && typeof this._action.teleprompterStarted === "function" ) {
-      this._action.teleprompterStarted();
+    // Run teleprompterStarted hook
+    if ( this._context && typeof this._context.teleprompterStarted === "function" ) {
+      this._context.teleprompterStarted();
     }
   }
 
-  set action( instance ) { //Actions, Delegate, Responses, .....
-    this._action = instance;
+  set context( instance ) { //Actions, Delegate, Responses, .....
+    this._context = instance;
   }
 
   increaseVelocity() {}
