@@ -2,18 +2,20 @@
   Imaginary Teleprompter
   Copyright (C) 2019 Imaginary Sense Inc.
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
+  This file is part of Imaginary Teleprompter.
+
+  Imaginary Teleprompter is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful,
+  Imaginary Teleprompter is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See theRemote 
-  GNU General Public License for more details.
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Affero General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU Affero General Public License
+  along with Imaginary Teleprompter.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 'use strict';
@@ -69,24 +71,23 @@ class Teleprompter extends DOMParser {
     // Initialize events
 
     // Initialize resize event
-    // If browser does not support modern ResizeObserver, use a hacky alternative.
-    if ( typeof ResizeObserver === "undefined" ) {
-      console.info("Instance resize operations have not yet been implemented for this browser.");
-      // new ResizeSensor( this._teleprompter, this.onResize );
-    }
-    // If otherwise, use the modern ResizeObserver.
-    else {
+    if ( typeof ResizeObserver !== "undefined" ) {
       this.resizeTimeout = new Timeout;
       // Copy instant context
       new ResizeObserver( function () { instance.onResize(); } )
         .observe( this._teleprompter );
     }
-    // Resize implementations: https://stackoverflow.com/questions/6492683/how-to-detect-divs-dimension-changed
+    // If browser does not support modern ResizeObserver, use a hacky alternative.
+    else {
+      console.info("Instance resize operations have not yet been implemented for this browser.");
+      // new ResizeSensor( this._teleprompter, this.onResize );
+    }
+    // Lookup: resize implementations at https://stackoverflow.com/questions/6492683/how-to-detect-divs-dimension-changed
   }
 
   // Resize Event
   onResize( /* event */ ) {
-    if ( this._debug ) console.log( "Resize" );
+    if ( this._debug ) console.debug( "Resize" );
 
     // Copy context information
     const teleprompter = this._teleprompter;
@@ -101,7 +102,7 @@ class Teleprompter extends DOMParser {
     } );
   } // end onResize
 
-  startPrompt() {
+  startPrompting() {
     
     // Parse contents
     // this.parse( this._contents );
@@ -115,7 +116,7 @@ class Teleprompter extends DOMParser {
     }
   }
 
-  set context( instance ) { //Actions, Delegate, Responses, .....
+  set context( instance ) { // Actions, Delegate, Responses, .....
     this._context = instance;
   }
 

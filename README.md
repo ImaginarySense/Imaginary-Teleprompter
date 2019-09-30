@@ -1,8 +1,6 @@
-![Teleprompter](https://github.com/ImaginarySense/Teleprompter-Electron/raw/master/build/install-spinner.png)
+![Imaginary Teleprompter](https://github.com/ImaginarySense/Teleprompter-Electron/raw/master/build/install-spinner.png)
 
-# v3-concept
-
-Experimentation code for version 3.0
+# Imaginary Teleprompter (3.0)
 
 ## Development Setup
 1. `npm install`
@@ -15,4 +13,4 @@ Experimentation code for version 3.0
 Imaginary Sense Inc.
 
 ## License
-This software is under [GPL3](https://github.com/javiercordero/Teleprompter/blob/master/LICENSE) license.
+This software is under the GNU [AGPL3](https://github.com/ImaginarySense/Teleprompter-Core/blob/v3-concept/LICENSE) license.

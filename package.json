@@ -4,7 +4,7 @@
   "version": "3.0.0",
   "email": "teleprompter@imaginary.tech",
   "homepage": "https://imaginary.tech/teleprompter/",
-  "license": "GPL-3.0+",
+  "license": "AGPL-3.0+",
   "scripts": {
     "develop": "npx nodemon",
     "start": "npm run build-dev",
