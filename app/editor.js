@@ -39,6 +39,9 @@ class Editor {
     // Get teleprompter element
     let teleprompter = document.getElementsByClassName( "teleprompter" )[0];
     
+    this.editMode = true;
+    this.WYSIWYG = true;
+
     // Initialize Teleprompter object
     this._teleprompter = new Teleprompter( teleprompter );
     this._teleprompter.context = this;
@@ -51,18 +54,22 @@ class Editor {
 
   enterEditMode() {
     console.debug("Entering Edit Mode");
+    this.editMode = true;
   }
 
   leaveEditMode() {
     console.debug("Leaving Edit Mode");
+    this.editMode = false;
   }
 
   enterWYSIWYGMode() {
     console.debug("Entering Edit Mode");
+    this.WYSIWYG = true;
   }
 
   leaveWYSIWYGMode() {
     console.debug("Leaving Edit Mode");
+    this.WYSIWYG = false;
   }
 
   teleprompterStarted() {
@@ -70,8 +77,5 @@ class Editor {
   }
 
 }
-
-Editor.prototype._editMode = true;
-Editor.prototype._WYSIWYG = true;
 
 export default Editor;

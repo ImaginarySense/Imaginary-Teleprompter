@@ -123,4 +123,4 @@ class CKEditorImplementation extends Editor {
 
 }
 
-new CKEditorImplementation();
+export default CKEditorImplementation;
