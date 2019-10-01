@@ -36,14 +36,15 @@ import Teleprompter from './teleprompter';
 class Editor {
 
   constructor() {
+    console.log("Editor");
     // Get teleprompter element
-    let teleprompter = document.getElementsByClassName( "teleprompter" )[0];
+    this.domObject = document.getElementsByClassName( "teleprompter" )[0];
     
     this.editMode = true;
     this.WYSIWYG = true;
 
     // Initialize Teleprompter object
-    this._teleprompter = new Teleprompter( teleprompter );
+    this._teleprompter = new Teleprompter( this.domObject );
     this._teleprompter.context = this;
 
     // Assign UI event actions

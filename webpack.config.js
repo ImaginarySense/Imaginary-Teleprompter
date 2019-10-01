@@ -11,7 +11,7 @@ module.exports = {
   // mode: 'development',
 
   // https://webpack.js.org/configuration/entry-context/
-  entry: ['./app/editor.js'],
+  entry: ['./app/main.js'],
   
   // https://webpack.js.org/configuration/output/
   output: {

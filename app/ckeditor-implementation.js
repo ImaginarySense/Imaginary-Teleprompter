@@ -50,11 +50,12 @@ import Editor from './editor';
 
 class CKEditorImplementation extends Editor {
   constructor() {
-    
+    console.log("CKEditorImplementation");
+
     super();
 
     // Initialize CKEditor 5 class
-    DecoupledEditor.create( this.teleprompter.firstElementChild, {
+    DecoupledEditor.create( this.domObject.firstElementChild, {
       plugins: [
         Alignment,
         // Autosave,
@@ -63,8 +64,8 @@ class CKEditorImplementation extends Editor {
         Font,
         Heading,
         Highlight,
-        Image,
-        ImageUpload,
+        // Image,
+        // ImageUpload,
         Italic,
         Link,
         List,

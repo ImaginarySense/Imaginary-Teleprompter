@@ -30,6 +30,7 @@ String.prototype.splice = function( idx, rem, str ) {
 class DOMParser {
 
   constructor( source ) {
+    // console.debug("Parser");
 
     // Define clear parsed text container.
     this.clear();

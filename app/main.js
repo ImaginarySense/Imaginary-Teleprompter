@@ -23,4 +23,10 @@
 // Import Teleprompter's CKEditor Implementation
 import CKEditorImplementation from './ckeditor-implementation';
 
-new CKEditorImplementation();
+class ImaginaryTeleprompter {
+  constructor() {
+    console.log("Starting Imaginary Teleprompter");
+    this.instance = new CKEditorImplementation();
+  }
+}
+new ImaginaryTeleprompter;

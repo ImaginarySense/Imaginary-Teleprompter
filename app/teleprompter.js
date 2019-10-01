@@ -26,6 +26,7 @@ import Timeout from './timeout';
 class Teleprompter extends DOMParser {
 
   constructor( teleprompterIdentifier, settings={} ) {
+    console.log("Teleprompter");
 
     let teleprompter;
     // If pased contents is a string, lookup DOM element.
