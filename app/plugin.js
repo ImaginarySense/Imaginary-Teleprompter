@@ -20,24 +20,24 @@
 
 'use strict';
 
-// Import Teleprompter's CKEditor Implementation
-import CKEditorImplementation from './ckeditor-implementation';
-// Imaginary Teleprompter Plugins Import
-import Playback from './plugins/playback';
-import Mirror from './plugins/mirror';
+// Imaginary Teleprompter Mirror Plugin
+export default class Plugin {
 
-class ImaginaryTeleprompter {
-  constructor() {
-    console.log("Starting Imaginary Teleprompter");
-
-    let teleprompterSettings = {
-      plugins: [
-        Mirror,
-        Playback,
-      ]
-    };
-
-    this.instance = new CKEditorImplementation( teleprompterSettings );
+  // Plugin Name
+  static get pluginName() {
+    return 'Unnamed';
   }
+
+  constructor(teleprompter, contents, debug) {
+    this.teleprompter = teleprompter;
+    this.contents = contents;
+    this._debug = debug;
+  }
+
+  init() {
+    if (this._debug) console.log(`Initializing ${Plugin.pluginName}`);
+  }
+
 }
-new ImaginaryTeleprompter;
+
+Plugin.prototype._debug = true;

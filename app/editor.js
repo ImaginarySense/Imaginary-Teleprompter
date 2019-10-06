@@ -33,9 +33,9 @@ import Teleprompter from './teleprompter';
 
 // Editor code starts here
 
-class Editor {
+export default class Editor {
 
-  constructor() {
+  constructor(settings) {
     console.log("Editor");
     // Get teleprompter element
     this.domObject = document.getElementsByClassName( "teleprompter" )[0];
@@ -44,13 +44,13 @@ class Editor {
     this.WYSIWYG = true;
 
     // Initialize Teleprompter object
-    this._teleprompter = new Teleprompter( this.domObject );
+    this._teleprompter = new Teleprompter( this.domObject, settings );
     this._teleprompter.context = this;
 
-    // Assign UI event actions
-    document.getElementById( "start" ).addEventListener( "click", ()=> {
-      this._teleprompter.startPrompting();
-    } );
+    // // Assign UI event actions
+    // document.getElementById( "start" ).addEventListener( "click", ()=> {
+    //   this._teleprompter.startPrompting();
+    // } );
   }
 
   enterEditMode() {
@@ -78,5 +78,3 @@ class Editor {
   }
 
 }
-
-export default Editor;

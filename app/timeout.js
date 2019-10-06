@@ -20,7 +20,7 @@
 
 'use strict';
 
-class Timeout {
+export default class Timeout {
 
   constructor( ) {
     this.status = false;
@@ -33,5 +33,3 @@ class Timeout {
     this.status = window.setTimeout( callback, timeout );
   }
 }
-
-export default Timeout;

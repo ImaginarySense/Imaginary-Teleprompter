@@ -20,24 +20,62 @@
 
 'use strict';
 
-// Import Teleprompter's CKEditor Implementation
-import CKEditorImplementation from './ckeditor-implementation';
-// Imaginary Teleprompter Plugins Import
-import Playback from './plugins/playback';
-import Mirror from './plugins/mirror';
+export default class Controls {
 
-class ImaginaryTeleprompter {
   constructor() {
-    console.log("Starting Imaginary Teleprompter");
-
-    let teleprompterSettings = {
-      plugins: [
-        Mirror,
-        Playback,
-      ]
-    };
-
-    this.instance = new CKEditorImplementation( teleprompterSettings );
+    // Use constructors to map all methods to your teleprompter instances.
   }
+
+  // // Controls
+  // listControls() {}
+
+  // // Prompt State
+
+  // startPrompting() {}
+
+  // stopPrompting() {}
+
+  // enterEditMode() {}
+
+  // leaveEditMode() {}
+
+  // toggleEditMode() {}
+
+  // enterWYSIWYG() {}
+
+  // leaveWYSIWYG() {}
+
+  // toggleWYSIWYG() {}
+
+  // // Controls
+  // showControls() {}
+
+  // hideControls() {}
+
+  // // Skipping
+  // skipTo(selector) {}
+
+  // skipToNextPage() {}
+
+  // skipToPreviousPage() {}
+
+  // skipToNextPage() {}
+
+  // skipToPreviousPage() {}
+
+  // // Focus
+  // setFocusMode(mode) {}
+
+  // setFocusArea(location) {}
+
+  // // Font Sizes
+  // increaseFontSize() {}
+
+  // decreaseFontSize() {}
+
+  // rescaleFontSize(size) {}
+
+  // // Margin Control
+  // setWidth(percentage) {}
+
 }
-new ImaginaryTeleprompter;

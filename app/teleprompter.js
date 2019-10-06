@@ -20,10 +20,12 @@
 
 'use strict';
 
-import DOMParser from './parser';
+// Imports
+import Controls from './controls';
 import Timeout from './timeout';
+import DOMParser from './parser';
 
-class Teleprompter extends DOMParser {
+export default class Teleprompter {
 
   constructor( teleprompterIdentifier, settings={} ) {
     console.log("Teleprompter");
@@ -39,11 +41,6 @@ class Teleprompter extends DOMParser {
       console.err( "teleprompter is undefined" );
       return;
     }
-
-    // Initialize parser.
-    super();
-
-    // Set contents.
 
     // Initialize properties using attributes from 'settings'. If no setting is found, set default.
     this._teleprompter = teleprompter;
@@ -63,7 +60,55 @@ class Teleprompter extends DOMParser {
     this.play = typeof settings.play !== "undefined" ? settings.play : true;
     this.timer = typeof settings.timer !== "undefined" ? settings.timer : true;
 
+    this.plugins = {};
+    this.setupPlugins(settings.plugins);
   } // end Constructor
+
+  setupPlugins(plugins) {
+
+    for (const plugin of plugins) {
+      this.plugins[ plugin.pluginName ] = new plugin(this, this._contents, this._debug);
+
+      // Initialize plugins
+      if ( typeof this.plugins[ plugin.pluginName ].init === "function" ) {
+        this.plugins[ plugin.pluginName ].init();
+      }
+    }
+    console.log("Available plugins", this.plugins);
+  }
+
+  startPrompting() {
+    
+    // Parse contents
+    // this.parse( this._contents );
+
+    // console.log( this._editor );
+
+    // Run teleprompterStarted hook
+    if ( this._context && typeof this._context.teleprompterStarted === "function" ) {
+      this._context.teleprompterStarted();
+    }
+  }
+
+  // CONTROLS
+
+  increaseVelocity() {}
+  decreaseVelocity() {}
+  next() {}
+  previous() {}
+  togglePlay() {}
+  play() {}
+  pause() {}
+  stop() {}
+  increaseFont() {}
+  decreaseFont() {}
+  goTo( element ) {}
+
+  // ANIMATION
+
+  animate() {}
+
+  // EVENTS
 
   editorReady() {
     // Make reference to this context.
@@ -88,7 +133,7 @@ class Teleprompter extends DOMParser {
 
   // Resize Event
   onResize( /* event */ ) {
-    if ( this._debug ) console.debug( "Resize" );
+    if ( this._debug ) console.debug( "Resize triggered" );
 
     // Copy context information
     const teleprompter = this._teleprompter;
@@ -103,38 +148,17 @@ class Teleprompter extends DOMParser {
     } );
   } // end onResize
 
-  startPrompting() {
-    
-    // Parse contents
-    // this.parse( this._contents );
+  atEnd() {}
 
-    // console.log( this._editor );
-    // console.log( this.fontUnit );
-
-    // Run teleprompterStarted hook
-    if ( this._context && typeof this._context.teleprompterStarted === "function" ) {
-      this._context.teleprompterStarted();
-    }
-  }
+  // SETTERS
 
   set context( instance ) { // Actions, Delegate, Responses, .....
     this._context = instance;
   }
 
-  increaseVelocity() {}
-  decreaseVelocity() {}
-  next() {}
-  previous() {}
-  togglePlay() {}
-  play() {}
-  pause() {}
-  stop() {}
-  animate() {}
-  increaseFont() {}
-  decreaseFont() {}
-  goTo( element ) {}
+  // GETTERS
+
   get eta() {}
-  atEnd() {}
   
   // Get fontSize multiplier unit based on contents width.
   get fontUnit() {
@@ -151,5 +175,3 @@ Teleprompter.prototype._timeoutDelay = 250;
 Teleprompter.prototype._inputCapDelay = 100;
 Teleprompter.prototype._limit = 2600;
 Teleprompter.prototype._debug = true;
-
-export default Teleprompter;

@@ -48,11 +48,11 @@ import Undo from '@ckeditor/ckeditor5-undo/src/undo';
 // Import Abstracted Editor Library
 import Editor from './editor';
 
-class CKEditorImplementation extends Editor {
-  constructor() {
+export default class CKEditorImplementation extends Editor {
+  constructor(settings) {
     console.log("CKEditorImplementation");
 
-    super();
+    super(settings);
 
     // Initialize CKEditor 5 class
     DecoupledEditor.create( this.domObject.firstElementChild, {
@@ -111,7 +111,7 @@ class CKEditorImplementation extends Editor {
       // Reference editor object from editor class.
       // this._teleprompter._editor = editor;
       // this._editor = editor;
-      console.log( "Ready?" );
+      console.log( "CKEditor Ready?" );
       // On editor ready, lazy load teleprompter related code.
       this._teleprompter.editorReady();
       console.log( "Done!" );
@@ -123,5 +123,3 @@ class CKEditorImplementation extends Editor {
   } // End editor implemetation
 
 }
-
-export default CKEditorImplementation;
