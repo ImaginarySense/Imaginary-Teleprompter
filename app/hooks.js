@@ -22,26 +22,25 @@
 
 export default class Hook {
   constructor() {
-    if( typeof Hook.prototype.hooks == 'undefined' )
+    if( typeof Hook.prototype.hooks === 'undefined' )
       Hook.prototype.hooks = [];
     this.hooks = Hook.prototype.hooks;
   }
 
   static register( name, callback ) {
-    console.log("Register", name);
-    if( typeof Hook.prototype.hooks[name] == 'undefined' )
+    if (this.prototype._debug) console.log("Register", name);
+    if( typeof Hook.prototype.hooks[name] === 'undefined' )
       Hook.prototype.hooks[name] = []
     Hook.prototype.hooks[name].push( callback )
   }
 
   static call( name, args ) {
-    console.log("Call", name);
-    if( typeof Hook.prototype.hooks[name] != 'undefined' ) {
-      console.log(Hook.prototype.hooks[name]);
+    if( typeof Hook.prototype.hooks[name] !== 'undefined' ) {
+      if (this.prototype._debug) console.log("Call", name, Hook.prototype.hooks[name]);
       for( let i = 0; i < Hook.prototype.hooks[name].length; ++i ) {        
         try {
           const code = Hook.prototype.hooks[name][i]( args );
-          if( code !== 0 ) {
+          if( !(typeof code === 'undefined' || code === 0 ) ) {
             throw `${Hook.prototype.hooks[name]}'s ${Hook.prototype.hooks[name][i]} returned error code ${code}`;
           }
         } catch (e) {

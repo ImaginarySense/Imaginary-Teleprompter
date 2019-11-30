@@ -80,7 +80,7 @@ export default class CKEditorImplementation extends Editor {
         Undo
       ],
       toolbar: {
-        items: [ /*'anchor', '|', */'undo', 'redo', '|', /*'heading', '|', */'bold', 'italic', 'underline', 'strikethrough', '|', 'subscript', 'superscript', '|', 'FontFamily', 'FontSize', '|', 'FontColor', /*'FontBackgroundColor', */'highlight', '|', 'removeFormat', '|', 'numberedList', 'bulletedList', '|', 'alignment', '|', 'link', '|', /*'imageupload', */'insertTable', '|' ]
+        items: [ /*'anchor', '|', */'undo', 'redo', '|', /*'heading', '|', */'bold', 'italic', 'underline', 'strikethrough', '|', 'subscript', 'superscript', '|', 'FontFamily', 'FontSize', '|', 'FontColor', /*'FontBackgroundColor', */'highlight', '|', 'removeFormat', '|', 'numberedList', 'bulletedList', '|', 'alignment', '|', /*'link', '|', /*'imageupload', */'insertTable', '|' ]
       },
       alignment: {
         options: [ 'center', 'left', 'right' ]

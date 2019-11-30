@@ -25,27 +25,6 @@ import Controls from './controls';
 import Timeout from './timeout';
 import DOMParser from './parser';
 
-class Plugin {
-  constructor() {
-  }
-
-  static register( name, callback ) {
-    if( 'undefined' == typeof( Plugin.hooks[name] ) )
-      Plugin.hooks[name] = []
-    Plugin.hooks[name].push( callback )
-  }
-
-  static call( name, args ) {
-    if( 'undefined' != typeof( Plugin.hooks[name] ) )
-      for( i = 0; i < Plugin.hooks[name].length; ++i )
-        console.log(Plugin.hooks[name]);
-        // if( !Plugin.hooks[name][i]( args ) ) {
-          // break;
-        // }
-  }
-}
-Plugin.prototype.hooks = [];
-
 export default class Teleprompter {
 
   constructor( teleprompterIdentifier, settings={} ) {
@@ -98,7 +77,7 @@ export default class Teleprompter {
     console.log("Available plugins", this.plugins);
   }
 
-  startPrompting() {
+  start() {
     
     // Parse contents
     // this.parse( this._contents );

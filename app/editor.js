@@ -49,7 +49,7 @@ export default class Editor {
 
     // // Assign UI event actions
     // document.getElementById( "start" ).addEventListener( "click", ()=> {
-    //   this._teleprompter.startPrompting();
+    //   this._teleprompter.start();
     // } );
   }
 

@@ -57,43 +57,42 @@ export default class Playback extends Plugin {
   play( ...args ) {
     console.log('Play');
     // if (this._debug) console.log('Play');
-    return 0;
+    Hook.call( 'onPlay', [ ] );
   }
 
   pause ( ...args ) {
     console.log('Pause');
     // if (this._debug) console.log('Pause');
-    return 0;
+    Hook.call( 'onPause', [ ] );
   }
 
   togglePlayback () {
     console.log('Toggle Playback');
     // if (this._debug) console.log('Toggle Playback');
-    return 0;
   }
 
   increaseVelocity() {
     console.log('Increase Velocity');
     // if (this._debug) console.log('Increase Velocity');
-    return 0;
+    Hook.call( 'onVelocityIncrease', [ ] );
   }
 
   decreaseVelocity() {
     console.log('Decrease Velocity');
     // if (this._debug) console.log('Decrease Velocity');
-    return 0;
+    Hook.call( 'onVelocityDecrease', [ ] );
   }
 
   fastForward() {
     console.log('Fast Forward');
     // if (this._debug) console.log('Fast Forward');
-    return 0;
+    Hook.call( 'onFastForward', [ ] );
   }
 
   rewind() {
     console.log('Rewind');
     // if (this._debug) console.log('Rewind');
-    return 0;
+    Hook.call( 'onRewindForward', [ ] );
   }
 
 }
