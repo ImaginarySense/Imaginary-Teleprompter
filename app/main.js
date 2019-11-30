@@ -32,8 +32,12 @@ class ImaginaryTeleprompter {
 
     let teleprompterSettings = {
       plugins: [
-        Mirror,
         Playback,
+        Mirror,
+      ],
+      enabledPlugins: [
+        "playback",
+        "mirror",
       ]
     };
 

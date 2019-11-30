@@ -25,6 +25,27 @@ import Controls from './controls';
 import Timeout from './timeout';
 import DOMParser from './parser';
 
+class Plugin {
+  constructor() {
+  }
+
+  static register( name, callback ) {
+    if( 'undefined' == typeof( Plugin.hooks[name] ) )
+      Plugin.hooks[name] = []
+    Plugin.hooks[name].push( callback )
+  }
+
+  static call( name, args ) {
+    if( 'undefined' != typeof( Plugin.hooks[name] ) )
+      for( i = 0; i < Plugin.hooks[name].length; ++i )
+        console.log(Plugin.hooks[name]);
+        // if( !Plugin.hooks[name][i]( args ) ) {
+          // break;
+        // }
+  }
+}
+Plugin.prototype.hooks = [];
+
 export default class Teleprompter {
 
   constructor( teleprompterIdentifier, settings={} ) {
@@ -70,9 +91,9 @@ export default class Teleprompter {
       this.plugins[ plugin.pluginName ] = new plugin(this, this._contents, this._debug);
 
       // Initialize plugins
-      if ( typeof this.plugins[ plugin.pluginName ].init === "function" ) {
+      // if (typeof this.plugins[plugin.pluginName] !== "undefined" && typeof this.plugins[ plugin.pluginName ].init === "function") {
         this.plugins[ plugin.pluginName ].init();
-      }
+      // }
     }
     console.log("Available plugins", this.plugins);
   }
@@ -90,23 +111,23 @@ export default class Teleprompter {
     }
   }
 
-  // CONTROLS
+  // // CONTROLS
 
-  increaseVelocity() {}
-  decreaseVelocity() {}
-  next() {}
-  previous() {}
-  togglePlay() {}
-  play() {}
-  pause() {}
-  stop() {}
-  increaseFont() {}
-  decreaseFont() {}
-  goTo( element ) {}
+  // increaseVelocity() {}
+  // decreaseVelocity() {}
+  // next() {}
+  // previous() {}
+  // togglePlay() {}
+  // play() {}
+  // pause() {}
+  // stop() {}
+  // increaseFont() {}
+  // decreaseFont() {}
+  // goTo( element ) {}
 
-  // ANIMATION
+  // // ANIMATION
 
-  animate() {}
+  // animate() {}
 
   // EVENTS
 

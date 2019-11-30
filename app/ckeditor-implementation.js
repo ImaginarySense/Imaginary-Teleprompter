@@ -22,7 +22,7 @@
 
 // CKEditor 5 imports
 import Alignment from '@ckeditor/ckeditor5-alignment/src/alignment';
-import Autosave from '@ckeditor/ckeditor5-autosave/src/autosave';
+// import Autosave from '@ckeditor/ckeditor5-autosave/src/autosave';
 import Bold from '@ckeditor/ckeditor5-basic-styles/src/bold';
 import DecoupledEditor from '@ckeditor/ckeditor5-editor-decoupled/src/decouplededitor';
 import Essentials from '@ckeditor/ckeditor5-essentials/src/essentials';
@@ -30,8 +30,8 @@ import Font from '@ckeditor/ckeditor5-font/src/font';
 // import FontFamilyConfig from '@ckeditor/ckeditor5-font/src/font';
 import Heading from '@ckeditor/ckeditor5-heading/src/heading';
 import Highlight from '@ckeditor/ckeditor5-highlight/src/highlight';
-import Image from '@ckeditor/ckeditor5-image/src/image';
-import ImageUpload from '@ckeditor/ckeditor5-image/src/imageupload';
+// import Image from '@ckeditor/ckeditor5-image/src/image';
+// import ImageUpload from '@ckeditor/ckeditor5-image/src/imageupload';
 import Italic from '@ckeditor/ckeditor5-basic-styles/src/italic';
 import Link from '@ckeditor/ckeditor5-link/src/link';
 import List from '@ckeditor/ckeditor5-list/src/list';

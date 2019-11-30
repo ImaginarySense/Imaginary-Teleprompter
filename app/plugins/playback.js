@@ -21,9 +21,11 @@
 'use strict';
 
 import Plugin from '../plugin';
+import Hook from '../hooks';
 
 // Imaginary Teleprompter Playback Plugin
 export default class Playback extends Plugin {
+// export default class Playback {
 
   static get pluginName() {
     return 'Playback';
@@ -34,51 +36,65 @@ export default class Playback extends Plugin {
     super(teleprompter, contents, debug);
     
     // Plugin public commands
-    this.commands = {
-      play: this.play,
-      pause: this.pause,
-      togglePlayback: this.playback,
-      increaseVelocity: this.increaseVelocity,
-      decreaseVelocity: this.decreaseVelocity,
-      fastForward: this.fastForward,
-      rewind: this.rewind
-    };
+    this.pluginName = "Playback"
+    // this.commands = {
+    //   play: this.play,
+    //   pause: this.pause,
+    //   togglePlayback: this.playback,
+    //   increaseVelocity: this.increaseVelocity,
+    //   decreaseVelocity: this.decreaseVelocity,
+    //   fastForward: this.fastForward,
+    //   rewind: this.rewind
+    // };
   }
 
   init() {
     if (this._debug) console.log(`Initializing ${Playback.pluginName}`);
-
-    // Test: Access another plugin's space from another plugin.
-    // this.teleprompter.plugins.Mirror.commands.mirror(1);
-    // Status, bad implementation.
+    Hook.register( 'pause', this.pause );
+    Hook.register( 'play', this.play );
   }
 
-  play() {
-    if (this._debug) console.log('Play');
+  play( ...args ) {
+    console.log('Play');
+    // if (this._debug) console.log('Play');
+    return 0;
   }
 
-  pause () {
-    if (this._debug) console.log('Pause');
+  pause ( ...args ) {
+    console.log('Pause');
+    // if (this._debug) console.log('Pause');
+    return 0;
   }
 
   togglePlayback () {
-    if (this._debug) console.log('Toggle Playback');
+    console.log('Toggle Playback');
+    // if (this._debug) console.log('Toggle Playback');
+    return 0;
   }
 
   increaseVelocity() {
-    if (this._debug) console.log('Increase Velocity');
+    console.log('Increase Velocity');
+    // if (this._debug) console.log('Increase Velocity');
+    return 0;
   }
 
   decreaseVelocity() {
-    if (this._debug) console.log('Decrease Velocity');
+    console.log('Decrease Velocity');
+    // if (this._debug) console.log('Decrease Velocity');
+    return 0;
   }
 
   fastForward() {
-    if (this._debug) console.log('Fast Forward');
+    console.log('Fast Forward');
+    // if (this._debug) console.log('Fast Forward');
+    return 0;
   }
 
   rewind() {
-    if (this._debug) console.log('Rewind');
+    console.log('Rewind');
+    // if (this._debug) console.log('Rewind');
+    return 0;
   }
 
 }
+Playback.prototype._debug = true;

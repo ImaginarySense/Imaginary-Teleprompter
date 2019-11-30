@@ -21,9 +21,11 @@
 'use strict';
 
 import Plugin from '../plugin';
+import Hook from '../hooks';
 
 // Imaginary Teleprompter Mirror Plugin
 export default class Mirror extends Plugin {
+// export default class Mirror {
 
   // Plugin Name
   static get pluginName() {
@@ -47,15 +49,18 @@ export default class Mirror extends Plugin {
   constructor(teleprompter, contents, debug) {
     // Set context
     super(teleprompter, contents, debug);
-
-    // Plugin's public commands
-    this.commands = {
-      mirror: this.mirror
-    };
+    // Set name
+    this.pluginName = 'Mirror';
+    // // Plugin's public commands
+    // this.commands = {
+    //   mirror: this.mirror
+    // };
   }
 
   init() {
     if (this._debug) console.log(`Initializing ${Mirror.pluginName}`);
+    Hook.call( 'pause', [ ] );
+    Hook.call( 'play', [ ] );
   }
 
   mirror(flip) {
@@ -103,3 +108,4 @@ export default class Mirror extends Plugin {
   }
 
 }
+Mirror.prototype._debug = true;

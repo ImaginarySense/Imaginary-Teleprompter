@@ -20,24 +20,19 @@
 
 'use strict';
 
-// Imaginary Teleprompter Mirror Plugin
+// Imaginary Teleprompter Meta Plugin
 export default class Plugin {
 
-  // Plugin Name
-  static get pluginName() {
-    return 'Unnamed';
-  }
-
   constructor(teleprompter, contents, debug) {
+    this.pluginName = 'Unnamed';
     this.teleprompter = teleprompter;
     this.contents = contents;
     this._debug = debug;
   }
 
   init() {
-    if (this._debug) console.log(`Initializing ${Plugin.pluginName}`);
+    if (this._debug) console.error('Plugin has no init()');
   }
 
 }
-
 Plugin.prototype._debug = true;
