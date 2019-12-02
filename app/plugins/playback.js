@@ -22,6 +22,7 @@
 
 import Plugin from '../plugin';
 import Hook from '../hooks';
+import Key from '../inputs';
 
 // Imaginary Teleprompter Playback Plugin
 export default class Playback extends Plugin {
@@ -50,12 +51,25 @@ export default class Playback extends Plugin {
 
   init() {
     if (this._debug) console.log(`Initializing ${Playback.pluginName}`);
-    Hook.register( 'pause', this.pause );
-    Hook.register( 'play', this.play );
+    // 
+    Key.register( [' ', 32], this.togglePlayback );
+    Key.register( ['s', 'S', 'ArrowDown', 40, 68], this.increaseVelocity );
+    Key.register( ['w', 'W', 'ArrowUp', 38, 87], this.decreaseVelocity );
+    Key.register( ['d', 'D', 'ArrowRight', 39, 83], this.fastForward );
+    Key.register( ['a', 'A', 'ArrowLeft', 37, 65], this.rewind );
+    // 
+    Hook.register( 'play', ()=> { this.play(); } );
+    Hook.register( 'pause', ()=> { this.pause; } );
+    Hook.register( 'togglePlayback', ()=> { this.playback; } );
+    Hook.register( 'increaseVelocity', ()=> { this.increaseVelocity; } );
+    Hook.register( 'decreaseVelocity', ()=> { this.decreaseVelocity; } );
+    Hook.register( 'fastForward', ()=> { this.fastForward; } );
+    Hook.register( 'rewind', ()=> { this.rewind; } );
   }
 
   play( ...args ) {
     console.log('Play');
+    this.togglePlayback();
     // if (this._debug) console.log('Play');
     Hook.call( 'onPlay', [ ] );
   }

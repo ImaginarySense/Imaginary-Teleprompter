@@ -21,14 +21,9 @@
 'use strict';
 
 export default class Hook {
-  constructor() {
-    if( typeof Hook.prototype.hooks === 'undefined' )
-      Hook.prototype.hooks = [];
-    this.hooks = Hook.prototype.hooks;
-  }
 
   static register( name, callback ) {
-    if (this.prototype._debug) console.log("Register", name);
+    if (this.prototype._debug) console.log("Register Hook", name);
     if( typeof Hook.prototype.hooks[name] === 'undefined' )
       Hook.prototype.hooks[name] = []
     Hook.prototype.hooks[name].push( callback )
