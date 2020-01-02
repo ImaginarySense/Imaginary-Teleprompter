@@ -45,11 +45,13 @@ export default class Teleprompter {
     // Initialize properties using attributes from 'settings'. If no setting is found, set default.
     this._teleprompter = teleprompter;
     this._contents = teleprompter.firstElementChild;
+    this._overlay = teleprompter.lastElementChild;
+    this.overlayFocus = document.getElementById("overlayFocus");
 
     // For these input values, the range is possitives, greater than 0
     this.speed = Math.abs( settings.speed ) || 2;
     this.acceleration = Math.abs( settings.acceleration ) || 2;
-    this.width = Math.abs( settings.width ) || 84;
+    this.margins = Math.abs( 1-settings.margins ) || 84;
     this.focus = Math.abs( settings.focus ) || 50;
 
     // Ensure flip is within valid range
@@ -114,6 +116,19 @@ export default class Teleprompter {
     // Make reference to this context.
     const instance = this;
 
+    // Initialize CSS Stylesheet
+    // Create style elements.
+    var styleElement = document.createElement('style');
+    // Append style elements to head.
+    document.head.appendChild(styleElement);
+    // Grab element's style sheet.
+    this.styleSheet = styleElement.sheet;
+
+    // Set initial relative values.
+    this.setFocusHeight();
+    this.setScreenHeight();
+    this.updateUnit();
+
     // Initialize events
 
     // Initialize resize event
@@ -150,6 +165,77 @@ export default class Teleprompter {
 
   atEnd() {}
 
+  setScreenHeight( ) {
+      this.height = this._overlay.clientHeight;
+  }
+
+  setFocusHeight( ) {
+    if ( typeof this.overlayFocus !== 'undefined' )
+      this.focusHeight = this.overlayFocus.clientHeight;
+    else
+      this.focusHeight = 0;
+  }
+
+  // Update unit and unit related measurements
+  updateUnit() {
+    this.unit = this.focusHeight/80;
+    this.speedLimit = this._limit*this.unit;
+    if (this._debug) setTimeout( ()=> { console.log("Unit updated: "+this.unit) && false; });
+    // this.resumeAnimation();
+  }
+
+  setStill( newPosition ) {
+    let position;
+    if ( newPosition === undefined )
+      position = this.pos;
+    else
+      pos = newPosition;
+    this._teleprompter.style.transform = 'translateY('+position+'px)';
+    // prompt.style.transform = 'translateY('+theCurrPos+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+')'
+    // If animation is running...
+    if ( this._teleprompter.classList.contains("move") ) {
+      // Stop animation by removing move class.
+      this._teleprompter.classList.remove("move");
+      // Delete animation rules before setting new ones.
+      this.styleSheet.deleteRule(0);
+    }
+  }
+
+  animate( time, destination, curve ) {
+    // If no curve parameter, default to linear. This is the equivalent of a function overload.
+    if (this.curve === undefined)
+        this.curve = 'linear';
+    // Retain current position.
+    this.setStill();
+    // Set new animation rules.
+    this.styleSheet.insertRule('\
+        .teleprompter.move {\
+            transform: translateY('+destination+'px)) !important;\
+            transition: transform '+time+'ms '+curve+';\
+    }', 0);
+    // transform: translateY('+destination+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+') !important;\
+    // Prevent race condition in Chrome by requesting for current position (not just transform) before resuming animation.
+    hack();
+
+    // Resume animation by re adding the class.
+    this._teleprompter.classList.add("move");
+    if (this._debug) this.timeout( ()=> { console.log(/*"Curr: "+getCurrPos()+"\n*/"Dest: "+destination+"\nRemTime "+time) && false; }, 0);
+  }
+  //https://css-tricks.com/controlling-css-animations-transitions-javascript/
+
+  hack() {
+    return this._teleprompter.getBoundingClientRect().top;
+    // return prompt.offsetTop;
+  }
+
+  timeout( delay, cb ) {
+    // If a timeout is already executing, reset it.
+    if (this._timeout)
+      window.clearTimeout(this._timeout);
+    // Set: Wait time second before resuming animation
+    this._timeout = window.setTimeout(cb, delay);
+  }
+
   // SETTERS
 
   set context( instance ) { // Actions, Delegate, Responses, .....
@@ -157,6 +243,10 @@ export default class Teleprompter {
   }
 
   // GETTERS
+
+  get pos() {
+    return this._contents.getBoundingClientRect().top;
+  }
 
   get eta() {}
   
@@ -169,6 +259,7 @@ export default class Teleprompter {
 
 }
 
+Teleprompter.prototype._x = 0;
 Teleprompter.prototype._transitionDelays = 500;
 Teleprompter.prototype._transitionDelays = 500;
 Teleprompter.prototype._timeoutDelay = 250;

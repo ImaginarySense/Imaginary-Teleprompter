@@ -59,12 +59,12 @@ export default class Playback extends Plugin {
     Key.register( ['a', 'A', 'ArrowLeft', 37, 65], this.rewind );
     // 
     Hook.register( 'play', ()=> { this.play(); } );
-    Hook.register( 'pause', ()=> { this.pause; } );
-    Hook.register( 'togglePlayback', ()=> { this.playback; } );
-    Hook.register( 'increaseVelocity', ()=> { this.increaseVelocity; } );
-    Hook.register( 'decreaseVelocity', ()=> { this.decreaseVelocity; } );
-    Hook.register( 'fastForward', ()=> { this.fastForward; } );
-    Hook.register( 'rewind', ()=> { this.rewind; } );
+    Hook.register( 'pause', ()=> { this.pause(); } );
+    Hook.register( 'togglePlayback', ()=> { this.playback(); } );
+    Hook.register( 'increaseVelocity', ()=> { this.increaseVelocity(); } );
+    Hook.register( 'decreaseVelocity', ()=> { this.decreaseVelocity(); } );
+    Hook.register( 'fastForward', ()=> { this.fastForward(); } );
+    Hook.register( 'rewind', ()=> { this.rewind(); } );
   }
 
   play( ...args ) {
@@ -76,6 +76,7 @@ export default class Playback extends Plugin {
 
   pause ( ...args ) {
     console.log('Pause');
+    this.togglePlayback();
     // if (this._debug) console.log('Pause');
     Hook.call( 'onPause', [ ] );
   }

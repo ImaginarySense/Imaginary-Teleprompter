@@ -28,6 +28,7 @@
 
 body {
   overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 /* HEADER */
 .navbar-brand {
@@ -73,6 +74,16 @@ body {
   background: #fafafa;
   /*background: #f8f9fa;*/
   border-bottom-color: #CCC; 
+}
+#overlay {
+  z-index: 20;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  opacity: 0.45;
+  cursor: crosshair;
 }
 .teleprompter {
   @extend %clear;
