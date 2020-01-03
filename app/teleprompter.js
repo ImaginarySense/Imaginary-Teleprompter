@@ -42,15 +42,18 @@ export default class Teleprompter {
       return;
     }
 
-    // Initialize properties using attributes from 'settings'. If no setting is found, set default.
+    // Initialize DOM variables
     this._teleprompter = teleprompter;
     this._contents = teleprompter.firstElementChild;
     this._overlay = teleprompter.lastElementChild;
     this.overlayFocus = document.getElementById("overlayFocus");
 
+    // Initialize properties using attributes from 'settings'. If no setting is found, set default.
+
     // For these input values, the range is possitives, greater than 0
-    this.speed = Math.abs( settings.speed ) || 2;
-    this.acceleration = Math.abs( settings.acceleration ) || 2;
+    this._speed = Math.abs( settings.speed ) || 4;
+    this._acceleration = Math.abs( settings.acceleration ) || 1.45;
+    this.velocity = 0;
     this.margins = Math.abs( 1-settings.margins ) || 84;
     this.focus = Math.abs( settings.focus ) || 50;
 
@@ -59,8 +62,8 @@ export default class Teleprompter {
     this.flip = settings.flip>=0 && settings.flip<4 ? settings.flip : 0;
     
     // On Booleans, make distinction between false and undefined
-    this.play = typeof settings.play !== "undefined" ? settings.play : true;
-    this.timer = typeof settings.timer !== "undefined" ? settings.timer : true;
+    this._play = typeof settings.play !== "undefined" ? settings.play : true;
+    this._timer = typeof settings.timer !== "undefined" ? settings.timer : true;
 
     this.plugins = {};
     this.setupPlugins(settings.plugins);
@@ -92,10 +95,35 @@ export default class Teleprompter {
     }
   }
 
-  // // CONTROLS
+  // CONTROLS
 
-  // increaseVelocity() {}
-  // decreaseVelocity() {}
+  increaseVelocity() {
+    if (!this.atEnd()) {
+      if (this.velocity<this.speedLimit) {
+        this._x++;
+        this.updateVelocity();
+        this.resumeAnimation();
+        // incSteps();
+      }
+    }
+    else
+      this.stop();
+  }
+
+  decreaseVelocity() {
+    if (!this.atStart()) {
+      if (this.velocity>this.speedLimit*-1) {
+        this._x--;
+        this.updateVelocity();
+        this.resumeAnimation();
+        // incSteps();
+      }
+    }
+    else
+      // ToDo: Request to stop all instances 
+      this.stop();
+  }
+
   // next() {}
   // previous() {}
   // togglePlay() {}
@@ -127,6 +155,7 @@ export default class Teleprompter {
     // Set initial relative values.
     this.setFocusHeight();
     this.setScreenHeight();
+    this.setPromptHeight();
     this.updateUnit();
 
     // Initialize events
@@ -163,10 +192,46 @@ export default class Teleprompter {
     } );
   } // end onResize
 
-  atEnd() {}
+  updateVelocity() {
+    // (|x|^accelerationRate) * (+|-)
+    this.velocity = this._speed * Math.pow( Math.abs( this._x ), this._acceleration ) * ( this._x >= 0 ? 1 : -1 );
+    // if (this._debug) setTimeout( function() { console.log( "Velocity:", this.velocity ); } ), 0;
+    if (this._debug) console.log( "Velocity:", this.velocity );
+  }
+  
+  atEnd() {
+    let endReached;
+    if ( this._flipV )
+      endReached = this.pos >= 0;
+    else
+      endReached = this.pos <= - ( this.promptHeight - this.screenHeight );
+    if ( endReached && this._debug ) console.log("At top");
+    return endReached;
+  }
+
+  atStart() {
+    let topReached;
+    if ( this._flipV )
+      topReached = this.pos <= - ( this.promptHeight - this.screenHeight );
+    else
+      topReached = this.pos >= 0;
+    if ( topReached && this._debug ) console.log("At bottom");
+    return topReached;
+  }
+
+  stop() {
+    this._x=0;
+    this.updateVelocity();
+    this.resumeAnimation();
+    // timer.stopTimer();
+  }
 
   setScreenHeight( ) {
-      this.height = this._overlay.clientHeight;
+    this.screenHeight = this._overlay.clientHeight;
+  }
+
+  setPromptHeight( ) {
+    this.promptHeight = this._contents.clientHeight;
   }
 
   setFocusHeight( ) {
@@ -180,22 +245,64 @@ export default class Teleprompter {
   updateUnit() {
     this.unit = this.focusHeight/80;
     this.speedLimit = this._limit*this.unit;
-    if (this._debug) setTimeout( ()=> { console.log("Unit updated: "+this.unit) && false; });
-    // this.resumeAnimation();
+    // if (this._debug) setTimeout( ()=> { console.log("Unit updated: "+this.unit) && false; });
+    if (this._debug) console.log("Unit updated: ", this.unit, "Speed limit: ", this.speedLimit);
+    this.resumeAnimation();
+  }
+
+  resumeAnimation() {
+    // Resumes animation with new destination and time values.
+    if (this._play) {
+      // Restart timer.
+      // timer.startTimer();
+      // Get new style variables.
+      const currPos = this.pos,
+            destination = this.getDestination(currPos),
+            time = this.getRemainingTime(destination, currPos);
+      this.animate( time, destination );
+    }
+  }
+
+  getDestination( currPos ) {
+    // Set animation destination
+    let whereTo;
+    if (this.velocity>0) {
+      if (this._flipV)
+        whereTo = 0;
+      else
+        whereTo = -(this.promptHeight-this.screenHeight);
+    }
+    else if (this.velocity<0) {
+      if (this._flipV)
+        whereTo = -(this.promptHeight-this.screenHeight);
+      else
+        whereTo = 0;
+    }
+    else
+      // Destination equals current position in animation.
+      whereTo = currPos;
+    return whereTo;
+  }
+
+  // Solve for time to reach end.
+  getRemainingTime( destination, currPos ) {
+    return (this.velocity ? Math.abs(1000*(destination-currPos)/(this.velocity*this.unit)) : 0 );
   }
 
   setStill( newPosition ) {
     let position;
-    if ( newPosition === undefined )
+    if ( typeof newPosition === "undefined" )
       position = this.pos;
     else
-      pos = newPosition;
-    this._teleprompter.style.transform = 'translateY('+position+'px)';
-    // prompt.style.transform = 'translateY('+theCurrPos+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+')'
+      position = newPosition;
+    
+    this._contents.style.transform = 'translateY('+position+'px)';
+
+    // prompt.style.transform = 'translateY('+position+'px) scale('+(this._flipH?-1:1)+','+(this._flipV?-1:1)+')'
     // If animation is running...
-    if ( this._teleprompter.classList.contains("move") ) {
+    if ( this._contents.classList.contains("move") ) {
       // Stop animation by removing move class.
-      this._teleprompter.classList.remove("move");
+      this._contents.classList.remove("move");
       // Delete animation rules before setting new ones.
       this.styleSheet.deleteRule(0);
     }
@@ -203,25 +310,29 @@ export default class Teleprompter {
 
   animate( time, destination, curve ) {
     // If no curve parameter, default to linear. This is the equivalent of a function overload.
-    if (this.curve === undefined)
+    if ( typeof this.curve === "undefined" )
         this.curve = 'linear';
     // Retain current position.
     this.setStill();
     // Set new animation rules.
+      // .teleprompter:first-child.move {\
     this.styleSheet.insertRule('\
-        .teleprompter.move {\
-            transform: translateY('+destination+'px)) !important;\
-            transition: transform '+time+'ms '+curve+';\
-    }', 0);
+      article.move {\
+          transform: translateY('+destination+'px) !important;\
+          transition: transform '+time+'ms '+curve+';\
+      }', 0);
+    // console.log(this.styleSheet);
     // transform: translateY('+destination+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+') !important;\
+    
     // Prevent race condition in Chrome by requesting for current position (not just transform) before resuming animation.
-    hack();
+    this.hack();
 
     // Resume animation by re adding the class.
-    this._teleprompter.classList.add("move");
-    if (this._debug) this.timeout( ()=> { console.log(/*"Curr: "+getCurrPos()+"\n*/"Dest: "+destination+"\nRemTime "+time) && false; }, 0);
+    this._contents.classList.add("move");
+    // if (this._debug) this.timeout( ()=> { console.log(/*"Curr: "+getCurrPos()+"\n*/"Dest: "+destination+"\nRemTime "+time) && false; }, 0);
+    if (this._debug) console.log(/*"Curr: "+getCurrPos()+"\n*/"Dest: "+destination+"\nRemTime "+time);
   }
-  //https://css-tricks.com/controlling-css-animations-transitions-javascript/
+  // https://css-tricks.com/controlling-css-animations-transitions-javascript/
 
   hack() {
     return this._teleprompter.getBoundingClientRect().top;
@@ -257,12 +368,49 @@ export default class Teleprompter {
     return multiplier * this._teleprompter.clientWidth / 100;
   }
 
+  // INTERNAL CONTROLS
+  play() {
+    this._play = true;
+    this.internalPlay();
+  }
+
+  internalPlay() {
+    this.resumeAnimation();
+  }
+
+  pause() {
+    this._play = false;
+    // requestAnimationFrame(this.internalPause);
+    this.internalPause();
+  }
+
+  internalPause() {
+    this.animate(0, this.pos);
+    // timer.stopTimer();
+  }
+
+  start() {
+    if (this._debug) console.log("Prompt Started");
+    // requestAnimationFrame(this.increaseVelocity);
+    console.log("prompt", this.promptHeight);
+    console.log("screen", this.screenHeight);
+    // this.increaseVelocity();
+    this.increaseVelocity();
+    this.play();
+  }
+
 }
 
 Teleprompter.prototype._x = 0;
-Teleprompter.prototype._transitionDelays = 500;
 Teleprompter.prototype._transitionDelays = 500;
 Teleprompter.prototype._timeoutDelay = 250;
 Teleprompter.prototype._inputCapDelay = 100;
 Teleprompter.prototype._limit = 2600;
 Teleprompter.prototype._debug = true;
+
+Teleprompter.prototype._play = false;
+Teleprompter.prototype._flipV = false;
+Teleprompter.prototype._flipH = false;
+Teleprompter.prototype._fontSize = 1/100;
+Teleprompter.prototype._speed = 4.0;
+Teleprompter.prototype._acceleration = 1.45;

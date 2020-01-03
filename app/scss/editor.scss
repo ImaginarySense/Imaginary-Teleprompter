@@ -28,6 +28,7 @@
 
 body {
   overflow-x: hidden;
+  /*overflow: hidden;*/
   scroll-behavior: smooth;
 }
 /* HEADER */
@@ -88,12 +89,28 @@ body {
 .teleprompter {
   @extend %clear;
   width: 100%;
+  /*article {*/
+  /*}*/
   &:nth-child(1n) {
     @extend %clear;
+    /*Transform*/
+    position: relative;
+    /*overflow-x: hidden;*/
+    overflow-y: hidden;
+    will-change: transform;
+    /* Transform */
+    /*z-index: 10;*/
+    /*position: relative;*/
+    /*padding: 100vh 0px 100vh 0px;*/
+    /*top: 0px;*/
+    
+    /*Previous*/
+    top: 0;
     left: 0;
     right: 0;
     text-align: center;
     overflow-x: hidden;
+    scroll-behavior: smooth;
     list-style-position: inside;
     ol {
       @extend %clear;
@@ -130,7 +147,8 @@ body {
       }
     }
   }
-/*  #statusbar {
+/*
+  #statusbar {
     position: fixed;
     bottom: 0px;
     left: 0px;

@@ -1,6 +1,6 @@
 /*
   Imaginary Teleprompter
-  Copyright (C) 2019 Imaginary Sense Inc.
+  Copyright (C) 2020 Imaginary Sense Inc.
 
   This file is part of Imaginary Teleprompter.
 
@@ -24,12 +24,12 @@ import Plugin from '../plugin';
 import Hook from '../hooks';
 import Key from '../inputs';
 
-// Imaginary Teleprompter Playback Plugin
-export default class Playback extends Plugin {
-// export default class Playback {
+// Imaginary Teleprompter Animate Plugin
+export default class Animate extends Plugin {
+// export default class Animate {
 
   static get pluginName() {
-    return 'Playback';
+    return 'Animate';
   }
 
   constructor(teleprompter, contents, debug) {
@@ -37,46 +37,23 @@ export default class Playback extends Plugin {
     super(teleprompter, contents, debug);
     
     // Plugin public commands
-    this.pluginName = "Playback"
-    // this.commands = {
-    //   play: this.play,
-    //   pause: this.pause,
-    //   togglePlayback: this.playback,
-    //   increaseVelocity: this.increaseVelocity,
-    //   decreaseVelocity: this.decreaseVelocity,
-    //   fastForward: this.fastForward,
-    //   rewind: this.rewind
-    // };
+    this.pluginName = "Animate"
   }
 
   init() {
-    if (this._debug) console.log(`Initializing ${Playback.pluginName}`);
+    if (this._debug) console.log(`Initializing ${Animate.pluginName}`);
     // 
-    Key.register( [' ', 32], this.togglePlayback );
-    Key.register( ['s', 'S', 'ArrowDown', 40, 68], this.increaseVelocity );
-    Key.register( ['w', 'W', 'ArrowUp', 38, 87], this.decreaseVelocity );
-    Key.register( ['d', 'D', 'ArrowRight', 39, 83], this.fastForward );
-    Key.register( ['a', 'A', 'ArrowLeft', 37, 65], this.rewind );
-    // 
-    Hook.register( 'prompt', ()=> { this.prompt(); } );
     Hook.register( 'play', ()=> { this.play(); } );
     Hook.register( 'pause', ()=> { this.pause(); } );
-    Hook.register( 'togglePlayback', ()=> { this.playback(); } );
+    // Hook.register( 'togglePlayback', ()=> { this.playback(); } );
     Hook.register( 'increaseVelocity', ()=> { this.increaseVelocity(); } );
     Hook.register( 'decreaseVelocity', ()=> { this.decreaseVelocity(); } );
     Hook.register( 'fastForward', ()=> { this.fastForward(); } );
     Hook.register( 'rewind', ()=> { this.rewind(); } );
   }
 
-  prompt( ...args ) {
-    console.log('Play');
-    this.teleprompter.start();
-  }
-
   play( ...args ) {
     console.log('Play');
-    this.teleprompter.play();
-    // Hook.call( 'play', [ ] );
     // this.togglePlayback();
     // if (this._debug) console.log('Play');
     Hook.call( 'onPlay', [ ] );
@@ -119,4 +96,4 @@ export default class Playback extends Plugin {
   }
 
 }
-Playback.prototype._debug = true;
+Animate.prototype._debug = true;

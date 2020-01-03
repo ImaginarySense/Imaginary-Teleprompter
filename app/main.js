@@ -23,6 +23,7 @@
 // Import Teleprompter's CKEditor Implementation
 import CKEditorImplementation from './ckeditor-implementation';
 // Imaginary Teleprompter Plugins Import
+// import Animate from './plugins/animate';
 import Playback from './plugins/playback';
 import Mirror from './plugins/mirror';
 
@@ -32,10 +33,12 @@ class ImaginaryTeleprompter {
 
     let teleprompterSettings = {
       plugins: [
+        // Animate,
         Playback,
         Mirror,
       ],
       enabledPlugins: [
+        // "animate",
         "playback",
         "mirror",
       ]

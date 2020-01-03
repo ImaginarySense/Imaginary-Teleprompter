@@ -59,8 +59,10 @@ export default class Mirror extends Plugin {
 
   init() {
     if (this._debug) console.log(`Initializing ${Mirror.pluginName}`);
-    // Hook.call( 'pause', [ ] );
-    Hook.call( 'play', [ ] );
+    window.setTimeout( ()=> {
+      console.log("PROMPT HOOK RUNS");
+      Hook.call( 'prompt', [ ] );
+    }, 10000);
   }
 
   mirror(flip) {

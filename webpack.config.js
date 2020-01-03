@@ -45,7 +45,7 @@ module.exports = {
       host: 'localhost',
       port: 7313,
       server: { baseDir: ['./'] },
-      files: ['./editor.html', './app/*.js', './app/*.css'],
+      files: ['./editor.html', './app/*.js', './app/plugins*.js', './app/scss/*.scss'],
       index: './editor.html'
     })
   ],
