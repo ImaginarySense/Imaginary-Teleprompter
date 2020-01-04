@@ -295,9 +295,8 @@ export default class Teleprompter {
       position = this.pos;
     else
       position = newPosition;
-    
+    // 
     this._contents.style.transform = 'translateY('+position+'px)';
-
     // prompt.style.transform = 'translateY('+position+'px) scale('+(this._flipH?-1:1)+','+(this._flipV?-1:1)+')'
     // If animation is running...
     if ( this._contents.classList.contains("move") ) {
@@ -315,15 +314,13 @@ export default class Teleprompter {
     // Retain current position.
     this.setStill();
     // Set new animation rules.
-      // .teleprompter:first-child.move {\
     this.styleSheet.insertRule('\
-      article.move {\
+      .teleprompter:first-child.move {\
           transform: translateY('+destination+'px) !important;\
           transition: transform '+time+'ms '+curve+';\
       }', 0);
     // console.log(this.styleSheet);
     // transform: translateY('+destination+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+') !important;\
-    
     // Prevent race condition in Chrome by requesting for current position (not just transform) before resuming animation.
     this.hack();
 

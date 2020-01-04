@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!-- 
   Imaginary Teleprompter
-  Copyright (C) 2017-2019 Imaginary Sense Inc.
+  Copyright (C) 2017-2020 Imaginary Sense Inc.
 
   This file is part of Imaginary Teleprompter.
 
@@ -44,13 +44,23 @@
                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                   <a class="dropdown-item" href="#">New</a>
                   <a class="dropdown-item" href="#">Open</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="#">Save</a>
+                  <a class="dropdown-item" href="#">Save As</a>
+                  <div class="dropdown-divider"></div>
                   <a class="dropdown-item" href="#">Recent document 1</a>
                   <a class="dropdown-item" href="#">Recent document 2</a>
+                  <!-- <div class="dropdown-divider"></div> -->
+                  <!-- <a class="dropdown-item" href="#">Print</a> -->
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="#">Close</a>
+                  <a class="dropdown-item" href="#">Quit</a>
                 </div>
               </li>
               <!-- <li class="nav-item">
                 <a class="nav-link" href="#">Insert</a>
               </li> -->
+<!-- 
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Remote</a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
@@ -58,14 +68,15 @@
                   <a class="dropdown-item" href="#">Map Keys</a>
                 </div>
               </li>
+ -->
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Preferences</a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                   <a class="dropdown-item" href="#">Custom Prompting Styles</a>
-                  <a class="dropdown-item" href="#">Toolbar Settings</a>
+                  <!-- <a class="dropdown-item" href="#">Toolbar Settings</a> -->
                   <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="#">Enable Saving Within Teleprompter</a>
-                  <a class="dropdown-item disabled" href="#">Disable Saving Within Teleprompter</a>
+                  <a class="dropdown-item" href="#">Enable Legacy Saving</a>
+                  <a class="dropdown-item disabled" href="#">Disable Legacy Saving</a>
                 </div>
               </li>
               <li class="nav-item dropdown">
@@ -113,12 +124,14 @@
           <li class="nav-item">
             <a class="nav-link" data-toggle="tab" role="tab" href="#settings" aria-controls="settings" aria-selected="false">S</a>
           </li>
+<!-- 
           <li class="nav-item">
             <a class="nav-link" data-toggle="tab" role="tab" href="#emojis" aria-controls="emojis" aria-selected="false">E</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" data-toggle="tab" role="tab" href="#images" aria-controls="images" aria-selected="false">I</a>
           </li>
+ -->
           <li class="nav-item /*d-none*/">
             <a class="nav-link" data-toggle="tab" role="tab" href="#start" id="start">
               <span class="d-none d-sm-inline d-lg-none d-xl-inline">Update</span>
@@ -223,6 +236,8 @@
               <button class="btn btn-primary active">Off</button>
             </div>
           </div>
+          <div class='col-sm-3 col-md-6'></div>
+<!-- 
           <div class='col-sm-3'>
             <small>
               <label for="timer">Remote <span class="d-sm-none d-md-inline">Control</span></label>
@@ -241,6 +256,7 @@
               <button class="btn btn-primary active">Off</button>
             </div>
           </div>
+ -->
           <div class='col-xs-12 col-sm-6 col-md-3'>
             <small>
               <label for="fontSize">X-axis offset</label>
@@ -314,7 +330,7 @@
   </div>
  -->
   <div class="teleprompter">
-    <article class="motion">
+    <article>
       <strong>Welcome to Imaginary Teleprompter!</strong>
       <p>Are you ready to tell a story?</p>
       <p>"Teleprompter" is the most complete, free software, professional teleprompter for anyone to use. Click on "Prompt It!" whenever you're ready and control the speed with the arrow keys.</p>

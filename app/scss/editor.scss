@@ -88,7 +88,12 @@ body {
 }
 .teleprompter {
   @extend %clear;
-  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  /*width: 100%;*/
+
   /*article {*/
   /*}*/
   &:nth-child(1n) {
