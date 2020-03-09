@@ -1,6 +1,6 @@
 /*
   Imaginary Teleprompter
-  Copyright (C) 2019 Imaginary Sense Inc.
+  Copyright (C) 2015, 2016, 2019, 2020 Imaginary Sense Inc.
 
   This file is part of Imaginary Teleprompter.
 
@@ -62,8 +62,8 @@ export default class Teleprompter {
     this.flip = settings.flip>=0 && settings.flip<4 ? settings.flip : 0;
     
     // On Booleans, make distinction between false and undefined
-    this._play = typeof settings.play !== "undefined" ? settings.play : true;
-    this._timer = typeof settings.timer !== "undefined" ? settings.timer : true;
+    this._play = typeof settings.play !== "undefined" ? settings.play : false;
+    this._timer = typeof settings.timer !== "undefined" ? settings.timer : false;
 
     this.plugins = {};
     this.setupPlugins(settings.plugins);
@@ -126,7 +126,12 @@ export default class Teleprompter {
 
   // next() {}
   // previous() {}
-  // togglePlay() {}
+  togglePlayback() {
+    if ( this._play )
+      this.pause();
+    else
+      this.play();
+  }
   // play() {}
   // pause() {}
   // stop() {}
@@ -152,12 +157,6 @@ export default class Teleprompter {
     // Grab element's style sheet.
     this.styleSheet = styleElement.sheet;
 
-    // Set initial relative values.
-    this.setFocusHeight();
-    this.setScreenHeight();
-    this.setPromptHeight();
-    this.updateUnit();
-
     // Initialize events
 
     // Initialize resize event
@@ -173,11 +172,16 @@ export default class Teleprompter {
       // new ResizeSensor( this._teleprompter, this.onResize );
     }
     // Lookup: resize implementations at https://stackoverflow.com/questions/6492683/how-to-detect-divs-dimension-changed
+
+    // Set initial relative values.
+    this.setFocusHeight();
+    this.updateUnit();
+
   }
 
   // Resize Event
   onResize( /* event */ ) {
-    if ( this._debug ) console.debug( "Resize triggered" );
+    if (this._debug) console.debug( "Resize triggered" );
 
     // Copy context information
     const teleprompter = this._teleprompter;
@@ -205,18 +209,18 @@ export default class Teleprompter {
       endReached = this.pos >= 0;
     else
       endReached = this.pos <= - ( this.promptHeight - this.screenHeight );
-    if ( endReached && this._debug ) console.log("At top");
+    if ( endReached && this._debug ) console.log("End Reached");
     return endReached;
   }
 
   atStart() {
-    let topReached;
+    let startReached;
     if ( this._flipV )
-      topReached = this.pos <= - ( this.promptHeight - this.screenHeight );
+      startReached = this.pos <= - ( this.promptHeight - this.screenHeight );
     else
-      topReached = this.pos >= 0;
-    if ( topReached && this._debug ) console.log("At bottom");
-    return topReached;
+      startReached = this.pos >= 0;
+    if ( startReached && this._debug ) console.log("Start Reached");
+    return startReached;
   }
 
   stop() {
@@ -224,14 +228,6 @@ export default class Teleprompter {
     this.updateVelocity();
     this.resumeAnimation();
     // timer.stopTimer();
-  }
-
-  setScreenHeight( ) {
-    this.screenHeight = this._overlay.clientHeight;
-  }
-
-  setPromptHeight( ) {
-    this.promptHeight = this._contents.clientHeight;
   }
 
   setFocusHeight( ) {
@@ -286,7 +282,7 @@ export default class Teleprompter {
 
   // Solve for time to reach end.
   getRemainingTime( destination, currPos ) {
-    return (this.velocity ? Math.abs(1000*(destination-currPos)/(this.velocity*this.unit)) : 0 );
+    return this.velocity ? Math.abs(1000*(destination-currPos)/(this.velocity*this.unit)) : 0;
   }
 
   setStill( newPosition ) {
@@ -295,30 +291,36 @@ export default class Teleprompter {
       position = this.pos;
     else
       position = newPosition;
-    // 
-    this._contents.style.transform = 'translateY('+position+'px)';
+    this._contents.style.transform = `translateY(${position}px)`;
     // prompt.style.transform = 'translateY('+position+'px) scale('+(this._flipH?-1:1)+','+(this._flipV?-1:1)+')'
     // If animation is running...
     if ( this._contents.classList.contains("move") ) {
+      console.log("Removing move");
       // Stop animation by removing move class.
       this._contents.classList.remove("move");
       // Delete animation rules before setting new ones.
       this.styleSheet.deleteRule(0);
     }
+    else
+      console.log("Not removing move");
   }
 
   animate( time, destination, curve ) {
     // If no curve parameter, default to linear. This is the equivalent of a function overload.
     if ( typeof this.curve === "undefined" )
-        this.curve = 'linear';
+      this.curve = 'linear';
     // Retain current position.
     this.setStill();
     // Set new animation rules.
-    this.styleSheet.insertRule('\
-      .teleprompter:first-child.move {\
-          transform: translateY('+destination+'px) !important;\
-          transition: transform '+time+'ms '+curve+';\
-      }', 0);
+      // Working as a temp remedy, mistery is why does it stop...
+      // .move {\
+      // Confirmed not working
+      // .teleprompter:first-child.move {\
+    // time /= 1000
+    this.styleSheet.insertRule(`.move {
+      transform: translateY(${destination}px) scale(1,1) !important;
+      transition: transform ${time}ms ${curve};
+    }`, 0);
     // console.log(this.styleSheet);
     // transform: translateY('+destination+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+') !important;\
     // Prevent race condition in Chrome by requesting for current position (not just transform) before resuming animation.
@@ -326,8 +328,8 @@ export default class Teleprompter {
 
     // Resume animation by re adding the class.
     this._contents.classList.add("move");
-    // if (this._debug) this.timeout( ()=> { console.log(/*"Curr: "+getCurrPos()+"\n*/"Dest: "+destination+"\nRemTime "+time) && false; }, 0);
-    if (this._debug) console.log(/*"Curr: "+getCurrPos()+"\n*/"Dest: "+destination+"\nRemTime "+time);
+    // if (this._debug) this.timeout( ()=> console.log(/*"Curr:", this.pos, */"Dest:", destination, "RemTime:", time), 0);
+    if (this._debug) console.log(/*"Curr:", this.pos, */"Dest:", destination, "RemTime:", time);
   }
   // https://css-tricks.com/controlling-css-animations-transitions-javascript/
 
@@ -356,6 +358,16 @@ export default class Teleprompter {
     return this._contents.getBoundingClientRect().top;
   }
 
+  get screenHeight( ) {
+    return this._overlay.clientHeight;
+  }
+
+  get promptHeight( ) {
+    return this._contents.clientHeight;
+  }
+
+
+
   get eta() {}
   
   // Get fontSize multiplier unit based on contents width.
@@ -367,8 +379,10 @@ export default class Teleprompter {
 
   // INTERNAL CONTROLS
   play() {
+    if (this._debug) console.log('Play');
     this._play = true;
-    this.internalPlay();
+    requestAnimationFrame( ()=> { this.internalPlay() } );
+    // this.internalPlay();
   }
 
   internalPlay() {
@@ -376,9 +390,10 @@ export default class Teleprompter {
   }
 
   pause() {
+    if (this._debug) console.log('Pause');
     this._play = false;
-    // requestAnimationFrame(this.internalPause);
-    this.internalPause();
+    requestAnimationFrame( ()=> { this.internalPause() } );
+    // this.internalPause();
   }
 
   internalPause() {
@@ -389,11 +404,8 @@ export default class Teleprompter {
   start() {
     if (this._debug) console.log("Prompt Started");
     // requestAnimationFrame(this.increaseVelocity);
-    console.log("prompt", this.promptHeight);
-    console.log("screen", this.screenHeight);
-    // this.increaseVelocity();
-    this.increaseVelocity();
     this.play();
+    this.increaseVelocity();
   }
 
 }

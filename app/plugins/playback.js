@@ -1,6 +1,6 @@
 /*
   Imaginary Teleprompter
-  Copyright (C) 2019 Imaginary Sense Inc.
+  Copyright (C) 2019, 2020 Imaginary Sense Inc.
 
   This file is part of Imaginary Teleprompter.
 
@@ -52,11 +52,12 @@ export default class Playback extends Plugin {
   init() {
     if (this._debug) console.log(`Initializing ${Playback.pluginName}`);
     // 
-    Key.register( [' ', 32], this.togglePlayback );
-    Key.register( ['s', 'S', 'ArrowDown', 40, 68], this.increaseVelocity );
-    Key.register( ['w', 'W', 'ArrowUp', 38, 87], this.decreaseVelocity );
-    Key.register( ['d', 'D', 'ArrowRight', 39, 83], this.fastForward );
-    Key.register( ['a', 'A', 'ArrowLeft', 37, 65], this.rewind );
+    Key.register( ['F2'], ()=> { this.prompt(); } );
+    Key.register( [' ', 32], ()=> { this.togglePlayback(); } );
+    Key.register( ['s', 'S', 'ArrowDown', 40, 68], ()=> { this.increaseVelocity(); } );
+    Key.register( ['w', 'W', 'ArrowUp', 38, 87], ()=> { this.decreaseVelocity(); } );
+    Key.register( ['d', 'D', 'ArrowRight', 39, 83], ()=> { this.fastForward(); } );
+    Key.register( ['a', 'A', 'ArrowLeft', 37, 65], ()=> { this.rewind(); } );
     // 
     Hook.register( 'prompt', ()=> { this.prompt(); } );
     Hook.register( 'play', ()=> { this.play(); } );
@@ -69,52 +70,48 @@ export default class Playback extends Plugin {
   }
 
   prompt( ...args ) {
-    console.log('Play');
+    if (this._debug) console.log('Prompt');
     this.teleprompter.start();
+    Hook.call( 'onPromptStart', [ ] );
   }
 
   play( ...args ) {
-    console.log('Play');
-    this.teleprompter.play();
-    // Hook.call( 'play', [ ] );
-    // this.togglePlayback();
     // if (this._debug) console.log('Play');
+    this.teleprompter.play();
     Hook.call( 'onPlay', [ ] );
   }
 
   pause ( ...args ) {
-    console.log('Pause');
-    // this.togglePlayback();
     // if (this._debug) console.log('Pause');
+    this.teleprompter.pause();
     Hook.call( 'onPause', [ ] );
   }
 
   togglePlayback () {
-    console.log('Toggle Playback');
     // if (this._debug) console.log('Toggle Playback');
+    this.teleprompter.togglePlayback();
+    Hook.call( 'onTogglePlayback', [ ] );
   }
 
   increaseVelocity() {
-    console.log('Increase Velocity');
-    // if (this._debug) console.log('Increase Velocity');
+    if (this._debug) console.log('Increase Velocity');
+    this.teleprompter.increaseVelocity();
     Hook.call( 'onVelocityIncrease', [ ] );
   }
 
   decreaseVelocity() {
-    console.log('Decrease Velocity');
-    // if (this._debug) console.log('Decrease Velocity');
+    if (this._debug) console.log('Decrease Velocity');
+    this.teleprompter.decreaseVelocity();
     Hook.call( 'onVelocityDecrease', [ ] );
   }
 
   fastForward() {
-    console.log('Fast Forward');
-    // if (this._debug) console.log('Fast Forward');
+    if (this._debug) console.log('Fast Forward');
     Hook.call( 'onFastForward', [ ] );
   }
 
   rewind() {
-    console.log('Rewind');
-    // if (this._debug) console.log('Rewind');
+    if (this._debug) console.log('Rewind');
     Hook.call( 'onRewindForward', [ ] );
   }
 

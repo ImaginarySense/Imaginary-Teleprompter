@@ -1,6 +1,6 @@
 /*
   Imaginary Teleprompter
-  Copyright (C) 2019 Imaginary Sense Inc.
+  Copyright (C) 2019, 2020 Imaginary Sense Inc.
 
   This file is part of Imaginary Teleprompter.
 
@@ -88,34 +88,37 @@ body {
 }
 .teleprompter {
   @extend %clear;
-  position: absolute;
+  position: relative;
+  /*position: absolute;*/
+  /*position: fixed;*/
   top: 0;
   left: 0;
   right: 0;
-  /*width: 100%;*/
+  bottom: 0;
+  overflow-y: hidden;
 
   /*article {*/
   /*}*/
+  /*.teleprompter article {*/
   &:nth-child(1n) {
     @extend %clear;
     /*Transform*/
-    position: relative;
+    /*position: relative;*/
     /*overflow-x: hidden;*/
-    overflow-y: hidden;
+    /*overflow-y: hidden;*/
     will-change: transform;
     /* Transform */
     /*z-index: 10;*/
-    /*position: relative;*/
     /*padding: 100vh 0px 100vh 0px;*/
     /*top: 0px;*/
     
     /*Previous*/
-    top: 0;
-    left: 0;
-    right: 0;
+    /*top: 0;*/
+    /*left: 0;*/
+    /*right: 0;*/
+    /*overflow-x: hidden;*/
+    /*scroll-behavior: smooth;*/
     text-align: center;
-    overflow-x: hidden;
-    scroll-behavior: smooth;
     list-style-position: inside;
     ol {
       @extend %clear;
@@ -145,6 +148,7 @@ body {
       @extend %clear;
     }
   }
+
   .ck {
     &.ck-content {
       &.ck-editor__editable_inline {
@@ -152,7 +156,7 @@ body {
       }
     }
   }
-/*
+
   #statusbar {
     position: fixed;
     bottom: 0px;
@@ -162,7 +166,7 @@ body {
     div {
       border-radius: 7px 6px 7px 0 !important;
     }
-  }*/
+  }
 }
 /*.cke_path_item {
   font-size: 13pt !important;

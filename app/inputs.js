@@ -1,6 +1,6 @@
 /*
   Imaginary Teleprompter
-  Copyright (C) 2019 Imaginary Sense Inc.
+  Copyright (C) 2015, 2019, 2020 Imaginary Sense Inc.
 
   This file is part of Imaginary Teleprompter.
 
@@ -23,12 +23,31 @@
 export default class Key {
 
   static register( keys, callback, append) {
-    if (this.prototype._debug) console.log("Register Keys", keys);
-    if( typeof Key.prototype.keys[keys] === 'undefined' )
-      Key.prototype.keys[name] = []
-    Key.prototype.keys[name].push( callback )
+    if ( this.prototype._debug ) console.log("Register Keys", keys);
+    for ( let i=0; i<keys.length; i++ ) {
+      console.log(keys[i]);
+      if ( typeof Key.prototype.keys[keys[i]] === 'undefined' )
+        Key.prototype.keys[keys[i]] = []
+      Key.prototype.keys[keys[i]].push( callback )
+    }
   }
 
 }
 Key.prototype.keys = [];
 Key.prototype._debug = true;
+
+document.onkeydown = function( event ) {
+  // Legacy keyCode for compatibillity
+  if ( typeof event.key === "undefined" )
+    event.key = event.keyCode;
+  // Run every method asociated to key in sequence.
+  if ( typeof Key.prototype.keys[event.key] !== "undefined" ) {
+    if ( Key.prototype._debug ) console.log("Key: "+event.key) && false;
+    for ( let i=0; i<Key.prototype.keys[event.key].length; i++ ) {
+      Key.prototype.keys[event.key][i]();
+    }
+  }
+  // Prevent arrows and spacebar default action.
+  if ([" ","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(event.key) > -1 && event.preventDefault)
+    event.preventDefault();
+}
