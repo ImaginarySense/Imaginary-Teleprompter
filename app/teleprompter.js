@@ -22,6 +22,8 @@
 
 // Imports
 import Controls from './controls';
+import Hook from './hooks';
+import Key from './inputs';
 import Timeout from './timeout';
 import DOMParser from './parser';
 
@@ -67,6 +69,17 @@ export default class Teleprompter {
 
     this.plugins = {};
     this.setupPlugins(settings.plugins);
+
+    // Animation events
+    // On animation completion, check whether atStart or atEnd
+    document.addEventListener( 'transitionend', ()=> {
+      if(this.atStart()||this.atEnd()) {
+        // ToDo: Request to stop all instances 
+        this.stopAll();
+        // stopTimer();
+      }
+      if (this._debug) console.log("Reached end");
+    }, false);
   } // end Constructor
 
   setupPlugins(plugins) {
@@ -98,30 +111,25 @@ export default class Teleprompter {
   // CONTROLS
 
   increaseVelocity() {
-    if (!this.atEnd()) {
-      if (this.velocity<this.speedLimit) {
-        this._x++;
-        this.updateVelocity();
-        this.resumeAnimation();
-        // incSteps();
-      }
+    if (this.atEnd())
+      this.stopAll();
+    else if (this.velocity<this.speedLimit) {
+      this._x++;
+      this.updateVelocity();
+      this.resumeAnimation();
+      // incSteps();
     }
-    else
-      this.stop();
   }
 
   decreaseVelocity() {
-    if (!this.atStart()) {
-      if (this.velocity>this.speedLimit*-1) {
-        this._x--;
-        this.updateVelocity();
-        this.resumeAnimation();
-        // incSteps();
-      }
+    if (this.atStart())
+      this.stopAll();
+    else if (this.velocity>this.speedLimit*-1) {
+      this._x--;
+      this.updateVelocity();
+      this.resumeAnimation();
+      // incSteps();
     }
-    else
-      // ToDo: Request to stop all instances 
-      this.stop();
   }
 
   // next() {}
@@ -208,7 +216,7 @@ export default class Teleprompter {
     if ( this._flipV )
       endReached = this.pos >= 0;
     else
-      endReached = this.pos <= - ( this.promptHeight - this.screenHeight );
+      endReached = this.pos <= - ( this.promptHeight/* - this.screenHeight*/ );
     if ( endReached && this._debug ) console.log("End Reached");
     return endReached;
   }
@@ -216,11 +224,18 @@ export default class Teleprompter {
   atStart() {
     let startReached;
     if ( this._flipV )
-      startReached = this.pos <= - ( this.promptHeight - this.screenHeight );
+      startReached = this.pos <= - ( this.promptHeight/* - this.screenHeight*/ );
     else
       startReached = this.pos >= 0;
     if ( startReached && this._debug ) console.log("Start Reached");
     return startReached;
+  }
+
+  stopAll() {
+    if (Hook.call( 'stop' ).length===0) {
+      if (this._debug) console.log("Internal stop");
+      this.stop();
+    }
   }
 
   stop() {
@@ -255,7 +270,7 @@ export default class Teleprompter {
       const currPos = this.pos,
             destination = this.getDestination(currPos),
             time = this.getRemainingTime(destination, currPos);
-      this.animate( time, destination );
+      this.animate(time, destination, currPos);
     }
   }
 
@@ -266,11 +281,11 @@ export default class Teleprompter {
       if (this._flipV)
         whereTo = 0;
       else
-        whereTo = -(this.promptHeight-this.screenHeight);
+        whereTo = -(this.promptHeight/*-this.screenHeight*/);
     }
     else if (this.velocity<0) {
       if (this._flipV)
-        whereTo = -(this.promptHeight-this.screenHeight);
+        whereTo = -(this.promptHeight/*-this.screenHeight*/);
       else
         whereTo = 0;
     }
@@ -305,12 +320,12 @@ export default class Teleprompter {
       console.log("Not removing move");
   }
 
-  animate( time, destination, curve ) {
+  animate( time, destination, curPos, curve ) {
     // If no curve parameter, default to linear. This is the equivalent of a function overload.
-    if ( typeof this.curve === "undefined" )
-      this.curve = 'linear';
+    if ( typeof curve === "undefined" )
+      curve = 'linear';
     // Retain current position.
-    this.setStill();
+    this.setStill(curPos);
     // Set new animation rules.
       // Working as a temp remedy, mistery is why does it stop...
       // .move {\
@@ -323,8 +338,8 @@ export default class Teleprompter {
     }`, 0);
     // console.log(this.styleSheet);
     // transform: translateY('+destination+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+') !important;\
-    // Prevent race condition in Chrome by requesting for current position (not just transform) before resuming animation.
-    this.hack();
+    // Prevent race condition in Chrome by requesting for parent top position (not just transform) before reanimating.
+    this.topOffset;
 
     // Resume animation by re adding the class.
     this._contents.classList.add("move");
@@ -333,7 +348,7 @@ export default class Teleprompter {
   }
   // https://css-tricks.com/controlling-css-animations-transitions-javascript/
 
-  hack() {
+  get topOffset() {
     return this._teleprompter.getBoundingClientRect().top;
     // return prompt.offsetTop;
   }
@@ -355,7 +370,7 @@ export default class Teleprompter {
   // GETTERS
 
   get pos() {
-    return this._contents.getBoundingClientRect().top;
+    return this._contents.getBoundingClientRect().top - this.topOffset;
   }
 
   get screenHeight( ) {
@@ -414,7 +429,7 @@ Teleprompter.prototype._x = 0;
 Teleprompter.prototype._transitionDelays = 500;
 Teleprompter.prototype._timeoutDelay = 250;
 Teleprompter.prototype._inputCapDelay = 100;
-Teleprompter.prototype._limit = 2600;
+Teleprompter.prototype._limit = 10000;
 Teleprompter.prototype._debug = true;
 
 Teleprompter.prototype._play = false;

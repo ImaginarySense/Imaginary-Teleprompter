@@ -24,25 +24,26 @@ export default class Hook {
 
   static register( name, callback ) {
     if (this.prototype._debug) console.log("Register Hook", name);
-    if( typeof Hook.prototype.hooks[name] === 'undefined' )
+    if (typeof Hook.prototype.hooks[name] === 'undefined')
       Hook.prototype.hooks[name] = []
     Hook.prototype.hooks[name].push( callback )
   }
 
-  static call( name, args ) {
-    if( typeof Hook.prototype.hooks[name] !== 'undefined' ) {
+  static call( name, args=[] ) {
+    let codes=[];
+    if (typeof Hook.prototype.hooks[name] !== 'undefined') {
       if (this.prototype._debug) console.log("Call", name, Hook.prototype.hooks[name]);
-      for( let i = 0; i < Hook.prototype.hooks[name].length; ++i ) {        
+      for (let i = 0; i < Hook.prototype.hooks[name].length; ++i) {
         try {
-          const code = Hook.prototype.hooks[name][i]( args );
-          if( !(typeof code === 'undefined' || code === 0 ) ) {
-            throw `${Hook.prototype.hooks[name]}'s ${Hook.prototype.hooks[name][i]} returned error code ${code}`;
-          }
+          codes.push( Hook.prototype.hooks[name][i]( args ) );
+          if (!/*(*/typeof codes[i] === 'undefined'/* || code === 0 )*/)
+            throw `${Hook.prototype.hooks[name]}'s ${Hook.prototype.hooks[name][i]} returned error code ${codes[i]}`;
         } catch (e) {
           console.error(e);
         }
       }
     }
+    return codes
   }
 }
 Hook.prototype.hooks = [];

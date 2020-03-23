@@ -52,23 +52,30 @@ export default class Playback extends Plugin {
   init() {
     if (this._debug) console.log(`Initializing ${Playback.pluginName}`);
     // 
-    Key.register( ['F2'], ()=> { this.prompt(); } );
-    Key.register( [' ', 32], ()=> { this.togglePlayback(); } );
-    Key.register( ['s', 'S', 'ArrowDown', 40, 68], ()=> { this.increaseVelocity(); } );
-    Key.register( ['w', 'W', 'ArrowUp', 38, 87], ()=> { this.decreaseVelocity(); } );
+    // Key.register( ['F2'], ()=> { this.prompt(); } );
+    Key.register( [' ', 32], ()=> { Hook.call( 'togglePlayback' ); } );
+    Key.register( ['s', 'S', 'ArrowDown', 40, 68], ()=> { Hook.call( 'increaseVelocity' ); } );
+    Key.register( ['w', 'W', 'ArrowUp', 38, 87], ()=> { Hook.call( 'decreaseVelocity' ); } );
     Key.register( ['d', 'D', 'ArrowRight', 39, 83], ()=> { this.fastForward(); } );
     Key.register( ['a', 'A', 'ArrowLeft', 37, 65], ()=> { this.rewind(); } );
     // 
-    Hook.register( 'prompt', ()=> { this.prompt(); } );
-    Hook.register( 'play', ()=> { this.play(); } );
-    Hook.register( 'pause', ()=> { this.pause(); } );
-    Hook.register( 'togglePlayback', ()=> { this.playback(); } );
+    Hook.register( 'togglePlayback', ()=> { this.togglePlayback(); } );
     Hook.register( 'increaseVelocity', ()=> { this.increaseVelocity(); } );
     Hook.register( 'decreaseVelocity', ()=> { this.decreaseVelocity(); } );
-    Hook.register( 'fastForward', ()=> { this.fastForward(); } );
-    Hook.register( 'rewind', ()=> { this.rewind(); } );
+    Hook.register( 'stop', ()=> { this.stop(); } );
+    // 
+    // Hook.register( 'prompt', ()=> { this.prompt(); } );
+    // Hook.register( 'play', ()=> { this.play(); } );
+    // Hook.register( 'pause', ()=> { this.pause(); } );
+    // Hook.register( 'fastForward', ()=> { this.fastForward(); } );
+    // Hook.register( 'rewind', ()=> { this.rewind(); } );
   }
 
+  stop ( ...args ) {
+    // if (this._debug) console.log('Stop');
+    this.teleprompter.stop();
+  }
+  
   prompt( ...args ) {
     if (this._debug) console.log('Prompt');
     this.teleprompter.start();
