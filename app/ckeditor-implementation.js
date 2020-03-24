@@ -49,12 +49,18 @@ import Undo from '@ckeditor/ckeditor5-undo/src/undo';
 import Editor from './editor';
 
 export default class CKEditorImplementation extends Editor {
+
   constructor(settings) {
     console.log("CKEditorImplementation");
 
     super(settings);
 
     // Initialize CKEditor 5 class
+    this.instantiateEditor();
+
+  } // End constructor
+
+  instantiateEditor() {
     DecoupledEditor.create( this.domObject.firstElementChild, {
       plugins: [
         Alignment,
@@ -109,8 +115,8 @@ export default class CKEditorImplementation extends Editor {
       // Assign toolbar element to DOM container.
       document.getElementById( "toolbar" ).appendChild( editor.ui.view.toolbar.element );      
       // Reference editor object from editor class.
+      this._editor = editor;
       // this._teleprompter._editor = editor;
-      // this._editor = editor;
       console.log( "CKEditor Ready?" );
       // On editor ready, lazy load teleprompter related code.
       this._teleprompter.editorReady();
@@ -119,7 +125,6 @@ export default class CKEditorImplementation extends Editor {
     .catch( error => {
       console.error( error.stack );
     } );
-
-  } // End editor implemetation
+  }
 
 }

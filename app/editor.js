@@ -30,6 +30,8 @@ import 'bootstrap';
 
 // Import Imaginary Teleprompter Library
 import Teleprompter from './teleprompter';
+import Hook from './hooks';
+import Key from './inputs';
 
 // Editor code starts here
 
@@ -51,16 +53,32 @@ export default class Editor {
     // document.getElementById( "start" ).addEventListener( "click", ()=> {
     //   this._teleprompter.start();
     // } );
+
+    // Keyboard event actions
+    Key.register( ['F2'], ()=> { this.toggleEditMode(); } );
   }
 
-  enterEditMode() {
-    console.debug("Entering Edit Mode");
-    this.editMode = true;
+  toggleEditMode() {
+    if (this.editMode)
+      this.leaveEditMode();
+    else
+      this.enterEditMode();
   }
 
   leaveEditMode() {
     console.debug("Leaving Edit Mode");
     this.editMode = false;
+    this._editor.destroy()
+      .catch( error => {
+          console.log( error );
+      } );
+    // console.log(this._editor);
+  }
+
+  enterEditMode() {
+    console.debug("Entering Edit Mode");
+    this.editMode = true;
+    this.instantiateEditor();
   }
 
   enterWYSIWYGMode() {
