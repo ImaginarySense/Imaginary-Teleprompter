@@ -197,14 +197,13 @@ export default class Teleprompter {
     if (this._debug) console.debug( "Resize triggered" );
 
     // Copy context information
-    const teleprompter = this._teleprompter;
     const unit = this.fontUnit;
 
     // Make changes after an interuptable timeout to increase performance.
-    this.resizeTimeout.run( 0.1, function () {
+    this.resizeTimeout.run( 0.1, ()=> {
 
       // Update font size
-      teleprompter.style.fontSize = `${unit}px`;
+      this._teleprompter.style.fontSize = `${unit}px`;
 
     } );
   } // end onResize
@@ -221,7 +220,7 @@ export default class Teleprompter {
     if ( this._flipV )
       endReached = this.pos >= 0;
     else
-      endReached = this.pos <= - ( this.promptHeight/* - this.screenHeight*/ );
+      endReached = this.pos <= this.lastPos;
     if ( endReached && this._debug ) console.log("End Reached");
     return endReached;
   }
@@ -229,7 +228,7 @@ export default class Teleprompter {
   atStart() {
     let startReached;
     if ( this._flipV )
-      startReached = this.pos <= - ( this.promptHeight/* - this.screenHeight*/ );
+      startReached = this.pos <= this.lastPos;
     else
       startReached = this.pos >= 0;
     if ( startReached && this._debug ) console.log("Start Reached");
@@ -288,17 +287,18 @@ export default class Teleprompter {
       if (this._flipV)
         whereTo = 0;
       else
-        whereTo = -(this.promptHeight/*-this.screenHeight*/);
+        whereTo = this.lastPos;
     }
     else if (this.velocity<0) {
       if (this._flipV)
-        whereTo = -(this.promptHeight/*-this.screenHeight*/);
+        whereTo = this.lastPos;
       else
         whereTo = 0;
     }
     else
       // Destination equals current position in animation.
       whereTo = currPos;
+    console.log(this.promptHeight);
     return whereTo;
   }
 
@@ -355,31 +355,13 @@ export default class Teleprompter {
         'duration': time,
         'easingPreset': curve,
         'onRefUpdateCallback': (animation)=> {
-          // if (this._delta) {
-            // this._delta--;
-            // cancelAnimationFrame(animation);
-          // }
-          // else
           if (this._x===0 || !this._play)
             cancelAnimationFrame(animation);
-          // console.log(this._delta);
-
-          // if (this._delta) {
-          //   cancelAnimationFrame(animation);
-          //   this._delta = false;
-          // }
-          // else
-          // else
-            // this._delta = true;
         },
         'onAnimationCompleteCallback': ()=> {
           this.animationComplete();
         }
       });
-      // 
-      // if (this._play && this._x<-1 || this._x>1)
-      // if (this._x!==0 && this._play)
-        // this._delta = 1;
       break;
       case 1:
         // Retain current position.
@@ -412,6 +394,15 @@ export default class Teleprompter {
   }
   // https://css-tricks.com/controlling-css-animations-transitions-javascript/
   // https://css-tricks.com/restart-css-animation/
+
+  get lastPos() {
+    const lastPos = -(this.promptHeight+this.viewportHeight); // + 
+    console.log("lastPos", lastPos);
+    return lastPos
+    // - ( this.promptHeight/* - this.screenHeight*/ )
+    // return -(this.promptHeight-this.viewportHeight)
+    // return prompt.offsetTop;
+  }
 
   get topOffset() {
     return this._teleprompter.getBoundingClientRect().top;
@@ -457,15 +448,19 @@ export default class Teleprompter {
       return this._contents.getBoundingClientRect().top - this.topOffset;
   }
 
-  get screenHeight( ) {
-    return this._overlay.clientHeight;
+  get viewportHeight( ) {
+    const c = window.innerHeight;
+    // const c = window.innerHeight - this.topOffset;
+    // console.log("window.innerHeight", window.innerHeight);
+    // console.log("this.topOffset", this.topOffset);
+    console.log("viewportHeight", c);
+    return c;
+    // return this._teleprompter.clientHeight;
   }
 
   get promptHeight( ) {
     return this._contents.clientHeight;
   }
-
-
 
   get eta() {}
   
@@ -511,7 +506,6 @@ export default class Teleprompter {
 
 }
 
-// Teleprompter.prototype._delta = false;
 Teleprompter.prototype._engine = 2;
 Teleprompter.prototype._x = 0;
 Teleprompter.prototype._transitionDelays = 500;
