@@ -78,7 +78,9 @@ export default class Teleprompter {
     }, false);
 
     window.addEventListener("wheel", (event)=> {
-      this._userScrolled = true;
+      if (this._play)
+        this.pause();
+      // this._userScrolled = true;
     }, false);
     //   event.preventDefault();
     // }, {passive: false});
@@ -353,13 +355,13 @@ export default class Teleprompter {
         'duration': time,
         'easingPreset': curve,
         'onRefUpdateCallback': (animation)=> {
-          if (this._x===0)
+          if (this._x===0 || !this._play)
             cancelAnimationFrame(animation);
-          else if (this._userScrolled) {
-            cancelAnimationFrame(animation);
+          // else if (this._userScrolled) {
+            // cancelAnimationFrame(animation);
             // Re-request animation after timeout
-            this._userScrolled = false;
-          }
+            // this._userScrolled = false;
+          // }
         },
         'onAnimationCompleteCallback': ()=> {
           this.animationComplete();
