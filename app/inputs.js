@@ -48,6 +48,6 @@ document.onkeydown = function( event ) {
     }
   }
   // Prevent arrows and spacebar default action.
-  if ([" ","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(event.key) > -1 && event.preventDefault)
+  if ([" ","ArrowUp","ArrowDown","PageUp","PageDown"].indexOf(event.key) > -1 && event.preventDefault)
     event.preventDefault();
 }
