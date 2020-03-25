@@ -26,6 +26,7 @@ import Hook from './hooks';
 import Key from './inputs';
 import Timeout from './timeout';
 import DOMParser from './parser';
+import easyScroll from 'easy-scroll';
 
 export default class Teleprompter {
 
@@ -73,13 +74,15 @@ export default class Teleprompter {
     // Animation events
     // On animation completion, check whether atStart or atEnd
     document.addEventListener( 'transitionend', ()=> {
-      if(this.atStart()||this.atEnd()) {
-        // ToDo: Request to stop all instances 
-        this.stopAll();
-        // stopTimer();
-      }
-      if (this._debug) console.log("Reached end");
+      this.animationComplete();
     }, false);
+
+    window.addEventListener("wheel", (event)=> {
+      this._userScrolled = true;
+    }, false);
+    //   event.preventDefault();
+    // }, {passive: false});
+
   } // end Constructor
 
   setupPlugins(plugins) {
@@ -182,7 +185,7 @@ export default class Teleprompter {
     // Lookup: resize implementations at https://stackoverflow.com/questions/6492683/how-to-detect-divs-dimension-changed
 
     // Set initial relative values.
-    this.setFocusHeight();
+    // this.setFocusHeight();
     this.updateUnit();
 
   }
@@ -245,11 +248,11 @@ export default class Teleprompter {
     // timer.stopTimer();
   }
 
-  setFocusHeight( ) {
-    if ( typeof this.overlayFocus !== 'undefined' )
-      this.focusHeight = this.overlayFocus.clientHeight;
+  get focusHeight() {
+    if ( typeof this.overlayFocus !== 'undefined' && this.overlayFocus !== null )
+      return this.overlayFocus.clientHeight;
     else
-      this.focusHeight = 0;
+      return 320;
   }
 
   // Update unit and unit related measurements
@@ -270,7 +273,9 @@ export default class Teleprompter {
       const currPos = this.pos,
             destination = this.getDestination(currPos),
             time = this.getRemainingTime(destination, currPos);
-      this.animate(time, destination, currPos);
+      requestAnimationFrame(()=>{
+        this.animate(time, destination, currPos);
+      });
     }
   }
 
@@ -306,40 +311,84 @@ export default class Teleprompter {
       position = this.pos;
     else
       position = newPosition;
-    this._contents.style.transform = `translateY(${position}px)`;
+    switch (this._engine) {
+      case 2:
+        break;
+      case 1:
+        this._contents.style.top = `${position}px`;
+        break;
+      case 0:
+      default:
+        this._contents.style.transform = `translateY(${position}px)`;
+    }
     // prompt.style.transform = 'translateY('+position+'px) scale('+(this._flipH?-1:1)+','+(this._flipV?-1:1)+')'
     // If animation is running...
     if ( this._contents.classList.contains("move") ) {
-      console.log("Removing move");
+      if (this._debug) console.log("Removing move");
       // Stop animation by removing move class.
       this._contents.classList.remove("move");
+      try {
       // Delete animation rules before setting new ones.
-      this.styleSheet.deleteRule(0);
+        this.styleSheet.deleteRule(0);
+      }
+      catch(err) {
+        // if (this._debug) console.log(err);
+      }
     }
     else
-      console.log("Not removing move");
+      if (this._debug) console.log("Not removing move");
   }
 
   animate( time, destination, curPos, curve ) {
     // If no curve parameter, default to linear. This is the equivalent of a function overload.
     if ( typeof curve === "undefined" )
       curve = 'linear';
-    // Retain current position.
-    this.setStill(curPos);
-    // Set new animation rules.
-      // Working as a temp remedy, mistery is why does it stop...
-      // .move {\
-      // Confirmed not working
-      // .teleprompter:first-child.move {\
-    // time /= 1000
-    this.styleSheet.insertRule(`.move {
-      transform: translateY(${destination}px) scale(1,1) !important;
-      transition: transform ${time}ms ${curve};
-    }`, 0);
+    // Set animation rules.
+    switch (this._engine) {
+      case 2:
+      // https://github.com/tarun-dugar/easy-scroll
+      easyScroll({
+        'scrollableDomEle': window,
+        'direction': ( this._x >= 0 ? 'bottom' : 'top' ),
+        'duration': time,
+        'easingPreset': curve,
+        'onRefUpdateCallback': (animation)=> {
+          if (this._x===0)
+            cancelAnimationFrame(animation);
+          else if (this._userScrolled) {
+            cancelAnimationFrame(animation);
+            // Re-request animation after timeout
+            this._userScrolled = false;
+          }
+        },
+        'onAnimationCompleteCallback': ()=> {
+          this.animationComplete();
+        }
+      });
+      break;
+      case 1:
+        // Retain current position.
+        this.setStill(curPos);
+        this.styleSheet.insertRule(`.teleprompter>:first-child.move {
+          position: relative;
+          top: ${destination}px !important;
+          transition: top ${time}ms ${curve};
+        }`, 0);
+        break;
+      case 0:
+      default:
+        // Retain current position.
+        this.setStill(curPos);
+        this.styleSheet.insertRule(`.teleprompter>:first-child.move {
+          transform: translateY(${destination}px) scale(1,1) !important;
+          transition: transform ${time}ms ${curve};
+        }`, 0);
+    }
     // console.log(this.styleSheet);
     // transform: translateY('+destination+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+') !important;\
     // Prevent race condition in Chrome by requesting for parent top position (not just transform) before reanimating.
     this.topOffset;
+    // void this._teleprompter.offsetWidth;
 
     // Resume animation by re adding the class.
     this._contents.classList.add("move");
@@ -347,10 +396,24 @@ export default class Teleprompter {
     if (this._debug) console.log(/*"Curr:", this.pos, */"Dest:", destination, "RemTime:", time);
   }
   // https://css-tricks.com/controlling-css-animations-transitions-javascript/
+  // https://css-tricks.com/restart-css-animation/
 
   get topOffset() {
     return this._teleprompter.getBoundingClientRect().top;
     // return prompt.offsetTop;
+  }
+
+  animationComplete() {
+    if(this.atStart()||this.atEnd()) {
+      // ToDo: Request to stop all instances 
+      this.stopAll();
+      // stopTimer();
+    }
+    // // Remove class after completing animation. Causes problems when animating top instead of transition...
+    // this._contents.classList.remove("move");
+    // // Reflow
+    // this.topOffset;
+    if (this._debug) console.log("Reached end");
   }
 
   timeout( delay, cb ) {
@@ -370,7 +433,13 @@ export default class Teleprompter {
   // GETTERS
 
   get pos() {
-    return this._contents.getBoundingClientRect().top - this.topOffset;
+    if (this._engine===2) {
+      const value = -window.scrollY;
+      // console.log("pos", value);
+      return value;
+    }
+    else
+      return this._contents.getBoundingClientRect().top - this.topOffset;
   }
 
   get screenHeight( ) {
@@ -411,8 +480,10 @@ export default class Teleprompter {
     // this.internalPause();
   }
 
-  internalPause() {
-    this.animate(0, this.pos);
+  internalPause() {    
+    requestAnimationFrame(()=>{
+      this.animate(0, this.pos);
+    });
     // timer.stopTimer();
   }
 
@@ -425,6 +496,8 @@ export default class Teleprompter {
 
 }
 
+Teleprompter.prototype._userScrolled = false;
+Teleprompter.prototype._engine = 2;
 Teleprompter.prototype._x = 0;
 Teleprompter.prototype._transitionDelays = 500;
 Teleprompter.prototype._timeoutDelay = 250;

@@ -60,6 +60,16 @@ export default class CKEditorImplementation extends Editor {
 
   } // End constructor
 
+  // Define pseudo-virtual methods
+  get edit() {
+    return !this._editor.isReadOnly;
+  }
+  
+  set edit(state) {
+    this._editor.isReadOnly = !state;
+  }
+
+  // Instantiate
   instantiateEditor() {
     DecoupledEditor.create( this.domObject.firstElementChild, {
       plugins: [

@@ -41,8 +41,10 @@ export default class Editor {
     console.log("Editor");
     // Get teleprompter element
     this.domObject = document.getElementsByClassName( "teleprompter" )[0];
+    this.toolbar = document.getElementById( "toolbar" );
+    this.siteTop = document.getElementById( "siteTop" );
+    this.tabs = document.getElementById( "tabsContent" );
     
-    this.editMode = true;
     this.WYSIWYG = true;
 
     // Initialize Teleprompter object
@@ -59,7 +61,7 @@ export default class Editor {
   }
 
   toggleEditMode() {
-    if (this.editMode)
+    if (this.edit)
       this.leaveEditMode();
     else
       this.enterEditMode();
@@ -67,27 +69,40 @@ export default class Editor {
 
   leaveEditMode() {
     console.debug("Leaving Edit Mode");
-    this.editMode = false;
-    this._editor.destroy()
-      .catch( error => {
-          console.log( error );
-      } );
-    // console.log(this._editor);
+    // Remove toolbar
+    this.WYSIWYG = true;
+    this.edit = false;
+    // this.siteTop.classList.add('hidden');
+    // this.tabs.classList.add('hidden');
+    // this.toolbar.parentElement.classList.add('hidden');
+    // this.toolbar.parentElement.style.position = 'fixed';
+    // // this.toolbar.textContent = '';
+    // // this._editor.destroy()
+    // //   .catch( error => {
+    // //       console.log( error );
+    // //   } );
   }
 
   enterEditMode() {
     console.debug("Entering Edit Mode");
-    this.editMode = true;
-    this.instantiateEditor();
+    // Remove previous toolbar before creating new one
+    this.edit = true;
+    // this.siteTop.classList.remove('hidden');
+    // this.tabs.classList.remove('hidden');
+    // this.toolbar.parentElement.classList.remove('hidden');
+    // // document.getElementById( "toolbar" ).textContent = '';
+    // // this.instantiateEditor();
   }
 
   enterWYSIWYGMode() {
     console.debug("Entering Edit Mode");
+    this.edit = true;
     this.WYSIWYG = true;
   }
 
   leaveWYSIWYGMode() {
     console.debug("Leaving Edit Mode");
+    this.edit = true;
     this.WYSIWYG = false;
   }
 

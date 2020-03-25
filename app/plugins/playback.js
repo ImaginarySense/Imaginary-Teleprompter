@@ -56,8 +56,8 @@ export default class Playback extends Plugin {
     Key.register( [' ', 32], ()=> { Hook.call( 'togglePlayback' ); } );
     Key.register( ['s', 'S', 'ArrowDown', 40, 68], ()=> { Hook.call( 'increaseVelocity' ); } );
     Key.register( ['w', 'W', 'ArrowUp', 38, 87], ()=> { Hook.call( 'decreaseVelocity' ); } );
-    Key.register( ['d', 'D', 'ArrowRight', 39, 83], ()=> { this.fastForward(); } );
-    Key.register( ['a', 'A', 'ArrowLeft', 37, 65], ()=> { this.rewind(); } );
+    Key.register( ['PageDown'], ()=> { this.fastForward(); } );
+    Key.register( ['PageUp'], ()=> { this.rewind(); } );
     // 
     Hook.register( 'togglePlayback', ()=> { this.togglePlayback(); } );
     Hook.register( 'increaseVelocity', ()=> { this.increaseVelocity(); } );

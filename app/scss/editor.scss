@@ -77,13 +77,19 @@ body {
   border-bottom-color: #CCC; 
 }
 #overlay {
-  z-index: 20;
+  /*display: none;*/
+  /* Overlay floats above the screen */
   position: fixed;
-  top: 0px;
-  left: 0px;
-  right: 0px;
-  bottom: 0px;
+  z-index: 20;
+  /* Opacity should be set programatically */
   opacity: 0.45;
+  /* It's top and bottom are relative to the container */
+  top: 0px;
+  bottom: 0px;
+  /* And it takes all the space available in the container */
+  width: 100%;
+  height: 100%;
+  /* Make cursor unobtrusive */
   cursor: crosshair;
 }
 .teleprompter {
@@ -91,10 +97,12 @@ body {
   position: relative;
   /*position: absolute;*/
   /*position: fixed;*/
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  /* Bounding box */
+  /*height: 100vh;*/
+  /*top: 0;*/
+  /*left: 0;*/
+  /*right: 0;*/
+  /*bottom: 0;*/
   overflow-y: hidden;
 
   /*article {*/
@@ -102,23 +110,25 @@ body {
   /*.teleprompter article {*/
   &:nth-child(1n) {
     @extend %clear;
-    /*Transform*/
-    /*position: relative;*/
+    /* Top Transform */
+    /* Set on the animation itself: position: relative */
+    will-change: top;
+    top: 0;
+    /* Transform */
+    will-change: transform;
+    /* 2.x */
     /*overflow-x: hidden;*/
     /*overflow-y: hidden;*/
-    will-change: transform;
-    /* Transform */
     /*z-index: 10;*/
     /*padding: 100vh 0px 100vh 0px;*/
     /*top: 0px;*/
     
     /*Previous*/
-    /*top: 0;*/
     /*left: 0;*/
     /*right: 0;*/
     /*overflow-x: hidden;*/
     /*scroll-behavior: smooth;*/
-    text-align: center;
+    /*text-align: center;*/
     list-style-position: inside;
     ol {
       @extend %clear;
@@ -195,6 +205,16 @@ body {
     }
   }
 }
+.ck.ck-editor__editable_inline>:first-child {
+  margin-top: 0;
+}
+.ck.ck-editor__editable_inline>:last-child {
+  margin-bottom: 0;
+}
+
+.hidden {
+  display: none;
+}
 
 /* SMALL */
 @media screen and (min-width: 576px) {
@@ -205,13 +225,22 @@ body {
     position: sticky;
     top: -50px;
     z-index: 300;
+/*    &.hidden {
+      display: none;
+    }*/
   }
   #setupTabsContent {
     position: sticky;
     top: 48px;
+/*    &.hidden {
+      display: none;
+    }*/
   }
   #toolbar-container {
     top: 48px;
+/*    &.hidden {
+      top: 0;
+    }*/
   }
 
 }
@@ -221,12 +250,19 @@ body {
     position: sticky;
     top: 0;
     z-index: 300;
+/*    &.hidden {
+      display: none;
+    }*/
   }
   #setupTabsContent {
     position: fixed;
   }
   #toolbar-container {
     top: 56px;
+/*    &.hidden {
+      display: none;
+      top: 0;
+    }*/
   }
 
   .tab-bottom {
