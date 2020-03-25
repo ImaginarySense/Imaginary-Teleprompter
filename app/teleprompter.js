@@ -26,7 +26,8 @@ import Hook from './hooks';
 import Key from './inputs';
 import Timeout from './timeout';
 import DOMParser from './parser';
-import easyScroll from 'easy-scroll';
+// import easyScroll from 'easy-scroll';
+import easyScroll from '../../../easy-scroll/src/index.js';
 
 export default class Teleprompter {
 
@@ -80,7 +81,6 @@ export default class Teleprompter {
     window.addEventListener("wheel", (event)=> {
       if (this._play)
         this.pause();
-      // this._userScrolled = true;
     }, false);
     //   event.preventDefault();
     // }, {passive: false});
@@ -355,18 +355,31 @@ export default class Teleprompter {
         'duration': time,
         'easingPreset': curve,
         'onRefUpdateCallback': (animation)=> {
+          // if (this._delta) {
+            // this._delta--;
+            // cancelAnimationFrame(animation);
+          // }
+          // else
           if (this._x===0 || !this._play)
             cancelAnimationFrame(animation);
-          // else if (this._userScrolled) {
-            // cancelAnimationFrame(animation);
-            // Re-request animation after timeout
-            // this._userScrolled = false;
+          // console.log(this._delta);
+
+          // if (this._delta) {
+          //   cancelAnimationFrame(animation);
+          //   this._delta = false;
           // }
+          // else
+          // else
+            // this._delta = true;
         },
         'onAnimationCompleteCallback': ()=> {
           this.animationComplete();
         }
       });
+      // 
+      // if (this._play && this._x<-1 || this._x>1)
+      // if (this._x!==0 && this._play)
+        // this._delta = 1;
       break;
       case 1:
         // Retain current position.
@@ -498,7 +511,7 @@ export default class Teleprompter {
 
 }
 
-Teleprompter.prototype._userScrolled = false;
+// Teleprompter.prototype._delta = false;
 Teleprompter.prototype._engine = 2;
 Teleprompter.prototype._x = 0;
 Teleprompter.prototype._transitionDelays = 500;
