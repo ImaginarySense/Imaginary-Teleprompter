@@ -1,6 +1,6 @@
 /*
   Imaginary Teleprompter
-  Copyright (C) 2019 Imaginary Sense Inc.
+  Copyright (C) 2019, 2020 Imaginary Sense Inc.
 
   This file is part of Imaginary Teleprompter.
 

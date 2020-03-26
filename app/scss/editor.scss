@@ -29,7 +29,19 @@
 body {
   overflow-x: hidden;
   /*overflow: hidden;*/
-  scroll-behavior: smooth;
+  /*scroll-behavior: smooth;*/
+  background: #EEE;
+}
+:root {
+  scrollbar-color: #755fa1 #ccc !important;
+  scrollbar-width: thin !important;
+}
+::-webkit-scrollbar {
+  background-color: #d7d9d7; 
+  width: 0.6em;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #755fa1;
 }
 /* HEADER */
 .navbar-brand {
@@ -94,6 +106,7 @@ body {
 }
 .teleprompter {
   @extend %clear;
+  background: #FFF;
   position: relative;
   /*position: absolute;*/
   /*position: fixed;*/
@@ -114,8 +127,10 @@ body {
     /* Set on the animation itself: position: relative */
     will-change: top;
     top: 0;
-    margin-top: 100vh;
+    /* Margin bottom remains constant, unless flipV is active... IDK, this depends on how flipV gets done.*/
     margin-bottom: 100vh;
+    /* Margin top will variate according depending on the focus area */
+    /*margin-top: 100vh;*/
     /* Transform */
     will-change: transform;
     /* 2.x */

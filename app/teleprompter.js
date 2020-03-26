@@ -396,7 +396,8 @@ export default class Teleprompter {
   // https://css-tricks.com/restart-css-animation/
 
   get lastPos() {
-    const lastPos = -(this.promptHeight+this.viewportHeight); // + 
+    // const lastPos = -(this.promptHeight+this.viewportHeight); // + 
+    const lastPos = -(this.promptHeight);
     console.log("lastPos", lastPos);
     return lastPos
     // - ( this.promptHeight/* - this.screenHeight*/ )
@@ -449,12 +450,11 @@ export default class Teleprompter {
   }
 
   get viewportHeight( ) {
-    const c = window.innerHeight;
-    // const c = window.innerHeight - this.topOffset;
-    // console.log("window.innerHeight", window.innerHeight);
+    const viewportHeight = window.innerHeight;
+    // const viewportHeight = window.innerHeight - this.topOffset;
     // console.log("this.topOffset", this.topOffset);
-    console.log("viewportHeight", c);
-    return c;
+    console.log("viewportHeight", viewportHeight);
+    return viewportHeight;
     // return this._teleprompter.clientHeight;
   }
 
