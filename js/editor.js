@@ -1267,6 +1267,14 @@ var debug = false;
 
         });
 
+       function save() {
+            if (sid.currentElement != 0) {
+                var scriptsData = sid.getElements();
+                scriptsData[sid.currentElement]["data"] = document.getElementById("prompt").innerHTML;
+                sid.getSaveMode().setItem(sid.getDataKey(), JSON.stringify(scriptsData));
+            }
+        }
+
         sid.selectedElement = function(element) {
             var scriptsData = sid.getElements();
             if (scriptsData[sid.currentElement].hasOwnProperty('data'))
@@ -1282,11 +1290,7 @@ var debug = false;
         }
 
         sid.setEvent('input','prompt',function() {
-            if (sid.currentElement != 0) {
-                var scriptsData = sid.getElements();
-                scriptsData[sid.currentElement]["data"] = document.getElementById("prompt").innerHTML;
-                sid.getSaveMode().setItem(sid.getDataKey(), JSON.stringify(scriptsData));
-            }
+            save();
         });
 
         CKEDITOR.on('instanceReady', function(event) {
@@ -1315,11 +1319,13 @@ var debug = false;
             editor.on('focus', function() {
                 editorFocused = true;
                 if (debug) console.log('Editor focused.');
+                save();
             });
 
             editor.on('blur', function() {
                 editorFocused = false;
                 if (debug) console.log('Editor out of focus.');
+                save();
             });
         });
 
@@ -1327,6 +1333,7 @@ var debug = false;
         menuToggle.onclick = function(event) {
             event.preventDefault();
             document.querySelector("#wrapper").classList.toggle("toggled");
+            save();
         };
     }
 
