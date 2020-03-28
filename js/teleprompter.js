@@ -483,7 +483,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     document.addEventListener( 'transitionend', function() {
         if(atStart()||atEnd()) {
             stopAll();
-            resetTimer();
+            timer.stopTimer();
         }
         if (debug) console.log("Reached end") && false;
     }, false);
