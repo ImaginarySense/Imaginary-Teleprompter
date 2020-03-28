@@ -1,10 +1,10 @@
 {
   "name": "imaginary-teleprompter",
   "email": "support@imaginary.tech",
-  "homepage": "http://imaginary.tech/teleprompter/",
+  "homepage": "https://imaginary.tech/teleprompter/",
   "description": "The most complete and professional free software teleprompter application.",
   "license": "GPL-3.0+",
-  "version": "2.3.4",
+  "version": "2.4.0",
   "keywords": [
     "teleprompter",
     "television",
@@ -18,19 +18,19 @@
     "imaginary films",
     "imaginary"
   ],
-  "author": "Imaginary Sense <support@imaginary.tech> (http://imaginary.tech)",
+  "author": "Imaginary Sense Inc. <support@imaginary.tech> (https://imaginary.tech)",
   "contributors": [
-    "Javier O. Cordero-Pérez <javier@imaginary.tech> (http://javiercordero.info)",
+    "Javier O. Cordero-Pérez <javier@imaginary.tech> (https://javiercordero.info)",
     "Victor A. Ortiz-Alvarado <va2ron1@gmail.com> (https://twitter.com/Va2ron1)",
     "Rafael J. Sierra-Soto <rafael.sierra2@upr.edu> (https://www.facebook.com/rafael.jose.7737)",
     "Keyvan Pérez Pérez <keyvan.perez2@gmail.com> (https://github.com/keyvanp)"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/ImaginarySense/Teleprompter-Core"
+    "url": "https://github.com/ImaginarySense/Imaginary-Teleprompter"
   },
   "bugs": {
-    "url": "https://github.com/ImaginarySense/Teleprompter-Core/issues"
+    "url": "https://github.com/ImaginarySense/Imaginary-Teleprompter/issues"
   },
   "scripts": {
     "start": "electron main.js"

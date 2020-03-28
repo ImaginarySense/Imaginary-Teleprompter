@@ -1,31 +1,33 @@
 <!DOCTYPE html>
 <!--
-	Teleprompter
-	Copyright (C) 2015 Imaginary Sense, Imaginary Films LLC and contributors
-	
-	This program is free software: you can redistribute it and/or modify
+	Imaginary Teleprompter
+	Copyright (C) 2015 Imaginary Sense Inc. and contributors
+
+	This file is part of Imaginary Teleprompter.
+
+	Imaginary Teleprompter is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
-	
-	This program is distributed in the hope that it will be useful,
+
+	Imaginary Teleprompter is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
-	
+
 	You should have received a copy of the GNU General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	along with Imaginary Teleprompter.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <html>
 <head>
 	<meta charset="utf-8">
-	<meta property="og:title" content="Teleprompter by Imaginary Sense">
-	<meta property="og:site_name" content="Imaginary Tech">
-	<meta property="og:url" content="http://imaginary.tech/teleprompter/">
-	<meta property="og:description" content="'Teleprompter' is a professional grade, multi-platform, free software teleprompter for everyone to use. It's built on web technologies so it can run in any device.">
-	<meta property="og:image" content="http://imaginary.tech/teleprompter/img/if-teleprompter-web-fb.jpg">
+	<meta property="og:title" content="Imaginary Teleprompter">
+	<meta property="og:site_name" content="Imaginary Sense">
+	<meta property="og:url" content="https://imaginary.tech/teleprompter/">
+	<meta property="og:description" content="Imaginary Teleprompter is a professional grade, multi-platform, free software teleprompter for everyone to use. It's built on web technologies so it can run in any device.">
+	<meta property="og:image" content="https://imaginary.tech/teleprompter/img/if-teleprompter-web-fb.jpg">
 	<meta property="fb:app_id" content="196769633992905">
-	<title>Teleprompter by Imaginary Sense</title>
+	<title>Imaginary Teleprompter</title>
 	<link rel="icon" href="favicon.ico" type="image/x-icon">
 	<link rel="stylesheet" href="css/reset.css">
 	<link rel="stylesheet" href="css/bootstrap.min.css">
@@ -58,7 +60,7 @@
 						<li><a id="menu-toggle" href="#menu-toggle"><img style="width:26px;" src="fonts/noto-emoji-master/emoji_u1f4be.svg"></a></li>
 					</ul>
 					<div class="navbar-header">
-						<a class="external navbar-brand" href="http://imaginary.tech/teleprompter/" target="_blank"><img src="img/logo.png" alt="Teleprompter" ></a>
+						<a class="external navbar-brand" href="https://imaginary.tech/teleprompter/" target="_blank"><img src="img/logo.png" alt="Teleprompter" ></a>
 					</div>
 					<ul class="nav navbar-nav navbar-right">
 						<li><a id="advConfig" href="#content" data-toggle="collapse"><img style="width:26px;" src="fonts/noto-emoji-master/emoji_u2699.svg"></a></li>
@@ -119,26 +121,33 @@
 			<div class="container">
 				<div class='row'>
 					<div class='col-md-10 col-sm-10'>
-						<div class='col-md-4 col-sm-4'>
+						<div class='col-sm-3'>
 							<small>
 								<label for="speed">Speed:</label>
 								<label for="speed" id="speedValue">4.0</label>
 							</small>
 							<input type="range" id="speed" name="speed" data-slider-value="4.0" data-slider-step="0.5" data-slider-min="1" data-slider-max="20" data-slider-ticks="[1,4,20]" data-slider-ticks-snap-bounds="0">
 						</div>
-						<div class='col-md-4 col-sm-4'>
+						<div class='col-sm-3'>
 							<small>
-								<label for="acceleration">Acceleration curve:</label>
+								<label for="acceleration">Acceleration:</label>
 								<label for="acceleration" id="accelerationValue">1.45</label>
 							</small>
 							<input type="range" id="acceleration" name="acceleration" data-slider-value="1.45" data-slider-min="0.5" data-slider-max="1.8" data-slider-step="0.05" data-slider-ticks="[0.5,1.45,1.8]" data-slider-ticks-snap-bounds="0">
 						</div>
-						<div class='col-md-4 col-sm-4'>
+						<div class='col-sm-3'>
 							<small>
-								<label for="fontSize">Font scale:</label>
+								<label for="fontSize">Font size:</label>
 								<label for="fontSize" id="fontSizeValue">120</label><label for="fontSize">%</label>
 							</small>
 							<input type="range" id="fontSize" name="fontSize" data-slider-value="120" data-slider-min="50" data-slider-max="250" data-slider-step="5" data-slider-ticks="[50,120,250]" data-slider-ticks-snap-bounds="0">
+						</div>
+						<div class='col-sm-3'>
+							<small>
+								<label for="promptWidth">Width:</label>
+								<label for="promptWidth" id="promptWidthValue">84</label><label for="promptWidth">%</label>
+							</small>
+							<input type="range" id="promptWidth" name="promptWidth" data-slider-value="84" data-slider-min="50" data-slider-max="100" data-slider-step="1" data-slider-ticks="[50,84,100]" data-slider-ticks-snap-bounds="0">
 						</div>
 					</div>
 					<div class='col-md-2 col-sm-2'>
@@ -175,8 +184,8 @@
 		<div id="editorcontainer">
 			<div id="toolbar"></div>
 			<div id="promptcontainer">
-				<div id="prompt" contenteditable="true">
-					<h3>Welcome to Teleprompter!</h3>
+				<article id="prompt" contenteditable="true">
+					<h3>Welcome to Imaginary Teleprompter!</h3>
 					<p>Are you ready to tell a story?</p>
 					<br>
 					<p>"Teleprompter" is the most complete, free software, professional teleprompter for anyone to use. Click on "Prompt It!" whenever you're ready and control the speed with the arrow keys.</p>
@@ -238,7 +247,7 @@
 					<li>When prompting, press on the shortcut key to jump into the desired location.</li>
 					</ol>
 					<p>###</p>
-				</div>
+				</article>
 			</div>
 			<div id="statusbar"></div>
 		</div>
@@ -246,12 +255,12 @@
 	<!-- Footer -->
 	<footer id="footer" class="bs-docs-footer" role="contentinfo">
 		<div class="container">
-			<p style="color:#FFF;">&copy; <a id="imaginary" class="external" href="http://imaginary.tech/teleprompter/" target="_blank">Imaginary Films LLC &amp; Contributors</a></p>
-			<p>Developed by: <a class="external" href="https://www.linkedin.com/in/javier-oscar-cordero-p%25C3%25A9rez-70658033" target="_blank">Javier Cordero</a>,
-				<a class="external" href="https://twitter.com/Va2ron1" target="_blank">Victor Ortiz</a>,<br><a class="external" href="https://www.facebook.com/rafael.jose.7737">Rafael Sierra</a> &amp; <a class="external" href="https://github.com/keyvanp">Keyvan Pérez</a>.
+			<p style="color:#FFF;">&copy; <a id="imaginary" class="external" href="https://imaginary.tech/teleprompter/" target="_blank">Imaginary Sense Inc.</a></p>
+			<p>Authors: <a class="external" href="https://www.linkedin.com/in/javier-oscar-cordero-p%25C3%25A9rez-70658033" target="_blank">Javier Cordero</a> &amp;
+				<a class="external" href="https://twitter.com/Va2ron1" target="_blank">Victor Ortiz</a><br>Contributors: <a class="external" href="https://www.facebook.com/rafael.jose.7737">Rafael Sierra</a> &amp; <a class="external" href="https://github.com/keyvanp">Keyvan P&eacute;rez</a>.
 			</p>
 			<ul class="bs-docs-footer-links">
-				<li>Currently v2.3.4</li>
+				<li>Version 2.4.0</li>
 				<li>&middot;</li>
 				<li>Licensed under <a rel="license" href="LICENSE" target="_blank">GPL3</a>, assets under <a class="external" rel="license" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a></li>
 				<br>
@@ -260,10 +269,10 @@
 				<li>&middot;</li>
 				<li><a class="external" target="_blank" href="https://github.com/ImaginarySense/Teleprompter-Core">Source Code</a></li>
 				<li>&middot;</li>
-				<li><a class="external" target="_blank" href="http://imaginary.tech/teleprompter/#download">Downloads</a></li>
+				<li><a class="external" target="_blank" href="https://imaginary.tech/teleprompter/#download">Downloads</a></li>
 				<li>&middot;</li>
 			</ul>
-			<!--<li><a class="external" target="_blank" href="http://imaginary.tech/teleprompter/">About</a></li>-->
+			<!--<li><a class="external" target="_blank" href="https://imaginary.tech/teleprompter/">About</a></li>-->
 		</div>
 	</footer>
 	<div id="framecontainer">

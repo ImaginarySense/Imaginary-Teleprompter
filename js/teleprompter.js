@@ -1,20 +1,23 @@
 /*
-    Teleprompter
-    Copyright (C) 2015 Imaginary Sense, Imaginary Films LLC and contributors
+    Imaginary Teleprompter
+    Copyright (C) 2015 Imaginary Sense Inc. and contributors
 
-    This program is free software: you can redistribute it and/or modify
+    This file is part of Imaginary Teleprompter.
+
+    Imaginary Teleprompter is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
+    Imaginary Teleprompter is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See theRemote 
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with Imaginary Teleprompter.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 /*  References:
 https://github.com/jquery/PEP
 https://github.com/briangonzalez/jquery.pep.js/
@@ -39,7 +42,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     // Global objects
     var settings, session, prompt, pointer, overlay, overlayFocus, styleSheet, editor, timer, clock, remote;
     // Global variables
-    var unit, x, velocity, sensitivity, speedMultip, relativeLimit, steps, play, timeoutStatus, invertedWheel, focus, promptStyleOption, customStyle, flipV, flipH, fontSize, focusHeight, promptHeight, previousPromptHeight, screenHeight, previousScreenHeight, previousScreenWidth, previousVerticalDisplacementCorrector, domain, debug, closing, cap, syncDelay, isMobileApp;
+    var unit, x, velocity, sensitivity, speedMultip, relativeLimit, steps, play, timeoutStatus, invertedWheel, focus, promptStyleOption, customStyle, flipV, flipH, fontSize, promptWidth, focusHeight, promptHeight, previousPromptHeight, screenHeight, previousScreenHeight, previousScreenWidth, previousVerticalDisplacementCorrector, domain, debug, closing, cap, syncDelay, isMobileApp;
 
     // Enums
     var command = Object.freeze({
@@ -251,15 +254,24 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     }
 
     function updateContents() {
+        // 
+        // prompt = document.getElementsByClassName("prompt")[0];
+        // overlay = document.getElementById("overlay");
+        // overlayFocus = document.getElementById("overlayFocus");
+        // 
         if (debug) console.log("Updating prompter");
         updateDatamanager();
-        var oldFontSize = fontSize;
+        var oldFontSize = fontSize,
+            oldPromptWidth = promptWidth;
         fontSize = settings.data.fontSize/100;
         speedMultip = settings.data.speed;
         sensitivity = settings.data.acceleration;
+        promptWidth = settings.data.promptWidth;
         // If updating font, update it and resync
         if (oldFontSize !== fontSize)
             updateFont();
+        if (oldPromptWidth !== promptWidth)
+            updateWidth();
         // If screen is vertically flipped, resync
         else if (flipV) {
             onResize();
@@ -806,6 +818,13 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     function updateFont() {
         prompt.style.fontSize = fontSize+'em' ;
         overlayFocus.style.fontSize = fontSize+'em' ;
+        onResize();
+    }
+
+    function updateWidth() {
+        prompt.style.width = promptWidth+"vw";
+        prompt.style.left = 50-promptWidth/2+"vw";
+        // prompt.style.right = 50-promptWidth/2+"%";
         onResize();
     }
 
