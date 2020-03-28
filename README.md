@@ -1,4 +1,4 @@
-![Teleprompter](https://github.com/ImaginarySense/Imaginary-Teleprompter-Electron/raw/master/build/install-spinner.png)
+![Imaginary Teleprompter](https://github.com/ImaginarySense/Imaginary-Teleprompter-Electron/raw/master/build/install-spinner.png)
 
 [![GitHub license](https://img.shields.io/badge/license-GPL3-blue.svg)](https://raw.githubusercontent.com/ImaginarySense/Imaginary-Teleprompter/master/LICENSE)
 [![GitHub release](https://img.shields.io/github/release/ImaginarySense/Imaginary-Teleprompter-Electron.svg)](https://github.com/ImaginarySense/Imaginary-Teleprompter-Electron/releases)
