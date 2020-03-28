@@ -977,7 +977,7 @@ var debug = false;
 
     function updateFont(value) {
         if (debug) console.log("Updating font.");
-        document.getElementById("prompt").style.fontSize = "calc(5vw * "+(value/100+0.05)+")";
+        document.getElementById("prompt").style.fontSize = "calc(5vw * "+(value/100)+")";
     }
 
     function updateWidth(value) {
