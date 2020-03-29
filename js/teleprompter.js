@@ -42,7 +42,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     // Global objects
     var settings, session, prompt, pointer, overlay, overlayFocus, styleSheet, editor, timer, clock, remote;
     // Global variables
-    var unit, x, velocity, sensitivity, speedMultip, relativeLimit, steps, play, timeoutStatus, invertedWheel, focus, promptStyleOption, customStyle, flipV, flipH, fontSize, promptWidth, focusHeight, promptHeight, previousPromptHeight, screenHeight, previousScreenHeight, previousScreenWidth, previousVerticalDisplacementCorrector, domain, debug, closing, cap, syncDelay, isMobileApp;
+    var unit, x, velocity, sensitivity, speedMultip, relativeLimit, steps, play, timeoutStatus, invertedWheel, focus, promptStyleOption, customStyle, flipV, flipH, fontSize, promptWidth, focusHeight, promptHeight, previousPromptHeight, screenHeight, previousScreenHeight, screenWidth, previousVerticalDisplacementCorrector, domain, debug, closing, cap, syncDelay, isMobileApp;
 
     // Enums
     var command = Object.freeze({
@@ -118,7 +118,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         // Set initial relative values.
         setFocusHeight();
         setScreenHeight();
-        // setScreenWidth();
+        setScreenWidth();
         updateUnit();
         
         // Initialize domain for interprocess communication
@@ -677,45 +677,53 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
               currPos = -getCurrPos(),
               verticalDisplacement = focusVerticalDisplacementCorrector();
         let jump = 0;
-        console.log("currPos", currPos);
-        // console.log(anchors[0]);
-        // if (flipV) {
-            // for (let i=anchors.length-1; i>=0; i--) {
-            //     if (next) {
-            //         if (anchors[i].offsetTop-verticalDisplacement<currPos) {
-            //             jump = -promptHeight+anchors[i].offsetTop + screenHeight - verticalDisplacement;
-            //             break;
-            //         }
-            //     }
-            //     else if (anchors[i].offsetTop-verticalDisplacement>currPos) {
-            //         jump = -promptHeight+anchors[i].offsetTop + screenHeight - verticalDisplacement;
-            //         break;
-            //     }
-            // }
-        // }
-        // else {
-            if (next) {
+        if (debug) console.log("currPos", currPos);
+        if (next)
+            if (flipV) {
+                jump = -promptHeight + screenHeight;
                 for (let i=0; i<anchors.length; i++) {
-                    console.log("i", i);
-                    console.log('offsetTop', anchors[i].offsetTop);
-                    if (anchors[i].offsetTop-verticalDisplacement>currPos) {
-                        jump = -anchors[i].offsetTop + verticalDisplacement;
+                    if (debug) console.log("i", i);
+                    if (debug) console.log('offsetTop', anchors[i].offsetTop);
+                    if (promptHeight - anchors[i].offsetTop + verticalDisplacement - screenHeight < currPos) {
+                        jump = -promptHeight + anchors[i].offsetTop + screenHeight - verticalDisplacement;
                         break;
                     }
                 }
             }
-            else {
+            else
+                for (let i=0; i<anchors.length; i++) {
+                    if (debug) console.log("i", i);
+                    if (debug) console.log('offsetTop', anchors[i].offsetTop);
+                    if (anchors[i].offsetTop - verticalDisplacement > currPos) {
+                        jump = -anchors[i].offsetTop + verticalDisplacement;
+                        break;
+                    }
+                }
+        else {
+            // Add 20% padding (screenWidth/5) to jump to previous evaluations.
+            const padding = x&&!next>=0?screenWidth/5:0;
+            if (flipV) {
+                jump = -promptHeight + screenHeight;
                 for (let i=anchors.length-1; i>=0; i--) {
-                    console.log("i", i);
-                    console.log('offsetTop', anchors[i].offsetTop);
-                    if (anchors[i].offsetTop-verticalDisplacement<currPos) {
-                        jump = -anchors[i].offsetTop + verticalDisplacement;
+                    if (debug) console.log("i", i);
+                    if (debug) console.log('offsetTop', anchors[i].offsetTop);
+                    if (promptHeight - anchors[i].offsetTop + verticalDisplacement - screenHeight - padding - 1 > currPos) {
+                        jump = -promptHeight + anchors[i].offsetTop + screenHeight - verticalDisplacement;
                         break;
                     }
                 }
             }
-        // }
-        if (jump < 0 || !next)
+            else
+                for (let i=anchors.length-1; i>=0; i--) {
+                    if (debug) console.log("i", i);
+                    if (debug) console.log('offsetTop', anchors[i].offsetTop);
+                    if (anchors[i].offsetTop - verticalDisplacement + padding < currPos) {
+                        jump = -anchors[i].offsetTop + verticalDisplacement;
+                        break;
+                    }
+                }
+        }
+        if (!flipV && jump < 0 || flipV && jump > -promptHeight + screenHeight || !flipV && !next || flipV && !next )
             animate(0, jump);
         resumeAnimation();
     }
@@ -814,7 +822,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         setPromptHeight();
         setFocusHeight();
         setScreenHeight();
-        // setScreenWidth();
+        setScreenWidth();
         updateUnit();
         // You can guess what the next line does.
         correctVerticalDisplacement();        
