@@ -63,7 +63,9 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         "restoreEditor":15,
         "resetTimer":16,
         "nextAnchor":17,
-        "previousAnchor":18
+        "previousAnchor":18,
+        "fastForward":19,
+        "rewind":20
     });
 
     // Global constants
@@ -729,6 +731,40 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         resumeAnimation();
     }
 
+    function internalFastForward() {
+        const currPos = getCurrPos();
+        if (flipV) {
+            if (currPos < 0 - screenHeight * 0.5) {
+                const nextPos = currPos + screenHeight/2;
+                animate(0, nextPos);
+                resumeAnimation();
+            }
+        }
+        else
+            if (currPos > -promptHeight + screenHeight*1.5) { // < 0 || flipV && jump > -promptHeight + screenHeight || !flipV && !next || flipV && !next ) {
+                const nextPos = currPos - screenHeight/2;
+                animate(0, nextPos);
+                resumeAnimation();
+            }
+    }
+
+    function internalRewind() {
+        const currPos = getCurrPos();
+        if (flipV) {
+            if (currPos > -promptHeight + screenHeight*1.5) { // < 0 || flipV && jump > -promptHeight + screenHeight || !flipV && !next || flipV && !next ) {
+                const nextPos = currPos - screenHeight/2;
+                animate(0, nextPos);
+                resumeAnimation();
+            }
+        }
+        else 
+            if (currPos < 0 - screenHeight * 0.5) { // < 0 || flipV && jump > -promptHeight + screenHeight || !flipV && !next || flipV && !next ) {
+                const nextPos = currPos + screenHeight/2;
+                animate(0, nextPos);
+                resumeAnimation();
+            }
+    }
+
     // Update unit and unit related measurements
     function updateUnit() {
         unit = focusHeight/80;
@@ -1061,6 +1097,12 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                 case command.previousAnchor :
                     internalMoveToNextAnchor(false);
                     break;
+                case command.fastForward :
+                    internalFastForward();
+                    break;
+                case command.rewind :
+                    internalRewind();
+                    break;
                 default :
                     // Notify unknown message received.
                     if (debug) console.log("Unknown post message received: "+message.request) && false;
@@ -1167,6 +1209,22 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                 listener({
                     data: {
                         request: command.nextAnchor
+                    }
+                });
+                break;
+            case 34 :
+            case "PageDown" :
+                listener({
+                    data: {
+                        request: command.fastForward
+                    }
+                });
+                break;
+            case 33 :
+            case "PageUp" :
+                listener({
+                    data: {
+                        request: command.rewind
                     }
                 });
                 break;
