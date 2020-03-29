@@ -672,13 +672,13 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     }
 
     function internalMoveToNextAnchor(next) {
-        // Setup
         const anchors = document.getElementsByTagName("a"),
               currPos = -getCurrPos(),
               verticalDisplacement = focusVerticalDisplacementCorrector();
         let jump = 0;
         if (debug) console.log("currPos", currPos);
         if (next)
+            // Check flipV before loop to reduce cycles.
             if (flipV) {
                 jump = -promptHeight + screenHeight;
                 for (let i=0; i<anchors.length; i++) {
@@ -700,8 +700,8 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                     }
                 }
         else {
-            // Add 20% padding (screenWidth/5) to jump to previous evaluations.
-            const padding = x&&!next>=0?screenWidth/5:0;
+            // Add width based padding when jumping to previous evaluations.
+            const padding = x&&!next>=0?screenWidth/4.8:0;
             if (flipV) {
                 jump = -promptHeight + screenHeight;
                 for (let i=anchors.length-1; i>=0; i--) {
@@ -723,6 +723,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                     }
                 }
         }
+        // Move within movable area or from top to start.
         if (!flipV && jump < 0 || flipV && jump > -promptHeight + screenHeight || !flipV && !next || flipV && !next )
             animate(0, jump);
         resumeAnimation();
@@ -867,14 +868,14 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
     function internalIncreaseFontSize() {
         if (debug) console.log("Increasing font size.");
         if (fontSize<2.5)
-            fontSize+=0.05;
+            fontSize+=0.04;
         updateFont();
     }
 
     function internalDecreaseFontSize() {
         if (debug) console.log("Decreasing font size.");
-        if (fontSize>0.5)
-        fontSize-=0.05;
+        if (fontSize>0.01)
+        fontSize-=0.04;
         updateFont();
     }
 
