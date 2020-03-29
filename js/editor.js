@@ -68,7 +68,9 @@ var debug = false;
         "anchor": 13,
         "close": 14,
         "restoreEditor": 15,
-        "resetTimer":16
+        "resetTimer":16,
+        "nextAnchor":17,
+        "previousAnchor":18
     });
 
     function init() {
@@ -886,6 +888,22 @@ var debug = false;
                         request: command.resetTimer
                     }
                 });                    
+                break;
+                case 36:
+                case "Home":
+                listener({
+                    data: {
+                        request: command.previousAnchor
+                    }
+                });
+                break;
+                case 35:
+                case "End":
+                listener({
+                    data: {
+                        request: command.nextAnchor
+                    }
+                });
                 break;
                 // EDITOR COMMANDS
                 case 116:

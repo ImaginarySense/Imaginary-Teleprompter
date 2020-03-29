@@ -280,6 +280,12 @@ a:active {
 	z-index: 0;
 }
 
+/*img.cke_anchor {
+	width: 0;
+	padding: 0;
+	margin: 0;
+}
+*/
 /* Sidebar Styles */
 #sidebar-connect p {
 	color: #999999;

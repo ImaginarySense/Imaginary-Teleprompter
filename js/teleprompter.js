@@ -61,7 +61,9 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         "anchor":13,
         "close":14,
         "restoreEditor":15,
-        "resetTimer":16
+        "resetTimer":16,
+        "nextAnchor":17,
+        "previousAnchor":18
     });
 
     // Global constants
@@ -665,6 +667,59 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         editor.postMessage( {'request':command.anchor,'data':theAnchor}, getDomain() );
     }
 
+    function moveToNextAnchor( theAnchor ) {
+        editor.postMessage( {'request':command.anchor,'data':theAnchor}, getDomain() );
+    }
+
+    function internalMoveToNextAnchor(next) {
+        // Setup
+        const anchors = document.getElementsByTagName("a"),
+              currPos = -getCurrPos(),
+              verticalDisplacement = focusVerticalDisplacementCorrector();
+        let jump = 0;
+        console.log("currPos", currPos);
+        // console.log(anchors[0]);
+        // if (flipV) {
+            // for (let i=anchors.length-1; i>=0; i--) {
+            //     if (next) {
+            //         if (anchors[i].offsetTop-verticalDisplacement<currPos) {
+            //             jump = -promptHeight+anchors[i].offsetTop + screenHeight - verticalDisplacement;
+            //             break;
+            //         }
+            //     }
+            //     else if (anchors[i].offsetTop-verticalDisplacement>currPos) {
+            //         jump = -promptHeight+anchors[i].offsetTop + screenHeight - verticalDisplacement;
+            //         break;
+            //     }
+            // }
+        // }
+        // else {
+            if (next) {
+                for (let i=0; i<anchors.length; i++) {
+                    console.log("i", i);
+                    console.log('offsetTop', anchors[i].offsetTop);
+                    if (anchors[i].offsetTop-verticalDisplacement>currPos) {
+                        jump = -anchors[i].offsetTop + verticalDisplacement;
+                        break;
+                    }
+                }
+            }
+            else {
+                for (let i=anchors.length-1; i>=0; i--) {
+                    console.log("i", i);
+                    console.log('offsetTop', anchors[i].offsetTop);
+                    if (anchors[i].offsetTop-verticalDisplacement<currPos) {
+                        jump = -anchors[i].offsetTop + verticalDisplacement;
+                        break;
+                    }
+                }
+            }
+        // }
+        if (jump < 0 || !next)
+            animate(0, jump);
+        resumeAnimation();
+    }
+
     // Update unit and unit related measurements
     function updateUnit() {
         unit = focusHeight/80;
@@ -991,6 +1046,12 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                 case command.close :
                     closeInstance();
                     break;
+                case command.nextAnchor :
+                    internalMoveToNextAnchor(true);
+                    break;
+                case command.previousAnchor :
+                    internalMoveToNextAnchor(false);
+                    break;
                 default :
                     // Notify unknown message received.
                     if (debug) console.log("Unknown post message received: "+message.request) && false;
@@ -1083,6 +1144,22 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
             case "Backspace":
             case "backspace":
                 resetTimer();
+                break;
+            case 36:
+            case "Home":
+                listener({
+                    data: {
+                        request: command.previousAnchor
+                    }
+                });
+                break;
+            case 35:
+            case "End":
+                listener({
+                    data: {
+                        request: command.nextAnchor
+                    }
+                });
                 break;
             default: // Move to anchor.
                 // If key is not a string
