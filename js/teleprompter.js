@@ -726,9 +726,11 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                 }
         }
         // Move within movable area or from top to start.
-        if (!flipV && jump < 0 || flipV && jump > -promptHeight + screenHeight || !flipV && !next || flipV && !next )
+        if (!flipV && jump < 0 || flipV && jump > -promptHeight + screenHeight || !flipV && !next || flipV && !next ) {
             animate(0, jump);
-        resumeAnimation();
+            resumeAnimation();
+            timeout(0.5, syncPrompters);
+        }
     }
 
     function internalFastForward() {
@@ -738,6 +740,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                 const nextPos = currPos + screenHeight/2;
                 animate(0, nextPos);
                 resumeAnimation();
+                timeout(0.5, syncPrompters);
             }
         }
         else
@@ -745,6 +748,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                 const nextPos = currPos - screenHeight/2;
                 animate(0, nextPos);
                 resumeAnimation();
+                timeout(0.5, syncPrompters);
             }
     }
 
@@ -755,6 +759,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                 const nextPos = currPos - screenHeight/2;
                 animate(0, nextPos);
                 resumeAnimation();
+                timeout(0.5, syncPrompters);
             }
         }
         else 
@@ -762,6 +767,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                 const nextPos = currPos + screenHeight/2;
                 animate(0, nextPos);
                 resumeAnimation();
+                timeout(0.5, syncPrompters);
             }
     }
 
@@ -1198,35 +1204,19 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                 break;
             case 36:
             case "Home":
-                listener({
-                    data: {
-                        request: command.previousAnchor
-                    }
-                });
+                editor.postMessage( {'request':command.previousAnchor}, getDomain() );
                 break;
             case 35:
             case "End":
-                listener({
-                    data: {
-                        request: command.nextAnchor
-                    }
-                });
+                editor.postMessage( {'request':command.nextAnchor}, getDomain() );
                 break;
             case 34 :
             case "PageDown" :
-                listener({
-                    data: {
-                        request: command.fastForward
-                    }
-                });
+                editor.postMessage( {'request':command.fastForward}, getDomain() );
                 break;
             case 33 :
             case "PageUp" :
-                listener({
-                    data: {
-                        request: command.rewind
-                    }
-                });
+                editor.postMessage( {'request':command.rewind}, getDomain() );
                 break;
             default: // Move to anchor.
                 // If key is not a string
