@@ -27,7 +27,7 @@ var debug = false;
     // Import Electron libraries.
     if (inElectron()){
         const electron = require('electron');
-        const elecScreen = electron.screen;
+        var elecScreen = electron.screen;
         var ipcRenderer = electron.ipcRenderer;
         // var ipcRenderer = require('electron').ipcRenderer,
         // elecScreen = require('electron');

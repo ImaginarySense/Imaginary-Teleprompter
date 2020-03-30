@@ -113,9 +113,9 @@ let mainWindow = null,
 
 function createMainWindow () {
 	if (process.platform === 'win32')
-		mainWindow = new BrowserWindow({width: 1280, height: 800, javascript: true, title: 'Teleprompter by Imaginary Sense', useContentSize: true, nodeIntegration: true, icon: __dirname + '/icon.ico'});
+		mainWindow = new BrowserWindow({webPreferences: {nodeIntegration: true}, width: 1280, height: 800, javascript: true, title: 'Teleprompter by Imaginary Sense', useContentSize: true, nodeIntegration: true, icon: __dirname + '/icon.ico'});
 	else
-		mainWindow = new BrowserWindow({show: false, width: 1280, height: 800, javascript: true, title: 'Teleprompter by Imaginary Sense', useContentSize: true, nodeIntegration: true, icon: __dirname + '/icon.ico'});
+		mainWindow = new BrowserWindow({webPreferences: {nodeIntegration: true}, show: false, width: 1280, height: 800, javascript: true, title: 'Teleprompter by Imaginary Sense', useContentSize: true, nodeIntegration: true, icon: __dirname + '/icon.ico'});
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
 	mainWindow.once('ready-to-show', () => {
 		mainWindow.show();
