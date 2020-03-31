@@ -1367,6 +1367,19 @@ var debug = false;
             else
                 document.getElementById("prompt").innerHTML = "";
 
+            editor.on('dialogDefinition', function(event) {
+                save();
+            });
+
+            editor.on('change', function(event) {
+                save();
+            });
+
+            editor.on('paste', function(event) {
+                // event.data.type
+                // save();
+            });
+
             editor.on('key', function(event) {
                 if (event.key === undefined)
                     event.key = event.data.keyCode;
@@ -1385,7 +1398,7 @@ var debug = false;
             editor.on('focus', function() {
                 editorFocused = true;
                 if (debug) console.log('Editor focused.');
-                save();
+                // save();
             });
 
             editor.on('blur', function() {
