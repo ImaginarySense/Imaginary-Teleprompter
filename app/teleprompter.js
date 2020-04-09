@@ -79,8 +79,13 @@ export default class Teleprompter {
     }, false);
 
     window.addEventListener("wheel", (event)=> {
-      if (this._play)
+      if (this._play) {
         this.pause();
+        // this.scrollTimeout.run( 0.5, ()=> {
+        //   this.play();
+        // } );
+        this.timeout(500, (event)=>{this.play();});
+      }
     }, false);
     //   event.preventDefault();
     // }, {passive: false});
