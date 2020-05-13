@@ -1212,11 +1212,13 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                 break;
             case 34 :
             case "PageDown" :
-                editor.postMessage( {'request':command.fastForward}, getDomain() );
+                var cmd = (settings.data.airturn) ? command.nextAnchor : command.fastForward;
+                editor.postMessage( {'request':cmd}, getDomain() );
                 break;
             case 33 :
             case "PageUp" :
-                editor.postMessage( {'request':command.rewind}, getDomain() );
+                var cmd = (settings.data.airturn) ? command.previousAnchor : command.rewind;
+                editor.postMessage( {'request':cmd}, getDomain() );
                 break;
             default: // Move to anchor.
                 // If key is not a string

@@ -529,7 +529,7 @@ var debug = false;
         else if (typeof tinymce !== "undefined")
             htmldata = tinymce.get("prompt").getContent();
         // Define possible values
-        var primary, secondary, style, focusArea, speed, acceleration, fontSize, timer, voice;
+        var primary, secondary, style, focusArea, speed, acceleration, fontSize, timer, airturn, voice;
         // Get form values
         if (override!==undefined && typeof override==='string' || override instanceof String)
             override = JSON.parse(override);
@@ -574,12 +574,20 @@ var debug = false;
             else
                 timer = false;
         }
+        if (override!==undefined && override.airturn!==undefined)
+            airturn = override.airturn;
+        else {
+            if ( document.getElementById("airturn").children[0].classList.contains("btn-primary") )
+                airturn = true;
+            else
+                airturn = false;
+        }
         if (override!==undefined && override.voice!==undefined)
             voice = override.voice;
         else
             voice = false;
         // Merge all settings into one.
-        var settings = '{ "data": {"primary":'+primary+',"secondary":'+secondary+',"prompterStyle":'+style+',"focusMode":'+focusArea+',"speed":'+speed+',"acceleration":'+acceleration+',"fontSize":'+fontSize+',"promptWidth":'+promptWidth+',"timer":'+timer+',"voice":'+voice+'}}',
+        var settings = '{ "data": {"primary":'+primary+',"secondary":'+secondary+',"prompterStyle":'+style+',"focusMode":'+focusArea+',"speed":'+speed+',"acceleration":'+acceleration+',"fontSize":'+fontSize+',"promptWidth":'+promptWidth+',"timer":'+timer+',"airturn":'+airturn+',"voice":'+voice+'}}',
         session = '{ "html":"' + encodeURIComponent(htmldata) + '" }';
 
         // Store data locally for prompter to use
@@ -914,17 +922,19 @@ var debug = false;
                 break;
                 case 34 :
                 case "PageDown" :
+                var cmd = (settings.data.airturn) ? command.nextAnchor : command.fastForward;
                 listener({
                     data: {
-                        request: command.fastForward
+                        request: cmd
                     }
                 });
                 break;
                 case 33 :
                 case "PageUp" :
+                var cmd = (settings.data.airturn) ? command.previousAnchor : command.rewind;
                 listener({
                     data: {
-                        request: command.rewind
+                        request: cmd
                     }
                 });
                 break;
