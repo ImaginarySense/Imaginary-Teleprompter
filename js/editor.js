@@ -40,7 +40,7 @@ var debug = false;
     }
     
     // Global objects
-    var promptIt, updateIt, prompterWindow, frame, currentScript, canvas, canvasContext, slider, promptWidth,
+    var teleprompterSettings, promptIt, updateIt, prompterWindow, frame, currentScript, canvas, canvasContext, slider, promptWidth,
         syncMethods = {"instance":0, "canvas":1, "follow":2};
 
     // Global variables
@@ -594,6 +594,8 @@ var debug = false;
         dataManager.setItem("IFTeleprompterSettings", settings, 1);
         // If we use sessionStorage we wont be able to update the contents.
         dataManager.setItem("IFTeleprompterSession", session, 1);
+
+        teleprompterSettings = JSON.parse(settings);
     }
 
     function restoreEditor(event) {
@@ -906,23 +908,25 @@ var debug = false;
                 break;
                 case 36:
                 case "Home":
+                var cmd = (teleprompterSettings.data.airturn) ? command.rewind : command.previousAnchor;
                 listener({
                     data: {
-                        request: command.previousAnchor
+                        request: cmd
                     }
                 });
                 break;
                 case 35:
                 case "End":
+                var cmd = (teleprompterSettings.data.airturn) ? command.fastForward : command.nextAnchor;
                 listener({
                     data: {
-                        request: command.nextAnchor
+                        request: cmd
                     }
                 });
                 break;
                 case 34 :
                 case "PageDown" :
-                var cmd = (settings.data.airturn) ? command.nextAnchor : command.fastForward;
+                var cmd = (teleprompterSettings.data.airturn) ? command.nextAnchor : command.fastForward;
                 listener({
                     data: {
                         request: cmd
@@ -931,7 +935,7 @@ var debug = false;
                 break;
                 case 33 :
                 case "PageUp" :
-                var cmd = (settings.data.airturn) ? command.previousAnchor : command.rewind;
+                var cmd = (teleprompterSettings.data.airturn) ? command.previousAnchor : command.rewind;
                 listener({
                     data: {
                         request: cmd

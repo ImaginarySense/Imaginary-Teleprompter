@@ -1204,11 +1204,13 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                 break;
             case 36:
             case "Home":
-                editor.postMessage( {'request':command.previousAnchor}, getDomain() );
+                var cmd = (settings.data.airturn) ? command.rewind : command.previousAnchor;
+                editor.postMessage( {'request':cmd}, getDomain() );
                 break;
             case 35:
             case "End":
-                editor.postMessage( {'request':command.nextAnchor}, getDomain() );
+                var cmd = (settings.data.airturn) ? command.fastForward : command.nextAnchor;
+                editor.postMessage( {'request':cmd}, getDomain() );
                 break;
             case 34 :
             case "PageDown" :
