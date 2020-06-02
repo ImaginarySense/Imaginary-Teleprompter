@@ -21,26 +21,26 @@
     "Keyvan Pérez Pérez <keyvan.perez2@gmail.com> (https://github.com/keyvanp)"
   ],
   "devDependencies": {
-    "autoprefixer": "^9.5.1",
+    "autoprefixer": "^9.8.0",
     "browser-sync": "^2.26.3",
     "browser-sync-webpack-plugin": "^2.2.2",
     "css-loader": "^2.1.1",
     "eslint": "^5.16.0",
-    "node-sass": "^4.11.0",
-    "nodemon": "^1.18.11",
+    "node-sass": "^4.14.1",
+    "nodemon": "^1.19.4",
     "postcss-loader": "^3.0.0",
     "precss": "^4.0.0",
     "sass-loader": "^7.1.0",
     "style-loader": "^0.23.1",
-    "webpack": "^4.30.0",
-    "webpack-cli": "^3.3.0"
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
   },
   "dependencies": {
     "@ckeditor/ckeditor5-alignment": "github:ImaginarySense/ckeditor5-alignment#stable",
     "@ckeditor/ckeditor5-autosave": "^11.0.5",
     "@ckeditor/ckeditor5-basic-styles": "^11.1.4",
     "@ckeditor/ckeditor5-clipboard": "^12.0.2",
-    "@ckeditor/ckeditor5-dev-utils": "^12.0.5",
+    "@ckeditor/ckeditor5-dev-utils": "^12.0.9",
     "@ckeditor/ckeditor5-editor-decoupled": "^12.2.2",
     "@ckeditor/ckeditor5-essentials": "^11.0.5",
     "@ckeditor/ckeditor5-font": "github:ImaginarySense/ckeditor5-font#master",
@@ -55,11 +55,11 @@
     "@ckeditor/ckeditor5-table": "^14.0.0",
     "@ckeditor/ckeditor5-theme-lark": "^14.2.0",
     "@ckeditor/ckeditor5-undo": "^11.0.5",
-    "bootstrap": "^4.3.1",
-    "css-element-queries": "^1.2.1",
+    "bootstrap": "^4.5.0",
+    "css-element-queries": "^1.2.3",
     "easy-scroll": "^0.6.0",
-    "jquery": "^3.4.1",
-    "popper.js": "^1.15.0",
+    "jquery": "^3.5.1",
+    "popper.js": "^1.16.1",
     "raw-loader": "^3.1.0"
   },
   "repository": {

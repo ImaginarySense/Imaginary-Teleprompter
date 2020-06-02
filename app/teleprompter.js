@@ -73,7 +73,7 @@ export default class Teleprompter {
     this.setupPlugins(settings.plugins);
 
     // Animation events
-    // On animation completion, check whether atStart or atEnd
+    // Old on animation completion, check whether atStart or atEnd
     document.addEventListener( 'transitionend', ()=> {
       this.animationComplete();
     }, false);
@@ -84,7 +84,7 @@ export default class Teleprompter {
         // this.scrollTimeout.run( 0.5, ()=> {
         //   this.play();
         // } );
-        this.timeout(500, (event)=>{this.play();});
+        this.timeout(this._transitionDelays, (event)=>{this.play();});
       }
     }, false);
     //   event.preventDefault();
@@ -223,7 +223,7 @@ export default class Teleprompter {
   atEnd() {
     let endReached;
     if ( this._flipV )
-      endReached = this.pos >= 0;
+      endReached = this.pos === 0;
     else
       endReached = this.pos <= this.lastPos;
     if ( endReached && this._debug ) console.log("End Reached");
@@ -235,15 +235,29 @@ export default class Teleprompter {
     if ( this._flipV )
       startReached = this.pos <= this.lastPos;
     else
-      startReached = this.pos >= 0;
+      startReached = this.pos === 0;
     if ( startReached && this._debug ) console.log("Start Reached");
     return startReached;
+  }
+
+  animationComplete() {
+    console.log("Animation end");
+    if ( this.atStart() || this.atEnd() ) {
+    // if (this._x!==0 && ( this.atStart() || this.atEnd() )) {
+      // ToDo: Request to stop all instances 
+      this.stopAll();
+      // stopTimer();
+    }
+    // // Remove class after completing animation. Causes problems when animating top instead of transition...
+    // this._contents.classList.remove("move");
+    // // Reflow
+    // this.topOffset;
   }
 
   stopAll() {
     if (Hook.call( 'stop' ).length===0) {
       if (this._debug) console.log("Internal stop");
-      this.stop();
+        this.stop();
     }
   }
 
@@ -303,7 +317,7 @@ export default class Teleprompter {
     else
       // Destination equals current position in animation.
       whereTo = currPos;
-    console.log(this.promptHeight);
+    // console.log(this.promptHeight);
     return whereTo;
   }
 
@@ -354,14 +368,19 @@ export default class Teleprompter {
     switch (this._engine) {
       case 2:
       // https://github.com/tarun-dugar/easy-scroll
+      if ( typeof this.lastFrame !== 'undefined' )
+        cancelAnimationFrame(this.lastFrame);
       easyScroll({
         'scrollableDomEle': window,
         'direction': ( this._x >= 0 ? 'bottom' : 'top' ),
         'duration': time,
         'easingPreset': curve,
+        'scrollAmount': ( this._x === 0 ? 0 : undefined ),
         'onRefUpdateCallback': (animation)=> {
           if (this._x===0 || !this._play)
             cancelAnimationFrame(animation);
+          else
+            this.lastFrame = animation;
         },
         'onAnimationCompleteCallback': ()=> {
           this.animationComplete();
@@ -395,7 +414,8 @@ export default class Teleprompter {
     // Resume animation by re adding the class.
     this._contents.classList.add("move");
     // if (this._debug) this.timeout( ()=> console.log(/*"Curr:", this.pos, */"Dest:", destination, "RemTime:", time), 0);
-    if (this._debug) console.log(/*"Curr:", this.pos, */"Dest:", destination, "RemTime:", time);
+    if (this._debug) console.log("Curr:", this.pos, "Dest:", destination, "RemTime:", time);
+    // if (this._debug) console.log(/*"Curr:", this.pos, */"Dest:", destination, "RemTime:", time);
   }
   // https://css-tricks.com/controlling-css-animations-transitions-javascript/
   // https://css-tricks.com/restart-css-animation/
@@ -403,7 +423,7 @@ export default class Teleprompter {
   get lastPos() {
     // const lastPos = -(this.promptHeight+this.viewportHeight); // + 
     const lastPos = -(this.promptHeight);
-    console.log("lastPos", lastPos);
+    // console.log("lastPos", lastPos);
     return lastPos
     // - ( this.promptHeight/* - this.screenHeight*/ )
     // return -(this.promptHeight-this.viewportHeight)
@@ -413,19 +433,6 @@ export default class Teleprompter {
   get topOffset() {
     return this._teleprompter.getBoundingClientRect().top;
     // return prompt.offsetTop;
-  }
-
-  animationComplete() {
-    if(this.atStart()||this.atEnd()) {
-      // ToDo: Request to stop all instances 
-      this.stopAll();
-      // stopTimer();
-    }
-    // // Remove class after completing animation. Causes problems when animating top instead of transition...
-    // this._contents.classList.remove("move");
-    // // Reflow
-    // this.topOffset;
-    if (this._debug) console.log("Reached end");
   }
 
   timeout( delay, cb ) {
@@ -478,7 +485,7 @@ export default class Teleprompter {
 
   // INTERNAL CONTROLS
   play() {
-    if (this._debug) console.log('Play');
+    // if (this._debug) console.log('Play');
     this._play = true;
     requestAnimationFrame( ()=> { this.internalPlay() } );
     // this.internalPlay();
@@ -489,7 +496,7 @@ export default class Teleprompter {
   }
 
   pause() {
-    if (this._debug) console.log('Pause');
+    // if (this._debug) console.log('Pause');
     this._play = false;
     requestAnimationFrame( ()=> { this.internalPause() } );
     // this.internalPause();
@@ -513,7 +520,7 @@ export default class Teleprompter {
 
 Teleprompter.prototype._engine = 2;
 Teleprompter.prototype._x = 0;
-Teleprompter.prototype._transitionDelays = 500;
+Teleprompter.prototype._transitionDelays = 460;
 Teleprompter.prototype._timeoutDelay = 250;
 Teleprompter.prototype._inputCapDelay = 100;
 Teleprompter.prototype._limit = 10000;
