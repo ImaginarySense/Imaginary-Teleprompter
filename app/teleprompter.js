@@ -79,18 +79,22 @@ export default class Teleprompter {
     }, false);
 
     window.addEventListener("wheel", (event)=> {
-      if (this._play) {
-        this.pause();
-        // this.scrollTimeout.run( 0.5, ()=> {
-        //   this.play();
-        // } );
-        this.timeout(this._transitionDelays, (event)=>{this.play();});
-      }
+      this.pauseAndResume();
     }, false);
+    // window.addEventListener("drag", (event)=> {
+    //   this.pauseAndResume();
+    // }, false);
     //   event.preventDefault();
     // }, {passive: false});
 
   } // end Constructor
+
+  pauseAndResume() {
+    if (this._play) {
+      this.pause();
+      this.timeout(this._transitionDelays, (event)=>{this.play();});
+    }
+  }
 
   setupPlugins(plugins) {
 
@@ -225,7 +229,7 @@ export default class Teleprompter {
     if ( this._flipV )
       endReached = this.pos === 0;
     else
-      endReached = this.pos <= this.lastPos;
+      endReached = this.pos === this.promptHeight;
     if ( endReached && this._debug ) console.log("End Reached");
     return endReached;
   }
@@ -233,7 +237,7 @@ export default class Teleprompter {
   atStart() {
     let startReached;
     if ( this._flipV )
-      startReached = this.pos <= this.lastPos;
+      startReached = this.pos === this.promptHeight;
     else
       startReached = this.pos === 0;
     if ( startReached && this._debug ) console.log("Start Reached");
@@ -421,9 +425,8 @@ export default class Teleprompter {
   // https://css-tricks.com/restart-css-animation/
 
   get lastPos() {
-    // const lastPos = -(this.promptHeight+this.viewportHeight); // + 
-    const lastPos = -(this.promptHeight);
-    // console.log("lastPos", lastPos);
+    const lastPos = this._teleprompter.parentNode.scrollHeight;
+    // const lastPos = -this.promptHeight;
     return lastPos
     // - ( this.promptHeight/* - this.screenHeight*/ )
     // return -(this.promptHeight-this.viewportHeight)
@@ -453,7 +456,7 @@ export default class Teleprompter {
 
   get pos() {
     if (this._engine===2) {
-      const value = -window.scrollY;
+      const value = window.scrollY;
       // console.log("pos", value);
       return value;
     }
@@ -471,7 +474,8 @@ export default class Teleprompter {
   }
 
   get promptHeight( ) {
-    return this._contents.clientHeight;
+    // console.log(this._teleprompter.parentNode.scrollHeight, this._teleprompter.parentNode.clientHeight, this._teleprompter.parentNode.scrollTop, this.pos);
+    return this._teleprompter.parentNode.clientHeight;
   }
 
   get eta() {}
