@@ -78,21 +78,28 @@ export default class Teleprompter {
       this.animationComplete();
     }, false);
 
+    // Scroll override events
     window.addEventListener("wheel", (event)=> {
-      this.pauseAndResume();
-    }, false);
-    // window.addEventListener("drag", (event)=> {
-    //   this.pauseAndResume();
-    // }, false);
-    //   event.preventDefault();
-    // }, {passive: false});
+      if (event.deltaY !== 0)
+        this.pauseAndResume();
+    }, {passive: true});
+    window.addEventListener("mousedown", (event)=> {
+      if ( (event.target === this.teleprompter || event.target === document.getElementsByTagName('html')[0]) && event.clientX >= teleprompter.offsetWidth)
+        this.pause();
+    }, {passive: true});
+    window.addEventListener("mouseup", (event)=> {
+      // if (this._play)
+        this.play();
+    }, {passive: false});
 
   } // end Constructor
 
   pauseAndResume() {
     if (this._play) {
       this.pause();
-      this.timeout(this._transitionDelays, (event)=>{this.play();});
+      this.timeout(this._transitionDelays, (event)=> {
+        this.play();
+      });
     }
   }
 
