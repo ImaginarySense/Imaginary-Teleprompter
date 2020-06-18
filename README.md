@@ -17,7 +17,7 @@ Introduction
 -------------
 "Teleprompter" is the most complete, free software, professional teleprompter for anyone to use.
 
-It's built on web technologies so anyone can customize it to their needs. It may run on a web browser or as a standalone application for better performance and additional features. Standalone version tuns on Linux, Mac OS, Windows and Free BSD.
+It's built on web technologies so anyone can customize it to their needs. It may run on a web browser or as a standalone application for better performance and additional features. Standalone version runs on Linux, Mac OS, Windows and Free BSD.
 
 Help & Support
 -------------
