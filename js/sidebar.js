@@ -99,49 +99,103 @@ var SIDEBAR = function() {
         if (debug) console.log("Importing files...");
         for (var i=0, f; f = files[i]; i++) {
             if (debug) console.log(i+1);
-            if (f.type==="text/html") {
+            if (f.type==="text/html" || f.type==="text/plain") {
                 supportedFileFound = true;
                 var filename = escape(f.name),
                     reader = new FileReader();
                 if (debug) console.log( filename );
                 var elementsData = this.getElements();
-                // Closure to capture the file information.
-                reader.onload = ( function(theFile, sidebar) {
-                    return function(evt) {
-                        // Like with addScript, process files here...
-                        var elementsData = sidebar.getElements(),
-                            inputName = theFile.name,
-                            inputID = sidebar.createIDTag(inputName),
-                            maxLength = sidebar.maxFileSize();
-                        // Slicing name at lastIndexOf '.htm' works most common HTML file extensions. 
-                        inputName = inputName.slice( 0, inputName.lastIndexOf(".htm") );
-                        // Truncate file name.
-                        if ( inputName.length>maxLength ) {
-                            if (debug) console.log("Name will be truncated. Maximum allowed length: "+maxLength+" characters.");
-                            alert("The following file's name is too long and will be truncated: "+inputName);
-                            inputName = inputName.slice(0, maxLength);
-                        }
-                        elementsData.push({
-                            "id": inputID,
-                            "name": inputName,
-                            "data": evt.target.result,
-                            "editable": true
-                        });
-                        // Save
-                        // sidebar.currentElement = elementsData.length-1;
-                        sidebar.getSaveMode().setItem(sidebar.getDataKey(), JSON.stringify(elementsData));
-                        sidebar.refreshElements();
-                        // Load last imported file.
-                        sidebar.currentElement = elementsData.length-1;
-                        if (typeof sidebar.addElementEnded === "function") {
-                            sidebar.addElementEnded(elementsData[elementsData.length]);
-                        }
-                    };
-                }) (f, this);
+
+                if (f.type==="text/plain") {
+                    // Closure to capture the file information.
+                    reader.onload = ( function(theFile, sidebar) {
+                        return function(evt) {
+                            // Like with addScript, process files here...
+                            var elementsData = sidebar.getElements(),
+                                inputName = theFile.name,
+                                inputID = sidebar.createIDTag(inputName),
+                                maxLength = sidebar.maxFileSize();
+                            // Slicing name at lastIndexOf '.htm' works most common HTML file extensions. 
+                            inputName = inputName.slice( 0, inputName.lastIndexOf(".htm") );
+                            inputName = inputName.slice( 0, inputName.lastIndexOf(".txt") );
+                            inputName = inputName.slice( 0, inputName.lastIndexOf(".text") );
+                            // Truncate file name.
+                            if ( inputName.length>maxLength ) {
+                                if (debug) console.log("Name will be truncated. Maximum allowed length: "+maxLength+" characters.");
+                                alert("The following file's name is too long and will be truncated: "+inputName);
+                                inputName = inputName.slice(0, maxLength);
+                            }
+                            // Text file parsing
+                            var data = evt.target.result,
+                                parsedData = "<p>";
+                            for (var i=0; i<data.length; i++)
+                                if (data[i] !== "\n")
+                                    parsedData += data[i];
+                                else
+                                    parsedData += '</p>\n<p>';
+                            parsedData += "</p>";
+                            console.log(parsedData);
+                            // Save data
+                            elementsData.push({
+                                "id": inputID,
+                                "name": inputName,
+                                "data": parsedData,
+                                "editable": true
+                            });
+                            // Save
+                            // sidebar.currentElement = elementsData.length-1;
+                            sidebar.getSaveMode().setItem(sidebar.getDataKey(), JSON.stringify(elementsData));
+                            sidebar.refreshElements();
+                            // Load last imported file.
+                            sidebar.currentElement = elementsData.length-1;
+                            if (typeof sidebar.addElementEnded === "function") {
+                                sidebar.addElementEnded(elementsData[elementsData.length]);
+                            }
+                        };
+                    }) (f, this);
+                }
+
+                if (f.type==="text/html") {
+                    // Closure to capture the file information.
+                    reader.onload = ( function(theFile, sidebar) {
+                        return function(evt) {
+                            // Like with addScript, process files here...
+                            var elementsData = sidebar.getElements(),
+                                inputName = theFile.name,
+                                inputID = sidebar.createIDTag(inputName),
+                                maxLength = sidebar.maxFileSize();
+                            // Slicing name at lastIndexOf '.htm' works most common HTML file extensions. 
+                            inputName = inputName.slice( 0, inputName.lastIndexOf(".htm") );
+                            inputName = inputName.slice( 0, inputName.lastIndexOf(".txt") );
+                            inputName = inputName.slice( 0, inputName.lastIndexOf(".text") );
+                            // Truncate file name.
+                            if ( inputName.length>maxLength ) {
+                                if (debug) console.log("Name will be truncated. Maximum allowed length: "+maxLength+" characters.");
+                                alert("The following file's name is too long and will be truncated: "+inputName);
+                                inputName = inputName.slice(0, maxLength);
+                            }
+                            // Save data
+                            elementsData.push({
+                                "id": inputID,
+                                "name": inputName,
+                                "data": evt.target.result,
+                                "editable": true
+                            });
+                            // Save
+                            // sidebar.currentElement = elementsData.length-1;
+                            sidebar.getSaveMode().setItem(sidebar.getDataKey(), JSON.stringify(elementsData));
+                            sidebar.refreshElements();
+                            // Load last imported file.
+                            sidebar.currentElement = elementsData.length-1;
+                            if (typeof sidebar.addElementEnded === "function") {
+                                sidebar.addElementEnded(elementsData[elementsData.length]);
+                            }
+                        };
+                    }) (f, this);
+                }
                 // Begin reading the file's contents.
                 reader.readAsText(f);
             }
-            // Add support for more formats here...
             // Add unsuported file to unsuported file list.
             else
                 unsuportedFiles.push(escape(f.name));
