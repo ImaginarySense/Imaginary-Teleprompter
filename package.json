@@ -42,7 +42,7 @@
     "deb-version-compare": "git+https://github.com/sdumetz/node-deb-version-compare.git"
   },
   "devDependencies": {
-    "electron": "1.8.8"
+    "electron": "7.2.4"
   },
   "engine": "node >= 8.2.1",
   "preferGlobal": "false"
