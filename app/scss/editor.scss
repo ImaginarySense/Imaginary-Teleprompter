@@ -130,7 +130,7 @@ body {
     /* Margin bottom remains constant, unless flipV is active... IDK, this depends on how flipV gets done.*/
     margin-bottom: 100vh;
     /* Margin top will variate according depending on the focus area */
-    /*margin-top: 100vh;*/
+    margin-top: 100vh;
     /* Transform */
     will-change: transform;
     /* 2.x */
@@ -239,23 +239,23 @@ body {
 /* MEDIUM */
 @media screen and (min-width: 768px) {
   #siteTop {
-    position: sticky;
+/*    position: sticky;
     top: -50px;
     z-index: 300;
-/*    &.hidden {
+    &.hidden {
       display: none;
     }*/
   }
   #setupTabsContent {
-    position: sticky;
+/*    position: sticky;
     top: 48px;
-/*    &.hidden {
+    &.hidden {
       display: none;
     }*/
   }
   #toolbar-container {
-    top: 48px;
-/*    &.hidden {
+/*    top: 48px;
+    &.hidden {
       top: 0;
     }*/
   }
@@ -275,8 +275,8 @@ body {
     position: fixed;
   }
   #toolbar-container {
-    top: 56px;
-/*    &.hidden {
+/*    top: 56px;
+    &.hidden {
       display: none;
       top: 0;
     }*/

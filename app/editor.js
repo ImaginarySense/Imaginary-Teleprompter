@@ -40,7 +40,7 @@ export default class Editor {
   constructor(settings) {
     console.log("Editor");
     // Get teleprompter element
-    this.domObject = document.getElementsByClassName( "teleprompter" )[0];
+    this.teleprompterDOMInstances = document.getElementsByClassName( "teleprompter" );
     this.toolbar = document.getElementById( "toolbar" );
     this.siteTop = document.getElementById( "siteTop" );
     this.tabs = document.getElementById( "tabsContent" );
@@ -48,8 +48,13 @@ export default class Editor {
     this.WYSIWYG = true;
 
     // Initialize Teleprompter object
-    this._teleprompter = new Teleprompter( this.domObject, settings );
-    this._teleprompter.context = this;
+    this._teleprompters = [];
+    for (const DOMInstance of this.teleprompterDOMInstances) {
+      const teleprompterInstance = new Teleprompter( DOMInstance, settings );
+      teleprompterInstance.context = this;
+      this._teleprompters.push( teleprompterInstance );
+    }
+    this._teleprompter = this._teleprompters[0]
 
     // // Assign UI event actions
     // document.getElementById( "start" ).addEventListener( "click", ()=> {

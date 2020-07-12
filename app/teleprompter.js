@@ -197,7 +197,7 @@ export default class Teleprompter {
     }
     // If browser does not support modern ResizeObserver, use a hacky alternative.
     else {
-      console.info("Instance resize operations have not yet been implemented for this browser.");
+      console.info("Instance resize operations have not been implemented for this browser.");
       // new ResizeSensor( this._teleprompter, this.onResize );
     }
     // Lookup: resize implementations at https://stackoverflow.com/questions/6492683/how-to-detect-divs-dimension-changed
