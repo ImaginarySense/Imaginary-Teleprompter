@@ -38,7 +38,7 @@ var debug = false;
         window.$ = window.jQuery;
         window.Slider = require('./js/bootstrap-slider.min.js');
     }
-    
+
     // Global objects
     var promptIt, updateIt, prompterWindow, frame, currentScript, canvas, canvasContext, slider, promptWidth,
         syncMethods = {"instance":0, "canvas":1, "follow":2};
@@ -133,10 +133,10 @@ var debug = false;
             //Check, Update and Migrate Teleprompter Data
             dataManager.getItem("IFTeleprompterVersion",function(item) {
                 if (item == null || compare(currentVersion, item) == 1) {
-                    //fix 
+                    //fix
                     item = "0";
 
-                    //check if is going to use a develoment version 
+                    //check if is going to use a develoment version
                     if (!isADevVersion(item) && isADevVersion(currentVersion)) {
                         //migrarate from official version to a development version
                         window.location = "#devWarning";
@@ -150,7 +150,7 @@ var debug = false;
                         document.getElementById("closeWarning").onclick = closeWindow;
                         agreeButton.focus();
                     } else {
-                        //migrate from previous versions 
+                        //migrate from previous versions
                         applyMigration(item);
                         dataManager.setItem("IFTeleprompterVersion",currentVersion);
 
@@ -158,7 +158,7 @@ var debug = false;
                         //place this here to avoid problems with the warning and the newest modal
                         closeModal();
                     }
-                    
+
                 } else if(compare(item, currentVersion) == 1) {
                     window.location = "#devNewestVersion";
                     var cancelButton = document.getElementById("cancelNewestButton");
@@ -167,7 +167,7 @@ var debug = false;
                         window.close();
                     };
                     cancelButton.focus();
-                } 
+                }
             },0,0);
             // When asynchronous reply from main process, run function to...
             ipcRenderer.on('asynchronous-reply', function(event, arg) {
@@ -228,7 +228,7 @@ var debug = false;
                 // Forward remote control commands.
                 else if (arg.option === "command")
                     document.onkeydown(arg.data);
-                // 
+                //
                 // Get the "exteral" classes and update each link to load on an actual browser.
                 else if (arg.option === "prepareLinks") {
                     var classTags = document.getElementsByClassName('external');
@@ -464,7 +464,7 @@ var debug = false;
             }
         } else {
             // Update button
-            promptIt.innerHTML = "Prompt It!";
+            promptIt.innerHTML = i18next.t("Prompt It!");
             promptIt.onclick = submitTeleprompter;
             // Restore editor
             if (instance[0]) {
@@ -622,13 +622,13 @@ var debug = false;
             event.preventDefault();
 
         var secondaryDisplay = null;
-        
+
         updatePrompterData();
 
         // Determine whether to load "Primary".
-        instance[0] = (document.getElementById("primary").value > 0) ? true : false; 
+        instance[0] = (document.getElementById("primary").value > 0) ? true : false;
         // Determine whether to load "Secondary".
-        instance[1] = (document.getElementById("secondary").value > 0) ? true : false; 
+        instance[1] = (document.getElementById("secondary").value > 0) ? true : false;
         // Checks if is running on electron app...
         if (inElectron()) {
             // Check display availabillity.
@@ -689,8 +689,8 @@ var debug = false;
             if (instance[1])
                 prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + screen.availHeight + ',width=' + screen.width + ',top=0,left=' + screen.width + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0');
         }
-        
-        // If an external prompt is openned, focus on it.        
+
+        // If an external prompt is openned, focus on it.
         if (prompterWindow!=undefined && window.focus)
             // Adviced to launch as separate event on a delay.
             prompterWindow.focus();
@@ -894,7 +894,7 @@ var debug = false;
                     data: {
                         request: command.resetTimer
                     }
-                });                    
+                });
                 break;
                 case 36:
                 case "Home":
@@ -1249,7 +1249,7 @@ var debug = false;
 
         var div = document.createElement("div");
         div.id = "sidebar-connect";
-        
+
         var p = document.createElement("p");
         var text = document.createTextNode('Please use Web Connect on Teleprompter App to use the Remote Control');
         p.appendChild(text);
@@ -1419,15 +1419,15 @@ var debug = false;
     // Initialize objects after DOM is loaded
     if (document.readyState === "interactive" || document.readyState === "complete")
         // Call init if the DOM (interactive) or document (complete) is ready.
-        init();              
+        init();
     else
         // Set init as a listener for the DOMContentLoaded event.
         document.addEventListener("DOMContentLoaded", init);
 
     // Toogle control
     $('.btn-toggle').click(function() {
-        $(this).find('.btn').toggleClass('active');  
-        
+        $(this).find('.btn').toggleClass('active');
+
         if ($(this).find('.btn-primary').length>0) {
             $(this).find('.btn').toggleClass('btn-primary');
         }
@@ -1440,9 +1440,9 @@ var debug = false;
         if ($(this).find('.btn-info').length>0) {
             $(this).find('.btn').toggleClass('btn-info');
         }
-        
+
         $(this).find('.btn').toggleClass('btn-default');
-           
+
     });
     $('form').submit(function(){
         return false;
@@ -1463,7 +1463,7 @@ function exitDebug() {
     console.log("Leaving debug mode.");
 }
 function toggleDebugMode() {
-    if (debug) 
+    if (debug)
         exitDebug();
     else
         enterDebug();

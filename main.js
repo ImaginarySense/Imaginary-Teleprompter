@@ -35,6 +35,43 @@ const nativeImage = require('electron').nativeImage;
 const path = require('path');
 const url = require('url');
 const appDataFolder = app.getPath('appData') + '/ImaginarySense/Teleprompter';
+
+const http = require('http');
+const fs = require('fs');
+
+http.createServer(function (req, res) {
+	let path = url.parse(req.url).pathname.split('/')
+	if (req.method === "GET" && path.length >= 2 && path[1] === 'locales') {
+		let filePath = __dirname + req.url;
+		fs.lstat(filePath, (err, stats) => {
+			if(err || (stats && !stats.isFile())){
+				res.writeHead(404)
+			} else {
+				try {
+					if (fs.existsSync(__dirname + req.url)) {
+						console.log("File Exists")
+						res.writeHead(200, { "Content-Type": "text/html" });
+						fs.createReadStream(__dirname + req.url, "UTF-8").pipe(res);
+					}
+				} catch(err) {
+					res.writeHead(404)
+				}
+			}
+		});
+	} else {
+		res.writeHead(404)
+	}
+}).listen(3000);
+
+// http.createServer(function (req, res) {
+// 	if (req.method === "GET") {
+// 		res.writeHead(200, { "Content-Type": "text/html" });
+// 		fs.createReadStream(__dirname + req.url, "UTF-8").pipe(res);
+// 	} else {
+// 		res.writeHead(404)
+// 	}
+// }).listen(3000);
+
 // This should be placed at top of main.js to handle setup events quickly
 if (handleSquirrelEvent()) {
   // squirrel event handled and app will exit in 1000ms, so don't do anything else
@@ -51,7 +88,7 @@ function handleSquirrelEvent() {
   const appFolder = path.resolve(process.execPath, '..');
   const rootAtomFolder = path.resolve(appFolder, '..');
   const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'));
-  const exeName = path.basename(process.execPath); 
+  const exeName = path.basename(process.execPath);
 
   const spawn = function(command, args) {
 	let spawnedProcess, error;
@@ -148,7 +185,7 @@ app.on('activate', () => {
 });
 
 // This method will be called when Electron has finished initialization and is ready to create browser windows.
-app.on('ready', () => { 
+app.on('ready', () => {
 
 	// Create the browser window.
 	createMainWindow();
@@ -298,7 +335,7 @@ function setupMenu() {
 		]
 	},
 	];
-	
+
 	// Personalize menu for OS X
 	if (process.platform === 'darwin') {
 		template.unshift({
@@ -329,13 +366,13 @@ function imageServer() {
 	/*
 	//express server for image upload
 	var express = require('express');
-	var cors = require('cors') 
+	var cors = require('cors')
 	var app = express();
 
 	var multipart = require('connect-multiparty');
 	var multipartMiddleware = multipart();
 
-	var fs = require('fs'); 
+	var fs = require('fs');
 	var shell = require('shelljs');
 
 	var uploadPath = appDataFolder + '/uploads/';
@@ -345,13 +382,13 @@ function imageServer() {
 	//Make sure directories exist
 	shell.mkdir('-p', uploadPath);
 
-	app.use(cors()); 
+	app.use(cors());
 	app.post('/upload', multipartMiddleware, function(req, res) {
 			fs.readFile(req.files.upload.path, function (err, data) {
 					var newPath = uploadPath + req.files.upload.name;
-					fs.writeFile(newPath, data, function (err) { 
+					fs.writeFile(newPath, data, function (err) {
 						if (err) console.log({err: err});
-							else {  
+							else {
 								if(req.query.command == "QuickUpload"){
 									res.send({
 										"uploaded": 1,
@@ -370,7 +407,7 @@ function imageServer() {
 										html += "</script>";
 
 						res.send(html);
-								} 
+								}
 							}
 					});
 			});

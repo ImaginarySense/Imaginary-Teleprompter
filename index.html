@@ -37,6 +37,8 @@
 	<link rel="stylesheet" href="css/prompt.css">
 	<link rel="stylesheet" href="css/teleprompter-themes.css">
 	<link rel="stylesheet" href="css/mobilehide.css">
+	<script src="js/i18next.min.js"></script>
+	<script src="js/i18nextHttpBackend.min.js"></script>
 	<script src="ckeditor/ckeditor.js"></script>
 	<!--<script src="tinymce/tinymce.min.js"></script>-->
 </head>
@@ -154,7 +156,7 @@
 						<small>
 							<label for="timer">Timer</label>
 						</small><br>
-						<div id="timer" class="btn-group  btn-group-sm btn-toggle"> 
+						<div id="timer" class="btn-group  btn-group-sm btn-toggle">
 						    <button class="btn btn-default">On</button>
 						    <button class="btn btn-primary active">Off</button>
 						</div>
@@ -164,7 +166,7 @@
 						<small>
 							<label for="timer">Timer</label>
 						</small><br>
-						<div id="timer" class="btn-group  btn-group-sm btn-toggle"> 
+						<div id="timer" class="btn-group  btn-group-sm btn-toggle">
 						    <button class="btn btn-default">I</button>
 						    <button class="btn btn-primary active">O</button>
 						</div>
@@ -173,7 +175,7 @@
 						<small>
 							<label for="timer">Voice</label>
 						</small><br>
-						<div id="timer" class="btn-group btn-group-sm btn-toggle"> 
+						<div id="timer" class="btn-group btn-group-sm btn-toggle">
 						    <button class="btn btn-default">Inactive</button>
 						</div>
 					</div>
@@ -478,9 +480,26 @@
 <!--<script src="js/jquery.qrcode.js"></script>-->
 <script src="js/jscolor.min.js"></script>
 <script type="text/javascript">
+
 if (inElectron()){
 	var {ipcMain} = require('electron');
 	var {shell} = require('electron');
+
+	i18next
+		.use(i18nextHttpBackend)
+		.init({
+			lng: 'en-US',
+			fallbackLng: 'en-US',
+			supportedLngs: ['en-US', 'es-PR'],
+			ns: ['all'],
+	  	defaultNS: 'all',
+			load: 'currentOnly',
+			backend: {
+	      loadPath: 'http://localhost:3000/locales/{{lng}}/{{ns}}.json'
+	    },
+			debug: true
+		});
+
 }
 if (typeof CKEDITOR!=="undefined") {
 			 // Turn off automatic editor creation first.
@@ -530,7 +549,7 @@ CKEDITOR.on( 'dialogDefinition', function( ev ) {
 	console.log(dialogName);
 	if ( dialogName == 'table' ) {
 		var info = dialogDefinition.getContents( 'info' );
-		console.log(info);      
+		console.log(info);
 		info.get( 'txtWidth' )[ 'default' ] = '100%';
 		info.get( 'txtBorder' )[ 'default' ] = '0';
 		info.get( 'txtRows' )[ 'default' ] = '1';
@@ -554,7 +573,7 @@ CKEDITOR.on( 'dialogDefinition', function( ev ) {
 	}
 	if ( dialogName == 'image2' ) {
 		var info = dialogDefinition.getContents( 'info' );
-		console.log(info);  
+		console.log(info);
 		info.get( 'width' )[ 'default' ] = '100%';
 		info.get( 'height' )[ 'default' ] = 'auto';
 	}
