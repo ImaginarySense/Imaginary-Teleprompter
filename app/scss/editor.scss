@@ -207,8 +207,14 @@ body {
   border-bottom: 1px #000;
 }
 #toolbar-container {
-  top: 0px;
   position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(to bottom, rgba(255,255,255,1) 12%,rgba(255,255,255,0) 100%);
+}
+#toolbar-container-imaginaryteleprompter {
+  position: sticky;
+  top: 0;
   z-index: 100;
   background: linear-gradient(to bottom, rgba(255,255,255,1) 12%,rgba(255,255,255,0) 100%);
 }
@@ -253,7 +259,7 @@ body {
       display: none;
     }*/
   }
-  #toolbar-container {
+  #toolbar-container-imaginaryteleprompter {
     top: 48px;
 /*    &.hidden {
       top: 0;
@@ -274,7 +280,7 @@ body {
   #setupTabsContent {
     position: fixed;
   }
-  #toolbar-container {
+  #toolbar-container-imaginaryteleprompter {
     top: 56px;
 /*    &.hidden {
       display: none;

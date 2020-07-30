@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<!-- 
+  Imaginary Teleprompter
+  Copyright (C) 2017-2020 Imaginary Sense Inc.
+
+  This file is part of Imaginary Teleprompter.
+
+  Imaginary Teleprompter is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  Imaginary Teleprompter is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with Imaginary Teleprompter.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Imaginary Teleprompter, by Imaginary Sense</title>
+  <link rel="icon" href="dist/img/logo_sm.png" type="image/png-icon">
+</head>
+<body>
+  <!-- BEGIN EDITOR -->
+  <div class="container-fluid" id="toolbar-container">
+    <div id="toolbar"></div>
+  </div>
+<!--
+  <div id="prompt">
+    <p>1</p>
+  </div>
+ -->
+  <div class="teleprompter">
+    <article class="ck-content">
+      <strong>Welcome to Imaginary Teleprompter!</strong>
+      <p>Are you ready to tell a story?</p>
+      <p>"Teleprompter" is the most complete, free software, professional teleprompter for anyone to use. Click on "Prompt It!" whenever you're ready and control the speed with the arrow keys.</p>
+      <br>
+      <strong>- Here are some of our features -</strong>
+      <ol>
+      <li>Control the speed and text-size with the 'Up' and 'Down' arrow keys, the 'W' and 'S' keys or the mouse wheel. You may press 'Spacebar' to pause at anytime.</li>
+      <li>Dynamically change the font-size by pressing 'Left' and 'Right' or the 'A' and 'D' keys.</li>
+      <li>Flip modes allow <em>mirroring</em> the prompter in every possible way.</li>
+      <li>You can use one or two instances. Mirror one, monitor on the other one.</li>
+      <li><a id="5" name="5">Set almost any key as an <em>anchor</em> and instantly jump to any part of the script. Try pressing '5' now!</a></li>
+      <li>Different focus areas allow you to easily use Teleprompter with a webcam, a tablet, or professional teleprompter equipment.</li>
+      <li>Time your segments with the built in <em>timer</em>. Press 'Backspace' to reset the timer.</li>
+      <li>Tweak the <em>Speed</em>, <em>Acceleration Curve</em> and <em>Font Size</em> settings to fit your hosts' needs.</li>
+      <li>The Rich Text Editor, derived from the highly customizable CKEditor, gives unlimited possibilities on what you can prompt.</li>
+      <ul>
+      <li>Insert images from the web or copy and paste them into the prompter.
+      <img alt="Picture: Arecibo Sky" src="dist/img/arecibo-sky.jpg">
+      </li>
+      </ul>
+      <li>There are various <em>Prompter Styles</em> to choose from. You may also create your own.</li>
+      <li>Press 'F11' to enter and leave fullscreen.
+      You may fullscreen the text editor for greater concentration.</li>
+      <li>Run the "External prompter" on a second screen, add new contents into the editor, then "Update" your prompter in realtime without having to halt your script.</li>
+      <li>Teleprompter works across screens with different resolutions and aspect ratios.</li>
+      <li>Using calculus and relative measurement units, Teleprompter is built to age gracefully. Speed and contents remain consistent from your smallest screen up to 4k devices and beyond.</li>
+      <li>Animations are hardware accelerated for a smooth scroll. A quad-core computer with dedicated graphics and, at least, 2GB RAM is recommended for optimal results.</li>
+      <li>Teleprompter doesn't stretch a lower quality copy of your prompt for monitoring, instead it renders each instance individually at the highest quality possible. You should lower your resolution to increase performance on lower end machines.</li>
+      <li>Text can be pasted from other word processors such as Libre Office Writer&trade; and Microsoft Word&reg;.</li>
+      <li>All data is managed locally. We retain no user data.</li>
+      <li>Use the standalone installation for greater performance and automatic fullscreen prompting.</li>
+      <li>The standalone version comes for Linux, OS X, Microsoft Windows and Free BSD.</li>
+      <li>Close prompts and return to the editor by pressing 'ESC'.</li>
+      </ol>
+      <hr>
+      <br>
+      <strong>- How to use anchor shortcuts -</strong>
+      <ol>
+      <li>Select a keyword or line you want to jump to on your text in the editor.</li>
+      <li>Click on the <strong>Flag Icon</strong> on the editor's tool bar.</li>
+      <li>A box named "Anchor Properties" should have appeared. Type any single key of your choice and click 'Ok'.<br>Note preassigned keys, such as WASD and Spacebar will be ignored.</li>
+      <li>Repeat as many times as you wish.</li>
+      <li>When prompting, press on the shortcut key to jump into the desired location.</li>
+      </ol>
+      <p>###</p>
+    </article>
+    <!-- <div id="statusbar"></div> -->
+    <!-- 
+    <table border="0" cellpadding="0" cellspacing="0" touch-action="none" id="overlay">
+      <tbody>
+        <tr id="overlayTop" class="overlayBg">
+          <td>&nbsp;</td>
+        </tr>
+        <tr id="overlayFocus">
+          <td>&nbsp;</td>
+        </tr>
+        <tr id="overlayBottom" class="overlayBg">
+          <td>&nbsp;</td>
+        </tr>
+      </tbody>
+    </table>
+    -->
+  </div>
+  <script src="dist/imaginary-teleprompter-app.js" type="text/javascript"></script>
+</body>
+</html>
