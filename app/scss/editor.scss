@@ -130,7 +130,7 @@ body {
     /* Margin bottom remains constant, unless flipV is active... IDK, this depends on how flipV gets done.*/
     margin-bottom: 100vh;
     /* Margin top will variate according depending on the focus area */
-    margin-top: 100vh;
+    /*margin-top: 100vh;*/
     /* Transform */
     will-change: transform;
     /* 2.x */
@@ -207,8 +207,14 @@ body {
   border-bottom: 1px #000;
 }
 #toolbar-container {
-  top: 0px;
   position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(to bottom, rgba(255,255,255,1) 12%,rgba(255,255,255,0) 100%);
+}
+#toolbar-container-imaginaryteleprompter {
+  position: sticky;
+  top: 0;
   z-index: 100;
   background: linear-gradient(to bottom, rgba(255,255,255,1) 12%,rgba(255,255,255,0) 100%);
 }
@@ -239,23 +245,23 @@ body {
 /* MEDIUM */
 @media screen and (min-width: 768px) {
   #siteTop {
-/*    position: sticky;
+    position: sticky;
     top: -50px;
     z-index: 300;
-    &.hidden {
+/*    &.hidden {
       display: none;
     }*/
   }
   #setupTabsContent {
-/*    position: sticky;
+    position: sticky;
     top: 48px;
-    &.hidden {
+/*    &.hidden {
       display: none;
     }*/
   }
-  #toolbar-container {
-/*    top: 48px;
-    &.hidden {
+  #toolbar-container-imaginaryteleprompter {
+    top: 48px;
+/*    &.hidden {
       top: 0;
     }*/
   }
@@ -274,9 +280,9 @@ body {
   #setupTabsContent {
     position: fixed;
   }
-  #toolbar-container {
-/*    top: 56px;
-    &.hidden {
+  #toolbar-container-imaginaryteleprompter {
+    top: 56px;
+/*    &.hidden {
       display: none;
       top: 0;
     }*/

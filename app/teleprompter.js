@@ -32,7 +32,7 @@ import easyScroll from '../../../easy-scroll/src/index.js';
 export default class Teleprompter {
 
   constructor( teleprompterIdentifier, settings={} ) {
-    console.log("Teleprompter");
+    if (this._debug) console.log("Teleprompter");
 
     let teleprompter;
     // If pased contents is a string, lookup DOM element.
@@ -113,7 +113,7 @@ export default class Teleprompter {
         this.plugins[ plugin.pluginName ].init();
       // }
     }
-    console.log("Available plugins", this.plugins);
+    if (this._debug) console.log("Available plugins", this.plugins);
   }
 
   start() {
@@ -121,7 +121,7 @@ export default class Teleprompter {
     // Parse contents
     // this.parse( this._contents );
 
-    // console.log( this._editor );
+    // if (this._debug) console.log( this._editor );
 
     // Run teleprompterStarted hook
     if ( this._context && typeof this._context.teleprompterStarted === "function" ) {
@@ -252,7 +252,7 @@ export default class Teleprompter {
   }
 
   animationComplete() {
-    console.log("Animation end");
+    if (this._debug) console.log("Animation end");
     if ( this.atStart() || this.atEnd() ) {
     // if (this._x!==0 && ( this.atStart() || this.atEnd() )) {
       // ToDo: Request to stop all instances 
@@ -290,7 +290,7 @@ export default class Teleprompter {
   updateUnit() {
     this.unit = this.focusHeight/80;
     this.speedLimit = this._limit*this.unit;
-    // if (this._debug) setTimeout( ()=> { console.log("Unit updated: "+this.unit) && false; });
+    // if (this._debug) setTimeout( ()=> { if (this._debug) console.log("Unit updated: "+this.unit) && false; });
     if (this._debug) console.log("Unit updated: ", this.unit, "Speed limit: ", this.speedLimit);
     this.resumeAnimation();
   }
@@ -328,7 +328,7 @@ export default class Teleprompter {
     else
       // Destination equals current position in animation.
       whereTo = currPos;
-    // console.log(this.promptHeight);
+    // if (this._debug) console.log(this.promptHeight);
     return whereTo;
   }
 
@@ -416,7 +416,7 @@ export default class Teleprompter {
           transition: transform ${time}ms ${curve};
         }`, 0);
     }
-    // console.log(this.styleSheet);
+    // if (this._debug) console.log(this.styleSheet);
     // transform: translateY('+destination+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+') !important;\
     // Prevent race condition in Chrome by requesting for parent top position (not just transform) before reanimating.
     this.topOffset;
@@ -424,7 +424,7 @@ export default class Teleprompter {
 
     // Resume animation by re adding the class.
     this._contents.classList.add("move");
-    // if (this._debug) this.timeout( ()=> console.log(/*"Curr:", this.pos, */"Dest:", destination, "RemTime:", time), 0);
+    // if (this._debug) this.timeout( ()=> if (this._debug) console.log(/*"Curr:", this.pos, */"Dest:", destination, "RemTime:", time), 0);
     if (this._debug) console.log("Curr:", this.pos, "Dest:", destination, "RemTime:", time);
     // if (this._debug) console.log(/*"Curr:", this.pos, */"Dest:", destination, "RemTime:", time);
   }
@@ -464,7 +464,7 @@ export default class Teleprompter {
   get pos() {
     if (this._engine===2) {
       const value = window.scrollY;
-      // console.log("pos", value);
+      // if (this._debug) console.log("pos", value);
       return value;
     }
     else
@@ -474,14 +474,14 @@ export default class Teleprompter {
   get viewportHeight( ) {
     const viewportHeight = window.innerHeight;
     // const viewportHeight = window.innerHeight - this.topOffset;
-    // console.log("this.topOffset", this.topOffset);
-    console.log("viewportHeight", viewportHeight);
+    // if (this._debug) console.log("this.topOffset", this.topOffset);
+    if (this._debug) console.log("viewportHeight", viewportHeight);
     return viewportHeight;
     // return this._teleprompter.clientHeight;
   }
 
   get promptHeight( ) {
-    // console.log(this._teleprompter.parentNode.scrollHeight, this._teleprompter.parentNode.clientHeight, this._teleprompter.parentNode.scrollTop, this.pos);
+    // if (this._debug) console.log(this._teleprompter.parentNode.scrollHeight, this._teleprompter.parentNode.clientHeight, this._teleprompter.parentNode.scrollTop, this.pos);
     return this._teleprompter.parentNode.clientHeight;
   }
 
@@ -535,7 +535,7 @@ Teleprompter.prototype._transitionDelays = 460;
 Teleprompter.prototype._timeoutDelay = 250;
 Teleprompter.prototype._inputCapDelay = 100;
 Teleprompter.prototype._limit = 10000;
-Teleprompter.prototype._debug = true;
+Teleprompter.prototype._debug = false;
 
 Teleprompter.prototype._play = false;
 Teleprompter.prototype._flipV = false;
