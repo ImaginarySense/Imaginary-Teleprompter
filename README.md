@@ -11,7 +11,7 @@
 # Imaginary Teleprompter
 Core files of our Teleprompter software. This repo contains all the features present in the standalone desktop version and necesary files for a mobile version to work.
 
-If you intend to make standalone executables and gain access to the Electron exclusive features, please see [Imaginary-Imaginary-Teleprompter-Electron](https://github.com/ImaginarySense/Imaginary-Imaginary-Teleprompter-Electron). You may also test the latest release on your web browser at [https://imaginarysense.github.io/Imaginary-Teleprompter/](https://imaginarysense.github.io/Imaginary-Teleprompter/)
+If you intend to make standalone executables and gain access to the Electron exclusive features, please see [Imaginary-Teleprompter-Electron](https://github.com/ImaginarySense/Imaginary-Teleprompter-Electron). You may also test the latest release on your web browser at [https://imaginarysense.github.io/Imaginary-Teleprompter/](https://imaginarysense.github.io/Imaginary-Teleprompter/)
 
 Introduction
 -------------
@@ -28,7 +28,7 @@ If you have an issue, please write it to us, we will help you or fix the bug.
 *  Victor Ortiz <va2ron1@imaginary.tech>
 
 ## Contributors:
-*  Keyvan Pérez <keyvan.perez2@gmail.com>
+*   Keyvan Pérez <keyvan.perez2@gmail.com>
 *  Rafael Sierra <rafael.sierra2@upr.edu> 
 
 ## Copyright: 
@@ -36,3 +36,4 @@ Imaginary Sense Inc. & Contributors
 
 ## License: 
 This software is under [GPL3](https://github.com/ImaginarySense/Imaginary-Teleprompter/blob/master/LICENSE) license.
+  
