@@ -6,7 +6,7 @@
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/ImaginarySense/Imaginary-Teleprompter.svg)](http://isitmaintained.com/project/ImaginarySense/Imaginary-Teleprompter "Average time to resolve an issue")
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/ImaginarySense/Imaginary-Teleprompter.svg)](http://isitmaintained.com/project/ImaginarySense/Imaginary-Teleprompter "Percentage of issues still open")
 [![SourceForge](https://img.shields.io/sourceforge/dm/teleprompter-imaginary-films.svg)](https://sourceforge.net/projects/teleprompter-imaginary-films/)
-[![Twitter Follow](https://img.shields.io/twitter/follow/imaginary_tech.svg?style=social&label=Follow)](http://twitter.com/user/imaginary_tech)
+[![Twitter Follow](https://img.shields.io/twitter/follow/imaginary_tech.svg?style=social&label=Follow)](https://twitter.com/imaginary_tech)
 
 # Imaginary Teleprompter
 Core files of our Teleprompter software. This repo contains all the features present in the standalone desktop version and necesary files for a mobile version to work.
