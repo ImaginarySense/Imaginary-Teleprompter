@@ -20,10 +20,22 @@
 
 var SIDEBAR = function() {
     this.instructionsLoaded = true;
+    this.modal = undefined;
 
     this.closeModal =  function() {
-        window.location = "#close";
+        if (this.modal) {
+            this.modal.hide()
+            this.modal = undefined;
+        }
         document.getElementById("prompt").focus();
+    }
+
+    this.openModal = function() {
+        this.modal = new bootstrap.Modal(document.getElementById("filesManagerModal"), {
+            keyboard: false,
+            backdrop: 'static'
+        });
+        this.modal.show();
     }
 
     this.maxFileSize = function() {
@@ -84,11 +96,6 @@ var SIDEBAR = function() {
             this.addElementEnded(elementsData[elementsData.length]);
         }
         this.closeModal();
-        window.setTimeout(function() {
-            var sideBar = document.querySelector("#wrapper");
-            if (!sideBar.classList.contains("toggled"))
-                sideBar.classList.toggle("toggled");
-        }, 2000);
     };
 
     this.handleFileSelect = function(evt) {
@@ -195,7 +202,63 @@ var SIDEBAR = function() {
                 }
                 // Begin reading the file's contents.
                 reader.readAsText(f);
+            // Alpha import of rtf files
+            } else if (f.name.endsWith(".rtf")) {
+                supportedFileFound = true;
+                var reader = new FileReader();
+                reader.onload = ( function(theFile, sidebar) {
+                    return function(evt) {
+                        // Like with addScript, process files here...
+                        var elementsData = sidebar.getElements(),
+                            inputName = theFile.name,
+                            inputID = sidebar.createIDTag(inputName),
+                            maxLength = sidebar.maxFileSize();
+                        // Slicing name at lastIndexOf '.htm' works most common HTML file extensions. 
+                        inputName = inputName.slice( 0, inputName.lastIndexOf(".rtf") );
+                        // Truncate file name.
+                        if ( inputName.length>maxLength ) {
+                            if (debug) console.log("Name will be truncated. Maximum allowed length: "+maxLength+" characters.");
+                            alert("The following file's name is too long and will be truncated: "+inputName);
+                            inputName = inputName.slice(0, maxLength);
+                        }
+
+                        // Text file parsing
+                        var data = evt.target.result,
+                            parsedData = "<p>";
+                        
+                        // Converting rtf data to plain text
+                        data = data.replace(/\\pict([^]+?)\\par/g, "");
+                        data = data.replace(/\\par[d]?/g, "");
+                        data = data.replace(/\{\*?\\[^{}]+}|[{}]|\\\n?[A-Za-z]+\n?(?:-?\d+)?[ ]?/g, "")
+                        data = data.replace(/\\'[0-9a-zA-Z]{2}/g, "").trim();
+                        
+                        for (var i=0; i<data.length; i++)
+                            if (data[i] !== "\n")
+                                parsedData += data[i];
+                            else
+                                parsedData += '</p>\n<p>';
+                        parsedData += "</p>";
+                        // Save data
+                        elementsData.push({
+                            "id": inputID,
+                            "name": inputName,
+                            "data": parsedData,
+                            "editable": true
+                        });
+                        // Save
+                        // sidebar.currentElement = elementsData.length-1;
+                        sidebar.getSaveMode().setItem(sidebar.getDataKey(), JSON.stringify(elementsData));
+                        sidebar.refreshElements();
+                        // Load last imported file.
+                        sidebar.currentElement = elementsData.length-1;
+                        if (typeof sidebar.addElementEnded === "function") {
+                            sidebar.addElementEnded(elementsData[elementsData.length]);
+                        }
+                    };
+                }) (f, this);
+                reader.readAsText(f);
             }
+
             // Add unsuported file to unsuported file list.
             else
                 unsuportedFiles.push(escape(f.name));
@@ -249,14 +312,14 @@ var SIDEBAR = function() {
 
     this.loadDialog = function(){
         //Close Dialog
-        document.getElementById("cancelSidebarButton2").onclick = function(e){
-            e.preventDefault();
-            window.location = '#close';
-        };
-        document.getElementById("cancelSidebarButton").onclick = function(e){
-            e.preventDefault();
-            window.location = '#close';
-        };
+        // document.getElementById("cancelSidebarButton2").onclick = function(e){
+        //     e.preventDefault();
+        //     window.location = '#close';
+        // };
+        // document.getElementById("cancelSidebarButton").onclick = function(e){
+        //     e.preventDefault();
+        //     window.location = '#close';
+        // };
         //Script Add Input Event
         document.getElementById("inputName").oninput = function(e){
             document.getElementById("inputID").value = this.createIDTag(document.getElementById("inputName").value);
@@ -437,59 +500,42 @@ var SIDEBAR = function() {
     };
 
     this.exitEditMode = function(){
-        var menuNode = document.getElementById(this.menu).children;
+        // var menuNode = document.getElementById(this.menu).children;
 
-        for (var j = 0; j < menuNode.length; j++) {
-            menuNode[j].classList.remove("disabled");
-            menuNode[j].children[0].classList.remove("editableMode");
+        // for (var j = 0; j < menuNode.length; j++) {
+        //     menuNode[j].classList.remove("disabled");
+        //     menuNode[j].children[0].classList.remove("editableMode");
 
-            if(menuNode[j].children[0].querySelector("#editMode"))
-                menuNode[j].children[0].querySelector("#editMode").style.display = "";
+        //     if(menuNode[j].children[0].querySelector("#editMode"))
+        //         menuNode[j].children[0].querySelector("#editMode").style.display = "";
             
-            if(menuNode[j].children[0].querySelector("#deleteMode"))
-                menuNode[j].children[0].querySelector("#deleteMode").style.display = "none";
+        //     if(menuNode[j].children[0].querySelector("#deleteMode"))
+        //         menuNode[j].children[0].querySelector("#deleteMode").style.display = "none";
             
-            if(menuNode[j].children[0].children[0])
-                menuNode[j].children[0].children[0].setAttribute("contentEditable", false);
-        }
+        //     if(menuNode[j].children[0].children[0])
+        //         menuNode[j].children[0].children[0].setAttribute("contentEditable", false);
+        // }
     };
 
     this.clearElements = function() {
-        var li = document.createElement("li");
-        li.classList.add("sidebar-brand");
-
-        var div = document.createElement("div");
-        div.classList.add("col-xs-6");
-        div.style.paddingLeft = '0px';
-        div.innerHTML = this.getName();
-        li.appendChild(div);
-
-        div = document.createElement("div");
-        div.classList.add("col-xs-6");
-
-        //Close Sidebar Button
-        var span = document.createElement("span");
-        span.classList.add("glyphicon");
-        span.classList.add("glyphicon-chevron-left");
-        span.setAttribute("tabindex","0");
-        span.onclick = function(e) {
-            e.stopImmediatePropagation();
-            this.exitEditMode();
-            document.querySelector("#wrapper").classList.toggle("toggled");
-        }.bind(this);
-
-        div.appendChild(span);
-        li.appendChild(div);
-        var menu = document.getElementById(this.menu);
-        menu.innerHTML = "";
-        menu.appendChild(li);
+        document.getElementById(this.menu).innerHTML = "";
     };
 
     this.deleteElement = function(id) {
+        this.closeModal();
 
-        window.location = "#sidebarDeleteElement";
-        document.getElementById("deleteSidebarButton").focus();
-        document.getElementById("deleteSidebarButton").onclick = function(e) {
+        fileManagerDeleteModal = new bootstrap.Modal(document.getElementById("fileManagerDeleteModal"), {
+            keyboard: false,
+            backdrop: 'static'
+        });
+        fileManagerDeleteModal.show();
+
+        document.getElementById("fileManagerDeleteModalCancel").onclick = function(e) {
+            fileManagerDeleteModal.hide();
+            this.openModal();
+        }.bind(this);
+
+        document.getElementById("fileManagerDeleteModalDelete").onclick = function(e) {
             var elementsData = this.getElements();
             
             elementsData.splice(this.getElementIndexByID(id), 1);
@@ -501,7 +547,9 @@ var SIDEBAR = function() {
             this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData)); 
             this.refreshElements();
             this.selectedElement(null);
-            window.location = "#close";
+            
+            fileManagerDeleteModal.hide();
+            this.openModal();
         }.bind(this);
     };
     
@@ -525,103 +573,135 @@ var SIDEBAR = function() {
         var menuNode = document.getElementById(this.menu);
         this.setInstructions();
         for (var i = 0; i < elementsData.length; i++) {
-            var li = document.createElement("li");
-            var div = document.createElement("div");
-            li.id = elementsData[i].id;
-        
-            div.classList.add("list");
+            var tr = document.createElement("tr");
+            tr.id = elementsData[i].id;
 
-            var p = document.createElement("p");
-            p.id = "textBlock";
-            p.style.display = "inline";
-            p.setAttribute("contentEditable", false);
-            p.setAttribute("tabindex","0");
-
-            p.appendChild(document.createTextNode(elementsData[i].name));
-            div.appendChild(p);
-
-            li.onclick = function(e) {
+            // Title
+            var th = document.createElement("th");
+            th.onclick = function(e) {
                 e.stopImmediatePropagation();
-                if (e.target.contentEditable == "false") {
-                    this.currentElement = this.getElementIndexByID(e.target.parentNode.parentNode.id);
+                var pass = false, topElement, textBlock, id = undefined;
+                if (e.target.id === "textBlock") {
+                    topElement = e.target.parentNode.parentNode.parentNode.parentNode;
+                    textBlock = e.target;
+                } else if (e.target.nodeName === "I") {
+                    topElement = e.target.parentNode.parentNode.parentNode.parentNode;
+                    textBlock = topElement.querySelector("#textBlock");
+                } else if (e.target.nodeName === "DIV") {
+                    topElement = e.target.parentNode.parentNode;
+                    textBlock = topElement.querySelector("#textBlock");
+                }
+
+                if (topElement) {
+                    id = topElement.id;
+                    pass = textBlock.disabled;
+                }
+                
+                if (pass) {
+                    this.currentElement = this.getElementIndexByID(id);
                     this.setInstructions();
                     elementsData = this.getElements();
                     if (typeof this.selectedElement === "function") {
                         this.selectedElement(elementsData[this.currentElement]);
                     }
-
                 }
             }.bind(this);
 
-            if(elementsData[i].editable){
-                var span2 = document.createElement("span");
-                span2.id = "deleteMode";
-                span2.classList.add("glyphicon");
-                span2.classList.add("glyphicon-minus");
-                span2.setAttribute("tabindex","0");
-                span2.onclick = function(e) {
-                    e.stopImmediatePropagation();
-                    this.deleteElement(e.target.parentNode.parentNode.id);
-                    window.setTimeout(function() {
-                        this.refreshElements();
-                    }.bind(this), 1);
-                }.bind(this);
-                span2.style.display = "none";
-                div.appendChild(span2);
+            var row = document.createElement("div");
+            row.classList = "row align-items-center";
+
+            var div = document.createElement("div");
+            div.classList = "col-auto";
+            var icon = document.createElement("i");
+            icon.classList = "bi bi-file-earmark-easel-fill";
+            div.appendChild(icon);
+            row.appendChild(div)
+
+            div = document.createElement("div");
+            div.classList = "col-auto";
+            var input = document.createElement("input");
+            input.id = "textBlock";
+            input.classList = "form-control"
+
+            input.value = elementsData[i].name;
+            input.disabled = true;
+
+            div.appendChild(input);
+            row.appendChild(div);
+            th.appendChild(row);
+            tr.appendChild(th);
+
+            if (i !== 0) {
+                // Add Tools
+                th = document.createElement("th");
+
+                row = document.createElement("div");
+                row.classList = "row align-items-center";
+
+                div = document.createElement("div");
+                div.classList = "col-auto";
+                div.style = "padding: .375rem .75rem;";
 
                 var span = document.createElement("span");
                 span.id = "editMode";
-                span.setAttribute("tabindex","0");
-                span.classList.add("glyphicon");
-                span.classList.add("glyphicon-pencil");
+                span.setAttribute("tabindex", "0");
+
+                icon = document.createElement("i");
+                icon.classList = "bi bi-pencil";
+                span.appendChild(icon);
+
                 span.onclick = function(e) {
                     e.stopImmediatePropagation();
 
                     this.exitEditMode();
 
-                    e.target.style.display = "none";
-                    e.target.parentNode.querySelector("#deleteMode").style.display = "";
-                    e.target.parentNode.classList.add("editableMode");
-                    e.target.parentNode.classList.remove("disabled");
-                    var textBlock = e.target.parentNode.querySelector("#textBlock");
-                    textBlock.setAttribute("contentEditable", true);
-                    textBlock.focus();
-                    if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
-                        var range = document.createRange();
-                        range.selectNodeContents(textBlock);
-                        range.collapse(false);
-                        var sel = window.getSelection();
-                        sel.removeAllRanges();
-                        sel.addRange(range);
-                    } else if (typeof document.body.createTextRange != "undefined") {
-                        var textRange = document.body.createTextRange();
-                        textRange.moveToElementText(textBlock);
-                        textRange.collapse(false);
-                        textRange.select();
-                    }
+                    e.target.parentNode.style.display = "none";
+                    e.target.parentNode.parentNode.querySelector("#deleteMode").style.display = "";
+                    // e.target.parentNode.classList.add("editableMode");
+                    // e.target.parentNode.classList.remove("disabled");
+                    var textBlock = e.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector("#textBlock");
+                    textBlock.disabled = false;
+                    // textBlock.setAttribute("contentEditable", true);
+                    // textBlock.focus();
+                    // if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
+                    //     var range = document.createRange();
+                    //     range.selectNodeContents(textBlock);
+                    //     range.collapse(false);
+                    //     var sel = window.getSelection();
+                    //     sel.removeAllRanges();
+                    //     sel.addRange(range);
+                    // } else if (typeof document.body.createTextRange != "undefined") {
+                    //     var textRange = document.body.createTextRange();
+                    //     textRange.moveToElementText(textBlock);
+                    //     textRange.collapse(false);
+                    //     textRange.select();
+                    // }
 
                     textBlock.onkeydown = function(e) {
                         if (e.keyCode == 13) {
                             e.stopImmediatePropagation();
-
-                            if (e.target.innerHTML.length>this.maxFileSize())
+                            
+                            if (e.target.value.length>this.maxFileSize())
                                 return false;
 
-                            var text = e.target.innerHTML.replace("&nbsp;", '');
+                            var text = e.target.value.replace("&nbsp;", '');
                             text = text.replace("<br>", '');
                             if (text.length > 0) {
-                                e.target.innerHTML = text;
+                                e.target.value = text;
 
-                                elementsData[this.getElementIndexByID(e.target.parentNode.parentNode.id)]['name'] = text;
+                                elementsData[this.getElementIndexByID(e.target.parentNode.parentNode.parentNode.parentNode.id)]['name'] = text;
                                 this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
-                                this.exitEditMode();
+                                e.target.parentNode.parentNode.parentNode.parentNode.querySelector("#editMode").style.display = "";
+                                e.target.parentNode.parentNode.parentNode.parentNode.querySelector("#deleteMode").style.display = "none";
+                                e.target.disabled = true;
+
                                 return true;
                             } else {
                                 return false;
                             }
                         } else if (e.keyCode == 8) {
-                            if (e.target.innerHTML.length - 1 === 0) {
-                                e.target.innerHTML = "&nbsp;";
+                            if (e.target.value.length - 1 === 0) {
+                                e.target.value = "&nbsp;";
                             }
                         }
 
@@ -630,101 +710,238 @@ var SIDEBAR = function() {
 
                     return false;
                 }.bind(this);
+
                 div.appendChild(span);
 
-                var downloadButton = document.createElement("span");
-                downloadButton.id = "download";
-                // span3.setAttribute("tabindex","3");
-                downloadButton.classList.add("glyphicon");
-                downloadButton.classList.add("glyphicon-download");
-                downloadButton.onclick = function(e) {
+                span = document.createElement("span");
+                span.id = "deleteMode";
+                span.setAttribute("tabindex", "0");
+
+                icon = document.createElement("i");
+                icon.classList = "bi bi-file-earmark-minus";
+                span.appendChild(icon);
+
+                span.onclick = function(e) {
                     e.stopImmediatePropagation();
-                    this.currentElement = this.getElementIndexByID(e.target.parentNode.parentNode.id);
-                    elementsData = this.getElements();
-                    if (typeof this.selectedElement === "function") {
-                        // Download document
-                        this.download(elementsData[this.currentElement], this.currentElement);
-                    }
-                // Insert download code here...
+                    this.deleteElement(e.target.parentNode.parentNode.parentNode.parentNode.parentNode.id);
+                    window.setTimeout(function() {
+                        this.refreshElements();
+                    }.bind(this), 1);
                 }.bind(this);
-                div.appendChild(downloadButton);
+                span.style.display = "none";
+
+                div.appendChild(span);
+                row.appendChild(div);
+                th.appendChild(row);
+
+                tr.appendChild(th);
+
+                // var li = document.createElement("li");
+                // var div = document.createElement("div");
+                // li.id = elementsData[i].id;
+
+                // div.classList.add("list");
+
+                // var p = document.createElement("p");
+                // p.id = "textBlock";
+                // p.style.display = "inline";
+                // p.setAttribute("contentEditable", false);
+                // p.setAttribute("tabindex","0");
+
+                // p.appendChild(document.createTextNode(elementsData[i].name));
+                // div.appendChild(p);
+
+                // li.onclick = function(e) {
+                //     e.stopImmediatePropagation();
+                //     if (e.target.contentEditable == "false") {
+                //         this.currentElement = this.getElementIndexByID(e.target.parentNode.parentNode.id);
+                //         this.setInstructions();
+                //         elementsData = this.getElements();
+                //         if (typeof this.selectedElement === "function") {
+                //             this.selectedElement(elementsData[this.currentElement]);
+                //         }
+
+                //     }
+                // }.bind(this);
+
+                // if(elementsData[i].editable){
+                //     var span2 = document.createElement("span");
+                //     span2.id = "deleteMode";
+                //     span2.classList.add("glyphicon");
+                //     span2.classList.add("glyphicon-minus");
+                //     span2.setAttribute("tabindex","0");
+                //     span2.onclick = function(e) {
+                //         e.stopImmediatePropagation();
+                //         this.deleteElement(e.target.parentNode.parentNode.id);
+                //         window.setTimeout(function() {
+                //             this.refreshElements();
+                //         }.bind(this), 1);
+                //     }.bind(this);
+                //     span2.style.display = "none";
+                //     div.appendChild(span2);
+
+                    // var span = document.createElement("span");
+                    // span.id = "editMode";
+                    // span.setAttribute("tabindex","0");
+                    // span.classList.add("glyphicon");
+                    // span.classList.add("glyphicon-pencil");
+                    // span.onclick = function(e) {
+                    //     e.stopImmediatePropagation();
+
+                    //     this.exitEditMode();
+
+                    //     e.target.style.display = "none";
+                    //     e.target.parentNode.querySelector("#deleteMode").style.display = "";
+                    //     e.target.parentNode.classList.add("editableMode");
+                    //     e.target.parentNode.classList.remove("disabled");
+                    //     var textBlock = e.target.parentNode.querySelector("#textBlock");
+                    //     textBlock.setAttribute("contentEditable", true);
+                    //     textBlock.focus();
+                    //     if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
+                    //         var range = document.createRange();
+                    //         range.selectNodeContents(textBlock);
+                    //         range.collapse(false);
+                    //         var sel = window.getSelection();
+                    //         sel.removeAllRanges();
+                    //         sel.addRange(range);
+                    //     } else if (typeof document.body.createTextRange != "undefined") {
+                    //         var textRange = document.body.createTextRange();
+                    //         textRange.moveToElementText(textBlock);
+                    //         textRange.collapse(false);
+                    //         textRange.select();
+                    //     }
+
+                    //     textBlock.onkeydown = function(e) {
+                    //         if (e.keyCode == 13) {
+                    //             e.stopImmediatePropagation();
+
+                    //             if (e.target.innerHTML.length>this.maxFileSize())
+                    //                 return false;
+
+                    //             var text = e.target.innerHTML.replace("&nbsp;", '');
+                    //             text = text.replace("<br>", '');
+                    //             if (text.length > 0) {
+                    //                 e.target.innerHTML = text;
+
+                    //                 elementsData[this.getElementIndexByID(e.target.parentNode.parentNode.id)]['name'] = text;
+                    //                 this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
+                    //                 this.exitEditMode();
+                    //                 return true;
+                    //             } else {
+                    //                 return false;
+                    //             }
+                    //         } else if (e.keyCode == 8) {
+                    //             if (e.target.innerHTML.length - 1 === 0) {
+                    //                 e.target.innerHTML = "&nbsp;";
+                    //             }
+                    //         }
+
+                    //         return true;
+                    //     }.bind(this);
+
+                    //     return false;
+                    // }.bind(this);
+                    // div.appendChild(span);
+
+                //     var downloadButton = document.createElement("span");
+                //     downloadButton.id = "download";
+                //     // span3.setAttribute("tabindex","3");
+                //     downloadButton.classList.add("glyphicon");
+                //     downloadButton.classList.add("glyphicon-download");
+                //     downloadButton.onclick = function(e) {
+                //         e.stopImmediatePropagation();
+                //         this.currentElement = this.getElementIndexByID(e.target.parentNode.parentNode.id);
+                //         elementsData = this.getElements();
+                //         if (typeof this.selectedElement === "function") {
+                //             // Download document
+                //             this.download(elementsData[this.currentElement], this.currentElement);
+                //         }
+                //     // Insert download code here...
+                //     }.bind(this);
+                //     div.appendChild(downloadButton);
+                // }
+                // li.appendChild(div);
+                // menuNode.appendChild(li);
+            } else {
+                th = document.createElement("th");
+                tr.appendChild(th);
             }
-            li.appendChild(div);
-            menuNode.appendChild(li);
+            
+            menuNode.appendChild(tr);
         }
 
         // Import button
-        var importLi = document.createElement("li");
-        importLi.style.position = "relative";
-        var input = document.createElement("input");
-        input.id = "files";
-        input.setAttribute("type","file");
-        input.setAttribute("name","files[]");
-        input.setAttribute("multiple", "");
-        input.setAttribute("readonly", "");
-        input.setAttribute("tabindex","0");
-        input.classList.add("addOption");
-        input.addEventListener('change', this.handleFileSelect.bind(this), false);
-        input.style.position = "absolute";
-        input.style.opacity = "0";
-        // Emulate CSS mouse hover
-        input.style.cursor = "pointer";
-        input.addEventListener("mouseenter", function () {
-            importLi.style.background = "rgba(255,255,255,0.2)";
-            importDiv.style.color = "#FFFFFF";
-        });
-        input.addEventListener("mouseleave", function () {
-            importLi.style.background = "initial";
-            importDiv.style.color = "#999";
-        });
-        input.style.zIndex = "2";
-        // Add real button
-        importLi.appendChild(input);
+        // var importLi = document.createElement("li");
+        // importLi.style.position = "relative";
+        // var input = document.createElement("input");
+        // input.id = "files";
+        // input.setAttribute("type","file");
+        // input.setAttribute("name","files[]");
+        // input.setAttribute("multiple", "");
+        // input.setAttribute("readonly", "");
+        // input.setAttribute("tabindex","0");
+        // input.classList.add("addOption");
+        // input.addEventListener('change', this.handleFileSelect.bind(this), false);
+        // input.style.position = "absolute";
+        // input.style.opacity = "0";
+        // // Emulate CSS mouse hover
+        // input.style.cursor = "pointer";
+        // input.addEventListener("mouseenter", function () {
+        //     importLi.style.background = "rgba(255,255,255,0.2)";
+        //     importDiv.style.color = "#FFFFFF";
+        // });
+        // input.addEventListener("mouseleave", function () {
+        //     importLi.style.background = "initial";
+        //     importDiv.style.color = "#999";
+        // });
+        // input.style.zIndex = "2";
+        // // Add real button
+        // importLi.appendChild(input);
         // Create fake styled import button.
-        var importDiv = document.createElement("div");
-        importDiv.classList.add("addOption");
-        var span2 = document.createElement("span");
-        span2.id = "addMode";
-        span2.classList.add("glyphicon");
-        span2.classList.add("glyphicon-folder-open");
-        importDiv.appendChild(span2);
-        importDiv.style.position = "relative";
-        var p = document.createElement("p");
-        p.id = "textBlock";
-        p.style.display = "inline";
-        p.setAttribute("contentEditable", false);
-        p.appendChild(document.createTextNode(this.getImportElementName()));
-        importDiv.appendChild(p);
-        // Add fake button
-        importLi.appendChild(importDiv);
-        menuNode.appendChild(importLi);
+        // var importDiv = document.createElement("div");
+        // importDiv.classList.add("addOption");
+        // var span2 = document.createElement("span");
+        // span2.id = "addMode";
+        // span2.classList.add("glyphicon");
+        // span2.classList.add("glyphicon-folder-open");
+        // importDiv.appendChild(span2);
+        // importDiv.style.position = "relative";
+        // var p = document.createElement("p");
+        // p.id = "textBlock";
+        // p.style.display = "inline";
+        // p.setAttribute("contentEditable", false);
+        // p.appendChild(document.createTextNode(this.getImportElementName()));
+        // importDiv.appendChild(p);
+        // // Add fake button
+        // importLi.appendChild(importDiv);
+        // menuNode.appendChild(importLi);
 
-        var li = document.createElement("li");
-        var div = document.createElement("div");
-        div.classList.add("addOption");
-        div.setAttribute("tabindex","0");
-        var span2 = document.createElement("span");
-        span2.id = "addMode";
-        span2.classList.add("glyphicon");
-        span2.classList.add("glyphicon-plus");
-        div.appendChild(span2);
+        // var li = document.createElement("li");
+        // var div = document.createElement("div");
+        // div.classList.add("addOption");
+        // div.setAttribute("tabindex","0");
+        // var span2 = document.createElement("span");
+        // span2.id = "addMode";
+        // span2.classList.add("glyphicon");
+        // span2.classList.add("glyphicon-plus");
+        // div.appendChild(span2);
 
-        var p = document.createElement("p");
-        p.id = "textBlock";
-        p.style.display = "inline";
-        p.setAttribute("contentEditable", false);
-        p.appendChild(document.createTextNode(this.getAddElementName()));
-        div.appendChild(p);
+        // var p = document.createElement("p");
+        // p.id = "textBlock";
+        // p.style.display = "inline";
+        // p.setAttribute("contentEditable", false);
+        // p.appendChild(document.createTextNode(this.getAddElementName()));
+        // div.appendChild(p);
 
-        li.onclick = function(e) {
-            e.stopImmediatePropagation();
-            window.location = '#sidebarAddElement';
-            document.getElementById("inputName").focus();
-        }.bind(this);
+        // li.onclick = function(e) {
+        //     e.stopImmediatePropagation();
+        //     window.location = '#sidebarAddElement';
+        //     document.getElementById("inputName").focus();
+        // }.bind(this);
         
         document.getElementById("addScriptSidebarButton").onclick = this.addScript.bind(this);
         
-        li.appendChild(div);
-        menuNode.appendChild(li);
+        // li.appendChild(div);
+        // menuNode.appendChild(li);
     };
 };

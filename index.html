@@ -29,6 +29,7 @@
 	<meta property="fb:app_id" content="196769633992905">
 	<title>Imaginary Teleprompter by Imaginary Sense</title>
 	<link rel="icon" href="favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="assets/bootstrap-icons/bootstrap-icons.css">
 	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
 	<link rel="stylesheet" href="assets/custom/css/docs.min.css">
 	<link rel="stylesheet" href="assets/bootstrap-slider/css/bootstrap-slider.min.css">
@@ -39,434 +40,444 @@
 	<script src="assets/ckeditor/ckeditor.js"></script>
 </head>
 <body>
-	<div id="wrapper" class="toggled hidden-xs">
-		<!-- Sidebar -->
+	<!-- Sidebar -->
+	<!-- <div id="wrapper" class="toggled hidden-xs">
 		<div id="sidebar-wrapper">
 			<ul class="sidebar-nav" id="scripts">
 			</ul>
-				<!--<ul class="sidebar-nav" id="images">
-					<li class="sidebar-brand">Images</li>
-				</ul>-->
 		</div>
-	</div>
-	<form>
-		<!-- Header -->
-		<nav class="navbar navbar-expand-lg navbar-light bg-light">
-			<div class="container">
-				<a class="navbar-brand" href="https://imaginary.tech/teleprompter/" target="_blank"><img src="assets/custom/img/logo.png" alt="Teleprompter"></a>
-				<ul class="navbar-nav">
-					<li class="nav-item">
-						<a class="nav-link" id="menu-toggle" href="#menu-toggle">
-							<img style="width:26px;" src="assets/custom/fonts/noto-emoji-master/emoji_u1f4be.svg">
-						</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" id="advConfig" href="#content" data-bs-toggle="collapse" aria-expanded="false" aria-controls="content">
-							<img style="width:26px;" src="assets/custom/fonts/noto-emoji-master/emoji_u2699.svg">
-						</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link hidden" id="updateIt" href=" ">Update</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" id="promptIt" aria-current="page" href=" ">Prompt It!</a>
-					</li>
-				</ul>
-			</div>
-		</nav>
-		<!-- Controls -->
-		<div class="collapse bs-docs-header" id="content" tabindex="-1" >
-			<div class="container">
-				<div class='row'>
-					<div class='col-md-3 col-sm-6'>
-						<!--<label for="basic-url">Flip mode</label>-->
-						<label for="primary">In-frame prompter</label>
-						<select class="form-control" id="primary" name="primary">
-							<option value="0" title="Don't prompt on this window">Disabled (Don't prompt on this window)</option>
-							<option value="1" title="Normal screen" selected="selected">No Flip (Normal screen)</option>
-							<option value="2" title="Normal mirror">Horizontal Flip (Mirror)</option>
-							<option value="3" title="Miror plus 180&deg; rotation">Vertical Flip (Miror plus 180&deg; rotation)</option>
-							<option value="4" title="180&deg; screen rotation">Double Flip (180&deg; screen rotation)</option>
-						</select>
+	</div> -->
+	<div class="container-fluid">
+		<div class="row">
+			<!-- Header -->
+			<nav class="navbar navbar-expand-lg navbar-light bg-light">
+				<div class="container">
+					<a class="navbar-brand" href="https://imaginary.tech/teleprompter/" target="_blank"><img src="assets/custom/img/logo.png" alt="Teleprompter"></a>
+					<ul class="navbar-nav">
+						<li class="nav-item">
+							<a class="nav-link" id="fileManagerToggle" href="#fileManagerToggle">
+								<img style="width:26px;" src="assets/custom/fonts/noto-emoji-master/emoji_u1f4d3.svg">
+							</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" id="advConfig" href="#content" data-bs-toggle="collapse" aria-expanded="false" aria-controls="content">
+								<img style="width:26px;" src="assets/custom/fonts/noto-emoji-master/emoji_u2699.svg">
+							</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link hidden" id="updateIt" href=" ">Update</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" id="promptIt" aria-current="page" href=" ">Prompt It!</a>
+						</li>
+					</ul>
+				</div>
+			</nav>
+			<!-- Controls -->
+			<div class="collapse bs-docs-header" id="content" tabindex="-1" >
+				<div class="container">
+					<div class='row pt-3'>
+						<div class='col-md-3 col-sm-6'>
+							<!--<label for="basic-url">Flip mode</label>-->
+							<label for="primary">In-frame prompter</label>
+							<select class="form-control" id="primary" name="primary">
+								<option value="0" title="Don't prompt on this window">Disabled (Don't prompt on this window)</option>
+								<option value="1" title="Normal screen" selected="selected">No Flip (Normal screen)</option>
+								<option value="2" title="Normal mirror">Horizontal Flip (Mirror)</option>
+								<option value="3" title="Miror plus 180&deg; rotation">Vertical Flip (Miror plus 180&deg; rotation)</option>
+								<option value="4" title="180&deg; screen rotation">Double Flip (180&deg; screen rotation)</option>
+							</select>
+						</div>
+						<div class='col-md-3 col-sm-6'>
+							<label for="secondary">External prompter</label>
+							<select class="form-control" id="secondary" name="secondary">
+								<option value="0" title="Don't prompt to a second window" selected="selected">Disabled (Don't prompt to a second window)</option>
+								<option value="1" title="Normal screen">No Flip (Normal screen)</option>
+								<option value="2" title="Normal mirror">Horizontal Flip (Mirror)</option>
+								<option value="3" title="Miror plus 180&deg; rotation">Vertical Flip (Miror plus 180&deg; rotation)</option>
+								<option value="4" title="180&deg; screen rotation">Double Flip  (180&deg; screen rotation)</option>
+							</select>
+						</div>
+						<div class='col-md-3 col-sm-6'>
+							<label for="prompterStyle">Prompter style</label>
+							<select class="form-control" id="prompterStyle" name="prompterStyle">
+								<option value="0">Azure Light</option>
+								<option value="1" selected="selected">Blackboard</option>
+								<option value="2">Classic Yellow</option>
+								<option value="3">Dark Matter</option>
+								<!-- <option value="4">Intergalactic</option> -->
+								<option value="4">Whiteboard</option>
+							</select>
+						</div>
+						<div class='col-md-3 col-sm-6'>
+							<label for="focus">Focus area</label>
+							<select class="form-control" id="focus" name="focus">
+								<option value="3" title="No focus area for increased efficiency.">None</option>
+								<option value="1">Top Focus (for Webcams)</option>
+								<option value="0" selected="selected">Middle Focus (for Professional prompters)</option>
+								<option value="2">Bottom Focus (for Screens over cameras)</option>
+								<option value="4" title="Dissable touch to enable interaction with HTML contents.">Interactive mode (interact with HTML contents)</option>
+							</select>
+						</div>
 					</div>
-					<div class='col-md-3 col-sm-6'>
-						<label for="secondary">External prompter</label>
-						<select class="form-control" id="secondary" name="secondary">
-							<option value="0" title="Don't prompt to a second window" selected="selected">Disabled (Don't prompt to a second window)</option>
-							<option value="1" title="Normal screen">No Flip (Normal screen)</option>
-							<option value="2" title="Normal mirror">Horizontal Flip (Mirror)</option>
-							<option value="3" title="Miror plus 180&deg; rotation">Vertical Flip (Miror plus 180&deg; rotation)</option>
-							<option value="4" title="180&deg; screen rotation">Double Flip  (180&deg; screen rotation)</option>
-						</select>
-					</div>
-					<div class='col-md-3 col-sm-6'>
-						<label for="prompterStyle">Prompter style</label>
-						<select class="form-control" id="prompterStyle" name="prompterStyle">
-							<option value="0">Azure Light</option>
-							<option value="1" selected="selected">Blackboard</option>
-							<option value="2">Classic Yellow</option>
-							<option value="3">Dark Matter</option>
-							<!-- <option value="4">Intergalactic</option> -->
-							<option value="4">Whiteboard</option>
-						</select>
-					</div>
-					<div class='col-md-3 col-sm-6'>
-						<label for="focus">Focus area</label>
-						<select class="form-control" id="focus" name="focus">
-							<option value="3" title="No focus area for increased efficiency.">None</option>
-							<option value="1">Top Focus (for Webcams)</option>
-							<option value="0" selected="selected">Middle Focus (for Professional prompters)</option>
-							<option value="2">Bottom Focus (for Screens over cameras)</option>
-							<option value="4" title="Dissable touch to enable interaction with HTML contents.">Interactive mode (interact with HTML contents)</option>
-						</select>
+				</div>
+				<div class="container">
+					<div class='row pb-3'>
+						<div class='col-md-10 col-sm-10'>
+							<div class='row'>
+							<div class='col-sm-3'>
+								<small>
+									<label for="speed">Speed:</label>
+									<label for="speed" id="speedValue">4.0</label>
+								</small>
+								<input type="range" id="speed" name="speed" data-slider-value="4.0" data-slider-step="0.5" data-slider-min="1" data-slider-max="20" data-slider-ticks="[1,4,20]" data-slider-ticks-snap-bounds="0">
+							</div>
+							<div class='col-sm-3'>
+								<small>
+									<label for="acceleration">Acceleration:</label>
+									<label for="acceleration" id="accelerationValue">1.45</label>
+								</small>
+								<input type="range" id="acceleration" name="acceleration" data-slider-value="1.45" data-slider-min="0.5" data-slider-max="1.8" data-slider-step="0.05" data-slider-ticks="[0.5,1.45,1.8]" data-slider-ticks-snap-bounds="0">
+							</div>
+							<div class='col-sm-3'>
+								<small>
+									<label for="fontSize">Font size:</label>
+									<label for="fontSize" id="fontSizeValue">120</label><label for="fontSize">%</label>
+								</small>
+								<input type="range" id="fontSize" name="fontSize" data-slider-value="120" data-slider-min="10" data-slider-max="250" data-slider-step="1" data-slider-ticks="[10,25,120,250]" data-slider-ticks-snap-bounds="0">
+							</div>
+							<div class='col-sm-3'>
+								<small>
+									<label for="promptWidth">Width:</label>
+									<label for="promptWidth" id="promptWidthValue">84</label><label for="promptWidth">%</label>
+								</small>
+								<input type="range" id="promptWidth" name="promptWidth" data-slider-value="84" data-slider-min="5" data-slider-max="100" data-slider-step="1" data-slider-ticks="[5,16,84,100]" data-slider-ticks-snap-bounds="0">
+							</div>
+							</div>
+						</div>
+						<div class='col-md-2 col-sm-2'>
+							<small>
+								<label for="timer">Timer</label>
+							</small><br>
+							<div class="btn-group" role="group"> 
+								<input type="radio" class="btn-check" name="btnradio" id="timerOn" autocomplete="on">
+								<label class="btn btn-outline-light" for="timerOn">On</label>
+							
+								<input type="radio" class="btn-check" name="btnradio" id="timerOff" autocomplete="off">
+								<label class="btn btn-outline-light" for="timerOff">Off</label>
+							</div>
+						</div>
+						<!--
+						<div class='col-md-1 col-sm-1'>
+							<small>
+								<label for="timer">Timer</label>
+							</small><br>
+							<div id="timer" class="btn-group  btn-group-sm btn-toggle"> 
+								<button class="btn btn-default">I</button>
+								<button class="btn btn-primary active">O</button>
+							</div>
+						</div>
+						<div class='col-md-1 col-sm-1'>
+							<small>
+								<label for="timer">Voice</label>
+							</small><br>
+							<div id="timer" class="btn-group btn-group-sm btn-toggle"> 
+								<button class="btn btn-default">Inactive</button>
+							</div>
+						</div>
+						-->
 					</div>
 				</div>
 			</div>
-			<div class="container">
-				<div class='row'>
-					<div class='col-md-10 col-sm-10'>
-						<div class='row'>
-						<div class='col-sm-3'>
-							<small>
-								<label for="speed">Speed:</label>
-								<label for="speed" id="speedValue">4.0</label>
-							</small>
-							<input type="range" id="speed" name="speed" data-slider-value="4.0" data-slider-step="0.5" data-slider-min="1" data-slider-max="20" data-slider-ticks="[1,4,20]" data-slider-ticks-snap-bounds="0">
-						</div>
-						<div class='col-sm-3'>
-							<small>
-								<label for="acceleration">Acceleration:</label>
-								<label for="acceleration" id="accelerationValue">1.45</label>
-							</small>
-							<input type="range" id="acceleration" name="acceleration" data-slider-value="1.45" data-slider-min="0.5" data-slider-max="1.8" data-slider-step="0.05" data-slider-ticks="[0.5,1.45,1.8]" data-slider-ticks-snap-bounds="0">
-						</div>
-						<div class='col-sm-3'>
-							<small>
-								<label for="fontSize">Font size:</label>
-								<label for="fontSize" id="fontSizeValue">120</label><label for="fontSize">%</label>
-							</small>
-							<input type="range" id="fontSize" name="fontSize" data-slider-value="120" data-slider-min="10" data-slider-max="250" data-slider-step="1" data-slider-ticks="[10,25,120,250]" data-slider-ticks-snap-bounds="0">
-						</div>
-						<div class='col-sm-3'>
-							<small>
-								<label for="promptWidth">Width:</label>
-								<label for="promptWidth" id="promptWidthValue">84</label><label for="promptWidth">%</label>
-							</small>
-							<input type="range" id="promptWidth" name="promptWidth" data-slider-value="84" data-slider-min="5" data-slider-max="100" data-slider-step="1" data-slider-ticks="[5,16,84,100]" data-slider-ticks-snap-bounds="0">
-						</div>
-						</div>
-					</div>
-					<div class='col-md-2 col-sm-2'>
-						<small>
-							<label for="timer">Timer</label>
-						</small><br>
-						<div class="btn-group" role="group"> 
-							<input type="radio" class="btn-check" name="btnradio" id="timerOn" autocomplete="on">
-							<label class="btn btn-outline-light" for="timerOn">On</label>
-						  
-							<input type="radio" class="btn-check" name="btnradio" id="timerOff" autocomplete="off">
-							<label class="btn btn-outline-light" for="timerOff">Off</label>
-						</div>
-					</div>
-					<!--
- 					<div class='col-md-1 col-sm-1'>
-						<small>
-							<label for="timer">Timer</label>
-						</small><br>
-						<div id="timer" class="btn-group  btn-group-sm btn-toggle"> 
-						    <button class="btn btn-default">I</button>
-						    <button class="btn btn-primary active">O</button>
-						</div>
-					</div>
-					<div class='col-md-1 col-sm-1'>
-						<small>
-							<label for="timer">Voice</label>
-						</small><br>
-						<div id="timer" class="btn-group btn-group-sm btn-toggle"> 
-						    <button class="btn btn-default">Inactive</button>
-						</div>
-					</div>
-					-->
-				</div>
-			</div>
 		</div>
+		<div class="row">
 		<!-- Editor Container -->
-		<div id="editorcontainer">
-			<div id="toolbar"></div>
-			<div id="promptcontainer">
-				<article id="prompt" contenteditable="true">
-					<h3>Welcome to Imaginary Teleprompter!</h3>
-					<p>Are you ready to tell a story?</p>
-					<br>
-					<p>"Teleprompter" is the most complete, free software, professional teleprompter for anyone to use. Click on "Prompt It!" whenever you're ready and control the speed with the arrow keys.</p>
-					<br>
-					<h3>Here are some of our features:</h3>
-					<ol>
-					<li>Control the speed and text-size with the 'Up' and 'Down' arrow keys, the 'W' and 'S' keys or the mouse wheel. You may press 'Spacebar' to pause at anytime.</li>
-					<li>Move half a screen backwards or forwards by pressing the 'PageUp' and 'PageDown' keys.</li>
-					<li>Dynamically change the font-size by pressing 'Left' and 'Right' or the 'A' and 'D' keys.</li>
-					<li>Flip modes allow <em>mirroring</em> the prompter in every possible way.</li>
-					<li>You can use one or two instances. Mirror one, monitor on the other one.</li>
-					<li><a id="5" name="5">Set almost any key as a <em>marker</em> and instantly jump to any part of the script. Try pressing '5' now!</a></li>
-					<li>Different focus areas allow you to easily use Teleprompter with a webcam, a tablet, or professional teleprompter equipment.</li>
-					<li>Time your segments with the built in <em>timer</em>. Press 'Backspace' to reset the timer.</li>
-					<li><a name data-cke-saved-name>You can also set nameless <em>markers</em> and move accross them using the Home and End buttons.</a></li>
-					<li>Tweak the <em>Speed</em>, <em>Acceleration Curve</em> and <em>Font Size</em> settings to fit your hosts' needs.</li>
-					<li>Press 'F11' to enter and leave fullscreen.
-					You may fullscreen the text editor for greater concentration.</li>
-					<li>The Rich Text Editor, derived from the highly customizable CKeditor, gives unlimited possibilities on what you can prompt.</li>
-					<ul>
-					<!--
-					 <li>Add emoticons to indicate feelings and expressions to your hosts.
-					</li>
-					-->
-					<li>
-					You may generate and display mathematical equations using the integrated CodeCogs equation editor.<br>
-					<table border="1" cellpadding="1" cellspacing="1">
-					<tbody>
-					<tr>
-					<td>&nbsp;</td>
-					<td><img alt="\bg_white \huge \sum_{heta+\Pi }^{80} sin(heta)" src="https://latex.codecogs.com/gif.latex?%5Cdpi%7B300%7D%20%5Cbg_white%20%5Chuge%20%5Csum_%7B%5CTheta&amp;plus;%5CPi%20%7D%5E%7B80%7D%20sin%28%5CTheta%29" /></td>
-					<td>&nbsp;</td>
-					</tr>
-					</tbody>
-					</table>
-					</li>
-					<li>Insert images from the web or copy and paste them into the prompter.
-					<img alt="Picture: Arecibo Sky" src="assets/custom/img/arecibo-sky.jpg">
-					</li>
-					 </ul>
-					<li>There are various <em>Prompter Styles</em> to choose from. You may also create your own.</li>
-					<!-- <li>Download our mobile app, <em>Teleprompter X</em>, to remote control Teleprompter instalations.</li> -->
-					<li>Run the "External prompter" on a second screen, add new contents into the editor, then "Update" your prompter in realtime without having to halt your script.</li>
-					<li>Teleprompter works across screens with different resolutions and aspect ratios.</li>
-					<li>Using calculus and relative measurement units, Teleprompter is built to age gracefully. Speed and contents remain consistent from your smallest screen up to 4k devices and beyond.</li>
-					<li>Animations are hardware accelerated for a smooth scroll. A quad-core computer with dedicated graphics and, at least, 2GB RAM is recommended for optimal results.</li>
-					<li>Teleprompter doesn't stretch a lower quality copy of your prompt for monitoring, instead it renders each instance individually at the highest quality possible. You should lower your resolution to increase performance on lower end machines.</li>
-					<li>Text can be pasted from other word processors such as Libre Office Writer&trade; and Microsoft Word&reg;.</li>
-					<li>All data is managed locally. We retain no user data.</li>
-					<li>Use the standalone installation for greater performance and automatic fullscreen prompting.</li>
-					<li>The standalone version comes for Linux, OS X, Microsoft Windows and Free BSD.</li>
-					<li>Close prompts and return to the editor by pressing 'ESC'.</li>
-					</ol>
-					<hr>
-					<h4>How to use anchor shortcuts:</h4>
-					<ol>
-					<li>Select a keyword or line you want to jump to on your text in the editor.</li>
-					<li>Click on the <strong>Flag Icon</strong> on the editor's tool bar.</li>
-					<li>A box named "Anchor Properties" should have appeared. Type any single key of your choice and click 'Ok'.<br>Note preassigned keys, such as WASD and Spacebar will be ignored.</li>
-					<li>Repeat as many times as you wish.</li>
-					<li>When prompting, press on the shortcut key to jump into the desired location.</li>
-					</ol>
-					<p>###</p>
-				</article>
+			<div id="editorcontainer" class="p-0">
+				<div id="toolbar"></div>
+				<div id="promptcontainer">
+					<article id="prompt" contenteditable="true">
+						<h3>Welcome to Imaginary Teleprompter!</h3>
+						<p>Are you ready to tell a story?</p>
+						<br>
+						<p>"Teleprompter" is the most complete, free software, professional teleprompter for anyone to use. Click on "Prompt It!" whenever you're ready and control the speed with the arrow keys.</p>
+						<br>
+						<h3>Here are some of our features:</h3>
+						<ol>
+						<li>Control the speed and text-size with the 'Up' and 'Down' arrow keys, the 'W' and 'S' keys or the mouse wheel. You may press 'Spacebar' to pause at anytime.</li>
+						<li>Move half a screen backwards or forwards by pressing the 'PageUp' and 'PageDown' keys.</li>
+						<li>Dynamically change the font-size by pressing 'Left' and 'Right' or the 'A' and 'D' keys.</li>
+						<li>Flip modes allow <em>mirroring</em> the prompter in every possible way.</li>
+						<li>You can use one or two instances. Mirror one, monitor on the other one.</li>
+						<li><a id="5" name="5">Set almost any key as a <em>marker</em> and instantly jump to any part of the script. Try pressing '5' now!</a></li>
+						<li>Different focus areas allow you to easily use Teleprompter with a webcam, a tablet, or professional teleprompter equipment.</li>
+						<li>Time your segments with the built in <em>timer</em>. Press 'Backspace' to reset the timer.</li>
+						<li><a name data-cke-saved-name>You can also set nameless <em>markers</em> and move accross them using the Home and End buttons.</a></li>
+						<li>Tweak the <em>Speed</em>, <em>Acceleration Curve</em> and <em>Font Size</em> settings to fit your hosts' needs.</li>
+						<li>Press 'F11' to enter and leave fullscreen.
+						You may fullscreen the text editor for greater concentration.</li>
+						<li>The Rich Text Editor, derived from the highly customizable CKeditor, gives unlimited possibilities on what you can prompt.</li>
+						<ul>
+						<!--
+						<li>Add emoticons to indicate feelings and expressions to your hosts.
+						</li>
+						-->
+						<li>
+						You may generate and display mathematical equations using the integrated CodeCogs equation editor.<br>
+						<table border="1" cellpadding="1" cellspacing="1">
+						<tbody>
+						<tr>
+						<td>&nbsp;</td>
+						<td><img alt="\bg_white \huge \sum_{heta+\Pi }^{80} sin(heta)" src="https://latex.codecogs.com/gif.latex?%5Cdpi%7B300%7D%20%5Cbg_white%20%5Chuge%20%5Csum_%7B%5CTheta&amp;plus;%5CPi%20%7D%5E%7B80%7D%20sin%28%5CTheta%29" /></td>
+						<td>&nbsp;</td>
+						</tr>
+						</tbody>
+						</table>
+						</li>
+						<li>Insert images from the web or copy and paste them into the prompter.
+						<img alt="Picture: Arecibo Sky" src="assets/custom/img/arecibo-sky.jpg">
+						</li>
+						</ul>
+						<li>There are various <em>Prompter Styles</em> to choose from. You may also create your own.</li>
+						<!-- <li>Download our mobile app, <em>Teleprompter X</em>, to remote control Teleprompter instalations.</li> -->
+						<li>Run the "External prompter" on a second screen, add new contents into the editor, then "Update" your prompter in realtime without having to halt your script.</li>
+						<li>Teleprompter works across screens with different resolutions and aspect ratios.</li>
+						<li>Using calculus and relative measurement units, Teleprompter is built to age gracefully. Speed and contents remain consistent from your smallest screen up to 4k devices and beyond.</li>
+						<li>Animations are hardware accelerated for a smooth scroll. A quad-core computer with dedicated graphics and, at least, 2GB RAM is recommended for optimal results.</li>
+						<li>Teleprompter doesn't stretch a lower quality copy of your prompt for monitoring, instead it renders each instance individually at the highest quality possible. You should lower your resolution to increase performance on lower end machines.</li>
+						<li>Text can be pasted from other word processors such as Libre Office Writer&trade; and Microsoft Word&reg;.</li>
+						<li>All data is managed locally. We retain no user data.</li>
+						<li>Use the standalone installation for greater performance and automatic fullscreen prompting.</li>
+						<li>The standalone version comes for Linux, OS X, Microsoft Windows and Free BSD.</li>
+						<li>Close prompts and return to the editor by pressing 'ESC'.</li>
+						</ol>
+						<hr>
+						<h4>How to use anchor shortcuts:</h4>
+						<ol>
+						<li>Select a keyword or line you want to jump to on your text in the editor.</li>
+						<li>Click on the <strong>Flag Icon</strong> on the editor's tool bar.</li>
+						<li>A box named "Anchor Properties" should have appeared. Type any single key of your choice and click 'Ok'.<br>Note preassigned keys, such as WASD and Spacebar will be ignored.</li>
+						<li>Repeat as many times as you wish.</li>
+						<li>When prompting, press on the shortcut key to jump into the desired location.</li>
+						</ol>
+						<p>###</p>
+					</article>
+				</div>
+				<div id="statusbar"></div>
 			</div>
-			<div id="statusbar"></div>
 		</div>
-	</form>
-	<!-- Footer -->
-	<footer id="footer" class="bs-docs-footer" role="contentinfo">
-		<div class="container">
-			<p style="color:#FFF;">&copy; <a id="imaginary" class="external" href="https://imaginary.tech/teleprompter/" target="_blank">Imaginary Sense Inc.</a></p>
-			<p>Authors: <a class="external" href="https://www.linkedin.com/in/javier-oscar-cordero-p%25C3%25A9rez-70658033" target="_blank">Javier Cordero</a> &amp;
-				<a class="external" href="https://twitter.com/Va2ron1" target="_blank">Victor Ortiz</a><br>Contributors: <a class="external" href="https://www.facebook.com/rafael.jose.7737">Rafael Sierra</a> &amp; <a class="external" href="https://github.com/keyvanp">Keyvan P&eacute;rez</a>.
-			</p>
-			<ul class="bs-docs-footer-links">
-				<li>Version 2.5.0 alpha</li>
-				<li>&middot;</li>
-				<li>Licensed under <a rel="license" href="LICENSE" target="_blank">GPL3</a>, assets under <a class="external" rel="license" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a></li>
-				<br>
-				<li>&middot;</li>
-				<li><a id="credits-link" href="#">Full Credits</a></li>
-				<li>&middot;</li>
-				<li><a class="external" target="_blank" href="https://github.com/ImaginarySense/Teleprompter-Core">Source Code</a></li>
-				<li>&middot;</li>
-				<li><a class="external" target="_blank" href="https://imaginary.tech/teleprompter/#download">Downloads</a></li>
-				<li>&middot;</li>
-			</ul>
-			<!--<li><a class="external" target="_blank" href="https://imaginary.tech/teleprompter/">About</a></li>-->
-		</div>
-	</footer>
-	<div id="framecontainer">
-		<iframe id="teleprompterframe" src="blank.html" class="fullsize"></iframe><!--   -->
-		<canvas id="telepromptercanvas" width="800" height="600" class="fullsize"></canvas>
-	</div>
-	<div id="devWarning" class="modalDialog">
-		<div style="width: 50%;">
-			<div class="panel panel-default">
-				<a href="#close" title="Close" id="closeWarning" class="close">X</a>
-				<div class="panel-heading">
-					<h1>Warning <small>Teleprompter</small></h1>
-				</div>
-				<div class="panel-body">
-					<p class="text-center">You're about to use a development version of Teleprompter. This means you may find bugs, incomplete and experimental features. You may even suffer from data lost. By agreeing to these terms your previous data will migrate to this version and older versions won't be able to access it.</p>
-					<br>
-					<p class="text-center">Do you agree to these terms in order to use our development version?</p>
-				</div>
-				<div class="panel-footer">
-					<ul class="pager" style="margin:0;">
-						<li><button type="button" class="btn btn-success" id="agreeWarningButton">Agree</button></li>
-						<li><button type="button" class="btn btn-danger" id="cancelWarningButton">Cancel</button></li>
+		<div class="row">
+			<!-- Footer -->
+			<footer id="footer" class="bs-docs-footer" role="contentinfo">
+				<div class="container">
+					<p style="color:#FFF;">&copy; <a id="imaginary" class="external" href="https://imaginary.tech/teleprompter/" target="_blank">Imaginary Sense Inc.</a></p>
+					<p>Authors: <a class="external" href="https://www.linkedin.com/in/javier-oscar-cordero-p%25C3%25A9rez-70658033" target="_blank">Javier Cordero</a> &amp;
+						<a class="external" href="https://twitter.com/Va2ron1" target="_blank">Victor Ortiz</a><br>Contributors: <a class="external" href="https://www.facebook.com/rafael.jose.7737">Rafael Sierra</a> &amp; <a class="external" href="https://github.com/keyvanp">Keyvan P&eacute;rez</a>.
+					</p>
+					<ul class="bs-docs-footer-links">
+						<li>Version 2.5.0 alpha</li>
+						<li>&middot;</li>
+						<li>Licensed under <a rel="license" href="LICENSE" target="_blank">GPL3</a>, assets under <a class="external" rel="license" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a></li>
+						<br>
+						<li>&middot;</li>
+						<li><a id="credits-link" href="#">Full Credits</a></li>
+						<li>&middot;</li>
+						<li><a class="external" target="_blank" href="https://github.com/ImaginarySense/Teleprompter-Core">Source Code</a></li>
+						<li>&middot;</li>
+						<li><a class="external" target="_blank" href="https://imaginary.tech/teleprompter/#download">Downloads</a></li>
+						<li>&middot;</li>
 					</ul>
+					<!--<li><a class="external" target="_blank" href="https://imaginary.tech/teleprompter/">About</a></li>-->
+				</div>
+			</footer>
+		</div>
+		<div id="framecontainer">
+			<iframe id="teleprompterframe" src="blank.html" class="fullsize"></iframe><!--   -->
+			<canvas id="telepromptercanvas" width="800" height="600" class="fullsize"></canvas>
+		</div>
+		<div id="devWarning" class="modalDialog">
+			<div style="width: 50%;">
+				<div class="panel panel-default">
+					<a href="#close" title="Close" id="closeWarning" class="close">X</a>
+					<div class="panel-heading">
+						<h1>Warning <small>Teleprompter</small></h1>
+					</div>
+					<div class="panel-body">
+						<p class="text-center">You're about to use a development version of Teleprompter. This means you may find bugs, incomplete and experimental features. You may even suffer from data lost. By agreeing to these terms your previous data will migrate to this version and older versions won't be able to access it.</p>
+						<br>
+						<p class="text-center">Do you agree to these terms in order to use our development version?</p>
+					</div>
+					<div class="panel-footer">
+						<ul class="pager" style="margin:0;">
+							<li><button type="button" class="btn btn-success" id="agreeWarningButton">Agree</button></li>
+							<li><button type="button" class="btn btn-danger" id="cancelWarningButton">Cancel</button></li>
+						</ul>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-	<div id="devNewestVersion" class="modalDialog">
-		<div style="width: 50%;">
-			<div class="panel panel-default">
-				<a href="#close" title="Close" class="close">X</a>
-				<div class="panel-heading">
-					<h1>Warning <small>Teleprompter</small></h1>
-				</div>
-				<div class="panel-body">
-					<p class="text-center">A newer version of the Teleprompter was already in use,<br> please use the lastest version instead of this one.</p>
-				</div>
-				<div class="panel-footer">
-					<ul class="pager" style="margin:0;">
-						<li><button type="button" class="btn btn-danger" id="cancelNewestButton">Exit App</button></li>
-					</ul>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Sidebar -->
-	<div id="sidebarDeleteElement" class="modalDialog">
-		<div style="width: 50%;">
-			<div class="panel panel-default">
-				<a href="#close" title="Close" class="close">X</a>
-				<div class="panel-heading">
-					<h1>Delete <small>Teleprompter</small></h1>
-				</div>
-				<div class="panel-body">
-					<p class="text-center">Are you sure do you want to delete the script?</p>
-				</div>
-				<div class="panel-footer">
-					<ul class="pager" style="margin:0;">
-							<li><button type="button" class="btn btn-default" id="cancelSidebarButton">Cancel</button></li>
-							<li><button type="button" class="btn btn-danger" id="deleteSidebarButton">Delete</button></li>
-					</ul>
+		<div id="devNewestVersion" class="modalDialog">
+			<div style="width: 50%;">
+				<div class="panel panel-default">
+					<a href="#close" title="Close" class="close">X</a>
+					<div class="panel-heading">
+						<h1>Warning <small>Teleprompter</small></h1>
+					</div>
+					<div class="panel-body">
+						<p class="text-center">A newer version of the Teleprompter was already in use,<br> please use the lastest version instead of this one.</p>
+					</div>
+					<div class="panel-footer">
+						<ul class="pager" style="margin:0;">
+							<li><button type="button" class="btn btn-danger" id="cancelNewestButton">Exit App</button></li>
+						</ul>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-	<div id="sidebarAddElement" class="modalDialog">
-		<div style="width: 50%;">
-			<div class="panel panel-default">
-				<a href="#close" title="Close" class="close">X</a>
-				<div class="panel-heading">
-					<h1>Scripts <small>Teleprompter</small></h1>
-				</div>
-				<div class="panel-body">
-					<div class="row">
-						<div class="col-md-12">
-							<form class="form-horizontal">
-								<div class="form-group">
-									<label for="inputName" class="col-sm-2 control-label">Title</label>
-									<div class="col-sm-10">
-										<input type="text" class="form-control" id="inputName" placeholder="Title" pattern="/([ -z])+/g" required>
-									</div>
-								</div>
-								<div class="form-group hidden">
-									<label for="inputID" class="col-sm-2 control-label">ID</label>
-									<div class="col-sm-10">
-										<input type="text" class="form-control" id="inputID" placeholder="title" disabled>
-									</div>
-								</div>
-								<!-- Remove hidden class to use these debugging fields. -->
-								<div class="form-group hidden">
-									<div class="col-sm-offset-2 col-sm-10">
-										<div class="checkbox">
-											<label>
-												<input type="checkbox" checked> Deletable
-											</label>
-											<label>
-												<input type="checkbox" checked> Editable
-											</label>
+		<!-- File Manager -->
+		<div class="modal" id="filesManagerModal" tabindex="-1">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Files</h5>
+						<button type="button" class="btn-close" id="fileManagerClose" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div class="d-flex align-items-start">
+							<div class="nav flex-column nav-pills col-3 me-3" id="v-pills-menu" role="tablist" aria-orientation="vertical">
+								<button class="nav-link active" id="v-pills-scripts-tab" data-bs-toggle="pill" data-bs-target="#v-pills-scripts" type="button" role="tab" aria-controls="v-pills-scripts" aria-selected="true">
+									<i class="bi bi-card-text"></i> 
+									Scripts
+								</button>
+							  	<button class="nav-link" id="v-pills-newScript-tab" data-bs-toggle="pill" data-bs-target="#v-pills-newScript" type="button" role="tab" aria-controls="v-pills-newScript" aria-selected="false">
+									<i class="bi bi-file-earmark-plus"></i>
+									New Script
+								</button>
+								<button class="nav-link" id="v-pills-import-tab" data-bs-toggle="pill" data-bs-target="#v-pills-import" type="button" role="tab" aria-controls="v-pills-import" aria-selected="false">
+									<i class="bi bi-folder-plus"></i>
+									Import File
+								</button>
+							</div>
+							<div class="tab-content w-100" id="v-pills-menuContent">
+							  <div class="tab-pane fade show active" id="v-pills-scripts" role="tabpanel" aria-labelledby="v-pills-home-tab">
+								<table class="table table-hover">
+									<tbody id="v-pills-scriptsContent">
+										<!-- Scripts will be loaded here -->
+									</tbody>
+								</table>
+							  </div>
+							  <div class="tab-pane fade" id="v-pills-newScript" role="tabpanel" aria-labelledby="v-pills-newScript-tab">
+								<form class="form-horizontal">
+									<div class="form-group">
+										<div class="col-sm-10">
+											<input type="text" class="form-control" id="inputName" placeholder="Title" required>
 										</div>
 									</div>
-								</div>
-								<div class="panel-footer">
-									<ul class="pager" style="margin:0;">
-										<li><input type="submit" class="btn btn-default" id="addScriptSidebarButton" value="Add Script"></li>
-										<li><button class="btn btn-danger" id="cancelSidebarButton2">Cancel</button></li>
-									</ul>
-								</div>
-							</form>
-						</div>
+									<div class="form-group hidden">
+										<label for="inputID" class="col-sm-2 control-label">ID</label>
+										<div class="col-sm-10">
+											<input type="text" class="form-control" id="inputID" placeholder="title" disabled>
+										</div>
+									</div>
+									<div class="form-group pt-2">
+										<button class="btn btn-primary" id="addScriptSidebarButton">Add Script</button>
+									</div>
+								</form>
+							  </div>
+							  <div class="tab-pane fade" id="v-pills-messages" role="tabpanel" aria-labelledby="v-pills-messages-tab">...</div>
+							  <div class="tab-pane fade" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-settings-tab">...</div>
+							</div>
+						  </div>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-	<!-- ColorPicker modal dialog -->
-	<div class="modal" id="openCustomStyles" tabindex="-1">
-		<div class="modal-dialog modal-xl">
-			<div class="modal-content">
+		<div id="fileManagerDeleteModal" class="modal" tabindex="-1">
+			<div class="modal-dialog">
+			  <div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title">Custom Styles <small>Administration Panel</small></h5>
-					<button type="button" class="btn-close" onClick="closePromptStyles();" aria-label="Close"></button>
+				  	<h5 class="modal-title">
+						Delete <small>Teleprompter</small>
+					</h5>
 				</div>
 				<div class="modal-body">
-					<div class="row">
-						<div class="col-md-3">
-							<h4>Styles</h4>
-							<div id="stylesContainer">
-								<table class="table" id="stylesTable" >
-									<tbody>
-										<tr>
-											<th class="table-item"><span>No Styles</span></th>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-						<div class="col-md-9">
-							<h4>Properties</h4>
-							<div class='row'>
-								<div class='col-md-4'>
-									<label>Body</label>
-									<input type="text" data-jscolor="{}" class="form-control" onChange="updateColorOnPreview(this)" id="bodyColor" value="" >
+				  <p>Are you sure do you want to delete the script?</p>
+				</div>
+				<div class="modal-footer">
+				  <button type="button" class="btn btn-danger" id="fileManagerDeleteModalCancel">Cancel</button>
+				  <button type="button" class="btn btn-primary" id="fileManagerDeleteModalDelete">Delete</button>
+				</div>
+			  </div>
+			</div>
+		</div>
+		<!-- ColorPicker modal dialog -->
+		<div class="modal" id="openCustomStyles" tabindex="-1">
+			<div class="modal-dialog modal-xl">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Custom Styles <small>Administration Panel</small></h5>
+						<button type="button" class="btn-close" onClick="closePromptStyles();" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-md-3">
+								<h4>Styles</h4>
+								<div id="stylesContainer">
+									<table class="table" id="stylesTable" >
+										<tbody>
+											<tr>
+												<th class="table-item"><span>No Styles</span></th>
+											</tr>
+										</tbody>
+									</table>
 								</div>
-								<div class='col-md-4'>
-									<label>Overlay</label>
-									<input type="text" data-jscolor="{}" class="form-control" onChange="updateColorOnPreview(this)" id="overlayColor" value="" >
-								</div>
-								<div class='col-md-4'>
-									<label>Text Color</label>
-									<input type="text" data-jscolor="{}" class="form-control" onChange="updateColorOnPreview(this)" id="textColor" value="" >
-								</div>
 							</div>
-							<h1><small>Preview</small></h1>
-							<div id="promptPreviewColor">
-								<!-- #overlay layers focus area on top of the prompt. -->
-								<table cellpadding="0" cellspacing="0" id="overlayPreview" >
-									<tbody>
-										<tr id="overlayTop" style = "background-color:#000;opacity:0.5;">
-											<td>Text</td>
-										</tr>
-										<tr id="overlayFocus" >
-											<td>Text</td>
-										</tr>
-										<tr id="overlayBottom" class="overlayBg" style = "background-color:#000;opacity:0.5;">
-											<td>Text</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-							</br>
-							<div class='row'>
-								<div class='col-md-4'>
-									<div class="input-group">
-										<span class="input-group-text" id="style-addon">Style Name</span>
-										<input type="text" class="form-control" placeholder="name" aria-describedby="style-addon" id="nameStyle">
+							<div class="col-md-9">
+								<h4>Properties</h4>
+								<div class='row'>
+									<div class='col-md-4'>
+										<label>Body</label>
+										<input type="text" data-jscolor="{}" class="form-control" onChange="updateColorOnPreview(this)" id="bodyColor" value="" >
+									</div>
+									<div class='col-md-4'>
+										<label>Overlay</label>
+										<input type="text" data-jscolor="{}" class="form-control" onChange="updateColorOnPreview(this)" id="overlayColor" value="" >
+									</div>
+									<div class='col-md-4'>
+										<label>Text Color</label>
+										<input type="text" data-jscolor="{}" class="form-control" onChange="updateColorOnPreview(this)" id="textColor" value="" >
 									</div>
 								</div>
-								<div class='col-md-8'>
-									<button class="btn btn-default" id="editStyleButton" disabled>Update Style</button>
-									<button class="btn btn-default" id="addStyleButton" disabled>New Style</button>
-									<button class="btn btn-default" id="removeStyleButton" disabled>Delete Style</button>
-									<button class="btn btn-default" id="defaultStyleButton">Set As Default</button>
+								<h1><small>Preview</small></h1>
+								<div id="promptPreviewColor">
+									<!-- #overlay layers focus area on top of the prompt. -->
+									<table cellpadding="0" cellspacing="0" id="overlayPreview" >
+										<tbody>
+											<tr id="overlayTop" style = "background-color:#000;opacity:0.5;">
+												<td>Text</td>
+											</tr>
+											<tr id="overlayFocus" >
+												<td>Text</td>
+											</tr>
+											<tr id="overlayBottom" class="overlayBg" style = "background-color:#000;opacity:0.5;">
+												<td>Text</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								</br>
+								<div class='row'>
+									<div class='col-md-4'>
+										<div class="input-group">
+											<span class="input-group-text" id="style-addon">Style Name</span>
+											<input type="text" class="form-control" placeholder="name" aria-describedby="style-addon" id="nameStyle">
+										</div>
+									</div>
+									<div class='col-md-8'>
+										<button class="btn btn-default" id="editStyleButton" disabled>Update Style</button>
+										<button class="btn btn-default" id="addStyleButton" disabled>New Style</button>
+										<button class="btn btn-default" id="removeStyleButton" disabled>Delete Style</button>
+										<button class="btn btn-default" id="defaultStyleButton">Set As Default</button>
+									</div>
 								</div>
 							</div>
 						</div>

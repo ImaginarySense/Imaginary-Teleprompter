@@ -33,11 +33,10 @@ body {
 
 #content {
 	margin-bottom: 0px;
-	padding-top: 10px;
-	padding-bottom: 10px;
+	padding: 0;
 }
 
-#menu-toggle, #advConfig {
+#fileManagerToggle, #advConfig {
 	padding: 12px 11px 11px 11px;
 	margin: 0px;
 	/*top: 0px;*/
@@ -435,4 +434,10 @@ img.cke_anchor {
 #promptIt:hover {
     color: #463265;
     background-color: #f9f9f9
+}
+
+#v-pills-scriptsContent .form-control:disabled {
+	background-color: initial;
+	border: 0;
+	padding-left: 0;
 }

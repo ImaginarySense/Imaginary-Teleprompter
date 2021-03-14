@@ -53,8 +53,9 @@ var debug = false;
         forceSecondaryDisplay = true;
     }
 
-    //SideBar
-    var sidebar = new SIDEBAR();
+    // File Manager
+    var fileManager = new SIDEBAR();
+    var filesManagerModal;
 
     // Enums
     var command = Object.freeze({
@@ -285,14 +286,14 @@ var debug = false;
                         dataToMigrate = JSON.parse(dataToMigrate);
                         if (dataToMigrate.length > 0) {
                             // Fix to not do more dirty work
-                            dataToMigrate[0]["id"] = sidebar.createIDTag(dataToMigrate[0].name, true);
-                            sidebar.getSaveMode().setItem(sidebar.getDataKey(), JSON.stringify(dataToMigrate));
+                            dataToMigrate[0]["id"] = fileManager.createIDTag(dataToMigrate[0].name, true);
+                            fileManager.getSaveMode().setItem(fileManager.getDataKey(), JSON.stringify(dataToMigrate));
                         }
                         // Continue with rest of the data
                         for (var i = 1; i < dataToMigrate.length; i++)
                             if (dataToMigrate[i].hasOwnProperty("name")) {
-                                dataToMigrate[i]["id"] = sidebar.createIDTag(dataToMigrate[i].name);
-                                sidebar.getSaveMode().setItem(sidebar.getDataKey(), JSON.stringify(dataToMigrate));
+                                dataToMigrate[i]["id"] = fileManager.createIDTag(dataToMigrate[i].name);
+                                fileManager.getSaveMode().setItem(fileManager.getDataKey(), JSON.stringify(dataToMigrate));
                             }
                     }
                 }, 0, 0);
@@ -305,85 +306,6 @@ var debug = false;
 
     // Initialize postMessage event listener.
     addEventListener("message", listener, false);
-
-    // Instance Editor
-    if (typeof tinymce !== "undefined") {
-        tinymce.init({
-            selector: "div#prompt",
-            inline: true, // The key to make apps without security loopholes.
-            auto_focus: "prompt", // Focus to show controls..
-            fixed_toolbar_container: "#toolbar",
-            statusbar: true,
-            elementpath: false, // Remove the path bar at the bottom.
-            resize: true, // True means will be vertically resizable.
-            theme: "modern", //dev: We should make a custom theme.
-            skin: "imaginary",
-            editor_css: "css/tinymce.css",
-            plugins: "advlist anchor save charmap code colorpicker contextmenu directionality emoticons fullscreen hr image media lists nonbreaking paste print searchreplace spellchecker table textcolor wordcount imagetools insertdatetime",
-            toolbar: ['anchor | save | undo redo | styleselect | bold italic underline strikethrough | superscript subscript | forecolor backcolor | bullist numlist | alignleft aligncenter alignright | charmap image | searchreplace fullscreen'],
-            contextmenu: "copy cut paste pastetext | anchor | image charmap",
-            menu: {
-                file: {
-                    title: 'File',
-                    items: 'newdocument print'
-                },
-                edit: {
-                    title: 'Edit',
-                    items: 'undo redo | cut copy paste pastetext | selectall'
-                },
-                insert: {
-                    title: 'Insert',
-                    items: 'anchor insertdatetime | image media emoticons | hr charmap'
-                },
-                format: {
-                    title: 'Format',
-                    items: 'bold italic underline strikethrough | superscript subscript | formats | removeformat | ltr rtl'
-                },
-                table: {
-                    title: 'Table',
-                    items: 'inserttable tableprops deletetable | cell row column'
-                },
-                tools: {
-                    title: 'Tools',
-                    items: 'searchreplace spellchecker code'
-                }
-            },
-            directionality: "ltr",
-            setup: function(editor) {
-                // Don't close editor when out of focus.
-                editor.on("blur", function() {
-                    editorFocused = false;
-                    return false;
-                });
-                editor.on("focus", function() {
-                    editorFocused = true;
-                });
-            },
-            style_formats: [{
-                title: 'Paragraph',
-                block: 'p'
-            }, {
-                title: 'Heading 1',
-                block: 'h1'
-            }, {
-                title: 'Heading 2',
-                block: 'h2'
-            }, {
-                title: 'Heading 3',
-                block: 'h3'
-            }, {
-                title: 'Heading 4',
-                block: 'h4'
-            }, ],
-            //image_list: [
-            //  {title: 'My image 1', value: 'http://www.tinymce.com/my1.gif'},
-            //  {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
-            //],
-            save_enablewhendirty: false,
-            save_onsavecallback: save,
-            nonbreaking_force_tab: true
-        });
-    }
 
     function save() {
         if (debug) console.log("Save pressed");
@@ -968,23 +890,27 @@ var debug = false;
                 }
                 */
                 default:
-                var key;
-                // If key is not a string
-                if (!isFunction(event.key.indexOf))
-                    key = String.fromCharCode(event.key);
-                else
-                    key = event.key;
-                //if ( key.indexOf("Key")===0 || key.indexOf("Digit")===0 )
-                //      key = key.charAt(key.length-1);
-                if (!is_int(key))
-                    key = key.toLowerCase();
-                if (debug) console.log(key);
-                listener({
-                    data: {
-                        request: command.anchor,
-                        data: key
+                    // Check if event key exists, prevent issues with modals
+                    if (event.key) {
+                        var key;
+                        // If key is not a string
+                        if (!isFunction(event.key.indexOf))
+                            key = String.fromCharCode(event.key);
+                        else
+                            key = event.key;
+                        //if ( key.indexOf("Key")===0 || key.indexOf("Digit")===0 )
+                        //      key = key.charAt(key.length-1);
+                        if (!is_int(key))
+                            key = key.toLowerCase();
+                        if (debug) console.log(key);
+                        listener({
+                            data: {
+                                request: command.anchor,
+                                data: key
+                            }
+                        });
                     }
-                });
+                
             }
         }
     };
@@ -1005,9 +931,11 @@ var debug = false;
         else
             window.location = "#close";
         document.getElementById("prompt").focus();
-        var sideBar = document.querySelector("#wrapper");
-        if (!sideBar.classList.contains("toggled"))
-            sideBar.classList.toggle("toggled");
+
+        if (fileManager.modal) {
+            fileManager.modal.hide()
+            fileManager.modal = undefined;
+        }
     }
 
     // Save last use settings
@@ -1312,14 +1240,14 @@ var debug = false;
     // Teleprompter Scripts File Manager
     function initScripts() {
         //initialize SideBar
-        var sid = sidebar.on('scripts',{
+        var sid = fileManager.on('v-pills-scriptsContent',{
             "name":"Files",
             "elementName":"Script",
             "newElementName":"Untitled",
             "dataKey":"IFTeleprompterSideBar",
             "preloadData":[{
                 "name": "Instructions",
-                "data": '<h3>Welcome to Imaginary Teleprompter!</h3><p>Are you ready to tell a story?</p><br><p>"Teleprompter" is the most complete, free software, professional teleprompter for anyone to use. Click on "Prompt It!" whenever you\'re ready and control the speed with the arrow keys.</p><br><h3>Here are some of our features:</h3><ol><li>Control the speed and text-size with the \'Up\' and \'Down\' arrow keys, the \'W\' and \'S\' keys or the mouse wheel. You may press \'Spacebar\' to pause at anytime.</li><li>Move half a screen backwards or forwards by pressing the \'PageUp\' and \'PageDown\' keys.</li><li>Dynamically change the font-size by pressing \'Left\' and \'Right\' or the \'A\' and \'D\' keys.</li><li>Flip modes allow <em>mirroring</em> the prompter in every possible way.</li><li>You can use one or two instances. Mirror one, monitor on the other one.</li><li><a id="5" name="5">Set almost any key as a <em>marker</em> and instantly jump to any part of the script. Try pressing \'5\' now!</a></li><li>Different focus areas allow you to easily use Teleprompter with a webcam, a tablet, or professional teleprompter equipment.</li><li>Time your segments with the built in <em>timer</em>. Press \'Backspace\' to reset the timer.</li><li><a name data-cke-saved-name src="#">You can also set nameless <em>markers</em> and move accross them using the Home and End buttons.</a></li><li>Tweak the <em>Speed</em>, <em>Acceleration Curve</em> and <em>Font Size</em> settings to fit your hosts\' needs.</li><li>Press \'F11\' to enter and leave fullscreen.You may fullscreen the text editor for greater concentration.</li><li>The Rich Text Editor, derived from the highly customizable CKeditor, gives unlimited possibilities on what you can prompt.</li><ul><!-- <li>Add emoticons to indicate feelings and expressions to your hosts.</li>--><li>You may generate and display mathematical equations using the integrated CodeCogs equation editor.<br><table border="1" cellpadding="1" cellspacing="1"><tbody><tr><td>&nbsp;</td><td><img alt="\bg_white \huge \sum_{heta+\Pi }^{80} sin(heta)" src="https://latex.codecogs.com/gif.latex?%5Cdpi%7B300%7D%20%5Cbg_white%20%5Chuge%20%5Csum_%7B%5CTheta&amp;plus;%5CPi%20%7D%5E%7B80%7D%20sin%28%5CTheta%29" /></td><td>&nbsp;</td></tr></tbody></table></li><li>Insert images from the web or copy and paste them into the prompter.<img alt="Picture: Arecibo Sky" src="img/arecibo-sky.jpg"></li> </ul><li>There are various <em>Prompter Styles</em> to choose from. You may also create your own.</li><!-- <li>Download our mobile app, <em>Teleprompter X</em>, to remote control Teleprompter instalations.</li> --><li>Run the "External prompter" on a second screen, add new contents into the editor, then "Update" your prompter in realtime without having to halt your script.</li><li>Teleprompter works across screens with different resolutions and aspect ratios.</li><li>Using calculus and relative measurement units, Teleprompter is built to age gracefully. Speed and contents remain consistent from your smallest screen up to 4k devices and beyond.</li><li>Animations are hardware accelerated for a smooth scroll. A quad-core computer with dedicated graphics and, at least, 2GB RAM is recommended for optimal results.</li><li>Teleprompter doesn\'t stretch a lower quality copy of your prompt for monitoring, instead it renders each instance individually at the highest quality possible. You should lower your resolution to increase performance on lower end machines.</li><li>Text can be pasted from other word processors such as Libre Office Writer&trade; and Microsoft Word&reg;.</li><li>All data is managed locally. We retain no user data.</li><li>Use the standalone installation for greater performance and automatic fullscreen prompting.</li><li>The standalone version comes for Linux, OS X, Microsoft Windows and Free BSD.</li><li>Close prompts and return to the editor by pressing \'ESC\'.</li></ol><hr><h4>How to use anchor shortcuts:</h4><ol><li>Select a keyword or line you want to jump to on your text in the editor.</li><li>Click on the <strong>Flag Icon</strong> on the editor\'s tool bar.</li><li>A box named "Anchor Properties" should have appeared. Type any single key of your choice and click \'Ok\'.<br>Note preassigned keys, such as WASD and Spacebar will be ignored.</li><li>Repeat as many times as you wish.</li><li>When prompting, press on the shortcut key to jump into the desired location.</li></ol><p>###</p>',
+                "data": '<h3>Welcome to Imaginary Teleprompter!</h3><p>Are you ready to tell a story?</p><br><p>"Teleprompter" is the most complete, free software, professional teleprompter for anyone to use. Click on "Prompt It!" whenever you\'re ready and control the speed with the arrow keys.</p><br><h3>Here are some of our features:</h3><ol><li>Control the speed and text-size with the \'Up\' and \'Down\' arrow keys, the \'W\' and \'S\' keys or the mouse wheel. You may press \'Spacebar\' to pause at anytime.</li><li>Move half a screen backwards or forwards by pressing the \'PageUp\' and \'PageDown\' keys.</li><li>Dynamically change the font-size by pressing \'Left\' and \'Right\' or the \'A\' and \'D\' keys.</li><li>Flip modes allow <em>mirroring</em> the prompter in every possible way.</li><li>You can use one or two instances. Mirror one, monitor on the other one.</li><li><a id="5" name="5">Set almost any key as a <em>marker</em> and instantly jump to any part of the script. Try pressing \'5\' now!</a></li><li>Different focus areas allow you to easily use Teleprompter with a webcam, a tablet, or professional teleprompter equipment.</li><li>Time your segments with the built in <em>timer</em>. Press \'Backspace\' to reset the timer.</li><li><a name data-cke-saved-name src="#">You can also set nameless <em>markers</em> and move accross them using the Home and End buttons.</a></li><li>Tweak the <em>Speed</em>, <em>Acceleration Curve</em> and <em>Font Size</em> settings to fit your hosts\' needs.</li><li>Press \'F11\' to enter and leave fullscreen.You may fullscreen the text editor for greater concentration.</li><li>The Rich Text Editor, derived from the highly customizable CKeditor, gives unlimited possibilities on what you can prompt.</li><ul><!-- <li>Add emoticons to indicate feelings and expressions to your hosts.</li>--><li>You may generate and display mathematical equations using the integrated CodeCogs equation editor.<br><table border="1" cellpadding="1" cellspacing="1"><tbody><tr><td>&nbsp;</td><td><img alt="\bg_white \huge \sum_{heta+\Pi }^{80} sin(heta)" src="https://latex.codecogs.com/gif.latex?%5Cdpi%7B300%7D%20%5Cbg_white%20%5Chuge%20%5Csum_%7B%5CTheta&amp;plus;%5CPi%20%7D%5E%7B80%7D%20sin%28%5CTheta%29" /></td><td>&nbsp;</td></tr></tbody></table></li><li>Insert images from the web or copy and paste them into the prompter.<img alt="Picture: Arecibo Sky" src="assets/custom/img/arecibo-sky.jpg"></li> </ul><li>There are various <em>Prompter Styles</em> to choose from. You may also create your own.</li><!-- <li>Download our mobile app, <em>Teleprompter X</em>, to remote control Teleprompter instalations.</li> --><li>Run the "External prompter" on a second screen, add new contents into the editor, then "Update" your prompter in realtime without having to halt your script.</li><li>Teleprompter works across screens with different resolutions and aspect ratios.</li><li>Using calculus and relative measurement units, Teleprompter is built to age gracefully. Speed and contents remain consistent from your smallest screen up to 4k devices and beyond.</li><li>Animations are hardware accelerated for a smooth scroll. A quad-core computer with dedicated graphics and, at least, 2GB RAM is recommended for optimal results.</li><li>Teleprompter doesn\'t stretch a lower quality copy of your prompt for monitoring, instead it renders each instance individually at the highest quality possible. You should lower your resolution to increase performance on lower end machines.</li><li>Text can be pasted from other word processors such as Libre Office Writer&trade; and Microsoft Word&reg;.</li><li>All data is managed locally. We retain no user data.</li><li>Use the standalone installation for greater performance and automatic fullscreen prompting.</li><li>The standalone version comes for Linux, OS X, Microsoft Windows and Free BSD.</li><li>Close prompts and return to the editor by pressing \'ESC\'.</li></ol><hr><h4>How to use anchor shortcuts:</h4><ol><li>Select a keyword or line you want to jump to on your text in the editor.</li><li>Click on the <strong>Flag Icon</strong> on the editor\'s tool bar.</li><li>A box named "Anchor Properties" should have appeared. Type any single key of your choice and click \'Ok\'.<br>Note preassigned keys, such as WASD and Spacebar will be ignored.</li><li>Repeat as many times as you wish.</li><li>When prompting, press on the shortcut key to jump into the desired location.</li></ol><p>###</p>',
                 "editable": false
             }],
 
@@ -1339,7 +1267,7 @@ var debug = false;
                 document.getElementById("prompt").innerHTML = scriptsData[sid.currentElement]['data'];
             else
                 document.getElementById("prompt").innerHTML = "";
-            document.querySelector("#wrapper").classList.toggle("toggled");
+            sid.closeModal()
         }
 
         sid.addElementEnded = function(element) {
@@ -1400,12 +1328,17 @@ var debug = false;
             });
         });
 
-        var menuToggle = document.querySelector("#menu-toggle");
-        menuToggle.onclick = function(event) {
+        var fileManagerToggle = document.querySelector("#fileManagerToggle");
+        fileManagerToggle.onclick = function(event) {
             event.preventDefault();
-            document.querySelector("#wrapper").classList.toggle("toggled");
+            fileManager.openModal();
             save();
         };
+        var fileManagerClose = document.querySelector("#fileManagerClose");
+        fileManagerClose.onclick = function(event) {
+            fileManager.closeModal();
+        }
+        
     }
 
     // Initialize objects after DOM is loaded
