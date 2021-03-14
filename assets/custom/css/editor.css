@@ -1,0 +1,438 @@
+/*
+	Imaginary Teleprompter
+	Copyright (C) 2015 Imaginary Sense Inc. and contributors
+
+	This file is part of Imaginary Teleprompter.
+
+	Imaginary Teleprompter is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	Imaginary Teleprompter is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with Imaginary Teleprompter.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+body {
+	background: #333;
+	margin: 0px;
+	padding: 0px;
+	-webkit-touch-callout: none;
+	/*-webkit-user-select: none;*/
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	overflow-x: hidden;
+}
+
+#content {
+	margin-bottom: 0px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+#menu-toggle, #advConfig {
+	padding: 12px 11px 11px 11px;
+	margin: 0px;
+	/*top: 0px;*/
+}
+
+a#promptIt {
+	background:#EEE;
+	font-weight: bold;
+	font-size: 1.4em;
+}
+
+a#updateIt {
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
+#updateIt:hover {
+	background:#EEE;
+}
+
+#editorcontainer:-webkit-full-screen {
+	width: 100%;
+	height: 100%;
+	top: 0px;
+	bottom: 0px;
+}
+
+#editorcontainer {
+	position: relative;
+	background: #EEE;
+	min-height: 320px;
+	height: auto;
+}
+
+footer #imaginary {
+	font-weight: bold;
+}
+
+#promptcontainer {
+	text-align: center;
+	position: relative;
+	overflow: auto;
+	overflow-x: hidden;
+	overflow-y: auto;
+	resize: none;
+	top: 0px;
+	bottom: 0px;
+	width: 100%;
+	min-height: 78vh;
+	height: calc(100% - 69px);	
+	/* Cancel 3D transform from intergalactic theme. */
+	transform: rotateX(0deg) translate3d(0px,0px,0px) !important;
+}
+
+#toolbar {
+	position: relative;
+	top: 0px;
+	width: 100%;
+	background: #F0F0F0;
+}
+
+#prompt {
+	top:0;
+	bottom:0;
+	left:0;
+	right:0;
+	/*height: 100%;*/
+	left: 6.8vw;
+	width: 84vw;
+	border: dashed #CCC 0;
+	border-right-width: 1pt;
+	border-left-width: 1pt;
+	word-wrap: break-word;
+}
+
+/*#prompt > * {
+	border-left: dashed 1pt #CCC;
+	border-right: dashed 1pt #CCC;
+}*/
+
+#statusbar {
+	position: absolute;
+	bottom: 0px;
+}
+#statusbar div {
+	border-radius: 7px 6px 7px 0 !important;
+}
+.mce-menu {
+	background: #000;
+}
+
+#framecontainer {
+	position: fixed;
+	margin: 0px;
+	padding: 0px;
+	top: 105px;
+	bottom: 0px;
+	width: 100%;
+	z-index:10;
+	display: none;
+	border: none;
+}
+@media only screen and (min-width: 768px) {
+	#framecontainer {
+		top: 48px;
+	}
+}
+
+#footer {
+	margin: 0px;
+	padding: 20px;
+	text-align: center;
+	text-shadow: 0 1px 0 rgba(0,0,0,.1);
+	background-color: #6f5499;
+	background-image: linear-gradient(45deg, #4A4771 0%, #7C3875 100%);
+	/*background-image: linear-gradient(to bottom,#563d7c 0,#6f5499 100%);*/
+	background-repeat: repeat-x;
+	color: #CCF;
+}
+
+.fullsize {
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+}
+
+ul.bs-docs-footer-links {
+	margin: 10px;
+}
+
+#editorcontainer a:link {
+	color: #333;
+}
+
+a:link {
+	color: #FFF;
+}
+
+a:visited {
+	color: #FFF;
+}
+
+a:active {
+	color: #CCF;
+}
+
+.carbonad {
+	display:block;
+	background:#fdfdfd;
+	background-image:-moz-linear-gradient(top,#f8f8f8,#fdfdfd);
+	background-image:-webkit-gradient(linear,left top,left bottom,color-stop(0,#f8f8f8),color-stop(1,#fdfdfd));
+	border:1px solid #d5d5d5;
+	font-family:Lucida Grande,Arial,Helvetica,sans-serif;
+	font-size:11px;
+	height:118px;
+	line-height:15px;
+	overflow:hidden;
+	width:300px;
+}
+.carbonad-img {
+	border:none;
+	display:inline;
+	float:left;
+	height:100px;
+	margin:9px;
+	width:130px;
+}
+.carbonad-text {
+	display:inline;
+	float:left;
+	width:142px;
+	padding-top:13px;
+}
+.carbonad-text a {
+	color:#000;
+	text-decoration:none;
+	text-transform:none;
+}.carbonad-tag {
+	float:left;
+	margin-top:9px;
+	text-align:center;
+	width:142px;
+	color:#999;
+}
+.carbonad-tag a {
+	color:#999;
+	text-decoration:none;
+}
+
+.cke_combopanel__fontsize {
+	width: 150px !important;
+}
+
+.bs-docs-footer-links {
+	margin-bottom: 0 !important;
+}
+
+#wrapper {
+    padding-left: 0;
+    transition: all 0.5s ease;
+}
+
+#wrapper.toggled {
+    padding-left: 250px;
+}
+
+#sidebar-wrapper {
+    z-index: 1000;
+    position: fixed;
+    left: 250px;
+    width: 0;
+    height: 100%;
+    margin-left: -250px;
+    overflow-y: auto;
+    background: rgba(0,0,0,0.9);
+    transition: all 0.5s ease;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+    width: 250px;
+}
+
+#page-content-wrapper {
+    width: 100%;
+    position: absolute;
+    padding: 15px;
+}
+
+#wrapper {
+	will-change: margin-right;
+}
+
+#wrapper.toggled #page-content-wrapper {
+    position: absolute;
+    margin-right: -250px;
+}
+
+.tooltip.tooltip-main.top, .tooltip-arrow, .tooltip-inner {
+	z-index: 0;
+}
+
+/* Hide empty cke_anchor error, does not affect jumping. */
+img.cke_anchor {
+	display: none;
+}
+
+/* Remove CKE anchor padding. */
+#prompt a {
+	padding: 0;
+}
+
+/* Sidebar Styles */
+#sidebar-connect p {
+	color: #999999;
+    text-indent: 20px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.sidebar-nav {
+    top: 0;
+    min-width: 250px;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sidebar-nav li {
+    text-indent: 20px;
+    line-height: 40px;
+}
+
+.sidebar-nav li div {
+    display: block;
+    text-decoration: none;
+    color: #999999;
+}
+
+.sidebar-nav li div.list:hover {
+    text-decoration: none;
+    color: #fff;
+    background: rgba(255,255,255,0.2);
+}
+.sidebar-nav li div.list p:hover {
+    cursor: pointer;
+}
+.glyphicon.glyphicon-chevron-left,
+.glyphicon.glyphicon-pencil,
+.glyphicon.glyphicon-download {
+    cursor: pointer;
+}
+.glyphicon.glyphicon-folder-open {
+	right:4px;
+}
+.glyphicon.glyphicon-plus {
+	right:1px;
+}
+.list #textBlock {
+	word-wrap: break-word;
+}
+
+.sidebar-nav li div.addOption:hover {
+    text-decoration: none;
+    color: #fff;
+    background: rgba(255,255,255,0.2);
+    cursor: pointer;
+}
+
+.editableMode {
+    text-decoration: none;
+    color: #fff;
+    background: rgba(255,255,255,0.2);
+    cursor: pointer;
+}
+
+.sidebar-nav li div.list:active,
+.sidebar-nav li div.list:focus {
+    text-decoration: none;
+}
+
+.sidebar-nav > .sidebar-brand {
+    height: 65px;
+    font-size: 18px;
+    line-height: 60px;
+}
+
+.sidebar-nav > .sidebar-brand {
+    color: #999999;
+}
+
+@media(min-width:768px) {
+    #wrapper {
+        padding-left: 250px;
+    }
+    
+    #wrapper.toggled {
+        padding-left: 0;
+    }
+    
+    #sidebar-wrapper {
+        width: 250px;
+        overflow-x: hidden;
+    }
+    
+    #wrapper.toggled #sidebar-wrapper {
+        width: 0;
+    }
+    
+    #page-content-wrapper {
+        padding: 20px;
+        position: relative;
+    }
+    
+    #wrapper.toggled #page-content-wrapper {
+        position: relative;
+        margin-right: 0;
+    }
+}
+
+.slider.slider-horizontal {
+	width: 90%;
+}
+
+.disabled {
+    pointer-events:none;
+    opacity:0.4;
+}
+
+.hidden {
+	display: none;
+}
+
+.slider-handle {
+	cursor: pointer;
+}
+
+.navbar {
+	height: 50px;
+}
+
+.navbar-brand img {
+	height: 50px;
+}
+
+.bg-prompter {
+	background-color: #4A4771;
+}
+
+#promptIt {
+    font-weight: 500;
+    color: #563d7c
+}
+#promptIt:hover {
+    color: #463265;
+    background-color: #f9f9f9
+}

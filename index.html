@@ -29,16 +29,14 @@
 	<meta property="fb:app_id" content="196769633992905">
 	<title>Imaginary Teleprompter by Imaginary Sense</title>
 	<link rel="icon" href="favicon.ico" type="image/x-icon">
-	<link rel="stylesheet" href="css/reset.css">
-	<link rel="stylesheet" href="css/bootstrap.min.css">
-	<link rel="stylesheet" href="css/docs.min.css">
-	<link rel="stylesheet" href="css/bootstrap-slider.min.css">
-	<link rel="stylesheet" href="css/editor.css">
-	<link rel="stylesheet" href="css/prompt.css">
-	<link rel="stylesheet" href="css/teleprompter-themes.css">
-	<link rel="stylesheet" href="css/mobilehide.css">
-	<script src="ckeditor/ckeditor.js"></script>
-	<!--<script src="tinymce/tinymce.min.js"></script>-->
+	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="assets/custom/css/docs.min.css">
+	<link rel="stylesheet" href="assets/bootstrap-slider/css/bootstrap-slider.min.css">
+	<link rel="stylesheet" href="assets/custom/css/editor.css">
+	<link rel="stylesheet" href="assets/custom/css/prompt.css">
+	<link rel="stylesheet" href="assets/custom/css/teleprompter-themes.css">
+	<link rel="stylesheet" href="assets/custom/css/mobilehide.css">
+	<script src="assets/ckeditor/ckeditor.js"></script>
 </head>
 <body>
 	<div id="wrapper" class="toggled hidden-xs">
@@ -53,23 +51,29 @@
 	</div>
 	<form>
 		<!-- Header -->
-		<header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+		<nav class="navbar navbar-expand-lg navbar-light bg-light">
 			<div class="container">
-				<div class='row'>
-					<ul class="nav navbar-nav navbar-left hidden-xs" style="padding-right:20px;">
-						<li><a id="menu-toggle" href="#menu-toggle"><img style="width:26px;" src="fonts/noto-emoji-master/emoji_u1f4be.svg"></a></li>
-					</ul>
-					<div class="navbar-header">
-						<a class="external navbar-brand" href="https://imaginary.tech/teleprompter/" target="_blank"><img src="img/logo.png" alt="Teleprompter" ></a>
-					</div>
-					<ul class="nav navbar-nav navbar-right">
-						<li><a id="advConfig" href="#content" data-toggle="collapse"><img style="width:26px;" src="fonts/noto-emoji-master/emoji_u2699.svg"></a></li>
-						<li><a id="updateIt" class="hidden" href=" ">Update</a></li>
-						<li><a id="promptIt" href=" ">Prompt It!</a></li>
-					</ul>
-				</div>
+				<a class="navbar-brand" href="https://imaginary.tech/teleprompter/" target="_blank"><img src="assets/custom/img/logo.png" alt="Teleprompter"></a>
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<a class="nav-link" id="menu-toggle" href="#menu-toggle">
+							<img style="width:26px;" src="assets/custom/fonts/noto-emoji-master/emoji_u1f4be.svg">
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="advConfig" href="#content" data-bs-toggle="collapse" aria-expanded="false" aria-controls="content">
+							<img style="width:26px;" src="assets/custom/fonts/noto-emoji-master/emoji_u2699.svg">
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link hidden" id="updateIt" href=" ">Update</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="promptIt" aria-current="page" href=" ">Prompt It!</a>
+					</li>
+				</ul>
 			</div>
-		</header>
+		</nav>
 		<!-- Controls -->
 		<div class="collapse bs-docs-header" id="content" tabindex="-1" >
 			<div class="container">
@@ -121,6 +125,7 @@
 			<div class="container">
 				<div class='row'>
 					<div class='col-md-10 col-sm-10'>
+						<div class='row'>
 						<div class='col-sm-3'>
 							<small>
 								<label for="speed">Speed:</label>
@@ -149,14 +154,18 @@
 							</small>
 							<input type="range" id="promptWidth" name="promptWidth" data-slider-value="84" data-slider-min="5" data-slider-max="100" data-slider-step="1" data-slider-ticks="[5,16,84,100]" data-slider-ticks-snap-bounds="0">
 						</div>
+						</div>
 					</div>
 					<div class='col-md-2 col-sm-2'>
 						<small>
 							<label for="timer">Timer</label>
 						</small><br>
-						<div id="timer" class="btn-group  btn-group-sm btn-toggle"> 
-						    <button class="btn btn-default">On</button>
-						    <button class="btn btn-primary active">Off</button>
+						<div class="btn-group" role="group"> 
+							<input type="radio" class="btn-check" name="btnradio" id="timerOn" autocomplete="on">
+							<label class="btn btn-outline-light" for="timerOn">On</label>
+						  
+							<input type="radio" class="btn-check" name="btnradio" id="timerOff" autocomplete="off">
+							<label class="btn btn-outline-light" for="timerOff">Off</label>
 						</div>
 					</div>
 					<!--
@@ -181,6 +190,7 @@
 				</div>
 			</div>
 		</div>
+		<!-- Editor Container -->
 		<div id="editorcontainer">
 			<div id="toolbar"></div>
 			<div id="promptcontainer">
@@ -223,7 +233,7 @@
 					</table>
 					</li>
 					<li>Insert images from the web or copy and paste them into the prompter.
-					<img alt="Picture: Arecibo Sky" src="img/arecibo-sky.jpg">
+					<img alt="Picture: Arecibo Sky" src="assets/custom/img/arecibo-sky.jpg">
 					</li>
 					 </ul>
 					<li>There are various <em>Prompter Styles</em> to choose from. You may also create your own.</li>
@@ -262,7 +272,7 @@
 				<a class="external" href="https://twitter.com/Va2ron1" target="_blank">Victor Ortiz</a><br>Contributors: <a class="external" href="https://www.facebook.com/rafael.jose.7737">Rafael Sierra</a> &amp; <a class="external" href="https://github.com/keyvanp">Keyvan P&eacute;rez</a>.
 			</p>
 			<ul class="bs-docs-footer-links">
-				<li>Version 2.4.0</li>
+				<li>Version 2.5.0 alpha</li>
 				<li>&middot;</li>
 				<li>Licensed under <a rel="license" href="LICENSE" target="_blank">GPL3</a>, assets under <a class="external" rel="license" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a></li>
 				<br>
@@ -320,6 +330,7 @@
 			</div>
 		</div>
 	</div>
+	<!-- Sidebar -->
 	<div id="sidebarDeleteElement" class="modalDialog">
 		<div style="width: 50%;">
 			<div class="panel panel-default">
@@ -389,44 +400,41 @@
 		</div>
 	</div>
 	<!-- ColorPicker modal dialog -->
-	<div id="openCustomStyles" class="modalDialog">
-		<div style="width: 84%;">
-
-			<div class="panel panel-default">
-				<a title="Close" class="close" onclick="closePromptStyles();">X</a>
-				<div class="panel-heading">
-					<h1>Custom Styles <small>Administration Panel</small></h1>
+	<div class="modal" id="openCustomStyles" tabindex="-1">
+		<div class="modal-dialog modal-xl">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Custom Styles <small>Administration Panel</small></h5>
+					<button type="button" class="btn-close" onClick="closePromptStyles();" aria-label="Close"></button>
 				</div>
-				<div class="panel-body" style="padding-top: 0px;">
-					<div class="row" style="margin-top: -10px;">
+				<div class="modal-body">
+					<div class="row">
 						<div class="col-md-3">
-							<h1><small>Styles</small></h1>
-							<div class="panel panel-default">
-								<div id="stylesContainer">
-									<table class="table table-bordered" id="stylesTable" >
-										<tbody>
-											<tr>
-												<th class="table-item"><span>No Styles</span></th>
-											</tr>
-										</tbody>
-									</table>
-								</div>
+							<h4>Styles</h4>
+							<div id="stylesContainer">
+								<table class="table" id="stylesTable" >
+									<tbody>
+										<tr>
+											<th class="table-item"><span>No Styles</span></th>
+										</tr>
+									</tbody>
+								</table>
 							</div>
 						</div>
 						<div class="col-md-9">
-							<h1><small>Properties</small></h1>
+							<h4>Properties</h4>
 							<div class='row'>
 								<div class='col-md-4'>
 									<label>Body</label>
-									<input type="text" class="form-control jscolor" onchange="updateColorOnPreview(this)" id="bodyColor" value="" >
+									<input type="text" data-jscolor="{}" class="form-control" onChange="updateColorOnPreview(this)" id="bodyColor" value="" >
 								</div>
 								<div class='col-md-4'>
 									<label>Overlay</label>
-									<input type="text" class="form-control jscolor" onchange="updateColorOnPreview(this)" id="overlayColor" value="" >
+									<input type="text" data-jscolor="{}" class="form-control" onChange="updateColorOnPreview(this)" id="overlayColor" value="" >
 								</div>
 								<div class='col-md-4'>
 									<label>Text Color</label>
-									<input type="text" class="form-control jscolor" onchange="updateColorOnPreview(this)" id="textColor" value="" >
+									<input type="text" data-jscolor="{}" class="form-control" onChange="updateColorOnPreview(this)" id="textColor" value="" >
 								</div>
 							</div>
 							<h1><small>Preview</small></h1>
@@ -450,8 +458,8 @@
 							<div class='row'>
 								<div class='col-md-4'>
 									<div class="input-group">
-										<span class="input-group-addon" id="basic-addon1">Style Name</span>
-										<input type="text"  class="form-control" placeholder="name" aria-describedby="basic-addon1" id="nameStyle">
+										<span class="input-group-text" id="style-addon">Style Name</span>
+										<input type="text" class="form-control" placeholder="name" aria-describedby="style-addon" id="nameStyle">
 									</div>
 								</div>
 								<div class='col-md-8'>
@@ -468,15 +476,15 @@
 		</div>
 	</div>
 </body>
-<script src="js/jquery.min.js"></script>
-<script src="js/data.manager.js"></script>
-<script src="js/sidebar.js"></script>
-<script src="js/teleprompter-themes.js"></script>
-<script src="js/editor.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/bootstrap-slider.min.js"></script>
-<!--<script src="js/jquery.qrcode.js"></script>-->
-<script src="js/jscolor.min.js"></script>
+<script src="assets/jquery/jquery.min.js"></script>
+<script src="assets/custom/js/data.manager.js"></script>
+<script src="assets/custom/js/sidebar.js"></script>
+<script src="assets/custom/js/teleprompter-themes.js"></script>
+<script src="assets/custom/js/editor.js"></script>
+<script src="assets/bootstrap/js/bootstrap.min.js"></script>
+<script src="assets/bootstrap-slider/js/bootstrap-slider.min.js"></script>
+<!--<script src="assets/jquery/js/jquery.qrcode.js"></script>-->
+<script src="assets/custom/js/jscolor.min.js"></script>
 <script type="text/javascript">
 if (inElectron()){
 	var {ipcMain} = require('electron');
