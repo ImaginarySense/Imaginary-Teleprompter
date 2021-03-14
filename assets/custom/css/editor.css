@@ -441,3 +441,9 @@ img.cke_anchor {
 	border: 0;
 	padding-left: 0;
 }
+
+#editMode, #deleteMode, #download {
+	cursor: pointer;
+	padding-left: .25rem!important;
+	padding-right: .25rem!important;
+}

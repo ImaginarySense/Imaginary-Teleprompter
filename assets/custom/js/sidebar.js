@@ -90,6 +90,9 @@ var SIDEBAR = function() {
         this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
         this.refreshElements();
 
+        var scripts = new bootstrap.Tab(document.getElementById("v-pills-scripts-tab"));
+        scripts.show();
+
         this.currentElement = elementsData.length-1;
 
         if (typeof this.addElementEnded === "function") {
@@ -153,6 +156,9 @@ var SIDEBAR = function() {
                             // sidebar.currentElement = elementsData.length-1;
                             sidebar.getSaveMode().setItem(sidebar.getDataKey(), JSON.stringify(elementsData));
                             sidebar.refreshElements();
+
+                            var scripts = new bootstrap.Tab(document.getElementById("v-pills-scripts-tab"));
+                            scripts.show();
                             // Load last imported file.
                             sidebar.currentElement = elementsData.length-1;
                             if (typeof sidebar.addElementEnded === "function") {
@@ -311,15 +317,24 @@ var SIDEBAR = function() {
     };
 
     this.loadDialog = function(){
-        //Close Dialog
-        // document.getElementById("cancelSidebarButton2").onclick = function(e){
-        //     e.preventDefault();
-        //     window.location = '#close';
-        // };
-        // document.getElementById("cancelSidebarButton").onclick = function(e){
-        //     e.preventDefault();
-        //     window.location = '#close';
-        // };
+        var menuContent = document.getElementById("v-pills-menuContent");
+
+        var input = document.createElement("input");
+        input.id = "files";
+        input.setAttribute("type","file");
+        input.setAttribute("name","files[]");
+        input.setAttribute("multiple", "");
+        input.setAttribute("readonly", "");
+        input.setAttribute("tabindex","0");
+
+        input.addEventListener('change', this.handleFileSelect.bind(this), false);
+        input.style.display = "none";
+
+        menuContent.appendChild(input);
+
+        document.getElementById("v-pills-import-tab").onclick = function(e) {
+            input.click();
+        }.bind(this);
         //Script Add Input Event
         document.getElementById("inputName").oninput = function(e){
             document.getElementById("inputID").value = this.createIDTag(document.getElementById("inputName").value);
@@ -499,23 +514,7 @@ var SIDEBAR = function() {
         }.bind(this), 2);
     };
 
-    this.exitEditMode = function(){
-        // var menuNode = document.getElementById(this.menu).children;
-
-        // for (var j = 0; j < menuNode.length; j++) {
-        //     menuNode[j].classList.remove("disabled");
-        //     menuNode[j].children[0].classList.remove("editableMode");
-
-        //     if(menuNode[j].children[0].querySelector("#editMode"))
-        //         menuNode[j].children[0].querySelector("#editMode").style.display = "";
-            
-        //     if(menuNode[j].children[0].querySelector("#deleteMode"))
-        //         menuNode[j].children[0].querySelector("#deleteMode").style.display = "none";
-            
-        //     if(menuNode[j].children[0].children[0])
-        //         menuNode[j].children[0].children[0].setAttribute("contentEditable", false);
-        // }
-    };
+    this.exitEditMode = function(){};
 
     this.clearElements = function() {
         document.getElementById(this.menu).innerHTML = "";
@@ -657,25 +656,8 @@ var SIDEBAR = function() {
 
                     e.target.parentNode.style.display = "none";
                     e.target.parentNode.parentNode.querySelector("#deleteMode").style.display = "";
-                    // e.target.parentNode.classList.add("editableMode");
-                    // e.target.parentNode.classList.remove("disabled");
                     var textBlock = e.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector("#textBlock");
                     textBlock.disabled = false;
-                    // textBlock.setAttribute("contentEditable", true);
-                    // textBlock.focus();
-                    // if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
-                    //     var range = document.createRange();
-                    //     range.selectNodeContents(textBlock);
-                    //     range.collapse(false);
-                    //     var sel = window.getSelection();
-                    //     sel.removeAllRanges();
-                    //     sel.addRange(range);
-                    // } else if (typeof document.body.createTextRange != "undefined") {
-                    //     var textRange = document.body.createTextRange();
-                    //     textRange.moveToElementText(textBlock);
-                    //     textRange.collapse(false);
-                    //     textRange.select();
-                    // }
 
                     textBlock.onkeydown = function(e) {
                         if (e.keyCode == 13) {
@@ -731,137 +713,31 @@ var SIDEBAR = function() {
                 span.style.display = "none";
 
                 div.appendChild(span);
+
+                span = document.createElement("span");
+                span.id = "download";
+                span.setAttribute("tabindex", "0");
+
+                icon = document.createElement("i");
+                icon.classList = "bi bi-cloud-download";
+                span.appendChild(icon);
+
+                span.onclick = function(e) {
+                    e.stopImmediatePropagation();
+                    this.currentElement = this.getElementIndexByID(e.target.parentNode.parentNode.parentNode.parentNode.parentNode.id);
+                    elementsData = this.getElements();
+                    if (typeof this.selectedElement === "function") {
+                        // Download document
+                        this.download(elementsData[this.currentElement], this.currentElement);
+                    }
+                }.bind(this);
+
+                div.appendChild(span);
+
                 row.appendChild(div);
                 th.appendChild(row);
 
                 tr.appendChild(th);
-
-                // var li = document.createElement("li");
-                // var div = document.createElement("div");
-                // li.id = elementsData[i].id;
-
-                // div.classList.add("list");
-
-                // var p = document.createElement("p");
-                // p.id = "textBlock";
-                // p.style.display = "inline";
-                // p.setAttribute("contentEditable", false);
-                // p.setAttribute("tabindex","0");
-
-                // p.appendChild(document.createTextNode(elementsData[i].name));
-                // div.appendChild(p);
-
-                // li.onclick = function(e) {
-                //     e.stopImmediatePropagation();
-                //     if (e.target.contentEditable == "false") {
-                //         this.currentElement = this.getElementIndexByID(e.target.parentNode.parentNode.id);
-                //         this.setInstructions();
-                //         elementsData = this.getElements();
-                //         if (typeof this.selectedElement === "function") {
-                //             this.selectedElement(elementsData[this.currentElement]);
-                //         }
-
-                //     }
-                // }.bind(this);
-
-                // if(elementsData[i].editable){
-                //     var span2 = document.createElement("span");
-                //     span2.id = "deleteMode";
-                //     span2.classList.add("glyphicon");
-                //     span2.classList.add("glyphicon-minus");
-                //     span2.setAttribute("tabindex","0");
-                //     span2.onclick = function(e) {
-                //         e.stopImmediatePropagation();
-                //         this.deleteElement(e.target.parentNode.parentNode.id);
-                //         window.setTimeout(function() {
-                //             this.refreshElements();
-                //         }.bind(this), 1);
-                //     }.bind(this);
-                //     span2.style.display = "none";
-                //     div.appendChild(span2);
-
-                    // var span = document.createElement("span");
-                    // span.id = "editMode";
-                    // span.setAttribute("tabindex","0");
-                    // span.classList.add("glyphicon");
-                    // span.classList.add("glyphicon-pencil");
-                    // span.onclick = function(e) {
-                    //     e.stopImmediatePropagation();
-
-                    //     this.exitEditMode();
-
-                    //     e.target.style.display = "none";
-                    //     e.target.parentNode.querySelector("#deleteMode").style.display = "";
-                    //     e.target.parentNode.classList.add("editableMode");
-                    //     e.target.parentNode.classList.remove("disabled");
-                    //     var textBlock = e.target.parentNode.querySelector("#textBlock");
-                    //     textBlock.setAttribute("contentEditable", true);
-                    //     textBlock.focus();
-                    //     if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
-                    //         var range = document.createRange();
-                    //         range.selectNodeContents(textBlock);
-                    //         range.collapse(false);
-                    //         var sel = window.getSelection();
-                    //         sel.removeAllRanges();
-                    //         sel.addRange(range);
-                    //     } else if (typeof document.body.createTextRange != "undefined") {
-                    //         var textRange = document.body.createTextRange();
-                    //         textRange.moveToElementText(textBlock);
-                    //         textRange.collapse(false);
-                    //         textRange.select();
-                    //     }
-
-                    //     textBlock.onkeydown = function(e) {
-                    //         if (e.keyCode == 13) {
-                    //             e.stopImmediatePropagation();
-
-                    //             if (e.target.innerHTML.length>this.maxFileSize())
-                    //                 return false;
-
-                    //             var text = e.target.innerHTML.replace("&nbsp;", '');
-                    //             text = text.replace("<br>", '');
-                    //             if (text.length > 0) {
-                    //                 e.target.innerHTML = text;
-
-                    //                 elementsData[this.getElementIndexByID(e.target.parentNode.parentNode.id)]['name'] = text;
-                    //                 this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
-                    //                 this.exitEditMode();
-                    //                 return true;
-                    //             } else {
-                    //                 return false;
-                    //             }
-                    //         } else if (e.keyCode == 8) {
-                    //             if (e.target.innerHTML.length - 1 === 0) {
-                    //                 e.target.innerHTML = "&nbsp;";
-                    //             }
-                    //         }
-
-                    //         return true;
-                    //     }.bind(this);
-
-                    //     return false;
-                    // }.bind(this);
-                    // div.appendChild(span);
-
-                //     var downloadButton = document.createElement("span");
-                //     downloadButton.id = "download";
-                //     // span3.setAttribute("tabindex","3");
-                //     downloadButton.classList.add("glyphicon");
-                //     downloadButton.classList.add("glyphicon-download");
-                //     downloadButton.onclick = function(e) {
-                //         e.stopImmediatePropagation();
-                //         this.currentElement = this.getElementIndexByID(e.target.parentNode.parentNode.id);
-                //         elementsData = this.getElements();
-                //         if (typeof this.selectedElement === "function") {
-                //             // Download document
-                //             this.download(elementsData[this.currentElement], this.currentElement);
-                //         }
-                //     // Insert download code here...
-                //     }.bind(this);
-                //     div.appendChild(downloadButton);
-                // }
-                // li.appendChild(div);
-                // menuNode.appendChild(li);
             } else {
                 th = document.createElement("th");
                 tr.appendChild(th);
@@ -869,79 +745,6 @@ var SIDEBAR = function() {
             
             menuNode.appendChild(tr);
         }
-
-        // Import button
-        // var importLi = document.createElement("li");
-        // importLi.style.position = "relative";
-        // var input = document.createElement("input");
-        // input.id = "files";
-        // input.setAttribute("type","file");
-        // input.setAttribute("name","files[]");
-        // input.setAttribute("multiple", "");
-        // input.setAttribute("readonly", "");
-        // input.setAttribute("tabindex","0");
-        // input.classList.add("addOption");
-        // input.addEventListener('change', this.handleFileSelect.bind(this), false);
-        // input.style.position = "absolute";
-        // input.style.opacity = "0";
-        // // Emulate CSS mouse hover
-        // input.style.cursor = "pointer";
-        // input.addEventListener("mouseenter", function () {
-        //     importLi.style.background = "rgba(255,255,255,0.2)";
-        //     importDiv.style.color = "#FFFFFF";
-        // });
-        // input.addEventListener("mouseleave", function () {
-        //     importLi.style.background = "initial";
-        //     importDiv.style.color = "#999";
-        // });
-        // input.style.zIndex = "2";
-        // // Add real button
-        // importLi.appendChild(input);
-        // Create fake styled import button.
-        // var importDiv = document.createElement("div");
-        // importDiv.classList.add("addOption");
-        // var span2 = document.createElement("span");
-        // span2.id = "addMode";
-        // span2.classList.add("glyphicon");
-        // span2.classList.add("glyphicon-folder-open");
-        // importDiv.appendChild(span2);
-        // importDiv.style.position = "relative";
-        // var p = document.createElement("p");
-        // p.id = "textBlock";
-        // p.style.display = "inline";
-        // p.setAttribute("contentEditable", false);
-        // p.appendChild(document.createTextNode(this.getImportElementName()));
-        // importDiv.appendChild(p);
-        // // Add fake button
-        // importLi.appendChild(importDiv);
-        // menuNode.appendChild(importLi);
-
-        // var li = document.createElement("li");
-        // var div = document.createElement("div");
-        // div.classList.add("addOption");
-        // div.setAttribute("tabindex","0");
-        // var span2 = document.createElement("span");
-        // span2.id = "addMode";
-        // span2.classList.add("glyphicon");
-        // span2.classList.add("glyphicon-plus");
-        // div.appendChild(span2);
-
-        // var p = document.createElement("p");
-        // p.id = "textBlock";
-        // p.style.display = "inline";
-        // p.setAttribute("contentEditable", false);
-        // p.appendChild(document.createTextNode(this.getAddElementName()));
-        // div.appendChild(p);
-
-        // li.onclick = function(e) {
-        //     e.stopImmediatePropagation();
-        //     window.location = '#sidebarAddElement';
-        //     document.getElementById("inputName").focus();
-        // }.bind(this);
-        
         document.getElementById("addScriptSidebarButton").onclick = this.addScript.bind(this);
-        
-        // li.appendChild(div);
-        // menuNode.appendChild(li);
     };
 };
