@@ -287,8 +287,10 @@ var debug = false;
             //ipcRenderer.send('asynchronous-message', 'network');
         } // end if
 
+        // Initialize controls
         initControls();
-
+        // Initialize styles menu
+        initPromptStyles();
         // Initialize file management features.
         initScripts();
         //initImages();

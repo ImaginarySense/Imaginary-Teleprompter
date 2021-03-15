@@ -214,11 +214,12 @@ function refreshPromptStyles(promptStyleElement) {
         }
     }
 
-    var opt = document.createElement('option');
-    opt.value = themeStyles.length;
-    opt.innerHTML = "Custom Style";
+    // Remove old option
+    // var opt = document.createElement('option');
+    // opt.value = themeStyles.length;
+    // opt.innerHTML = "Custom Style";
 
-    promptStyleElement.appendChild(opt);
+    // promptStyleElement.appendChild(opt);
     setStyle(defaultStyle);
 }
 
@@ -329,7 +330,7 @@ function addActiveStyleToRow() {
 
     var opt = document.createElement('button');
     opt.type = "button";
-    opt.classList.add("btn", "btn-default", "btn-xs");
+    opt.classList.add("btn", "btn-default", "btn-xs", "p-0");
     opt.id = "button_up";
     opt.innerHTML = "&#x25B2;";
     opt.onclick = function(event) {
@@ -341,7 +342,7 @@ function addActiveStyleToRow() {
 
     opt = document.createElement('button');
     opt.type = "button";
-    opt.classList.add("btn", "btn-default", "btn-xs");
+    opt.classList.add("btn", "btn-default", "btn-xs", "p-0");
     opt.id = "button_down";
     opt.innerHTML = "&#x25BC;";
     opt.onclick = function(event) {
@@ -354,11 +355,12 @@ function addActiveStyleToRow() {
 }
 
 function clickActiveStyle(row) {
-    var s = document.querySelector("#orderButtons");
+    var stylesTable = document.getElementById("stylesTable");
+    var s = stylesTable.querySelector("#orderButtons");
     if (s !== null)
         s.parentNode.removeChild(s);
 
-    s = document.querySelector(".active");
+    s = stylesTable.querySelector(".active");
     if (s !== null) {
         s.classList.remove('active');
     }
@@ -387,9 +389,9 @@ function refreshAdminPromptStyles() {
 
             var innerText = "";
 
-            if (themeStyles[i]["id"] == defaultStyle) {
-                innerText += "<span class=\"glyphicon glyphicon-share-alt\"> </span>";
-            }
+            // if (themeStyles[i]["id"] == defaultStyle) {
+            //     innerText += "<span class=\"glyphicon glyphicon-share-alt\"> </span>";
+            // }
             innerText += "<span>" + themeStyles[i]["name"] + "</span>";
 
             opt.innerHTML = innerText;
@@ -401,16 +403,12 @@ function refreshAdminPromptStyles() {
             }
             row.classList.add("style");
 
-
-
             //row.value = i;
             var objValue = document.createElement('p');
             objValue.innerHTML = i;
             objValue.id = "value";
             objValue.style.display = "none";
             opt.appendChild(objValue);
-
-
 
             row.appendChild(opt);
 
@@ -444,6 +442,7 @@ function moveItemUpDown(obj, down) {
 
     refreshAdminPromptStyles();
     refreshCurrentItem();
+    refreshPromptStyles();
 }
 
 function openPromptStyles() {
@@ -451,7 +450,9 @@ function openPromptStyles() {
         keyboard: false
     });
     openCustomStylesModal.show();
-
+    initPromptStyles();
+}
+function initPromptStyles() {
     document.getElementById("editStyleButton").addEventListener("click", editPromptStyle);
     document.getElementById("addStyleButton").addEventListener("click", addStyleToPromptStyles);
     document.getElementById("removeStyleButton").addEventListener("click", removeStyleFromPromptStyles);
