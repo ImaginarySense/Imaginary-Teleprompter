@@ -36,7 +36,7 @@ body {
 	padding: 0;
 }
 
-#fileManagerToggle, #advConfig {
+#fileManagerToggle, #settingsToggle, #quickConfig {
 	padding: 12px 11px 11px 11px;
 	margin: 0px;
 	/*top: 0px;*/
@@ -446,4 +446,7 @@ img.cke_anchor {
 	cursor: pointer;
 	padding-left: .25rem!important;
 	padding-right: .25rem!important;
+}
+.slider {
+	margin-left: 10px;
 }

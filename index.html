@@ -53,12 +53,12 @@
 							</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link" id="advConfig" href="#content" data-bs-toggle="collapse" aria-expanded="false" aria-controls="content">
+							<a class="nav-link" id="settingsToggle" href="#settingsModal">
 								<img style="width:26px;" src="assets/custom/fonts/noto-emoji-master/emoji_u2699.svg">
 							</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link" id="advConfig" href="#content" data-bs-toggle="collapse" aria-expanded="false" aria-controls="content">
+							<a class="nav-link" id="quickConfig" href="#content" data-bs-toggle="collapse" aria-expanded="false" aria-controls="content">
 								<img style="width:26px;" src="assets/custom/fonts/noto-emoji-master/emoji_u1f517.svg">
 							</a>
 						</li>
@@ -74,8 +74,8 @@
 			<!-- Controls -->
 			<div class="collapse bs-docs-header" id="content" tabindex="-1" >
 				<div class="container">
-					<div class='row pt-3'>
-						<div class='col-md-3 col-sm-6'>
+					<div class='row pt-3 pb-3'>
+						<div class='col-md-3 col-sm-6' id="primaryQuick">
 							<!--<label for="basic-url">Flip mode</label>-->
 							<label for="primary">In-frame prompter</label>
 							<select class="form-control" id="primary" name="primary">
@@ -86,7 +86,7 @@
 								<option value="4" title="180&deg; screen rotation">Double Flip (180&deg; screen rotation)</option>
 							</select>
 						</div>
-						<div class='col-md-3 col-sm-6'>
+						<div class='col-md-3 col-sm-6' id="secondaryQuick">
 							<label for="secondary">External prompter</label>
 							<select class="form-control" id="secondary" name="secondary">
 								<option value="0" title="Don't prompt to a second window" selected="selected">Disabled (Don't prompt to a second window)</option>
@@ -96,7 +96,7 @@
 								<option value="4" title="180&deg; screen rotation">Double Flip  (180&deg; screen rotation)</option>
 							</select>
 						</div>
-						<div class='col-md-3 col-sm-6'>
+						<div class='col-md-3 col-sm-6' id="prompterStyleQuick">
 							<label for="prompterStyle">Prompter style</label>
 							<select class="form-control" id="prompterStyle" name="prompterStyle">
 								<option value="0">Azure Light</option>
@@ -107,7 +107,7 @@
 								<option value="4">Whiteboard</option>
 							</select>
 						</div>
-						<div class='col-md-3 col-sm-6'>
+						<div class='col-md-3 col-sm-6' id="focusQuick">
 							<label for="focus">Focus area</label>
 							<select class="form-control" id="focus" name="focus">
 								<option value="3" title="No focus area for increased efficiency.">None</option>
@@ -117,51 +117,43 @@
 								<option value="4" title="Dissable touch to enable interaction with HTML contents.">Interactive mode (interact with HTML contents)</option>
 							</select>
 						</div>
-					</div>
-				</div>
-				<div class="container">
-					<div class='row pb-3'>
-						<div class='col-md-10 col-sm-10'>
-							<div class='row'>
-							<div class='col-sm-3'>
-								<small>
-									<label for="speed">Speed:</label>
-									<label for="speed" id="speedValue">4.0</label>
-								</small>
-								<input type="range" id="speed" name="speed" data-slider-value="4.0" data-slider-step="0.5" data-slider-min="1" data-slider-max="20" data-slider-ticks="[1,4,20]" data-slider-ticks-snap-bounds="0">
-							</div>
-							<div class='col-sm-3'>
-								<small>
-									<label for="acceleration">Acceleration:</label>
-									<label for="acceleration" id="accelerationValue">1.45</label>
-								</small>
-								<input type="range" id="acceleration" name="acceleration" data-slider-value="1.45" data-slider-min="0.5" data-slider-max="1.8" data-slider-step="0.05" data-slider-ticks="[0.5,1.45,1.8]" data-slider-ticks-snap-bounds="0">
-							</div>
-							<div class='col-sm-3'>
-								<small>
-									<label for="fontSize">Font size:</label>
-									<label for="fontSize" id="fontSizeValue">120</label><label for="fontSize">%</label>
-								</small>
-								<input type="range" id="fontSize" name="fontSize" data-slider-value="120" data-slider-min="10" data-slider-max="250" data-slider-step="1" data-slider-ticks="[10,25,120,250]" data-slider-ticks-snap-bounds="0">
-							</div>
-							<div class='col-sm-3'>
-								<small>
-									<label for="promptWidth">Width:</label>
-									<label for="promptWidth" id="promptWidthValue">84</label><label for="promptWidth">%</label>
-								</small>
-								<input type="range" id="promptWidth" name="promptWidth" data-slider-value="84" data-slider-min="5" data-slider-max="100" data-slider-step="1" data-slider-ticks="[5,16,84,100]" data-slider-ticks-snap-bounds="0">
-							</div>
-							</div>
+						<div class='col-md-3 col-sm-6' id="speedQuick">
+							<small>
+								<label for="speed">Speed:</label>
+								<label for="speed" id="speedValue">4.0</label>
+							</small>
+							<input type="range" id="speed" name="speed" data-slider-value="4.0" data-slider-step="0.5" data-slider-min="1" data-slider-max="20" data-slider-ticks="[1,4,20]" data-slider-ticks-snap-bounds="0">
 						</div>
-						<div class='col-md-2 col-sm-2'>
+						<div class='col-md-3 col-sm-6' id="accelerationQuick">
+							<small>
+								<label for="acceleration">Acceleration:</label>
+								<label for="acceleration" id="accelerationValue">1.45</label>
+							</small>
+							<input type="range" id="acceleration" name="acceleration" data-slider-value="1.45" data-slider-min="0.5" data-slider-max="1.8" data-slider-step="0.05" data-slider-ticks="[0.5,1.45,1.8]" data-slider-ticks-snap-bounds="0">
+						</div>
+						<div class='col-md-3 col-sm-6' id="fontSizeQuick">
+							<small>
+								<label for="fontSize">Font size:</label>
+								<label for="fontSize" id="fontSizeValue">120</label><label for="fontSize">%</label>
+							</small>
+							<input type="range" id="fontSize" name="fontSize" data-slider-value="120" data-slider-min="10" data-slider-max="250" data-slider-step="1" data-slider-ticks="[10,25,120,250]" data-slider-ticks-snap-bounds="0">
+						</div>
+						<div class='col-md-3 col-sm-6 hidden' id="promptWidthQuick">
+							<small>
+								<label for="promptWidth">Width:</label>
+								<label for="promptWidth" id="promptWidthValue">84</label><label for="promptWidth">%</label>
+							</small>
+							<input type="range" id="promptWidth" name="promptWidth" data-slider-value="84" data-slider-min="5" data-slider-max="100" data-slider-step="1" data-slider-ticks="[5,16,84,100]" data-slider-ticks-snap-bounds="0">
+						</div>
+						<div class='col-md-2 col-sm-2' id="timerQuick">
 							<small>
 								<label for="timer">Timer</label>
 							</small><br>
 							<div class="btn-group" role="group"> 
-								<input type="radio" class="btn-check" name="btnradio" id="timerOn" autocomplete="on">
+								<input type="radio" class="btn-check" name="btnradio" id="timerOn" autocomplete="on" onchange="updateQuickControl(this, 'timerQuick')">
 								<label class="btn btn-outline-light" for="timerOn">On</label>
 							
-								<input type="radio" class="btn-check" name="btnradio" id="timerOff" autocomplete="off">
+								<input type="radio" class="btn-check" name="btnradio" id="timerOff" autocomplete="off" onchange="updateQuickControl(this, 'timerQuick')">
 								<label class="btn btn-outline-light" for="timerOff">Off</label>
 							</div>
 						</div>
@@ -288,9 +280,11 @@
 				</div>
 			</footer>
 		</div>
-		<div id="framecontainer">
-			<iframe id="teleprompterframe" src="blank.html" class="fullsize"></iframe><!--   -->
-			<canvas id="telepromptercanvas" width="800" height="600" class="fullsize"></canvas>
+		<div class="row">
+			<div id="framecontainer">
+				<iframe id="teleprompterframe" src="blank.html" class="fullsize"></iframe><!--   -->
+				<canvas id="telepromptercanvas" width="800" height="600" class="fullsize"></canvas>
+			</div>
 		</div>
 		<div id="devWarning" class="modalDialog">
 			<div style="width: 50%;">
@@ -331,7 +325,7 @@
 				</div>
 			</div>
 		</div>
-		<!-- File Manager -->
+		<!-- File Manager Dialog -->
 		<div class="modal fade" id="filesManagerModal" tabindex="-1">
 			<div class="modal-dialog modal-lg">
 				<div class="modal-content">
@@ -405,6 +399,319 @@
 				  <button type="button" class="btn btn-primary" id="fileManagerDeleteModalDelete">Delete</button>
 				</div>
 			  </div>
+			</div>
+		</div>
+		<!-- Settings Dialog -->
+		<div class="modal fade" id="settingsModal" tabindex="-1">
+			<div class="modal-dialog modal-xl">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Settings</h5>
+						<button type="button" class="btn-close" id="settingsClose" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div class="d-flex align-items-start">
+							<div class="nav flex-column nav-pills col-3 me-3" id="v-pills-menu" role="tablist" aria-orientation="vertical">
+								<button class="nav-link active" id="v-pills-controls-tab" data-bs-toggle="pill" data-bs-target="#v-pills-controls" type="button" role="tab" aria-controls="v-pills-controls" aria-selected="true">
+									<i class="bi bi-circle-half"></i> 
+									Controls
+								</button>
+							  	<button class="nav-link" id="v-pills-styles-tab" data-bs-toggle="pill" data-bs-target="#v-pills-styles" type="button" role="tab" aria-controls="v-pills-styles" aria-selected="false">
+									<i class="bi bi-columns"></i>
+									Styles
+								</button>
+								<button class="nav-link" id="v-pills-newScript-tab" data-bs-toggle="pill" data-bs-target="#v-pills-newScript" type="button" role="tab" aria-controls="v-pills-newScript" aria-selected="false">
+									<i class="bi bi-hand-index"></i>
+									Key Mapping
+								</button>
+							</div>
+							<div class="tab-content w-100" id="v-pills-menuContent">
+							  	<div class="tab-pane fade show active" id="v-pills-controls" role="tabpanel" aria-labelledby="v-pills-controls-tab">
+								<table class="table table-hover">
+									<tbody id="v-pills-controlsContent">
+										<tr>
+											<th>
+												<div class="row">
+													<span style="padding: .375rem .75rem;">In-frame prompter</span>
+												</div>
+											</th>
+											<th>
+												<select class="form-control" id="primaryControl" name="primaryControl">
+													<option value="0" title="Don't prompt on this window">Disabled (Don't prompt on this window)</option>
+													<option value="1" title="Normal screen" selected="selected">No Flip (Normal screen)</option>
+													<option value="2" title="Normal mirror">Horizontal Flip (Mirror)</option>
+													<option value="3" title="Miror plus 180&deg; rotation">Vertical Flip (Miror plus 180&deg; rotation)</option>
+													<option value="4" title="180&deg; screen rotation">Double Flip (180&deg; screen rotation)</option>
+												</select>
+											</th>
+											<th>
+												<div class="input-group">
+													<span class="input-group-text">Quick</span>
+													<div class="input-group-text">
+														<input class="form-check-input mt-0" type="checkbox" value="" id="primaryQuickConfig">
+													</div>
+												</div>
+											</th>
+										</tr>
+										<tr>
+											<th>
+												<div class="row">
+													<span style="padding: .375rem .75rem;">External prompter</span>
+												</div>
+											</th>
+											<th>
+												<select class="form-control" id="secondaryControl" name="secondaryControl">
+													<option value="0" title="Don't prompt to a second window" selected="selected">Disabled (Don't prompt to a second window)</option>
+													<option value="1" title="Normal screen">No Flip (Normal screen)</option>
+													<option value="2" title="Normal mirror">Horizontal Flip (Mirror)</option>
+													<option value="3" title="Miror plus 180&deg; rotation">Vertical Flip (Miror plus 180&deg; rotation)</option>
+													<option value="4" title="180&deg; screen rotation">Double Flip  (180&deg; screen rotation)</option>
+												</select>
+											</th>
+											<th>
+												<div class="input-group">
+													<span class="input-group-text">Quick</span>
+													<div class="input-group-text">
+														<input class="form-check-input mt-0" type="checkbox" value="" id="secondaryQuickConfig">
+													</div>
+												</div>
+											</th>
+										</tr>
+										<tr>
+											<th>
+												<div class="row">
+													<span style="padding: .375rem .75rem;">Prompter style</span>
+												</div>
+											</th>
+											<th>
+												<select class="form-control" id="prompterStyleControl" name="prompterStyleControl">
+													<option value="0">Azure Light</option>
+													<option value="1" selected="selected">Blackboard</option>
+													<option value="2">Classic Yellow</option>
+													<option value="3">Dark Matter</option>
+													<!-- <option value="4">Intergalactic</option> -->
+													<option value="4">Whiteboard</option>
+												</select>
+											</th>
+											<th>
+												<div class="input-group">
+													<span class="input-group-text">Quick</span>
+													<div class="input-group-text">
+														<input class="form-check-input mt-0" type="checkbox" value="" id="prompterStyleQuickConfig">
+													</div>
+												</div>
+											</th>
+										</tr>
+										<tr>
+											<th>
+												<div class="row">
+													<span style="padding: .375rem .75rem;">Focus area</span>
+												</div>
+											</th>
+											<th>
+												<select class="form-control" id="focusControl" name="focusControl">
+													<option value="3" title="No focus area for increased efficiency.">None</option>
+													<option value="1">Top Focus (for Webcams)</option>
+													<option value="0" selected="selected">Middle Focus (for Professional prompters)</option>
+													<option value="2">Bottom Focus (for Screens over cameras)</option>
+													<option value="4" title="Dissable touch to enable interaction with HTML contents.">Interactive mode (interact with HTML contents)</option>
+												</select>
+											</th>
+											<th>
+												<div class="input-group">
+													<span class="input-group-text">Quick</span>
+													<div class="input-group-text">
+														<input class="form-check-input mt-0" type="checkbox" value="" id="focusQuickConfig">
+													</div>
+												</div>
+											</th>
+										</tr>
+										<tr>
+											<th>
+												<div class="row">
+													<span style="padding: .375rem .75rem;">Speed: <span id="speedControlValue">4.0</span></span>
+												</div>
+											</th>
+											<th>
+												<div class="row">
+													<div style="padding: .375rem .75rem;">
+														<input class="w-100" type="range" id="speedControl" name="speedControl" data-slider-value="4.0" data-slider-step="0.5" data-slider-min="1" data-slider-max="20" data-slider-ticks="[1,4,20]" data-slider-ticks-snap-bounds="0">
+													</div>
+												</div>
+											</th>
+											<th>
+												<div class="input-group">
+													<span class="input-group-text">Quick</span>
+													<div class="input-group-text">
+														<input class="form-check-input mt-0" type="checkbox" value="" id="speedQuickConfig">
+													</div>
+												</div>
+											</th>
+										</tr>
+										<tr>
+											<th>
+												<div class="row">
+													<span style="padding: .375rem .75rem;">Acceleration: <span id="accelerationControlValue">1.45</span></span>
+												</div>
+											</th>
+											<th>
+												<div class="row">
+													<div style="padding: .375rem .75rem;">
+														<input class="w-100" type="range" id="accelerationControl" name="accelerationControl" data-slider-value="1.45" data-slider-min="0.5" data-slider-max="1.8" data-slider-step="0.05" data-slider-ticks="[0.5,1.45,1.8]" data-slider-ticks-snap-bounds="0">
+													</div>
+												</div>
+											</th>
+											<th>
+												<div class="input-group">
+													<span class="input-group-text">Quick</span>
+													<div class="input-group-text">
+														<input class="form-check-input mt-0" type="checkbox" value="" id="accelerationQuickConfig">
+													</div>
+												</div>
+											</th>
+										</tr>
+										<tr>
+											<th>
+												<div class="row">
+													<span style="padding: .375rem .75rem;">Font size: <span id="fontSizeControlValue">120</span>%</span>
+												</div>
+											</th>
+											<th>
+												<div class="row">
+													<div style="padding: .375rem .75rem;">
+														<input class="w-100" type="range" id="fontSizeControl" name="fontSizeControl" data-slider-value="120" data-slider-min="10" data-slider-max="250" data-slider-step="1" data-slider-ticks="[10,25,120,250]" data-slider-ticks-snap-bounds="0">
+													</div>
+												</div>
+											</th>
+											<th>
+												<div class="input-group">
+													<span class="input-group-text">Quick</span>
+													<div class="input-group-text">
+														<input class="form-check-input mt-0" type="checkbox" value="" id="fontSizeQuickConfig">
+													</div>
+												</div>
+											</th>
+										</tr>
+										<tr>
+											<th>
+												<div class="row">
+													<span style="padding: .375rem .75rem;">Width: <span id="promptWidthControlValue">84</span>%</span>
+												</div>
+											</th>
+											<th>
+												<div class="row">
+													<div style="padding: .375rem .75rem;">
+														<input class="w-100" type="range" id="promptWidthControl" name="promptWidthControl" data-slider-value="84" data-slider-min="5" data-slider-max="100" data-slider-step="1" data-slider-ticks="[5,16,84,100]" data-slider-ticks-snap-bounds="0">
+													</div>
+												</div>
+											</th>
+											<th>
+												<div class="input-group">
+													<span class="input-group-text">Quick</span>
+													<div class="input-group-text">
+														<input class="form-check-input mt-0" type="checkbox" value="" id="promptWidthQuickConfig">
+													</div>
+												</div>
+											</th>
+										</tr>
+										<tr>
+											<th>
+												<div class="row">
+													<span style="padding: .375rem .75rem;">Timer</span>
+												</div>
+											</th>
+											<th>
+												<div class="btn-group" role="group"> 
+													<input type="radio" class="btn-check" name="btnradio" id="timerOnControl" autocomplete="on">
+													<label class="btn btn-outline-dark" for="timerOn">On</label>
+												
+													<input type="radio" class="btn-check" name="btnradio" id="timerOffControl" autocomplete="off">
+													<label class="btn btn-outline-dark" for="timerOff">Off</label>
+												</div>
+											</th>
+											<th>
+												<div class="input-group">
+													<span class="input-group-text">Quick</span>
+													<div class="input-group-text">
+														<input class="form-check-input mt-0" type="checkbox" value="" id="timerQuickConfig">
+													</div>
+												</div>
+											</th>
+										</tr>
+									</tbody>
+								</table>
+							  	</div>
+							  	<div class="tab-pane fade" id="v-pills-styles" role="tabpanel" aria-labelledby="v-pills-styles-tab">
+									<div class="row">
+										<div class="col-md-3">
+											<h4>Styles</h4>
+											<div id="stylesContainer">
+												<table class="table" id="stylesTable" >
+													<tbody>
+														<tr>
+															<th class="table-item"><span>No Styles</span></th>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+										</div>
+										<div class="col-md-9">
+											<h4>Properties</h4>
+											<div class='row'>
+												<div class='col-md-4'>
+													<label>Body</label>
+													<input type="text" data-jscolor="{}" class="form-control" onChange="updateColorOnPreview(this)" id="bodyColor" value="" >
+												</div>
+												<div class='col-md-4'>
+													<label>Overlay</label>
+													<input type="text" data-jscolor="{}" class="form-control" onChange="updateColorOnPreview(this)" id="overlayColor" value="" >
+												</div>
+												<div class='col-md-4'>
+													<label>Text Color</label>
+													<input type="text" data-jscolor="{}" class="form-control" onChange="updateColorOnPreview(this)" id="textColor" value="" >
+												</div>
+											</div>
+											<h1><small>Preview</small></h1>
+											<div id="promptPreviewColor">
+												<!-- #overlay layers focus area on top of the prompt. -->
+												<table cellpadding="0" cellspacing="0" id="overlayPreview" >
+													<tbody>
+														<tr id="overlayTop" style = "background-color:#000;opacity:0.5;">
+															<td>Text</td>
+														</tr>
+														<tr id="overlayFocus" >
+															<td>Text</td>
+														</tr>
+														<tr id="overlayBottom" class="overlayBg" style = "background-color:#000;opacity:0.5;">
+															<td>Text</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+											</br>
+										</div>
+									</div>
+									<div class='row'>
+										<div class='col-md-4'>
+											<div class="input-group">
+												<span class="input-group-text" id="style-addon">Style Name</span>
+												<input type="text" class="form-control" placeholder="name" aria-describedby="style-addon" id="nameStyle">
+											</div>
+										</div>
+										<div class='col-md-8'>
+											<button class="btn btn-default" id="editStyleButton" disabled>Update Style</button>
+											<button class="btn btn-default" id="addStyleButton" disabled>New Style</button>
+											<button class="btn btn-default" id="removeStyleButton" disabled>Delete Style</button>
+											<button class="btn btn-default" id="defaultStyleButton">Set As Default</button>
+										</div>
+									</div>
+							  	</div>
+							  	<div class="tab-pane fade" id="v-pills-messages" role="tabpanel" aria-labelledby="v-pills-messages-tab">...</div>
+							  	<div class="tab-pane fade" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-settings-tab">...</div>
+							</div>
+						  </div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<!-- ColorPicker modal dialog -->

@@ -57,6 +57,29 @@ var debug = false;
     var fileManager = new SIDEBAR();
     var filesManagerModal;
 
+    // Settings
+    var settingsModal, quickConfig = {
+        'primaryQuick': true,
+        'secondaryQuick': true,
+        'prompterStyleQuick': true,
+        'focusQuick': true,
+        'speedQuick': true,
+        'accelerationQuick': false,
+        'fontSizeQuick': true,
+        'promptWidthQuick': true,
+        'timerQuick': true
+    }, controls = [
+        'primary',
+        'secondary',
+        'prompterStyle',
+        'focus',
+        'speed',
+        'acceleration',
+        'fontSize',
+        'promptWidth',
+        'timer'
+    ];
+
     // Enums
     var command = Object.freeze({
         "incVelocity": 1,
@@ -104,7 +127,11 @@ var debug = false;
             new Slider("#speed", {}),
             new Slider("#acceleration", {}),
             new Slider("#fontSize", {}),
-            new Slider("#promptWidth", {})
+            new Slider("#promptWidth", {}),
+            new Slider("#speedControl", {}),
+            new Slider("#accelerationControl", {}),
+            new Slider("#fontSizeControl", {}),
+            new Slider("#promptWidthControl", {})
         ];
         // Data binding for advanced options
         slider[0].on("change", function(input) {
@@ -119,6 +146,20 @@ var debug = false;
         });
         slider[3].on("change", function(input) {
             document.getElementById("promptWidthValue").textContent = input.newValue;
+            updateWidth(input.newValue);
+        });
+        slider[4].on("change", function(input) {
+            document.getElementById("speedControlValue").textContent = parseFloat(Math.round(input.newValue * 10) / 10).toFixed(1);
+        });
+        slider[5].on("change", function(input) {
+            document.getElementById("accelerationControlValue").textContent = parseFloat(Math.round(input.newValue * 100) / 100).toFixed(2);
+        });
+        slider[6].on("change", function(input) {
+            document.getElementById("fontSizeControlValue").textContent = input.newValue;
+            updateFont(input.newValue);
+        });
+        slider[7].on("change", function(input) {
+            document.getElementById("promptWidthControlValue").textContent = input.newValue;
             updateWidth(input.newValue);
         });
         // Set credits button
@@ -245,6 +286,8 @@ var debug = false;
             ipcRenderer.send('asynchronous-message', 'prepareLinks');
             //ipcRenderer.send('asynchronous-message', 'network');
         } // end if
+
+        initControls();
 
         // Initialize file management features.
         initScripts();
@@ -423,7 +466,7 @@ var debug = false;
         togglePromptIt();
 
         // Set data to send.
-        var settings = '{ "data": {"secondary":0,"primary":1,"prompterStyle":2,"focusMode":3,"background":"#3CC","color":"#333","overlayBg":"#333","speed":"13","acceleration":"1.2","fontSize":"100","promptWidth":"84","timer":"false","voice":"false"}}',
+        var settings = '{ "data": {"secondary":0,"primary":1,"prompterStyle":2,"focusMode":3,"background":"#3CC","color":"#333","overlayBg":"#333","speed":"13","acceleration":"1.2","fontSize":"100","promptWidth":"84","timer":"false","voice":"false"}, "quickConfig": {}}',
             session = '{ "html":"' + encodeURIComponent(htmldata) + '" }';
 
         // Store data locally for prompter to use
@@ -498,13 +541,15 @@ var debug = false;
         else
             voice = false;
         // Merge all settings into one.
-        var settings = '{ "data": {"primary":'+primary+',"secondary":'+secondary+',"prompterStyle":'+style+',"focusMode":'+focusArea+',"speed":'+speed+',"acceleration":'+acceleration+',"fontSize":'+fontSize+',"promptWidth":'+promptWidth+',"timer":'+timer+',"voice":'+voice+'}}',
+        var settings = '{ "quickConfig": '+JSON.stringify(quickConfig)+', "data": {"primary":'+primary+',"secondary":'+secondary+',"prompterStyle":'+style+',"focusMode":'+focusArea+',"speed":'+speed+',"acceleration":'+acceleration+',"fontSize":'+fontSize+',"promptWidth":'+promptWidth+',"timer":'+timer+',"voice":'+voice+'}}',
         session = '{ "html":"' + encodeURIComponent(htmldata) + '" }';
 
         // Store data locally for prompter to use
         dataManager.setItem("IFTeleprompterSettings", settings, 1);
         // If we use sessionStorage we wont be able to update the contents.
         dataManager.setItem("IFTeleprompterSession", session, 1);
+
+        updateQuickConfig(quickConfig);
     }
 
     function restoreEditor(event) {
@@ -955,7 +1000,7 @@ var debug = false;
 
     function loadLastUseSettings() {
         // Get last used settings.
-        var settings = function ( lastSettings ) {
+        var settings = (lastSettings) => {
             if (lastSettings!==undefined && lastSettings!==null) {
                 if (debug) console.log(lastSettings);
                 lastSettings = JSON.parse(lastSettings);
@@ -996,6 +1041,7 @@ var debug = false;
                 //     voice.children[0].classList.toggle("btn-default");
                 //     voice.children[0].classList.innerHTML("Active");
                 // }
+                updateQuickConfig(lastSettings.quickConfig);
             }
         };
         dataManager.getItem("IFTeleprompterSettings", settings, 1);
@@ -1338,7 +1384,134 @@ var debug = false;
         fileManagerClose.onclick = function(event) {
             fileManager.closeModal();
         }
+
+        var settingsModalToggle = document.querySelector("#settingsToggle");
+        settingsModalToggle.onclick = function(event) {
+            event.preventDefault();
+            settingsModal = new bootstrap.Modal(document.getElementById("settingsModal"), {
+                keyboard: false,
+                backdrop: 'static'
+            });
+            settingsModal.show();
+        };
+        var settingsClose = document.querySelector("#settingsClose");
+        settingsClose.onclick = function(event) {
+            settingsModal.hide();
+        }
         
+    }
+
+    function initControls() {
+        var element;
+        for (var i = 0; i < controls.length; i++) {
+            element = document.getElementById(controls[i]);
+            if (element) {
+                if (element.hasAttribute('data-slider-value')) {
+                    element.setAttribute('data-slider-id', i);
+                    element.onchange = updateQuickSliderControl;
+                } else {
+                    element.onchange = updateQuickControl;
+                }
+            }
+            element = document.getElementById(controls[i] + "Control");
+            if (element) {
+                if (element.hasAttribute('data-slider-value')) {
+                    element.setAttribute('data-slider-id', i);
+                    element.onchange = updateSliderControl;
+                } else {
+                    element.onchange = updateControl;
+                }
+            }
+            element = document.getElementById(controls[i] + "QuickConfig");
+            if (element) {
+                element.onchange = updateQuickControlConfig;
+            }
+        }
+    }
+
+    function updateQuickConfig(settings) {
+        if (settings) {
+            var element;
+            for (var i = 0; i < controls.length; i++) {
+                element = document.getElementById(controls[i] + "Quick");
+                if (element) {
+                    // Cleaning previous hiddens
+                    element.classList.remove("hidden");
+                    if (!settings[controls[i] + "Quick"]) {
+                        element.classList.add("hidden");
+                    }
+                }
+    
+                element = document.getElementById(controls[i] + "QuickConfig");
+                if (element) {
+                    element.checked = settings[controls[i] + "Quick"];
+                }
+            }
+        }
+    }
+    
+    function updateControl(e) {
+        e.preventDefault();
+        var id = e.target.id.replace("Control", "");
+        var element = document.getElementById(id);
+        if (element) {
+            element.value = e.target.value;
+        }
+    }
+
+    var preventPropagation = false;
+
+    function updateSliderControl(e) {
+        e.preventDefault();
+        if (!preventPropagation) {
+            preventPropagation = true;
+        } else {
+            preventPropagation = false;
+            return;
+        }
+        // Assuming the order is right
+        var index = e.target.getAttribute('data-slider-id');
+        var slide = slider[parseInt(index) - 4];
+        slide.setValue(slider[parseInt(index)].getValue());
+        slide._trigger('change', {
+            newValue: slider[parseInt(index)].getValue()
+        });
+    }
+
+    function updateQuickSliderControl(e) {
+        e.preventDefault();
+        if (!preventPropagation) {
+            preventPropagation = true;
+        } else {
+            preventPropagation = false;
+            return;
+        }
+        // Assuming the order is right
+        var index = e.target.getAttribute('data-slider-id');
+        var slide = slider[parseInt(index)];
+        slide.setValue(slider[parseInt(index) - 4].getValue());
+        slide._trigger('change', {
+            newValue: slider[parseInt(index)].getValue()
+        });
+    }
+    
+    function updateQuickControl(e, cid = undefined) {
+        e.preventDefault();
+        var id = e.target.id;
+        if (typeof (cid) !== "undefined") {
+            id = cid;
+        }
+        var element = document.getElementById(id + "Control");
+        if (element) {
+            element.value = e.target.value;
+        }
+    }
+    
+    function updateQuickControlConfig(e) {
+        e.preventDefault();
+        var id = e.target.id.replace("Config", "");
+        quickConfig[id] = e.target.checked;
+        updatePrompterData();
     }
 
     // Initialize objects after DOM is loaded
