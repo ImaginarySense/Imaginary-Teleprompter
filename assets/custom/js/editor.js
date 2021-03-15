@@ -80,6 +80,24 @@ var debug = false;
         'timer'
     ];
 
+    // Commands Mapping
+    var mapping = {
+        "ArrowDown": "incVelocity",
+        "ArrowUp": "decVelocity",
+        "ArrowRight": "incFont",
+        "ArrowLeft": "decFont",
+        "Space": "togglePlay",
+        "Period": "sync",
+        "Backspace": "resetTimer",
+        "Home": "previousAnchor",
+        "End": "nextAnchor",
+        "PageDown": "fastForward",
+        "PageUp": "rewind",
+        "F6": "clearAllRequest",
+        "F8": "togglePrompter",
+        "F11": "toggleFullscreen"
+    }
+
     // Enums
     var command = Object.freeze({
         "incVelocity": 1,
@@ -292,14 +310,16 @@ var debug = false;
             //ipcRenderer.send('asynchronous-message', 'network');
         } // end if
 
+        //initImages();
+        loadLastUseSettings();
         // Initialize controls
         initControls();
         // Initialize styles menu
         initPromptStyles();
         // Initialize file management features.
         initScripts();
-        //initImages();
-        loadLastUseSettings();
+        // Initialize commands mapping
+        initCommandsMapping();
     } // end init()
 
     function closeWindow() {
@@ -548,7 +568,7 @@ var debug = false;
         else
             voice = false;
         // Merge all settings into one.
-        var settings = '{ "quickConfig": '+JSON.stringify(quickConfig)+', "data": {"primary":'+primary+',"secondary":'+secondary+',"prompterStyle":'+style+',"focusMode":'+focusArea+',"speed":'+speed+',"acceleration":'+acceleration+',"fontSize":'+fontSize+',"promptWidth":'+promptWidth+',"timer":'+timer+',"voice":'+voice+'}}',
+        var settings = '{ "quickConfig": '+JSON.stringify(quickConfig)+', "commandsMapping": '+JSON.stringify(mapping)+', "data": {"primary":'+primary+',"secondary":'+secondary+',"prompterStyle":'+style+',"focusMode":'+focusArea+',"speed":'+speed+',"acceleration":'+acceleration+',"fontSize":'+fontSize+',"promptWidth":'+promptWidth+',"timer":'+timer+',"voice":'+voice+'}}',
         session = '{ "html":"' + encodeURIComponent(htmldata) + '" }';
 
         // Store data locally for prompter to use
@@ -787,183 +807,159 @@ var debug = false;
         }
     }
 
-    document.onkeydown = function(event) {
-        // keyCode is announced to be deprecated but not all browsers support key as of 2016.
-        if (event.key === undefined)
-            event.key = event.keyCode;
-        if (!editorFocused) {
-            if (debug) console.log(event.key);
-            switch (event.key) {
-                // TELEPROMPTER COMMANDS
-                case "s":
-                case "S":
-                case "ArrowDown":
-                case 40: // Down
-                case 68: // S
+    var actions = {
+        "incVelocity": {
+            "name": "Increase Velocity",
+            "method": function() {
                 listener({
                     data: {
                         request: command.incVelocity
                     }
                 });
-                break;
-                    // prompterWindow.postMessage( message, getDomain())
-                    case "w":
-                    case "W":
-                    case "ArrowUp":
-                case 38: // Up
-                case 87: // W
+            }
+        },
+        "decVelocity": {
+            "name": "Decrease Velocity",
+            "method": function() {
                 listener({
                     data: {
                         request: command.decVelocity
                     }
                 });
-                break;
-                case "d":
-                case "D":
-                case "ArrowRight":
-                case 83: // S
-                case 39: // Right
+            }
+        },
+        "incFont": {
+            "name": "Increase Font",
+            "method": function() {
                 listener({
                     data: {
                         request: command.incFont
                     }
                 });
-                break;
-                case "a":
-                case "A":
-                case "ArrowLeft":
-                case 37: // Left
-                case 65: // A
+            }
+        },
+        "decFont": {
+            "name": "Decrease Font",
+            "method": function() {
                 listener({
                     data: {
                         request: command.decFont
                     }
                 });
-                break;
-                case " ":
-                case "Space": // Spacebar
-                case 32: // Spacebar
+            }
+        },
+        "togglePlay": {
+            "name": "Toggle Play",
+            "method": function() {
                 listener({
                     data: {
                         request: command.togglePlay
                     }
                 });
-                break;
-                case ".":
-                case "Period": // Numpad dot
-                case 110: // Numpad dot
-                case 190: // Dot
+            }
+        },
+        "sync": {
+            "name": "Sync",
+            "method": function() {
                 listener({
                     data: {
                         request: command.sync
                     }
                 });
-                break;
-                case 8:
-                case "Backspace":
+            }
+        },
+        "resetTimer": {
+            "name": "Reset Timer",
+            "method": function() {
                 listener({
                     data: {
                         request: command.resetTimer
                     }
-                });                    
-                break;
-                case 36:
-                case "Home":
+                });
+            }
+        },
+        "previousAnchor": {
+            "name": "Previous Anchor",
+            "method": function() {
                 listener({
                     data: {
                         request: command.previousAnchor
                     }
                 });
-                break;
-                case 35:
-                case "End":
+            }
+        },
+        "nextAnchor": {
+            "name": "Next Anchor",
+            "method": function() {
                 listener({
                     data: {
                         request: command.nextAnchor
                     }
                 });
-                break;
-                case 34 :
-                case "PageDown" :
+            }
+        },
+        "fastForward": {
+            "name": "Fast Forward",
+            "method": function() {
                 listener({
                     data: {
                         request: command.fastForward
                     }
                 });
-                break;
-                case 33 :
-                case "PageUp" :
+            }
+        },
+        "rewind": {
+            "name": "Rewind",
+            "method": function() {
                 listener({
                     data: {
                         request: command.rewind
                     }
                 });
-                break;
-                // EDITOR COMMANDS
-                case 116:
-                case "F5":
-                if (debug)
-                    refresh();
-                else
-                    console.log("Debug mode must be active to use 'F5' refresh in Electron. 'F10' enters and leaves debug mode.");
-                break;
-                case 117:
-                case "F6":
-                clearAllRequest();
-                break;
-                case 119:
-                case "F8":
-                togglePrompter();
-                break;
-                case 122:
-                case "F11":
-                event.preventDefault();
-                toggleFullscreen();
-                break;
-                case 120:
-                case "F10":
-                toggleDebug();
-                break;
-                case 27: // ESC
-                case "Escape":
-                restoreEditor();
-                closeModal();
-                break;
-                // Electron Commands
-                /*
-                case 17, 91, 70:
-                case "ctrl" + "" + "f":
-                if(inElectron()){
-                event.preventDefault();
-                toggleFullscreen();
-                break;
-                } else{
-                break;
-                }
-                */
-                default:
-                    // Check if event key exists, prevent issues with modals
-                    if (event.key) {
-                        var key;
-                        // If key is not a string
-                        if (!isFunction(event.key.indexOf))
-                            key = String.fromCharCode(event.key);
-                        else
-                            key = event.key;
-                        //if ( key.indexOf("Key")===0 || key.indexOf("Digit")===0 )
-                        //      key = key.charAt(key.length-1);
-                        if (!is_int(key))
-                            key = key.toLowerCase();
-                        if (debug) console.log(key);
-                        listener({
-                            data: {
-                                request: command.anchor,
-                                data: key
-                            }
-                        });
-                    }
-                
             }
+        },
+        "clearAllRequest": {
+            "name": "Clear All Request",
+            "method": function() {
+                clearAllRequest();
+            }
+        },
+        "togglePrompter": {
+            "name": "Toggle Prompter",
+            "method": function() {
+                togglePrompter();
+            }
+        },
+        "toggleFullscreen": {
+            "name": "Toggle Fullscreen",
+            "method": function(event) {
+                event.preventDefault();
+                toggleFullscreen();
+            }
+        }
+    }
+
+    document.onkeydown = function(event) {
+        if (mapping[event.code]) {
+            actions[mapping[event.code]]["method"]();
+        } else if (event.key) {
+            var key;
+            // If key is not a string
+            if (!isFunction(event.key.indexOf))
+                key = String.fromCharCode(event.key);
+            else
+                key = event.key;
+            //if ( key.indexOf("Key")===0 || key.indexOf("Digit")===0 )
+            //      key = key.charAt(key.length-1);
+            if (!is_int(key))
+                key = key.toLowerCase();
+            if (debug) console.log(key);
+            listener({
+                data: {
+                    request: command.anchor,
+                    data: key
+                }
+            });
         }
     };
 
@@ -1049,6 +1045,7 @@ var debug = false;
                 //     voice.children[0].classList.innerHTML("Active");
                 // }
                 updateQuickConfig(lastSettings.quickConfig);
+                mapping = lastSettings.commandsMapping;
             }
         };
         dataManager.getItem("IFTeleprompterSettings", settings, 1);
@@ -1519,6 +1516,95 @@ var debug = false;
         var id = e.target.id.replace("Config", "");
         quickConfig[id] = e.target.checked;
         updatePrompterData();
+    }
+
+    function initCommandsMapping() {
+        var table = document.getElementById("v-pills-commandsMappingContent");
+        var keys = Object.keys(actions);
+        for (var i = 0; i < keys.length; i++) {
+            var tr = document.createElement("tr");
+            var th = document.createElement("th");
+            th.classList = "col-6";
+
+            var div = document.createElement("div");
+            div.classList = "row text-center";
+
+            var span = document.createElement("span");
+            span.style = "padding: .375rem .75rem;";
+            span.innerHTML = actions[keys[i]]["name"];
+
+            div.appendChild(span);
+            th.appendChild(div);
+            tr.appendChild(th);
+
+            th = document.createElement("th");
+            th.classList = "col-6";
+
+            div = document.createElement("div");
+            div.classList = "row justify-content-center";
+
+            var col = document.createElement("div");
+            col.classList = "col-6 text-center";
+
+            var button = document.createElement("button");
+            button.classList = "btn btn-outline-primary w-100";
+            button.type = "button";
+            button.id = "getKey";
+
+            button.setAttribute("data-action", keys[i]);
+
+            for (var key in mapping) {
+                if (mapping.hasOwnProperty(key)) {
+                    if (mapping[key] === keys[i]) {
+                        button.setAttribute("data-key", key);
+                        let keyName = key.match(/[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+/g).join(' ');
+                        button.innerHTML = keyName
+                        break;
+                    }
+                }
+            }
+
+            if (button.innerHTML === "") {
+                button.innerHTML = "None";
+                button.setAttribute("data-key", 'none');
+            }
+
+            button.onclick  = function(e) {
+                e.target.innerHTML = "Press any key";
+                var pressKey = function(e){
+                    e.preventDefault();
+                    var key = e.target.getAttribute("data-key");
+                    var action = e.target.getAttribute("data-action");
+                    var nextKey = e.code;
+                    if (mapping[e.code] && mapping[e.code] !== action) {
+                        console.log("Already on another action");
+                        nextKey = key;
+                    }
+
+                    if (mapping[key]) {
+                        delete mapping[key];
+                    }
+
+                    mapping[nextKey] = action;
+                    e.target.setAttribute("data-key", nextKey);
+
+                    let keyName = nextKey.match(/[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+/g).join(' ');
+                    e.target.innerHTML = keyName;
+                    e.target.removeEventListener('keydown', pressKey);
+
+                    updatePrompterData();
+                }
+                e.target.addEventListener('keydown', pressKey);
+            }
+            
+            col.appendChild(button);
+            div.appendChild(col);
+            th.appendChild(div);
+            tr.appendChild(th);
+
+            table.appendChild(tr);
+        }
+
     }
 
     // Initialize objects after DOM is loaded

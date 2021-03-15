@@ -447,6 +447,20 @@ img.cke_anchor {
 	padding-left: .25rem!important;
 	padding-right: .25rem!important;
 }
+
 .slider {
 	margin-left: 10px;
+}
+
+.commandsContainer {
+	height: 60vh;
+	left: 0px;
+	right: 0px;
+	overflow: auto;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+.commandsContainer::-webkit-scrollbar {
+	display: none;
 }

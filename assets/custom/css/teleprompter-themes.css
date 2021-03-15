@@ -113,11 +113,18 @@
 }
 
 #stylesContainer {
-	height: 55vh;
+	height: 60vh;
 	left: 0px;
 	right: 0px;
 	overflow: auto;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
 }
+
+#stylesContainer::-webkit-scrollbar {
+	display: none;
+}
+
 .table-item {
 	word-wrap: break-word;
 }
