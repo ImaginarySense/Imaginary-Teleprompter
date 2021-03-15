@@ -113,7 +113,12 @@ var debug = false;
         updateIt = document.getElementById("updateIt");
         promptIt.onclick = submitTeleprompter;
         updateIt.onclick = updateTeleprompter;
-        document.getElementById("prompterStyle").setAttribute("onchange", "setStyleEvent(value);");
+        document.getElementById("prompterStyle").addEventListener('change', function(e) {
+            setStyleEvent(e.target.value);
+        });
+        document.getElementById("prompterStyleControl").addEventListener('change', function(e) {
+            setStyleEvent(e.target.value);
+        });
         document.getElementById("credits-link").onclick = credits;
 
         frame = document.getElementById("teleprompterframe");

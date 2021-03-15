@@ -442,7 +442,7 @@ function moveItemUpDown(obj, down) {
 
     refreshAdminPromptStyles();
     refreshCurrentItem();
-    refreshPromptStyles();
+    refreshPromptStyles(document.getElementById("prompterStyle"));
 }
 
 function openPromptStyles() {
