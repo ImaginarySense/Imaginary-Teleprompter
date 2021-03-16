@@ -22,6 +22,8 @@
 
 // IMPORT MAIN PROGRAM MODULES
 if (require('electron-squirrel-startup')) return;
+require('@electron/remote/main').initialize()
+
 const { electron,
 	app, // Module to control application's life.
 	BrowserWindow, // Module to create native browser window.
@@ -31,6 +33,7 @@ const { electron,
 	globalShortcut // Module can register/unregister a global keyboard shortcut with the operating system so that you can customize the operations for various shortcuts.
 	// Keep a global reference of the window object, if you don't, the window will be closed automatically when the JavaScript object is garbage collected.
 } = require('electron');
+
 const nativeImage = require('electron').nativeImage;
 const path = require('path');
 const url = require('url');
@@ -113,9 +116,36 @@ let mainWindow = null,
 
 function createMainWindow () {
 	if (process.platform === 'win32')
-		mainWindow = new BrowserWindow({webPreferences: {nodeIntegration: true}, width: 1280, height: 800, javascript: true, title: 'Teleprompter by Imaginary Sense', useContentSize: true, nodeIntegration: true, icon: __dirname + '/icon.ico'});
+		mainWindow = new BrowserWindow({
+			webPreferences: {
+				nodeIntegration: true,
+				contextIsolation: false,
+      			enableRemoteModule: true,
+				nativeWindowOpen: true
+			},
+			width: 1280,
+			height: 800,
+			javascript: true,
+			title: 'Teleprompter by Imaginary Sense',
+			useContentSize: true,
+			icon: __dirname + '/icon.ico'
+		});
 	else
-		mainWindow = new BrowserWindow({webPreferences: {nodeIntegration: true}, show: false, width: 1280, height: 800, javascript: true, title: 'Teleprompter by Imaginary Sense', useContentSize: true, nodeIntegration: true, icon: __dirname + '/icon.ico'});
+		mainWindow = new BrowserWindow({
+			webPreferences: {
+				nodeIntegration: true,
+				contextIsolation: false,
+      			enableRemoteModule: true,
+				nativeWindowOpen: true
+			},
+			show: false,
+			width: 1280,
+			height: 800,
+			javascript: true,
+			title: 'Teleprompter by Imaginary Sense',
+			useContentSize: true,
+			icon: __dirname + '/icon.ico'
+		});
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
 	mainWindow.once('ready-to-show', () => {
 		mainWindow.show();

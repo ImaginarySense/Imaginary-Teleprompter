@@ -23,20 +23,18 @@ var debug = false;
 
 (function() {
     // Use JavaScript Strict Mode.
+    var elecScreen, ipcRenderer, remote;
 
     // Import Electron libraries.
     if (inElectron()){
         const electron = require('electron');
-        var elecScreen = electron.screen;
-        var ipcRenderer = electron.ipcRenderer;
-        // var ipcRenderer = require('electron').ipcRenderer,
-        // elecScreen = require('electron');
-        // var remote = require('electron').remote; // Allows IPC with main process in Electron.
-        var remote = electron.remote; // Allows IPC with main process in Electron.
-        // elecScreen = require('electron'); // Allows Smart Fullscreens in Electron.
-        window.jQuery = require('./js/jquery.min.js');
+        remote = require('@electron/remote');  // Allows IPC with main process in Electron.
+        elecScreen = remote.screen; // Allows Smart Fullscreens in Electron.
+        ipcRenderer = electron.ipcRenderer;
+
+        window.jQuery = require('./assets/jquery/jquery.min.js');
         window.$ = window.jQuery;
-        window.Slider = require('./js/bootstrap-slider.min.js');
+        window.Slider = require('./assets/bootstrap-slider/js/bootstrap-slider.min.js');
     }
     
     // Global objects
@@ -623,18 +621,17 @@ var debug = false;
         // Checks if is running on electron app...
         if (inElectron()) {
             // Check display availabillity.
-            var displays = elecScreen.getAllDisplays(), // Returns an array of displays that are currently  available.
-                primaryDisplay = elecScreen.getPrimaryDisplay(),
-                currentDisplay = 0, // 0 means primary and 1 means secondary
-                cursorLocation = elecScreen.getCursorScreenPoint();
+            const displays = elecScreen.getAllDisplays()
+            
+            // of displays that are currently  available.
+            var primaryDisplay = elecScreen.getPrimaryDisplay(),
+            currentDisplay = 0, // 0 means primary and 1 means secondary
+            cursorLocation = elecScreen.getCursorScreenPoint();
             // Find the first display that isn't the primary display.
             if (debug) console.log("Displays amount: "+displays.length);
-            for (var i=0; i<displays.length; i++) {
-                if ( !(displays[i].bounds.x===primaryDisplay.bounds.x && displays[i].bounds.y===primaryDisplay.bounds.y) ) {
-                    secondaryDisplay = displays[i]; // externalDisplay recives all available displays.
-                    break;
-                }
-            }
+            const secondaryDisplay = displays.find((display) => {
+                return display.bounds.x !== 0 || display.bounds.y !== 0
+            })
             if (debug) console.log( "Primary display:" );
             if (debug) console.log( primaryDisplay );
             if (debug) console.log( "Secondary display:" );

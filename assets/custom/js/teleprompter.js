@@ -30,15 +30,6 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 
 // Encapsulate the code in an anonymous self-invoking function.
 (function () {
-    // Import Electron libraries.
-    if (inElectron() && !inIframe()) {
-        var {ipcRenderer} = require('electron');
-        window.jQuery = require('./js/jquery.min.js');
-        window.$ = window.jQuery;
-        // Manually import jQuery from javascript when running in a CommonsJS environment.
-        // Ref: https://github.com/electron/electron/issues/254 
-        remote = require('electron').remote; // Allow IPC with main process in Electron.
-    }
     // Global objects
     var settings, session, prompt, pointer, overlay, overlayFocus, styleSheet, editor, timer, clock, remote;
     // Global variables
@@ -73,6 +64,16 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         timeoutDelay = 250,
         inputCapDelay = 100,
         limit = 2600;
+    
+    // Import Electron libraries.
+    if (inElectron() && !inIframe()) {
+        var {ipcRenderer} = require('electron');
+        window.jQuery = require('./app/assets/jquery/jquery.min.js');
+        window.$ = window.jQuery;
+        // Manually import jQuery from javascript when running in a CommonsJS environment.
+        // Ref: https://github.com/electron/electron/issues/254 
+        remote = require('@electron/remote'); // Allow IPC with main process in Electron.
+    }
     
     function initCSS() {
         // Create style elements.
