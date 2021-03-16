@@ -1403,26 +1403,48 @@ var debug = false;
     }
 
     function initControls() {
-        var element;
+        var element, elements = [], elementValue, elementChecked, elementSelected;
         for (var i = 0; i < controls.length; i++) {
             element = document.getElementById(controls[i]);
-            if (element) {
+            if (element && element.value) {
+                elementValue = element.value;
                 if (element.hasAttribute('data-slider-value')) {
                     element.setAttribute('data-slider-id', i);
                     element.onchange = updateQuickSliderControl;
                 } else {
                     element.onchange = updateQuickControl;
                 }
+            } else {
+                elements = document.querySelectorAll('input[name="' + controls[i] + '"]');
+                elementValue = document.querySelector('input[name="' + controls[i] + '"]:checked').value;
+                for (var j = 0; j < elements.length; j++) {
+                    element = elements[j];
+                    element.onchange = updateQuickToggleControl;
+                }
             }
+
+            elements = [];
             element = document.getElementById(controls[i] + "Control");
             if (element) {
+                element.value = elementValue;
+                elementValue = undefined;
                 if (element.hasAttribute('data-slider-value')) {
                     element.setAttribute('data-slider-id', i);
                     element.onchange = updateSliderControl;
                 } else {
                     element.onchange = updateControl;
                 }
+            } else {
+                elements = document.querySelectorAll('input[name="' + controls[i] + 'Control"]');
+                document.querySelector('input[name="' + controls[i] + 'Control"][value="' + elementValue + '"]').checked = true;
+                elementValue = undefined;
+
+                for (var j = 0; j < elements.length; j++) {
+                    element = elements[j];
+                    element.onchange = updateToggleControl;
+                }
             }
+            
             element = document.getElementById(controls[i] + "QuickConfig");
             if (element) {
                 element.onchange = updateQuickControlConfig;
@@ -1460,6 +1482,28 @@ var debug = false;
         }
     }
 
+    function updateQuickControl(e) {
+        e.preventDefault();
+        var id = e.target.id;
+        var element = document.getElementById(id + "Control");
+        if (element) {
+            element.value = e.target.value;
+        }
+    }
+
+    function updateToggleControl(e) {
+        e.preventDefault();
+        var id = e.target.name.replace("Control", "");
+        var element = document.querySelector('input[name="' + id + '"][value="' + e.target.value + '"]');
+        element.checked = true;
+    }
+
+    function updateQuickToggleControl(e) {
+        e.preventDefault();
+        var id = e.target.name;
+        document.querySelector('input[name="' + id + 'Control"][value="' + e.target.value + '"]').checked = true;
+    }
+
     var preventPropagation = false;
 
     function updateSliderControl(e) {
@@ -1494,18 +1538,6 @@ var debug = false;
         slide._trigger('change', {
             newValue: slider[parseInt(index)].getValue()
         });
-    }
-    
-    function updateQuickControl(e, cid = undefined) {
-        e.preventDefault();
-        var id = e.target.id;
-        if (typeof (cid) !== "undefined") {
-            id = cid;
-        }
-        var element = document.getElementById(id + "Control");
-        if (element) {
-            element.value = e.target.value;
-        }
     }
     
     function updateQuickControlConfig(e) {

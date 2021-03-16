@@ -29,6 +29,7 @@
 	<meta property="fb:app_id" content="196769633992905">
 	<title>Imaginary Teleprompter by Imaginary Sense</title>
 	<link rel="icon" href="favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="assets/custom/css/reset.css">
 	<link rel="stylesheet" href="assets/bootstrap-icons/bootstrap-icons.css">
 	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
 	<link rel="stylesheet" href="assets/custom/css/docs.min.css">
@@ -150,10 +151,10 @@
 								<label for="timer">Timer</label>
 							</small><br>
 							<div class="btn-group" role="group"> 
-								<input type="radio" class="btn-check" name="btnradio" id="timerOn" autocomplete="on" onchange="updateQuickControl(this, 'timerQuick')">
+								<input type="radio" class="btn-check" name="timer" id="timerOn" value="on" autocomplete="on">
 								<label class="btn btn-outline-light" for="timerOn">On</label>
 							
-								<input type="radio" class="btn-check" name="btnradio" id="timerOff" autocomplete="off" onchange="updateQuickControl(this, 'timerQuick')">
+								<input type="radio" class="btn-check" name="timer" id="timerOff" value="off" autocomplete="off">
 								<label class="btn btn-outline-light" for="timerOff">Off</label>
 							</div>
 						</div>
@@ -622,11 +623,11 @@
 												</th>
 												<th>
 													<div class="btn-group" role="group"> 
-														<input type="radio" class="btn-check" name="btnradio" id="timerOnControl" autocomplete="on">
-														<label class="btn btn-outline-dark" for="timerOn">On</label>
+														<input type="radio" class="btn-check" name="timerControl" id="timerOnControl" value="on" autocomplete="on">
+														<label class="btn btn-outline-dark" for="timerOnControl">On</label>
 													
-														<input type="radio" class="btn-check" name="btnradio" id="timerOffControl" autocomplete="off">
-														<label class="btn btn-outline-dark" for="timerOff">Off</label>
+														<input type="radio" class="btn-check" name="timerControl" id="timerOffControl" value="off" autocomplete="off">
+														<label class="btn btn-outline-dark" for="timerOffControl">Off</label>
 													</div>
 												</th>
 												<th>
