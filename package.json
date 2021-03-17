@@ -39,6 +39,7 @@
   "dependencies": {
     "@electron/remote": "^1.0.4",
     "electron-squirrel-startup": "1.0.0",
+    "font-list": "^1.2.13",
     "shelljs": "0.8.1",
     "deb-version-compare": "git+https://github.com/sdumetz/node-deb-version-compare.git"
   },
