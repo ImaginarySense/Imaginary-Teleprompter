@@ -92,7 +92,9 @@ var debug = false;
         "PageDown": "fastForward",
         "PageUp": "rewind",
         "F6": "clearAllRequest",
+        "F5": "refresh",
         "F8": "togglePrompter",
+        "F10": "toggleDebug",
         "F11": "toggleFullscreen"
     }
 
@@ -933,7 +935,23 @@ var debug = false;
                 event.preventDefault();
                 toggleFullscreen();
             }
-        }
+        },
+        "refresh": {
+            "name": "Refresh Screen",
+            "method": function() {
+                if (debug)
+                    refresh();
+                else
+                    console.log("Debug mode must be active to use 'F5' refresh in Electron. 'F10' enters and leaves debug mode.");
+            }
+        },
+        "toggleDebug": {
+            "name": "Toggle Debug",
+            "method": function() {
+                toggleDebug();
+            }
+        },
+
     }
 
     document.onkeydown = function(event) {
