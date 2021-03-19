@@ -464,3 +464,7 @@ img.cke_anchor {
 .commandsContainer::-webkit-scrollbar {
 	display: none;
 }
+
+.commandsButtonTransition {
+	transition: border-color 2s cubic-bezier(1, 1, 1, 1), color 2s cubic-bezier(1, 1, 1, 1); transition-delay: 0s;
+}

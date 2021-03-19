@@ -954,7 +954,12 @@ var debug = false;
 
     }
 
-    document.addEventListener('keydown', function(event) {
+    function commandsListener (event) {
+        // Temporal Solution, until descomposition
+        if (event.target.hasAttribute("data-key")) {
+            return;
+        }
+
         if (mapping[event.code]) {
             actions[mapping[event.code]]["method"]();
         } else if (event.key) {
@@ -976,7 +981,8 @@ var debug = false;
                 }
             });
         }
-    });
+    }
+    document.addEventListener('keydown', commandsListener);
 
     function closeModal() {
         if (window.location.hash.slice(1) === "openCustomStyles")
@@ -1616,34 +1622,52 @@ var debug = false;
                 button.setAttribute("data-key", 'none');
             }
 
+            var pressKey = function(e){
+                var key = e.target.getAttribute("data-key");
+                var action = e.target.getAttribute("data-action");
+                var nextKey = e.code;
+                if (mapping[e.code] && mapping[e.code] !== action) {
+                    console.log("Already on another action");
+                    e.target.classList = "btn btn-outline-danger w-100 commandsButtonTransition";
+                    setInterval(function() {
+                        e.target.classList = "btn btn-outline-primary w-100";
+                        e.target.style = "";
+                    }, 500);
+                    nextKey = key;
+                }
+
+                if (mapping[key]) {
+                    delete mapping[key];
+                }
+
+                mapping[nextKey] = action;
+                e.target.setAttribute("data-key", nextKey);
+
+                let keyName = nextKey.match(/[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+/g).join(' ');
+                e.target.innerHTML = keyName;
+                document.removeEventListener('keydown', pressKey);
+
+                updatePrompterData();
+            }
+
+            button.addEventListener('focusout', (event) => {
+                var key = event.target.getAttribute("data-key");
+                let keyName = key.match(/[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+/g).join(' ');
+                event.target.innerHTML = keyName;
+                document.removeEventListener('keydown', pressKey);
+            });
+
             button.onclick  = function(event) {
                 event.preventDefault();
-                event.target.innerHTML = "Press any key";
-                var pressKey = function(e){
-                    console.log(e);
+                event.target.focus();
+                event.target.innerHTML = "Press any key";  
+                document.addEventListener('keydown', (e) => {
                     e.preventDefault();
-                    var key = e.target.getAttribute("data-key");
-                    var action = e.target.getAttribute("data-action");
-                    var nextKey = e.code;
-                    if (mapping[e.code] && mapping[e.code] !== action) {
-                        console.log("Already on another action");
-                        nextKey = key;
-                    }
-
-                    if (mapping[key]) {
-                        delete mapping[key];
-                    }
-
-                    mapping[nextKey] = action;
-                    e.target.setAttribute("data-key", nextKey);
-
-                    let keyName = nextKey.match(/[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+/g).join(' ');
-                    e.target.innerHTML = keyName;
-                    e.target.removeEventListener('keydown', pressKey);
-
-                    updatePrompterData();
-                }
-                button.addEventListener('keydown', pressKey);
+                    pressKey({
+                        target: event.target,
+                        code: e.code
+                    });
+                });
             }
             
             col.appendChild(button);
