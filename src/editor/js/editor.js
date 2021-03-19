@@ -954,7 +954,7 @@ var debug = false;
 
     }
 
-    document.onkeydown = function(event) {
+    document.addEventListener('keydown', function(event) {
         if (mapping[event.code]) {
             actions[mapping[event.code]]["method"]();
         } else if (event.key) {
@@ -976,7 +976,7 @@ var debug = false;
                 }
             });
         }
-    };
+    });
 
     function closeModal() {
         if (window.location.hash.slice(1) === "openCustomStyles")
@@ -1616,9 +1616,11 @@ var debug = false;
                 button.setAttribute("data-key", 'none');
             }
 
-            button.onclick  = function(e) {
-                e.target.innerHTML = "Press any key";
+            button.onclick  = function(event) {
+                event.preventDefault();
+                event.target.innerHTML = "Press any key";
                 var pressKey = function(e){
+                    console.log(e);
                     e.preventDefault();
                     var key = e.target.getAttribute("data-key");
                     var action = e.target.getAttribute("data-action");
@@ -1641,7 +1643,7 @@ var debug = false;
 
                     updatePrompterData();
                 }
-                e.target.addEventListener('keydown', pressKey);
+                button.addEventListener('keydown', pressKey);
             }
             
             col.appendChild(button);

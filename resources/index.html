@@ -29,15 +29,12 @@
 	<meta property="fb:app_id" content="196769633992905">
 	<title>Imaginary Teleprompter by Imaginary Sense</title>
 	<link rel="icon" href="favicon.ico" type="image/x-icon">
-	<link rel="stylesheet" href="assets/custom/css/reset.css">
-	<link rel="stylesheet" href="assets/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap-reboot.min.css">
 	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
-	<link rel="stylesheet" href="assets/custom/css/docs.min.css">
+	<link rel="stylesheet" href="assets/bootstrap-icons/bootstrap-icons.css">
 	<link rel="stylesheet" href="assets/bootstrap-slider/css/bootstrap-slider.min.css">
-	<link rel="stylesheet" href="assets/custom/css/editor.css">
-	<link rel="stylesheet" href="assets/custom/css/prompt.css">
-	<link rel="stylesheet" href="assets/custom/css/teleprompter-themes.css">
-	<link rel="stylesheet" href="assets/custom/css/mobilehide.css">
+	<link rel="stylesheet" href="assets/custom/css/teleprompter-universal.css">
+	<link rel="stylesheet" href="assets/custom/css/teleprompter-editor.css">
 	<script src="assets/ckeditor/ckeditor.js"></script>
 </head>
 <body>
@@ -726,92 +723,15 @@
 				</div>
 			</div>
 		</div>
-		<!-- ColorPicker modal dialog -->
-		<!-- <div class="modal fade" id="openCustomStyles" tabindex="-1">
-			<div class="modal-dialog modal-xl">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Custom Styles <small>Administration Panel</small></h5>
-						<button type="button" class="btn-close" onClick="closePromptStyles();" aria-label="Close"></button>
-					</div>
-					<div class="modal-body">
-						<div class="row">
-							<div class="col-md-3">
-								<h4>Styles</h4>
-								<div id="stylesContainer">
-									<table class="table" id="stylesTable" >
-										<tbody>
-											<tr>
-												<th class="table-item"><span>No Styles</span></th>
-											</tr>
-										</tbody>
-									</table>
-								</div>
-							</div>
-							<div class="col-md-9">
-								<h4>Properties</h4>
-								<div class='row'>
-									<div class='col-md-4'>
-										<label>Body</label>
-										<input type="text" data-jscolor="{}" class="form-control" onChange="updateColorOnPreview(this)" id="bodyColor" value="" >
-									</div>
-									<div class='col-md-4'>
-										<label>Overlay</label>
-										<input type="text" data-jscolor="{}" class="form-control" onChange="updateColorOnPreview(this)" id="overlayColor" value="" >
-									</div>
-									<div class='col-md-4'>
-										<label>Text Color</label>
-										<input type="text" data-jscolor="{}" class="form-control" onChange="updateColorOnPreview(this)" id="textColor" value="" >
-									</div>
-								</div>
-								<h1><small>Preview</small></h1>
-								<div id="promptPreviewColor">
-									<table cellpadding="0" cellspacing="0" id="overlayPreview" >
-										<tbody>
-											<tr id="overlayTop" style = "background-color:#000;opacity:0.5;">
-												<td>Text</td>
-											</tr>
-											<tr id="overlayFocus" >
-												<td>Text</td>
-											</tr>
-											<tr id="overlayBottom" class="overlayBg" style = "background-color:#000;opacity:0.5;">
-												<td>Text</td>
-											</tr>
-										</tbody>
-									</table>
-								</div>
-								</br>
-								<div class='row'>
-									<div class='col-md-4'>
-										<div class="input-group">
-											<span class="input-group-text" id="style-addon">Style Name</span>
-											<input type="text" class="form-control" placeholder="name" aria-describedby="style-addon" id="nameStyle">
-										</div>
-									</div>
-									<div class='col-md-8'>
-										<button class="btn btn-default" id="editStyleButton" disabled>Update Style</button>
-										<button class="btn btn-default" id="addStyleButton" disabled>New Style</button>
-										<button class="btn btn-default" id="removeStyleButton" disabled>Delete Style</button>
-										<button class="btn btn-default" id="defaultStyleButton">Set As Default</button>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div> -->
 	</div>
 </body>
 <script src="assets/jquery/jquery.min.js"></script>
-<script src="assets/custom/js/data.manager.js"></script>
-<script src="assets/custom/js/sidebar.js"></script>
-<script src="assets/custom/js/teleprompter-themes.js"></script>
-<script src="assets/custom/js/editor.js"></script>
 <script src="assets/bootstrap/js/bootstrap.min.js"></script>
 <script src="assets/bootstrap-slider/js/bootstrap-slider.min.js"></script>
+<script src="assets/jscolor/jscolor.min.js"></script>
+<script src="assets/custom/js/teleprompter-universal.js"></script>
+<script src="assets/custom/js/teleprompter-editor.js"></script>
 <!--<script src="assets/jquery/js/jquery.qrcode.js"></script>-->
-<script src="assets/custom/js/jscolor.min.js"></script>
 <script type="text/javascript">
 if (inElectron()){
 	var {ipcMain} = require('electron');
