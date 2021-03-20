@@ -18,11 +18,13 @@
     along with Imaginary Teleprompter.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-var SIDEBAR = function() {
-    this.instructionsLoaded = true;
-    this.modal = undefined;
+class FileManager {
+    constructor() {
+        this.instructionsLoaded = true;
+        this.modal = undefined;
+    }
 
-    this.closeModal =  function() {
+    closeModal() {
         if (this.modal) {
             this.modal.hide()
             this.modal = undefined;
@@ -30,7 +32,7 @@ var SIDEBAR = function() {
         document.getElementById("prompt").focus();
     }
 
-    this.openModal = function() {
+    openModal() {
         this.modal = new bootstrap.Modal(document.getElementById("filesManagerModal"), {
             keyboard: false,
             backdrop: 'static'
@@ -38,11 +40,11 @@ var SIDEBAR = function() {
         this.modal.show();
     }
 
-    this.maxFileSize = function() {
+    maxFileSize() {
         return Math.floor(255/2-5); // Return 122. Could be increased depending on the Filesystem and the charset encoding.
     }
 
-    this.download = function( currentDocument, index ) {
+    download(currentDocument, index) {
         if (debug) {
             console.log("Downloading:");
             console.log(currentDocument);
@@ -61,7 +63,7 @@ var SIDEBAR = function() {
         document.body.removeChild(element);
     };
 
-    this.addScript = function( evt ) {
+    addScript(evt) {
         if (evt.preventDefault!==undefined)
             evt.preventDefault();
         if (debug) console.log(evt);
@@ -101,7 +103,7 @@ var SIDEBAR = function() {
         this.closeModal();
     };
 
-    this.handleFileSelect = function(evt) {
+    handleFileSelect(evt) {
         var files = evt.target.files, // FileList object
             supportedFileFound = false,
             unsuportedFiles = new Array();
@@ -279,13 +281,13 @@ var SIDEBAR = function() {
             // Notify if no supported files where found.
             alert(unsuportedAlert);
         }
-        delete unsuportedFiles;
+        unsuportedFiles = null;
         if (!supportedFileFound)
             // Notify no files were imported.
             alert("Import failed. No supported file found.");
     }
 
-    this.on = function(nameElement, config) {
+    on(nameElement, config) {
         this.menu = nameElement;
         if (typeof config !== 'undefined' && config !== null) {
             if (config.hasOwnProperty('name'))
@@ -310,13 +312,13 @@ var SIDEBAR = function() {
         return this;
     };
 
-    this.load = function() {
+    load() {
         this.currentElement = 0;
         this.refreshElements();
         this.loadDialog();
     };
 
-    this.loadDialog = function(){
+    loadDialog(){
         var menuContent = document.getElementById("v-pills-menuContent");
 
         var input = document.createElement("input");
@@ -341,7 +343,7 @@ var SIDEBAR = function() {
         }.bind(this);
     }
 
-    this.getIDs = function(){
+    getIDs(){
         var elementsData = this.getElements();
         var ids = [];
         for(var i = 0; i < elementsData.length; i++){
@@ -350,7 +352,7 @@ var SIDEBAR = function() {
         return ids;
     }
 
-    this.createIDTag = function(name, noCheck){
+    createIDTag(name, noCheck){
         name = name.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
         var id = 'id' + name.replace(/\s/g, '');
         if(typeof noCheck == 'undefined' || noCheck == false){
@@ -366,68 +368,68 @@ var SIDEBAR = function() {
         return id;
     }
 
-    this.instructionsAreLoaded = function() {
+    instructionsAreLoaded() {
         return this.instructionsLoaded;
     }
 
-    this.setEvent = function(event, element, method) {
+    setEvent(event, element, method) {
         document.getElementById(element).addEventListener(event,function(e){
             method(e.target);
             this.refreshElements();
         }.bind(this));
     }
 
-    this.setSaveMode = function(saveMode){
+    setSaveMode(saveMode){
         if(saveMode === "sessionStorage")
             this.saveMode = sessionStorage;
         else
             this.saveMode = localStorage;
     };
 
-    this.getSaveMode = function(){
+    getSaveMode(){
         if (typeof this.saveMode !== 'undefined' && this.saveMode !== null)
             return this.saveMode;
         return localStorage;
     };
 
-    this.setName = function(name) {
+    setName(name) {
         this.name = name;
     };
 
-    this.getName = function() {
+    getName() {
         if (typeof this.name !== 'undefined' && this.name !== null)
             return this.name;
         return this.menu;
     };
 
-    this.setAddElementName = function(name) {
+    setAddElementName(name) {
         this.elementName = name;
     };
 
-    this.getAddElementName = function() {
+    getAddElementName() {
         if (typeof this.elementName !== 'undefined' && this.elementName !== null)
             return " Add " + this.elementName;
         return " Add " + this.getName();
     };
 
-    this.getImportElementName = function() {
+    getImportElementName() {
         if (typeof this.elementName !== 'undefined' && this.elementName !== null)
             return " Import " + this.elementName;
         return " Import " + this.getName();
     };
 
-    this.setNewElementName = function(name) {
+    setNewElementName(name) {
         this.newElementName = name;
     };
 
-    this.getNewElementName = function(){
+    getNewElementName(){
         if (typeof this.newElementName !== 'undefined' && this.newElementName !== null) {
             return this.newElementName;
         }
         return "New " + this.getName();
     };
 
-    this.getElements = function() {
+    getElements() {
         var elementsData = this.getSaveMode().getItem(this.getDataKey());
         if (typeof elementsData !== 'undefined' && elementsData !== null) {
             if(JSON.parse(elementsData).length == 0){
@@ -438,18 +440,18 @@ var SIDEBAR = function() {
         return this.getPreloadData();
     };
 
-    this.setDataKey = function(key) {
+    setDataKey(key) {
         this.dataKey = key;
     };
 
-    this.getDataKey = function() {
+    getDataKey() {
         if (this.dataKey) {
             return this.dataKey;
         }
         return "SideBar" + this.menu;
     };
 
-    this.setPreloadData = function(dataArray) {
+    setPreloadData(dataArray) {
         this.preloadData = [];
         var currentPreloadData = {};
         for(var i = 0; i < dataArray.length; i++){
@@ -495,17 +497,18 @@ var SIDEBAR = function() {
         }
     };
 
-    this.getPreloadData = function() {
+    getPreloadData() {
         if (typeof this.preloadData !== 'undefined' && this.preloadData !== null) {
             return this.preloadData;
         }
         return [];
     };
 
-    this.getCurrentElementIndex = function() {
+    getCurrentElementIndex() {
         return this.currentElement;
     };
-    this.refreshElements = function() {
+
+    refreshElements() {
         window.setTimeout(function() {
             this.clearElements();
         }.bind(this), 1);
@@ -514,23 +517,23 @@ var SIDEBAR = function() {
         }.bind(this), 2);
     };
 
-    this.exitEditMode = function(){};
+    exitEditMode(){};
 
-    this.clearElements = function() {
+    clearElements() {
         document.getElementById(this.menu).innerHTML = "";
     };
 
-    this.deleteElement = function(id) {
+    deleteElement(id) {
         this.closeModal();
 
-        fileManagerDeleteModal = new bootstrap.Modal(document.getElementById("fileManagerDeleteModal"), {
+        this.fileManagerDeleteModal = new bootstrap.Modal(document.getElementById("fileManagerDeleteModal"), {
             keyboard: false,
             backdrop: 'static'
         });
-        fileManagerDeleteModal.show();
+        this.fileManagerDeleteModal.show();
 
         document.getElementById("fileManagerDeleteModalCancel").onclick = function(e) {
-            fileManagerDeleteModal.hide();
+            this.fileManagerDeleteModal.hide();
             this.openModal();
         }.bind(this);
 
@@ -547,12 +550,12 @@ var SIDEBAR = function() {
             this.refreshElements();
             this.selectedElement(null);
             
-            fileManagerDeleteModal.hide();
+            this.fileManagerDeleteModal.hide();
             this.openModal();
         }.bind(this);
     };
     
-    this.getElementIndexByID = function(id) {
+    getElementIndexByID(id) {
         var elementsData = this.getElements();
         for (var i=0; i<elementsData.length; i++) {
             if(elementsData[i].id == id)
@@ -560,14 +563,14 @@ var SIDEBAR = function() {
         }
     };
 
-    this.setInstructions = function() {
+    setInstructions() {
         if (this.currentElement === 0)
             this.instructionsLoaded = true;
         else
             this.instructionsLoaded = false;
     }
 
-    this.addElements = function() {
+    addElements() {
         var elementsData = this.getElements();
         var menuNode = document.getElementById(this.menu);
         this.setInstructions();

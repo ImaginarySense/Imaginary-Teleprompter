@@ -61,8 +61,7 @@ var currentEditor = editorList[0];
     }
 
     // File Manager
-    var fileManager = new SIDEBAR();
-    var filesManagerModal;
+    var fileManager = new FileManager();
 
     // Settings
     var settingsModal, quickConfig = {
