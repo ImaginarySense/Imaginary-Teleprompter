@@ -36,7 +36,7 @@ gulp.task('prompter:css', function() {
 gulp.task('prompter:js', function() {
     return gulp.src(['./src/prompter/js/*.js'])
         .pipe(concat('teleprompter-prompter.js'))
-        .pipe(uglify().on('error', ()=>{}))
+        // .pipe(uglify().on('error', ()=>{}))
         .pipe(gulp.dest('./dist/assets/custom/js'));
 });
 
@@ -50,7 +50,7 @@ gulp.task('universal:css', function() {
 gulp.task('universal:js', function() {
     return gulp.src(['./src/universal/js/*.js'])
         .pipe(concat('teleprompter-universal.js'))
-        .pipe(uglify().on('error', ()=>{}))
+        // .pipe(uglify().on('error', ()=>{}))
         .pipe(gulp.dest('./dist/assets/custom/js'));
 });
 

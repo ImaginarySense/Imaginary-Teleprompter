@@ -21,6 +21,15 @@
 "use strict";
 var debug = false;
 
+var editorList = [
+    // oficial
+    "ckeditor",
+    // testing alternatives
+    "tinymce",
+    "summernote"
+]
+var currentEditor = editorList[0];
+
 (function() {
     // Use JavaScript Strict Mode.
     var elecScreen, ipcRenderer, remote;
@@ -516,10 +525,9 @@ var debug = false;
 
     function updatePrompterData( override ) {
         // Get html from editor
-        if (typeof CKEDITOR !== "undefined")
-            htmldata = CKEDITOR.instances.prompt.getData()
-        else if (typeof tinymce !== "undefined")
-            htmldata = tinymce.get("prompt").getContent();
+    
+        htmldata = window.teleprompter.editor.getEditorContent();
+
         // Define possible values
         var primary, secondary, style, focusArea, speed, acceleration, fontSize, timer, voice;
         // Get form values
@@ -1311,7 +1319,7 @@ var debug = false;
     // Teleprompter Scripts File Manager
     function initScripts() {
         //initialize SideBar
-        var sid = fileManager.on('v-pills-scriptsContent',{
+        window.teleprompter.fileManager = fileManager.on('v-pills-scriptsContent',{
             "name":"Files",
             "elementName":"Script",
             "newElementName":"Untitled",
@@ -1324,86 +1332,44 @@ var debug = false;
 
         });
 
-       function save() {
-            if (sid.currentElement != 0) {
-                var scriptsData = sid.getElements();
-                scriptsData[sid.currentElement]["data"] = document.getElementById("prompt").innerHTML;
-                sid.getSaveMode().setItem(sid.getDataKey(), JSON.stringify(scriptsData));
+        window.teleprompter.editor.save = function() {
+            if (window.teleprompter.fileManager.currentElement != 0) {
+                var scriptsData = window.teleprompter.fileManager.getElements();
+                scriptsData[window.teleprompter.fileManager.currentElement]["data"] = document.getElementById("prompt").innerHTML;
+                window.teleprompter.fileManager.getSaveMode().setItem(window.teleprompter.fileManager.getDataKey(), JSON.stringify(scriptsData));
             }
         }
 
-        sid.selectedElement = function(element) {
-            var scriptsData = sid.getElements();
-            if (scriptsData[sid.currentElement].hasOwnProperty('data'))
-                document.getElementById("prompt").innerHTML = scriptsData[sid.currentElement]['data'];
+        window.teleprompter.fileManager.selectedElement = function(element) {
+            var scriptsData = window.teleprompter.fileManager.getElements();
+            if (scriptsData[window.teleprompter.fileManager.currentElement].hasOwnProperty('data'))
+                document.getElementById("prompt").innerHTML = scriptsData[window.teleprompter.fileManager.currentElement]['data'];
             else
                 document.getElementById("prompt").innerHTML = "";
-            sid.closeModal()
+            window.teleprompter.fileManager.closeModal()
         }
 
-        sid.addElementEnded = function(element) {
+        window.teleprompter.fileManager.addElementEnded = function(element) {
             if (debug) console.log(element);
-            sid.selectedElement(element);
+            window.teleprompter.fileManager.selectedElement(element);
         }
 
-        sid.setEvent('input','prompt',function() {
+        window.teleprompter.fileManager.setEvent('input','prompt',function() {
             save();
         });
 
-        CKEDITOR.on('instanceReady', function(event) {
-            var editor = event.editor,
-            scriptsData = sid.getElements();
-            if (scriptsData[sid.currentElement].hasOwnProperty('data'))
-                document.getElementById("prompt").innerHTML = scriptsData[sid.currentElement]['data'];
-            else
-                document.getElementById("prompt").innerHTML = "";
+        function editorInit() {
+            // Need failed verification
+            loadScript(`editors/${currentEditor}.js`);
+        }
 
-            editor.on('dialogDefinition', function(event) {
-                save();
-            });
-
-            editor.on('change', function(event) {
-                save();
-            });
-
-            editor.on('paste', function(event) {
-                // event.data.type
-                // save();
-            });
-
-            editor.on('key', function(event) {
-                if (event.key === undefined)
-                    event.key = event.data.keyCode;
-                if (debug) console.log(event.key);
-                if (sid.instructionsAreLoaded() && -1===[1114129,1114177,1114179,1114121,5570578,1114337,4456466,2228240,91,225,27,112,113,114,115,116,117,118,119,120,121,122,123,45,20,33,34,35,36,37,38,39,40].indexOf(event.key)) {
-                    window.location = '#sidebarAddElement';
-                    document.getElementById("inputName").focus();
-                } else if (event.key===122 || event.key==="F11") {
-                    toggleFullscreen();
-                } else if (event.key===119 || event.key==="F8") {
-                    togglePrompter();
-                }
-                return true;
-            });
-
-            editor.on('focus', function() {
-                editorFocused = true;
-                if (debug) console.log('Editor focused.');
-                // save();
-            });
-
-            editor.on('blur', function() {
-                editorFocused = false;
-                if (debug) console.log('Editor out of focus.');
-                save();
-            });
-        });
+        editorInit();
 
         var fileManagerToggle = document.querySelector("#fileManagerToggle");
         fileManagerToggle.onclick = function(event) {
             event.preventDefault();
             fileManager.openModal();
-            save();
+            window.teleprompter.editor.save();
         };
         var fileManagerClose = document.querySelector("#fileManagerClose");
         fileManagerClose.onclick = function(event) {
