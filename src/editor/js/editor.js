@@ -18,57 +18,49 @@
     along with Imaginary Teleprompter.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-"use strict";
-var debug = false;
+class Editor {
+    constructor() {
+        this.debug = false;
+        this.contentEditor = {};
 
-var editorList = [
-    // oficial
-    "ckeditor",
-    // testing alternatives
-    "tinymce",
-    "summernote"
-]
-var currentEditor = editorList[0];
+        var editorList = [
+            // oficial
+            "ckeditor",
+            // testing alternatives
+            "tinymce",
+            "summernote"
+        ]
+        this.currentEditor = editorList[0];
 
-// (function() {
-    // Use JavaScript Strict Mode.
-    var elecScreen, ipcRenderer, remote;
+        // Import Electron libraries.
+        if (inElectron()){
+            const electron = require('electron');
+            this.remote = require('@electron/remote');  // Allows IPC with main process in Electron.
+            this.electronScreen = remote.screen; // Allows Smart Fullscreens in Electron.
+            this.ipcRenderer = electron.ipcRenderer;
 
-    // Import Electron libraries.
-    if (inElectron()){
-        const electron = require('electron');
-        remote = require('@electron/remote');  // Allows IPC with main process in Electron.
-        elecScreen = remote.screen; // Allows Smart Fullscreens in Electron.
-        ipcRenderer = electron.ipcRenderer;
+            // window.jQuery = require('./assets/jquery/jquery.min.js');
+            // window.$ = window.jQuery;
+            // window.Slider = require('./assets/bootstrap-slider/js/bootstrap-slider.min.js');
+        }
 
-        window.jQuery = require('./assets/jquery/jquery.min.js');
-        window.$ = window.jQuery;
-        window.Slider = require('./assets/bootstrap-slider/js/bootstrap-slider.min.js');
-    }
-    
-    // Global objects
-    var promptIt, updateIt, prompterWindow, frame, currentScript, canvas, canvasContext, slider, promptWidth,
-        syncMethods = {"instance":0, "canvas":1, "follow":2};
+        this.syncMethods = {"instance": 0, "canvas": 1, "follow": 2};
+        this.syncMethod = this.syncMethods.instance;
+        this.forceSecondaryDisplay = false;
+        this.instance = [false, false],
+        this.editorFocused = false;
 
-    // Global variables
-    var syncMethod = syncMethods.instance,
-        forceSecondaryDisplay = false,
-        domain, tic, instance = [false, false],
-        htmldata, editorFocused = false;
-
-    if ( syncMethod === syncMethods.canvas ) {
-        forceSecondaryDisplay = true;
+        if (this.syncMethod === this.syncMethods.canvas) {
+            this.forceSecondaryDisplay = true;
+        }
     }
 
-    // File Manager
-    var fileManager = new FileManager();
-
-    // Settings
-    var settingsModal;
-
-    function init() {
+    init() {
         // Set globals
-        tic = false;
+        this.tic = false;
+
+        // Initialize file Manager
+        teleprompter.fileManager = new FileManager();
 
         // Initialize commands mapping
         teleprompter.commandsMapping = new CommandsMapping();
@@ -77,30 +69,35 @@ var currentEditor = editorList[0];
         teleprompter.themes = new Themes();
         teleprompter.themes.setColorPicker();
 
+        // Initialize controls
+        teleprompter.controls = new Controls();
+
         // Set DOM javascript controls
-        promptIt = document.getElementById("promptIt");
-        updateIt = document.getElementById("updateIt");
-        promptIt.onclick = submitTeleprompter;
-        updateIt.onclick = updateTeleprompter;
+        this.promptIt = document.getElementById("promptIt");
+        this.updateIt = document.getElementById("updateIt");
+        this.promptIt.onclick = this.submitTeleprompter;
+        this.updateIt.onclick = this.updateTeleprompter;
+
         document.getElementById("prompterStyle").addEventListener('change', function(e) {
             teleprompter.themes.setStyle(e.target.value);
         }.bind(this));
+
         document.getElementById("prompterStyleControl").addEventListener('change', function(e) {
             teleprompter.themes.setStyle(e.target.value);
         }.bind(this));
-        document.getElementById("credits-link").onclick = credits;
 
-        frame = document.getElementById("teleprompterframe");
-        canvas = document.getElementById("telepromptercanvas");
-        canvasContext = canvas.getContext('2d');
+        this.frame = document.getElementById("teleprompterframe");
+        this.canvas = document.getElementById("telepromptercanvas");
+        this.canvasContext = this.canvas.getContext('2d');
 
         // Set initial configuration to prompter style
         teleprompter.themes.styleInit(document.getElementById("prompterStyle"));
 
         // Set credits button
-        document.getElementById("credits-link").onclick = credits;
+        document.getElementById("credits-link").onclick = this.credits;
+
         // Set domain to current domain.
-        setDomain();
+        this.setDomain();
 
         // If running inside Electron...
         if (inElectron()) {
@@ -108,7 +105,7 @@ var currentEditor = editorList[0];
             const remote = require('electron').remote;
 
             //Check, Update and Migrate Teleprompter Data
-            dataManager.getItem("IFTeleprompterVersion",function(item) {
+            dataManager.getItem("IFTeleprompterVersion", function(item) {
                 if (item == null || compare(currentVersion, item) == 1) {
                     //fix 
                     item = "0";
@@ -119,33 +116,33 @@ var currentEditor = editorList[0];
                         window.location = "#devWarning";
                         var agreeButton = document.getElementById("agreeWarningButton");
                         agreeButton.onclick = function(e) {
-                            applyMigration(item);
-                            dataManager.setItem("IFTeleprompterVersion",currentVersion);
-                            closeModal();
-                        };
-                        document.getElementById("cancelWarningButton").onclick = closeWindow;
-                        document.getElementById("closeWarning").onclick = closeWindow;
+                            this.applyMigration(item);
+                            dataManager.setItem("IFTeleprompterVersion", currentVersion);
+                            this.closeModal();
+                        }.bind(this);
+                        document.getElementById("cancelWarningButton").onclick = this.closeWindow;
+                        document.getElementById("closeWarning").onclick = this.closeWindow;
                         agreeButton.focus();
                     } else {
                         //migrate from previous versions 
-                        applyMigration(item);
+                        this.applyMigration(item);
                         dataManager.setItem("IFTeleprompterVersion",currentVersion);
 
                         //make sure all modal closes after reload the page
                         //place this here to avoid problems with the warning and the newest modal
-                        closeModal();
+                        this.closeModal();
                     }
                     
                 } else if(compare(item, currentVersion) == 1) {
                     window.location = "#devNewestVersion";
                     var cancelButton = document.getElementById("cancelNewestButton");
                     cancelButton.onclick = function(e){
-                        var window = remote.getCurrentWindow();
+                        var window = this.remote.getCurrentWindow();
                         window.close();
-                    };
+                    }.bind(this);
                     cancelButton.focus();
                 } 
-            },0,0);
+            }, 0, 0);
             // When asynchronous reply from main process, run function to...
             ipcRenderer.on('asynchronous-reply', function(event, arg) {
                 // Update Canvas
@@ -222,39 +219,93 @@ var currentEditor = editorList[0];
             //ipcRenderer.send('asynchronous-message', 'network');
         } // end if
 
-        // Initialize controls
-        teleprompter.controls = new Controls();
-        //initImages();
-        loadLastUseSettings();
-        // Initialize prompt styles
+
+        // Draw controls
+        teleprompter.controls.draw();
+
+        // Load latest values
+        this.loadLastUseSettings();
+
+        // Draw prompt styles
         teleprompter.themes.draw();
-        // Initialize file management features.
-        initScripts();
+
+        // Draw file management
+        teleprompter.fileManager.draw();
+
+        // Load current editor
+        loadScript(`editors/${this.currentEditor}.js`);
+
         // Initialize commands mapping editor
         teleprompter.commandsMapping.draw();
-    } // end init()
 
-    function closeWindow() {
-        var window = remote.getCurrentWindow();
+        // Maybe we need to move the listener to prompter
+        // Initialize postMessage event listener.
+        addEventListener("message", function(event) {
+            this.listener(event);
+        }.bind(this), false);
+
+        // Credits
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function() {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                this.htmldata = xmlhttp.responseText;
+                this.internalCredits();
+            }
+        }.bind(this);
+
+        document.addEventListener('keydown', function(event) {
+            this.commandsListener(event);
+        }.bind(this));
+
+        // Save last use settings
+        window.addEventListener("beforeunload", this.updatePrompterData);
+
+        // Toogle control
+        $('.btn-toggle').click(function() {
+            $(this).find('.btn').toggleClass('active');  
+            
+            if ($(this).find('.btn-primary').length>0) {
+                $(this).find('.btn').toggleClass('btn-primary');
+            }
+            if ($(this).find('.btn-danger').length>0) {
+                $(this).find('.btn').toggleClass('btn-danger');
+            }
+            if ($(this).find('.btn-success').length>0) {
+                $(this).find('.btn').toggleClass('btn-success');
+            }
+            if ($(this).find('.btn-info').length>0) {
+                $(this).find('.btn').toggleClass('btn-info');
+            }
+            
+            $(this).find('.btn').toggleClass('btn-default');
+            
+        });
+        $('form').submit(function(){
+            return false;
+        });
+    }
+
+    closeWindow() {
+        var window = this.remote.getCurrentWindow();
         window.close();
     }
 
     // Resize canvas size
-    function resizeCanvas(size) {
-        if ( !(canvas.width===size[0] && canvas.height===size[1]) ) {
-            canvas.width = size[0];
-            canvas.height = size[1];
+    resizeCanvas(size) {
+        if ( !(this.canvas.width===size[0] && this.canvas.height===size[1]) ) {
+            this.canvas.width = size[0];
+            this.canvas.height = size[1];
         }
     }
 
-    function isADevVersion(version) {
+    isADevVersion(version) {
         if(version.includes("rc") || version.includes("alpha") || version.includes("beta"))
             return true;
         return false;
     }
 
     //Apply migration by versions
-    function applyMigration(version) {
+    applyMigration(version) {
         switch (version) {
             // "default" at top for unnacaunted developer versions. I didn't thought this was possible! xD
             default:
@@ -262,20 +313,20 @@ var currentEditor = editorList[0];
             case null:
             case "0":
             case "2.2.0":
-                dataManager.getItem("IFTeleprompterSideBar",function(dataToMigrate) {
+                dataManager.getItem("IFTeleprompterSideBar", function(dataToMigrate) {
                     if (dataToMigrate) {
                         // Convert Data
                         dataToMigrate = JSON.parse(dataToMigrate);
                         if (dataToMigrate.length > 0) {
                             // Fix to not do more dirty work
-                            dataToMigrate[0]["id"] = fileManager.createIDTag(dataToMigrate[0].name, true);
-                            fileManager.getSaveMode().setItem(fileManager.getDataKey(), JSON.stringify(dataToMigrate));
+                            dataToMigrate[0]["id"] = teleprompter.fileManager.createIDTag(dataToMigrate[0].name, true);
+                            teleprompter.fileManager.getSaveMode().setItem(teleprompter.fileManager.getDataKey(), JSON.stringify(dataToMigrate));
                         }
                         // Continue with rest of the data
                         for (var i = 1; i < dataToMigrate.length; i++)
                             if (dataToMigrate[i].hasOwnProperty("name")) {
-                                dataToMigrate[i]["id"] = fileManager.createIDTag(dataToMigrate[i].name);
-                                fileManager.getSaveMode().setItem(fileManager.getDataKey(), JSON.stringify(dataToMigrate));
+                                dataToMigrate[i]["id"] = teleprompter.fileManager.createIDTag(dataToMigrate[i].name);
+                                teleprompter.fileManager.getSaveMode().setItem(teleprompter.fileManager.getDataKey(), JSON.stringify(dataToMigrate));
                             }
                     }
                 }, 0, 0);
@@ -286,123 +337,104 @@ var currentEditor = editorList[0];
         }
     }
 
-    // Initialize postMessage event listener.
-    addEventListener("message", listener, false);
-
-    function save() {
-        if (debug) console.log("Save pressed");
-    }
-
-    function inElectron() {
-        return navigator.userAgent.indexOf("Electron") != -1;
-    }
-
-    function setDomain() {
+    setDomain() {
         // Get current domain from browser
-        domain = document.domain;
+        this.domain = document.domain;
         // If not running on a server, return catchall.
-        if (domain.indexOf("http://") != 0 || domain.indexOf("https://") != 0 || domain.indexOf("localhost") != 0)
-            domain = "*";
+        if (this.domain.indexOf("http://") != 0 || this.domain.indexOf("https://") != 0 || this.domain.indexOf("localhost") != 0)
+        this.domain = "*";
     }
 
-    function getDomain() {
-        return domain;
+    getDomain() {
+        return this.domain;
     }
 
-    function launchIntoFullscreen(element) {
+    launchIntoFullscreen(element) {
         var requestFullscreen = element.requestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen || element.msRequestFullscreen;
-        if (requestFullscreen!==undefined)
+        if (requestFullscreen !== undefined)
             requestFullscreen.call(element);
     }
 
-    function exitFullscreen() {
+    exitFullscreen() {
         var exitFullscreen = document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen;
-        if (exitFullscreen!==undefined)
+        if (exitFullscreen !== undefined)
             exitFullscreen.call(document);
     }
 
-    function toggleFullscreen() {
+    toggleFullscreen() {
         var fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement,
         elem;
         if (fullscreenElement)
-            exitFullscreen();
+            this.exitFullscreen();
         else {
-            if (promptIt.onclick === submitTeleprompter)
+            if (this.promptIt.onclick === this.submitTeleprompter) // We need and alternative, this doesn't work in classes
                 elem = document.getElementById("editorcontainer");
             else
                 elem = document.documentElement;
-            launchIntoFullscreen(elem);
+            this.launchIntoFullscreen(elem);
         }
     }
 
-    function togglePrompter() {
-        if (promptIt.onclick === submitTeleprompter)
-            submitTeleprompter();
+    togglePrompter() {
+        if (this.promptIt.onclick === this.submitTeleprompter) // We need and alternative, this doesn't work in classes
+            this.submitTeleprompter();
         else
-            restoreEditor();
+            this.restoreEditor();
     }
 
-    function togglePromptIt() {
-        if (promptIt.onclick === submitTeleprompter) {
+    togglePromptIt() {
+        if (this.promptIt.onclick === this.submitTeleprompter) { // We need and alternative, this doesn't work in classes
             // Update button
-            promptIt.textContent = "Close It...";
-            promptIt.onclick = restoreEditor;
+            this.promptIt.textContent = "Close It...";
+            this.promptIt.onclick = this.restoreEditor;
             // Hide stuff
-            if (instance[0]) {
+            if (this.instance[0]) {
                 document.getElementById("content").style.display = "none";
                 document.getElementById("editorcontainer").style.display = "none";
                 document.getElementById("footer").style.display = "none";
                 // Show prompter instance
                 document.getElementById("framecontainer").style.display = "block";
-                if (instance[1] && syncMethod===syncMethods.canvas) {
-                    canvas.style.display = "block";
-                    frame.style.display = "none";
+                if (this.instance[1] && this.syncMethod === this.syncMethods.canvas) {
+                    this.canvas.style.display = "block";
+                    this.frame.style.display = "none";
                 }
                 else {
-                    frame.style.display = "block";
-                    canvas.style.display = "none";
+                    this.frame.style.display = "block";
+                    this.canvas.style.display = "none";
                 }
-                launchIntoFullscreen(document.documentElement);
-            } else if (instance[1]) {
-                updateIt.classList.remove("hidden");
+                this.launchIntoFullscreen(document.documentElement);
+            } else if (this.instance[1]) {
+                this.updateIt.classList.remove("hidden");
             }
         } else {
             // Update button
-            promptIt.innerHTML = "Prompt It!";
-            promptIt.onclick = submitTeleprompter;
+            this.promptIt.innerHTML = "Prompt It!";
+            this.promptIt.onclick = submitTeleprompter;
             // Restore editor
-            if (instance[0]) {
+            if (this.instance[0]) {
                 document.getElementById("content").style.display = "";
                 document.getElementById("editorcontainer").style.display = "";
                 document.getElementById("footer").style.display = "";
                 // Hide prompter frame
                 document.getElementById("framecontainer").style.display = "none";
-                if (instance[1] && syncMethod===syncMethods.canvas)
-                    canvas.style.display = "none";
+                if (this.instance[1] && this.syncMethod === this.syncMethods.canvas)
+                    this.canvas.style.display = "none";
                 else
-                    frame.style.display = "none";
-                exitFullscreen();
-            } else if (instance[1]) {
-                updateIt.classList.add("hidden");
+                    this.frame.style.display = "none";
+                this.exitFullscreen();
+            } else if (this.instance[1]) {
+                this.updateIt.classList.add("hidden");
             }
         }
     }
 
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            htmldata = xmlhttp.responseText;
-            internalCredits();
-        }
-    }
-
-    function internalCredits() {
+    internalCredits() {
         // Set primary instance as active.
-        instance[0] = true;
-        instance[1] = false;
+        this.instance[0] = true;
+        this.instance[1] = false;
 
         // Toggle editor interface
-        togglePromptIt();
+        this.togglePromptIt();
 
         // Set data to send.
         var settings = '{ "data": {"secondary":0,"primary":1,"prompterStyle":2,"focusMode":3,"background":"#3CC","color":"#333","overlayBg":"#333","speed":"13","acceleration":"1.2","fontSize":"100","promptWidth":"84","timer":"false","voice":"false"}, "quickConfig": {}}',
@@ -413,23 +445,24 @@ var currentEditor = editorList[0];
         dataManager.setItem("IFTeleprompterSession", session);
 
         // Update frame and focus on it.
-        //frame.src = "teleprompter.html";
-        frame.src = "teleprompter.html?debug=1";
-        frame.focus();
+        //this.frame.src = "teleprompter.html";
+        this.frame.src = "teleprompter.html?debug=1";
+        this.frame.focus();
 
     }
 
-    function credits() {
+    credits() {
         // Get credits page.
+        var xmlhttp = new XMLHttpRequest();
         xmlhttp.open("GET", "credits.html", true);
         xmlhttp.send();
-        toggleFullscreen();
+        this.toggleFullscreen();
     }
 
-    function updatePrompterData( override ) {
+    updatePrompterData(override) {
         // Get html from editor
     
-        htmldata = teleprompter.editor.getEditorContent();
+        this.htmldata = teleprompter.editor.contentEditor.getEditorContent();
 
         // Define possible values
         var primary, secondary, style, focusArea, speed, acceleration, fontSize, timer, voice;
@@ -480,7 +513,7 @@ var currentEditor = editorList[0];
             voice = false;
         // Merge all settings into one.
         var settings = '{ "quickConfig": '+JSON.stringify(teleprompter.controls.quickConfig)+', "commandsMapping": '+JSON.stringify(teleprompter.commandsMapping.mapping)+', "data": {"primary":'+primary+',"secondary":'+secondary+',"prompterStyle":'+style+',"focusMode":'+focusArea+',"speed":'+speed+',"acceleration":'+acceleration+',"fontSize":'+fontSize+',"promptWidth":'+promptWidth+',"timer":'+timer+',"voice":'+voice+'}}',
-        session = '{ "html":"' + encodeURIComponent(htmldata) + '" }';
+        session = '{ "html":"' + encodeURIComponent(this.htmldata) + '" }';
 
         // Store data locally for prompter to use
         dataManager.setItem("IFTeleprompterSettings", settings, 1);
@@ -490,33 +523,33 @@ var currentEditor = editorList[0];
         teleprompter.controls.updateQuickConfig(teleprompter.controls.quickConfig);
     }
 
-    function restoreEditor(event) {
-        if (promptIt.onclick === restoreEditor) {
+    restoreEditor(event) {
+        if (this.promptIt.onclick === this.restoreEditor) {
             if (debug) console.log("Restoring editor.");
             // Request to close prompters:
             // Close frame.
-            if (frame.src.indexOf("teleprompter.html") != -1)
-                frame.contentWindow.postMessage({
-                    'request': command.close
+            if (this.frame.src.indexOf("teleprompter.html") != -1)
+                this.frame.contentWindow.postMessage({
+                    'request': teleprompter.commandsMapping.command.close
                 }, getDomain());
             // Close window.
-            if (prompterWindow)
-                prompterWindow.postMessage({
-                    'request': command.close
+            if (this.prompterWindow)
+                this.prompterWindow.postMessage({
+                    'request': teleprompter.commandsMapping.command.close
                 }, getDomain());
-            if (syncMethod === syncMethods.canvas)
-                ipcRenderer.send('asynchronous-message', 'closeInstance');
+            if (this.syncMethod === this.syncMethods.canvas)
+                this.ipcRenderer.send('asynchronous-message', 'closeInstance');
             // Clear contents from frame
-            frame.src = "about:blank";
+            this.frame.src = "about:blank";
             // Stops the event but continues executing current function.
             if (event && event.preventDefault)
                 event.preventDefault();
-            togglePromptIt();
+            this.togglePromptIt();
         }
     }
 
     // On "Prompt It!" clicked
-    function submitTeleprompter(event) {
+    submitTeleprompter(event) {
         if (debug) console.log("Submitting to prompter");
 
         // Stops the event but continues executing the code.
@@ -525,21 +558,21 @@ var currentEditor = editorList[0];
 
         var secondaryDisplay = null;
         
-        updatePrompterData();
+        this.updatePrompterData();
 
         // Determine whether to load "Primary".
-        instance[0] = (document.getElementById("primary").value > 0) ? true : false; 
+        this.instance[0] = (document.getElementById("primary").value > 0) ? true : false; 
         // Determine whether to load "Secondary".
-        instance[1] = (document.getElementById("secondary").value > 0) ? true : false; 
+        this.instance[1] = (document.getElementById("secondary").value > 0) ? true : false; 
         // Checks if is running on electron app...
         if (inElectron()) {
             // Check display availabillity.
-            const displays = elecScreen.getAllDisplays()
+            const displays = this.electronScreen.getAllDisplays()
             
             // of displays that are currently  available.
-            var primaryDisplay = elecScreen.getPrimaryDisplay(),
+            var primaryDisplay = this.electronScreen.getPrimaryDisplay(),
             currentDisplay = 0, // 0 means primary and 1 means secondary
-            cursorLocation = elecScreen.getCursorScreenPoint();
+            cursorLocation = this.electronScreen.getCursorScreenPoint();
             // Find the first display that isn't the primary display.
             if (debug) console.log("Displays amount: "+displays.length);
             const secondaryDisplay = displays.find((display) => {
@@ -553,108 +586,110 @@ var currentEditor = editorList[0];
             if ( (cursorLocation.x < primaryDisplay.bounds.x) || (cursorLocation.x > primaryDisplay.bounds.width) || (cursorLocation.y < primaryDisplay.bounds.y) || (cursorLocation.y > primaryDisplay.bounds.height) )
                 currentDisplay = 1;
             // If there are any externalDisplay; then create a new window for the display.
-            if (instance[1]) {
+            if (this.instance[1]) {
                 if (secondaryDisplay || forceSecondaryDisplay) {
                     // Open external prompter on a display where the editor is not located at.
                     if (currentDisplay===0) {
                         if (debug) console.log("Displaying external on secondary display.");
                         // Load external instance if in-frame prompter wont run.
-                        if (instance[0] && syncMethod===syncMethods.canvas)
-                            openCanvasPrompter();
+                        if (this.instance[0] && this.syncMethod===this.syncMethods.canvas)
+                            this.openCanvasPrompter();
                         // Otherwise run perfect sync painter.
                         else
-                            prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + (secondaryDisplay.workArea.height-50) + ',width=' + (secondaryDisplay.workArea.width-50) + ',top='+ (secondaryDisplay.workArea.y+50) +',left=' + (secondaryDisplay.workArea.x+50) + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0' );
+                            this.prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + (secondaryDisplay.workArea.height-50) + ',width=' + (secondaryDisplay.workArea.width-50) + ',top='+ (secondaryDisplay.workArea.y+50) +',left=' + (secondaryDisplay.workArea.x+50) + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0' );
                     }
                     else if (currentDisplay>0) {
                         if (debug) console.log("Displaying external on primary display.");
                         // Load external instance if in-frame prompter wont run.
-                        if (instance[0] && syncMethod===syncMethods.canvas)
-                            openCanvasPrompter();
+                        if (this.instance[0] && this.syncMethod===this.syncMethods.canvas)
+                            this.openCanvasPrompter();
                         // Otherwise run perfect sync painter.
                         else
-                            prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + (primaryDisplay.workArea.height-50) + ',width=' + (primaryDisplay.workArea.width-50) + ',top='+ (primaryDisplay.workArea.y+50) +',left=' + (primaryDisplay.workArea.x+50) + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0');
+                            this.prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + (primaryDisplay.workArea.height-50) + ',width=' + (primaryDisplay.workArea.width-50) + ',top='+ (primaryDisplay.workArea.y+50) +',left=' + (primaryDisplay.workArea.x+50) + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0');
                     }
                 }
                 // If currentDisplay isn't the primaryDisplay or if there is no secondaryDisplay and the primary is unnocupied... Display on primaryDisplay.
-                else if (!instance[0]) {
+                else if (!this.instance[0]) {
                     if (debug) console.log("Displaying external on primary display.");
-                    prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + (primaryDisplay.workArea.height-50) + ',width=' + (primaryDisplay.workArea.width-50) + ',top='+ (primaryDisplay.workArea.y+50) +',left=' + (primaryDisplay.workArea.x+50) + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0');
+                    this.prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + (primaryDisplay.workArea.height-50) + ',width=' + (primaryDisplay.workArea.width-50) + ',top='+ (primaryDisplay.workArea.y+50) +',left=' + (primaryDisplay.workArea.x+50) + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0');
                 }
             }
             // Load InFrame prompter only if there's more than one screen or if the only screen available is free.
-            if ( instance[0] && ( !instance[1] || secondaryDisplay ) )
-                frame.src = "teleprompter.html" + (debug ? "?debug=1" : "");
+            if (this.instance[0] && (!this.instance[1] || secondaryDisplay))
+                this.frame.src = "teleprompter.html" + (debug ? "?debug=1" : "");
         } else {
-            if (instance[0])
-                frame.src = "teleprompter.html" + (debug ? "?debug=1" : "");
-            if (instance[1])
-                prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + screen.availHeight + ',width=' + screen.width + ',top=0,left=' + screen.width + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0');
+            if (this.instance[0])
+                this.frame.src = "teleprompter.html" + (debug ? "?debug=1" : "");
+            if (this.instance[1])
+                this.prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + screen.availHeight + ',width=' + screen.width + ',top=0,left=' + screen.width + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0');
         }
         
         // If an external prompt is openned, focus on it.        
-        if (prompterWindow!=undefined && window.focus)
+        if (this.prompterWindow!=undefined && window.focus)
             // Adviced to launch as separate event on a delay.
-            prompterWindow.focus();
+            this.prompterWindow.focus();
         else
-            frame.focus();
+            this.frame.focus();
 
         // In case of both instances active and not enough screens...
-        if (!forceSecondaryDisplay && (inElectron() && !secondaryDisplay && instance[0] && instance[1])) {
+        if (!forceSecondaryDisplay && (inElectron() && !secondaryDisplay && this.instance[0] && this.instance[1])) {
             window.alert("You don't have any external Display.");
-            instance[0] = false;
-            instance[1] = false;
+            this.instance[0] = false;
+            this.instance[1] = false;
         }
         // In case that no instance is active...
-        else if (!(instance[0] || instance[1]))
+        else if (!(this.instance[0] || this.instance[1]))
             window.alert("You must prompt at least to one display.");
         else
-            togglePromptIt();
+            this.togglePromptIt();
     }
 
-    function openCanvasPrompter() {
+    openCanvasPrompter() {
         // Opening experimental prompter...
         if (debug) console.log("Opening experimental prompter.");
-        ipcRenderer.send('asynchronous-message', 'openInstance');
+        this.ipcRenderer.send('asynchronous-message', 'openInstance');
     }
 
-    function updateTeleprompter(event) {
+    updateTeleprompter(event) {
         // Stops the event but continues executing the code.
         event.preventDefault();
         // Update data.
-        updatePrompterData();
+        this.updatePrompterData();
         if (debug) console.log("Updating prompter contents");
         // Request update on teleprompter other instance.
-        listener({
+        this.listener({
             data: {
-                request: command.updateContents
+                request: teleprompter.commandsMapping.command.updateContents
             }
         });
     }
 
-    function toggleDebug() {
+    toggleDebug() {
         if (inElectron())
-            remote.getCurrentWindow().toggleDevTools();
+            this.remote.getCurrentWindow().toggleDevTools();
         else
-            toggleDebugMode();
+            this.toggleDebugMode();
     }
 
-    function toc() {
-        tic != tic;
+    toc() {
+        this.tic != this.tic;
     }
 
-    function refresh() {
+    refresh() {
         location.reload();
     }
 
-    function clearAllRequest() {
+    clearAllRequest() {
         if (confirm("You've pressed F6. Do you wish to perform a factory reset of Teleprompter? You will loose all saved scripts and custom styles.") ) {
             dataManager.clearAll();
-            window.removeEventListener("beforeunload", updatePrompterData);
+            window.removeEventListener("beforeunload", function() {
+                this.updatePrompterData();
+            }.bind(this));
             refresh();
         }
     }
 
-    function listener(event) {
+    listener(event) {
         // Message data. Uncommenting will give you valuable information and decrease performance dramatically.
         /*
         setTimeout(function() {
@@ -665,91 +700,90 @@ var currentEditor = editorList[0];
         }, 0);
         */
         // If the event comes from the same domain...
-        if (!event.domain || event.domain === getDomain()) {
+        if (!event.domain || event.domain === this.getDomain()) {
             var message = event.data;
             // Special case. Restore editor message received.
-            if (message.request === command.restoreEditor)
-                restoreEditor();
+            if (message.request === teleprompter.commandsMapping.command.restoreEditor)
+                this.restoreEditor();
             else {
-                if ( syncMethod===syncMethods.canvas && instance[0] && instance[1] && inElectron() ) {
+                if (this.syncMethod===this.syncMethods.canvas && this.instance[0] && this.instance[1] && inElectron() ) {
                     // IPC between main process directly.
-                    ipcRenderer.send('asynchronous-message', message);
+                    this.ipcRenderer.send('asynchronous-message', message);
                 }
                 else {
                     // If this isn't a instant sync command, follow normal procedure.
-                    if (!(message.request === command.iSync || message.request === command.sync)) {
+                    if (!(message.request === teleprompter.commandsMapping.command.iSync || message.request === teleprompter.commandsMapping.command.sync)) {
                         // Tic toc mechanism symmetricaly distributes message request lag.
-                        if (tic) {
+                        if (this.tic) {
                             // Redirect message to each prompter instance.
-                            if (instance[1])
-                                prompterWindow.postMessage(message, getDomain());
+                            if (this.instance[1])
+                                this.prompterWindow.postMessage(message, this.getDomain());
                             if (instance[0])
-                                frame.contentWindow.postMessage(message, getDomain());
+                                this.frame.contentWindow.postMessage(message, this.getDomain());
                         } else {
                             // Redirect message to each prompter instance.
-                            if (instance[0])
-                                frame.contentWindow.postMessage(message, getDomain());
-                            if (instance[1])
-                                prompterWindow.postMessage(message, getDomain());
+                            if (this.instance[0])
+                                this.frame.contentWindow.postMessage(message, this.getDomain());
+                            if (this.instance[1])
+                                this.prompterWindow.postMessage(message, this.getDomain());
                         }
                     }
                     // If requesting for sync, ensure both instances are open. Otherwise do nothing.
-                    else if (instance[0] && instance[1]) {
+                    else if (this.instance[0] && this.instance[1]) {
                         // Tic toc mechanism symmetricaly distributes message request lag.
-                        if (tic) {
+                        if (this.tic) {
                             // Redirect message to each prompter instance.
-                            if (instance[1])
-                                prompterWindow.postMessage(message, getDomain());
-                            if (instance[0])
-                                frame.contentWindow.postMessage(message, getDomain());
+                            if (this.instance[1])
+                                this.prompterWindow.postMessage(message, this.getDomain());
+                            if (this.instance[0])
+                                this.frame.contentWindow.postMessage(message, this.getDomain());
                         } else {
                             // Redirect message to each prompter instance.
-                            if (instance[0])
-                                frame.contentWindow.postMessage(message, getDomain());
-                            if (instance[1])
-                                prompterWindow.postMessage(message, getDomain());
+                            if (this.instance[0])
+                                this.frame.contentWindow.postMessage(message, this.getDomain());
+                            if (this.instance[1])
+                                this.prompterWindow.postMessage(message, this.getDomain());
                         }
                     }
                     // Update tic-toc bit.
-                    setTimeout(toc, 10);
+                    setTimeout(this.toc, 10);
                 }
             }
         }
     }
 
-    function commandsListener (event) {
+    commandsListener (event) {
         // Temporal Solution, until descomposition
         if (event.target.hasAttribute("data-key")) {
             return;
         }
-
+        var mapping = teleprompter.commandsMapping.mapping;
         if (mapping[event.code]) {
-            actions[mapping[event.code]]["method"]();
+            teleprompter.commandsMapping.actions[mapping[event.code]]["method"]();
         } else if (event.key) {
             var key;
             // If key is not a string
-            if (!isFunction(event.key.indexOf))
+            if (!this.isFunction(event.key.indexOf))
                 key = String.fromCharCode(event.key);
             else
                 key = event.key;
             //if ( key.indexOf("Key")===0 || key.indexOf("Digit")===0 )
             //      key = key.charAt(key.length-1);
-            if (!is_int(key))
+            if (!this.is_int(key))
                 key = key.toLowerCase();
             if (debug) console.log(key);
-            listener({
+            this.listener({
                 data: {
-                    request: command.anchor,
+                    request: teleprompter.commandsMapping.command.anchor,
                     data: key
                 }
             });
         }
     }
-    document.addEventListener('keydown', commandsListener);
 
-    function closeModal() {
+    closeModal() {
         if (window.location.hash.slice(1) === "openCustomStyles")
-            closePromptStyles();
+            this.closePromptStyles();
         else if (window.location.hash.slice(1) === "devWarning") {
             var version = function(thisVersion) {
                 console.log(thisVersion);
@@ -764,28 +798,25 @@ var currentEditor = editorList[0];
             window.location = "#close";
         document.getElementById("prompt").focus();
 
-        if (fileManager.modal) {
-            fileManager.modal.hide()
-            fileManager.modal = undefined;
+        if (teleprompter.fileManager.modal) {
+            teleprompter.fileManager.modal.hide()
+            teleprompter.fileManager.modal = undefined;
         }
     }
 
-    // Save last use settings
-    window.addEventListener("beforeunload", updatePrompterData);
-
-    function updateFont(value) {
+    updateFont(value) {
         if (debug) console.log("Updating font.");
         document.getElementById("prompt").style.fontSize = "calc(5vw * "+(value/100)+")";
     }
 
-    function updateWidth(value) {
+    updateWidth(value) {
         if (debug) console.log("Updating width.");
         const prompt = document.getElementById("prompt");
         prompt.style.width = value+"vw";
         prompt.style.left = "calc("+(50-value/2)+"vw - 14px)";
     }
 
-    function loadLastUseSettings() {
+    loadLastUseSettings() {
         // Get last used settings.
         var settings = (lastSettings) => {
             if (lastSettings!==undefined && lastSettings!==null) {
@@ -816,8 +847,8 @@ var currentEditor = editorList[0];
                 document.getElementById("accelerationValue").textContent = parseFloat(Math.round(lastSettings.data.acceleration * 100) / 100).toFixed(2);
                 document.getElementById("fontSizeValue").textContent = lastSettings.data.fontSize;
                 document.getElementById("promptWidthValue").textContent = lastSettings.data.promptWidth;
-                updateFont(lastSettings.data.fontSize);
-                updateWidth(lastSettings.data.promptWidth);
+                this.updateFont(lastSettings.data.fontSize);
+                this.updateWidth(lastSettings.data.promptWidth);
                 // Set timer value
                 document.getElementById("timerOn").checked = lastSettings.data.timer;
                 document.getElementById("timerOff").checked = !lastSettings.data.timer;
@@ -835,18 +866,18 @@ var currentEditor = editorList[0];
         dataManager.getItem("IFTeleprompterSettings", settings, 1);
     }
 
-    function isFunction(possibleFunction) {
+    isFunction(possibleFunction) {
         return typeof(possibleFunction) === typeof(Function)
     }
 
-    function is_int(value) {
+    is_int(value) {
         if (parseFloat(value) == parseInt(value) && !isNaN(value))
             return true;
         else
             return false;
     }
 
-    function insertTextAtCursor(node) {
+    insertTextAtCursor(node) {
         var sel, range, html;
         if (window.getSelection) {
             sel = window.getSelection();
@@ -860,156 +891,38 @@ var currentEditor = editorList[0];
         }
     }
 
-    function b64toBlob(b64Data, contentType, sliceSize) {
-        contentType = contentType || '';
-        sliceSize = sliceSize || 512;
-
-        var byteCharacters = atob(b64Data);
-        var byteArrays = [];
-
-        for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-            var slice = byteCharacters.slice(offset, offset + sliceSize);
-
-            var byteNumbers = new Array(slice.length);
-            for (var i = 0; i < slice.length; i++)
-                byteNumbers[i] = slice.charCodeAt(i);
-
-            var byteArray = new Uint8Array(byteNumbers);
-
-            byteArrays.push(byteArray);
+    // Global functions, to be accessed from Electron's main process.
+    enterDebug() {
+        debug = true;
+        console.log("Entering debug mode.");
+        function updateFont() {
+            this.prompt.style.fontSize = fontSize+'em' ;
+            this.overlayFocus.style.fontSize = fontSize+'em' ;
+            this.onResize();
         }
-
-        var blob = new Blob(byteArrays, {
-            type: contentType
-        });
-        return blob;
+    }
+    exitDebug() {
+        this.debug = false;
+        console.log("Leaving debug mode.");
     }
 
-    // Teleprompter Scripts File Manager
-    function initScripts() {
-        //initialize SideBar
-        teleprompter.fileManager = fileManager.on('v-pills-scriptsContent',{
-            "name":"Files",
-            "elementName":"Script",
-            "newElementName":"Untitled",
-            "dataKey":"IFTeleprompterSideBar",
-            "preloadData":[{
-                "name": "Instructions",
-                "data": '<h3>Welcome to Imaginary Teleprompter!</h3><p>Are you ready to tell a story?</p><br><p>"Teleprompter" is the most complete, free software, professional teleprompter for anyone to use. Click on "Prompt It!" whenever you\'re ready and control the speed with the arrow keys.</p><br><h3>Here are some of our features:</h3><ol><li>Control the speed and text-size with the \'Up\' and \'Down\' arrow keys, the \'W\' and \'S\' keys or the mouse wheel. You may press \'Spacebar\' to pause at anytime.</li><li>Move half a screen backwards or forwards by pressing the \'PageUp\' and \'PageDown\' keys.</li><li>Dynamically change the font-size by pressing \'Left\' and \'Right\' or the \'A\' and \'D\' keys.</li><li>Flip modes allow <em>mirroring</em> the prompter in every possible way.</li><li>You can use one or two instances. Mirror one, monitor on the other one.</li><li><a id="5" name="5">Set almost any key as a <em>marker</em> and instantly jump to any part of the script. Try pressing \'5\' now!</a></li><li>Different focus areas allow you to easily use Teleprompter with a webcam, a tablet, or professional teleprompter equipment.</li><li>Time your segments with the built in <em>timer</em>. Press \'Backspace\' to reset the timer.</li><li><a name data-cke-saved-name src="#">You can also set nameless <em>markers</em> and move accross them using the Home and End buttons.</a></li><li>Tweak the <em>Speed</em>, <em>Acceleration Curve</em> and <em>Font Size</em> settings to fit your hosts\' needs.</li><li>Press \'F11\' to enter and leave fullscreen.You may fullscreen the text editor for greater concentration.</li><li>The Rich Text Editor, derived from the highly customizable CKeditor, gives unlimited possibilities on what you can prompt.</li><ul><!-- <li>Add emoticons to indicate feelings and expressions to your hosts.</li>--><li>You may generate and display mathematical equations using the integrated CodeCogs equation editor.<br><table border="1" cellpadding="1" cellspacing="1"><tbody><tr><td>&nbsp;</td><td><img alt="\bg_white \huge \sum_{heta+\Pi }^{80} sin(heta)" src="https://latex.codecogs.com/gif.latex?%5Cdpi%7B300%7D%20%5Cbg_white%20%5Chuge%20%5Csum_%7B%5CTheta&amp;plus;%5CPi%20%7D%5E%7B80%7D%20sin%28%5CTheta%29" /></td><td>&nbsp;</td></tr></tbody></table></li><li>Insert images from the web or copy and paste them into the prompter.<img alt="Picture: Arecibo Sky" src="assets/custom/img/arecibo-sky.jpg"></li> </ul><li>There are various <em>Prompter Styles</em> to choose from. You may also create your own.</li><!-- <li>Download our mobile app, <em>Teleprompter X</em>, to remote control Teleprompter instalations.</li> --><li>Run the "External prompter" on a second screen, add new contents into the editor, then "Update" your prompter in realtime without having to halt your script.</li><li>Teleprompter works across screens with different resolutions and aspect ratios.</li><li>Using calculus and relative measurement units, Teleprompter is built to age gracefully. Speed and contents remain consistent from your smallest screen up to 4k devices and beyond.</li><li>Animations are hardware accelerated for a smooth scroll. A quad-core computer with dedicated graphics and, at least, 2GB RAM is recommended for optimal results.</li><li>Teleprompter doesn\'t stretch a lower quality copy of your prompt for monitoring, instead it renders each instance individually at the highest quality possible. You should lower your resolution to increase performance on lower end machines.</li><li>Text can be pasted from other word processors such as Libre Office Writer&trade; and Microsoft Word&reg;.</li><li>All data is managed locally. We retain no user data.</li><li>Use the standalone installation for greater performance and automatic fullscreen prompting.</li><li>The standalone version comes for Linux, OS X, Microsoft Windows and Free BSD.</li><li>Close prompts and return to the editor by pressing \'ESC\'.</li></ol><hr><h4>How to use anchor shortcuts:</h4><ol><li>Select a keyword or line you want to jump to on your text in the editor.</li><li>Click on the <strong>Flag Icon</strong> on the editor\'s tool bar.</li><li>A box named "Anchor Properties" should have appeared. Type any single key of your choice and click \'Ok\'.<br>Note preassigned keys, such as WASD and Spacebar will be ignored.</li><li>Repeat as many times as you wish.</li><li>When prompting, press on the shortcut key to jump into the desired location.</li></ol><p>###</p>',
-                "editable": false
-            }],
-
-        });
-
-        teleprompter.editor.save = function() {
-            if (teleprompter.fileManager.currentElement != 0) {
-                var scriptsData = teleprompter.fileManager.getElements();
-                scriptsData[teleprompter.fileManager.currentElement]["data"] = document.getElementById("prompt").innerHTML;
-                teleprompter.fileManager.getSaveMode().setItem(teleprompter.fileManager.getDataKey(), JSON.stringify(scriptsData));
-            }
-        }
-
-        teleprompter.fileManager.selectedElement = function(element) {
-            var scriptsData = teleprompter.fileManager.getElements();
-            if (scriptsData[teleprompter.fileManager.currentElement].hasOwnProperty('data'))
-                document.getElementById("prompt").innerHTML = scriptsData[teleprompter.fileManager.currentElement]['data'];
-            else
-                document.getElementById("prompt").innerHTML = "";
-            teleprompter.fileManager.closeModal()
-        }
-
-        teleprompter.fileManager.addElementEnded = function(element) {
-            if (debug) console.log(element);
-            teleprompter.fileManager.selectedElement(element);
-        }
-
-        teleprompter.fileManager.setEvent('input','prompt',function() {
-            save();
-        });
-
-        function editorInit() {
-            // Need failed verification
-            loadScript(`editors/${currentEditor}.js`);
-        }
-
-        editorInit();
-
-        var fileManagerToggle = document.querySelector("#fileManagerToggle");
-        fileManagerToggle.onclick = function(event) {
-            event.preventDefault();
-            fileManager.openModal();
-            teleprompter.editor.save();
-        };
-        var fileManagerClose = document.querySelector("#fileManagerClose");
-        fileManagerClose.onclick = function(event) {
-            fileManager.closeModal();
-        }
-
-        var settingsModalToggle = document.querySelector("#settingsToggle");
-        settingsModalToggle.onclick = function(event) {
-            event.preventDefault();
-            settingsModal = new bootstrap.Modal(document.getElementById("settingsModal"), {
-                keyboard: false,
-                backdrop: 'static'
-            });
-            settingsModal.show();
-        };
-        var settingsClose = document.querySelector("#settingsClose");
-        settingsClose.onclick = function(event) {
-            settingsModal.hide();
-        }
-        
+    toggleDebugMode() {
+        if (this.debug) 
+            this.exitDebug();
+        else
+            this.enterDebug();
     }
 
-    // Initialize objects after DOM is loaded
-    if (document.readyState === "interactive" || document.readyState === "complete")
-        // Call init if the DOM (interactive) or document (complete) is ready.
-        init();              
-    else
-        // Set init as a listener for the DOMContentLoaded event.
-        document.addEventListener("DOMContentLoaded", init);
+}
 
-    // Toogle control
-    $('.btn-toggle').click(function() {
-        $(this).find('.btn').toggleClass('active');  
-        
-        if ($(this).find('.btn-primary').length>0) {
-            $(this).find('.btn').toggleClass('btn-primary');
-        }
-        if ($(this).find('.btn-danger').length>0) {
-            $(this).find('.btn').toggleClass('btn-danger');
-        }
-        if ($(this).find('.btn-success').length>0) {
-            $(this).find('.btn').toggleClass('btn-success');
-        }
-        if ($(this).find('.btn-info').length>0) {
-            $(this).find('.btn').toggleClass('btn-info');
-        }
-        
-        $(this).find('.btn').toggleClass('btn-default');
-           
-    });
-    $('form').submit(function(){
-        return false;
-    });
-// }());
+teleprompter.editor = new Editor()
 
-// Global functions, to be accessed from Electron's main process.
-function enterDebug() {
-    debug = true;
-    console.log("Entering debug mode.");    function updateFont() {
-        prompt.style.fontSize = fontSize+'em' ;
-        overlayFocus.style.fontSize = fontSize+'em' ;
-        onResize();
-    }
-}
-function exitDebug() {
-    debug = false;
-    console.log("Leaving debug mode.");
-}
-function toggleDebugMode() {
-    if (debug) 
-        exitDebug();
-    else
-        enterDebug();
-}
+// Initialize objects after DOM is loaded
+if (document.readyState === "interactive" || document.readyState === "complete")
+    // Call init if the DOM (interactive) or document (complete) is ready.
+    teleprompter.editor.init();              
+else
+    // Set init as a listener for the DOMContentLoaded event.
+    document.addEventListener("DOMContentLoaded", function() {
+        teleprompter.editor.init();
+    }.bind(this));

@@ -79,18 +79,18 @@ loadScript('assets/ckeditor/ckeditor.js', () => {
 
     CKEDITOR.on('instanceReady', function(event) {
         var editor = event.editor,
-        scriptsData = window.teleprompter.fileManager.getElements();
-        if (scriptsData[window.teleprompter.fileManager.currentElement].hasOwnProperty('data'))
-            document.getElementById("prompt").innerHTML = scriptsData[window.teleprompter.fileManager.currentElement]['data'];
+        scriptsData = teleprompter.fileManager.getElements();
+        if (scriptsData[teleprompter.fileManager.currentElement].hasOwnProperty('data'))
+            document.getElementById("prompt").innerHTML = scriptsData[teleprompter.fileManager.currentElement]['data'];
         else
             document.getElementById("prompt").innerHTML = "";
 
         editor.on('dialogDefinition', function(event) {
-            window.teleprompter.editor.save();
+            teleprompter.editor.contentEditor.save();
         });
 
         editor.on('change', function(event) {
-            window.teleprompter.editor.save();
+            teleprompter.editor.contentEditor.save();
         });
 
         editor.on('paste', function(event) {
@@ -102,7 +102,7 @@ loadScript('assets/ckeditor/ckeditor.js', () => {
             if (event.key === undefined)
                 event.key = event.data.keyCode;
             if (debug) console.log(event.key);
-            if (window.teleprompter.fileManager.instructionsAreLoaded() && -1===[1114129,1114177,1114179,1114121,5570578,1114337,4456466,2228240,91,225,27,112,113,114,115,116,117,118,119,120,121,122,123,45,20,33,34,35,36,37,38,39,40].indexOf(event.key)) {
+            if (teleprompter.fileManager.instructionsAreLoaded() && -1===[1114129,1114177,1114179,1114121,5570578,1114337,4456466,2228240,91,225,27,112,113,114,115,116,117,118,119,120,121,122,123,45,20,33,34,35,36,37,38,39,40].indexOf(event.key)) {
                 window.location = '#sidebarAddElement';
                 document.getElementById("inputName").focus();
             } else if (event.key===122 || event.key==="F11") {
@@ -122,11 +122,11 @@ loadScript('assets/ckeditor/ckeditor.js', () => {
         editor.on('blur', function() {
             editorFocused = false;
             if (debug) console.log('Editor out of focus.');
-            window.teleprompter.editor.save();
+            teleprompter.editor.contentEditor.save();
         });
     });
 
-    window.teleprompter.editor.getEditorContent = function() {
+    teleprompter.editor.contentEditor.getEditorContent = function() {
         return CKEDITOR.instances.prompt.getData()
     }
 })

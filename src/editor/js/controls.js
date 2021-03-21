@@ -46,7 +46,9 @@ class Controls {
             'timerQuick': true
         }
         this.quickConfig = this.defaultsQuickConfig;
+    }
 
+    draw() {
         this.slider = [
             new Slider("#speed", {}),
             new Slider("#acceleration", {}),

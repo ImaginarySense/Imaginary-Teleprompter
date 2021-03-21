@@ -72,7 +72,7 @@ class CommandsMapping {
             "incVelocity": {
                 "name": "Increase Velocity",
                 "method": function() {
-                    listener({
+                    teleprompter.editor.listener({
                         data: {
                             request: this.command.incVelocity
                         }
@@ -82,7 +82,7 @@ class CommandsMapping {
             "decVelocity": {
                 "name": "Decrease Velocity",
                 "method": function() {
-                    listener({
+                    teleprompter.editor.listener({
                         data: {
                             request: this.command.decVelocity
                         }
@@ -92,7 +92,7 @@ class CommandsMapping {
             "incFont": {
                 "name": "Increase Font",
                 "method": function() {
-                    listener({
+                    teleprompter.editor.listener({
                         data: {
                             request: this.command.incFont
                         }
@@ -102,7 +102,7 @@ class CommandsMapping {
             "decFont": {
                 "name": "Decrease Font",
                 "method": function() {
-                    listener({
+                    teleprompter.editor.listener({
                         data: {
                             request: this.command.decFont
                         }
@@ -112,7 +112,7 @@ class CommandsMapping {
             "togglePlay": {
                 "name": "Toggle Play",
                 "method": function() {
-                    listener({
+                    teleprompter.editor.listener({
                         data: {
                             request: this.command.togglePlay
                         }
@@ -122,7 +122,7 @@ class CommandsMapping {
             "sync": {
                 "name": "Sync",
                 "method": function() {
-                    listener({
+                    teleprompter.editor.listener({
                         data: {
                             request: this.command.sync
                         }
@@ -132,7 +132,7 @@ class CommandsMapping {
             "resetTimer": {
                 "name": "Reset Timer",
                 "method": function() {
-                    listener({
+                    teleprompter.editor.listener({
                         data: {
                             request: this.command.resetTimer
                         }
@@ -142,7 +142,7 @@ class CommandsMapping {
             "previousAnchor": {
                 "name": "Previous Anchor",
                 "method": function() {
-                    listener({
+                    teleprompter.editor.listener({
                         data: {
                             request: this.command.previousAnchor
                         }
@@ -152,7 +152,7 @@ class CommandsMapping {
             "nextAnchor": {
                 "name": "Next Anchor",
                 "method": function() {
-                    listener({
+                    teleprompter.editor.listener({
                         data: {
                             request: this.command.nextAnchor
                         }
@@ -162,7 +162,7 @@ class CommandsMapping {
             "fastForward": {
                 "name": "Fast Forward",
                 "method": function() {
-                    listener({
+                    teleprompter.editor.listener({
                         data: {
                             request: this.command.fastForward
                         }
@@ -172,7 +172,7 @@ class CommandsMapping {
             "rewind": {
                 "name": "Rewind",
                 "method": function() {
-                    listener({
+                    teleprompter.editor.listener({
                         data: {
                             request: this.command.rewind
                         }
@@ -182,27 +182,27 @@ class CommandsMapping {
             "clearAllRequest": {
                 "name": "Clear All Request",
                 "method": function() {
-                    clearAllRequest();
+                    teleprompter.editor.clearAllRequest();
                 }
             },
             "togglePrompter": {
                 "name": "Toggle Prompter",
                 "method": function() {
-                    togglePrompter();
+                    teleprompter.editor.togglePrompter();
                 }
             },
             "toggleFullscreen": {
                 "name": "Toggle Fullscreen",
                 "method": function(event) {
                     event.preventDefault();
-                    toggleFullscreen();
+                    teleprompter.editor.toggleFullscreen();
                 }
             },
             "refresh": {
                 "name": "Refresh Screen",
                 "method": function() {
                     if (debug)
-                        refresh();
+                        teleprompter.editor.refresh();
                     else
                         console.log("Debug mode must be active to use 'F5' refresh in Electron. 'F10' enters and leaves debug mode.");
                 }
@@ -210,7 +210,7 @@ class CommandsMapping {
             "toggleDebug": {
                 "name": "Toggle Debug",
                 "method": function() {
-                    toggleDebug();
+                    teleprompter.editor.toggleDebug();
                 }
             },
     
