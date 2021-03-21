@@ -1,6 +1,6 @@
 /*
     Imaginary Teleprompter
-    Copyright (C) 2015 Imaginary Sense Inc. and contributors
+    Copyright (C) 2015-2021 Imaginary Sense Inc. and contributors
 
     This file is part of Imaginary Teleprompter.
 
@@ -134,26 +134,30 @@ var currentEditor = editorList[0];
         // Set globals
         tic = false;
 
+        // Initialize themes
+        window.teleprompter.themes = new Themes();
+        window.teleprompter.themes.setColorPicker();
+
         // Set DOM javascript controls
         promptIt = document.getElementById("promptIt");
         updateIt = document.getElementById("updateIt");
         promptIt.onclick = submitTeleprompter;
         updateIt.onclick = updateTeleprompter;
         document.getElementById("prompterStyle").addEventListener('change', function(e) {
-            setStyleEvent(e.target.value);
-        });
+            window.teleprompter.themes.setStyle(e.target.value);
+        }.bind(this));
         document.getElementById("prompterStyleControl").addEventListener('change', function(e) {
-            setStyleEvent(e.target.value);
-        });
+            window.teleprompter.themes.setStyle(e.target.value);
+        }.bind(this));
         document.getElementById("credits-link").onclick = credits;
 
         frame = document.getElementById("teleprompterframe");
         canvas = document.getElementById("telepromptercanvas");
         canvasContext = canvas.getContext('2d');
-        // Set default style and option style
-        //setStyle(document.getElementById("prompterStyle").value);
+
         // Set initial configuration to prompter style
-        styleInit(document.getElementById("prompterStyle"));
+        window.teleprompter.themes.styleInit(document.getElementById("prompterStyle"));
+
         slider = [
             new Slider("#speed", {}),
             new Slider("#acceleration", {}),
@@ -322,8 +326,8 @@ var currentEditor = editorList[0];
         loadLastUseSettings();
         // Initialize controls
         initControls();
-        // Initialize styles menu
-        initPromptStyles();
+        // Initialize prompt styles
+        window.teleprompter.themes.initPromptStyles();
         // Initialize file management features.
         initScripts();
         // Initialize commands mapping
@@ -1696,11 +1700,4 @@ function toggleDebugMode() {
         exitDebug();
     else
         enterDebug();
-}
-// On change Prompter Style
-function setStyleEvent(prompterStyle) {
-    if (setStyle) {
-        if (debug) console.log(prompterStyle);
-        setStyle(prompterStyle);
-    }
 }

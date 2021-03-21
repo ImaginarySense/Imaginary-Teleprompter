@@ -48,7 +48,7 @@ gulp.task('universal:css', function() {
 });
 
 gulp.task('universal:js', function() {
-    return gulp.src(['./src/universal/js/*.js'])
+    return gulp.src(['./src/universal/js/universal.js', './src/universal/js/*.js'])
         .pipe(concat('teleprompter-universal.js'))
         // .pipe(uglify().on('error', ()=>{}))
         .pipe(gulp.dest('./dist/assets/custom/js'));

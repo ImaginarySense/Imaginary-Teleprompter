@@ -1,5 +1,6 @@
 window.teleprompter = {
-    editor: {}
+    editor: {},
+    themes: {}
 };
 
 function loadScript(url, callback)
@@ -34,4 +35,16 @@ function loadCSS(url, callback)
 
     // Fire the loading
     head.appendChild(script);
+}
+
+function hexc(orig) {
+    var rgb = orig.replace(/\s/g, '').match(/^rgba?\((\d+),(\d+),(\d+)/i);
+    return (rgb && rgb.length === 4) ?
+        ("0" + parseInt(rgb[1], 10).toString(16)).slice(-2) +
+        ("0" + parseInt(rgb[2], 10).toString(16)).slice(-2) +
+        ("0" + parseInt(rgb[3], 10).toString(16)).slice(-2) : orig;
+}
+
+function inElectron() {
+    return navigator.userAgent.indexOf("Electron") !== -1;
 }

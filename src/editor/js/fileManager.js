@@ -1,6 +1,6 @@
 /*
     Imaginary Teleprompter
-    Copyright (C) 2015 Imaginary Sense Inc. and contributors
+    Copyright (C) 2015-2021 Imaginary Sense Inc. and contributors
 
     This file is part of Imaginary Teleprompter.
 

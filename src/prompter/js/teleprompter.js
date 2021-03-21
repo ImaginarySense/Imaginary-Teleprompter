@@ -200,8 +200,12 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         }
         // Set flip and styles to values from settings.
         setFlips();
-        styleInit();
-        setStyle( promptStyleOption );
+
+        // Initialize themes
+        window.teleprompter.themes = new Themes();
+
+        window.teleprompter.themes.styleInit();
+        window.teleprompter.themes.setStyle( promptStyleOption );
 
         // Wheel settings
         invertedWheel = false;//settings.data.invertedWheel;
