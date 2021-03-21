@@ -202,10 +202,10 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         setFlips();
 
         // Initialize themes
-        window.teleprompter.themes = new Themes();
+        teleprompter.themes = new Themes();
 
-        window.teleprompter.themes.styleInit();
-        window.teleprompter.themes.setStyle( promptStyleOption );
+        teleprompter.themes.styleInit();
+        teleprompter.themes.setStyle( promptStyleOption );
 
         // Wheel settings
         invertedWheel = false;//settings.data.invertedWheel;

@@ -1,6 +1,8 @@
 window.teleprompter = {
     editor: {},
-    themes: {}
+    themes: {},
+    commandsMapping: {},
+    controls: {}
 };
 
 function loadScript(url, callback)

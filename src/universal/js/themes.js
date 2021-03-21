@@ -445,7 +445,7 @@ class Themes {
         this.initPromptStyles();
     }
 
-    initPromptStyles() {
+    draw() {
         document.getElementById("editStyleButton").addEventListener("click", function() {
             this.editPromptStyle();
         }.bind(this));
