@@ -33,9 +33,9 @@
     "url": "https://github.com/ImaginarySense/Imaginary-Teleprompter/issues"
   },
   "scripts": {
-    "start": "electron main.js"
+    "start": "electron src/main.js"
   },
-  "main": "main.js",
+  "main": "src/main.js",
   "dependencies": {
     "@electron/remote": "^1.0.4",
     "deb-version-compare": "git+https://github.com/sdumetz/node-deb-version-compare.git",

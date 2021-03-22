@@ -369,7 +369,7 @@ class Editor {
 
     toggleFullscreen() {
         var fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement,
-        elem;
+            elem;
         if (fullscreenElement)
             this.exitFullscreen();
         else {
@@ -608,7 +608,7 @@ class Editor {
                             this.openCanvasPrompter();
                         // Otherwise run perfect sync painter.
                         else
-                            this.prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + (secondaryDisplay.workArea.height-50) + ',width=' + (secondaryDisplay.workArea.width-50) + ',top='+ (secondaryDisplay.workArea.y+50) +',left=' + (secondaryDisplay.workArea.x+50) + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0' );
+                            this.prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + (secondaryDisplay.workArea.height-50) + ',width=' + (secondaryDisplay.workArea.width-50) + ',top='+ (secondaryDisplay.workArea.y+50) +',left=' + (secondaryDisplay.workArea.x+50) + ',fullscreen=0,status=0,location=0,menubar=0,toolbar=0' );
                     }
                     else if (currentDisplay>0) {
                         if (debug) console.log("Displaying external on primary display.");
@@ -617,13 +617,13 @@ class Editor {
                             this.openCanvasPrompter();
                         // Otherwise run perfect sync painter.
                         else
-                            this.prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + (primaryDisplay.workArea.height-50) + ',width=' + (primaryDisplay.workArea.width-50) + ',top='+ (primaryDisplay.workArea.y+50) +',left=' + (primaryDisplay.workArea.x+50) + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0');
+                            this.prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + (primaryDisplay.workArea.height-50) + ',width=' + (primaryDisplay.workArea.width-50) + ',top='+ (primaryDisplay.workArea.y+50) +',left=' + (primaryDisplay.workArea.x+50) + ',fullscreen=0,status=0,location=0,menubar=0,toolbar=0');
                     }
                 }
                 // If currentDisplay isn't the primaryDisplay or if there is no secondaryDisplay and the primary is unnocupied... Display on primaryDisplay.
                 else if (!this.instance[0]) {
                     if (debug) console.log("Displaying external on primary display.");
-                    this.prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + (primaryDisplay.workArea.height-50) + ',width=' + (primaryDisplay.workArea.width-50) + ',top='+ (primaryDisplay.workArea.y+50) +',left=' + (primaryDisplay.workArea.x+50) + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0');
+                    this.prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + (primaryDisplay.workArea.height-50) + ',width=' + (primaryDisplay.workArea.width-50) + ',top='+ (primaryDisplay.workArea.y+50) +',left=' + (primaryDisplay.workArea.x+50) + ',fullscreen=0,status=0,location=0,menubar=0,toolbar=0');
                 }
             }
             // Load InFrame prompter only if there's more than one screen or if the only screen available is free.
@@ -633,7 +633,7 @@ class Editor {
             if (this.instance[0])
                 this.frame.src = "teleprompter.html" + (debug ? "?debug=1" : "");
             if (this.instance[1])
-                this.prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + screen.availHeight + ',width=' + screen.width + ',top=0,left=' + screen.width + ',fullscreen=1,status=0,location=0,menubar=0,toolbar=0');
+                this.prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + screen.availHeight + ',width=' + screen.width + ',top=0,left=' + screen.width + ',fullscreen=0,status=0,location=0,menubar=0,toolbar=0');
         }
         
         // If an external prompt is openned, focus on it.        
