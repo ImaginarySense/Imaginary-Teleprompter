@@ -34,7 +34,7 @@ gulp.task('prompter:css', function() {
 });
 
 gulp.task('prompter:js', function() {
-    return gulp.src(['./src/prompter/js/*.js'])
+    return gulp.src(['./src/editor/js/commandsMapping.js', './src/prompter/js/*.js'])
         .pipe(concat('teleprompter-prompter.js'))
         // .pipe(uglify().on('error', ()=>{}))
         .pipe(gulp.dest('./dist/assets/custom/js'));
@@ -54,6 +54,13 @@ gulp.task('universal:js', function() {
         .pipe(gulp.dest('./dist/assets/custom/js'));
 });
 
+gulp.task('electron:js', function() {
+    return gulp.src(['./src/main.js'])
+        // .pipe(concat('teleprompter-universal.js'))
+        // .pipe(uglify().on('error', ()=>{}))
+        .pipe(gulp.dest('./dist'));
+});
+
 gulp.task('default', 
     gulp.series(
         'clean',
@@ -63,6 +70,7 @@ gulp.task('default',
         'prompter:css',
         'prompter:js',
         'universal:css',
-        'universal:js'
+        'universal:js',
+        'electron:js'
     )
 );
