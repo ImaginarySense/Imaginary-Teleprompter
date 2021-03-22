@@ -1,6 +1,6 @@
 /*
     Imaginary Teleprompter
-    Copyright (C) 2015 Imaginary Sense Inc. and contributors
+    Copyright (C) 2015-2021 Imaginary Sense Inc. and contributors
 
     This file is part of Imaginary Teleprompter.
 
@@ -148,7 +148,10 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         // Get focus mode
         focus = settings.data.focusMode;
 
-        timer = $('.clock').timer({ stopVal: 10000 });
+        timer = $('.clock').timer({
+            stopVal: 10000,
+            direction: 'ccw'
+        });
         // Get and set prompter text
         updateContents();
         setPromptHeight();
@@ -1028,6 +1031,33 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         if (debug) console.log("Timer reset.");
     }
 
+    function launchIntoFullscreen(element) {
+        var requestFullscreen = element.requestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen || element.msRequestFullscreen;
+        if (requestFullscreen!==undefined)
+            requestFullscreen.call(element);
+    }
+
+    function exitFullscreen() {
+        var exitFullscreen = document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen;
+        if (exitFullscreen!==undefined)
+            exitFullscreen.call(document);
+    }
+
+    function toggleFullscreen() {
+        if (debug) console.log("Toggle fullscreen");
+        var fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+        if (fullscreenElement) {
+
+            if (debug) console.log("Entering fullscreen");
+            exitFullscreen();
+        }
+        else {
+
+            if (debug) console.log("Leaving fullscreen");
+            launchIntoFullscreen(document.documentElement);
+        }
+    }
+
     function listener(event) {
         // Message data. Uncommenting will give you valuable information and decrease performance dramatically.
         /*
@@ -1201,6 +1231,11 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
             case "F12":
                 if (!inIframe())
                     toggleDebug();
+                break;
+            case 122:
+            case "F11":
+                if (!inIframe())
+                    toggleFullscreen();
                 break;
             case 8:
             case "Backspace":
