@@ -75,8 +75,14 @@ class Editor {
         // Set DOM javascript controls
         this.promptIt = document.getElementById("promptIt");
         this.updateIt = document.getElementById("updateIt");
-        this.promptIt.onclick = this.submitTeleprompter;
-        this.updateIt.onclick = this.updateTeleprompter;
+        
+        this.promptCanSubmitTeleprompter = true;
+        this.promptIt.onclick = function(event) {
+            this.submitTeleprompter(event);
+        }.bind(this);
+        this.updateIt.onclick = function(event) {
+            this.updateTeleprompter(event);
+        }.bind(this);
 
         document.getElementById("prompterStyle").addEventListener('change', function(e) {
             teleprompter.themes.setStyle(e.target.value);
@@ -198,7 +204,7 @@ class Editor {
                     addQRConnection(arg.data);
                 // Restore instances
                 else if (arg.option === "restoreEditor")
-                    restoreEditor();
+                    this.restoreEditor();
                 // Forward remote control commands.
                 else if (arg.option === "command")
                     document.onkeydown(arg.data);
@@ -367,7 +373,7 @@ class Editor {
         if (fullscreenElement)
             this.exitFullscreen();
         else {
-            if (this.promptIt.onclick === this.submitTeleprompter) // We need and alternative, this doesn't work in classes
+            if (this.promptCanSubmitTeleprompter)
                 elem = document.getElementById("editorcontainer");
             else
                 elem = document.documentElement;
@@ -376,17 +382,20 @@ class Editor {
     }
 
     togglePrompter() {
-        if (this.promptIt.onclick === this.submitTeleprompter) // We need and alternative, this doesn't work in classes
+        if (this.promptCanSubmitTeleprompter)
             this.submitTeleprompter();
         else
             this.restoreEditor();
     }
 
     togglePromptIt() {
-        if (this.promptIt.onclick === this.submitTeleprompter) { // We need and alternative, this doesn't work in classes
+        if (this.promptCanSubmitTeleprompter) {
             // Update button
             this.promptIt.textContent = "Close It...";
-            this.promptIt.onclick = this.restoreEditor;
+            this.promptCanSubmitTeleprompter = false;
+            this.promptIt.onclick = function(event) {
+                this.restoreEditor(event);
+            }.bind(this);
             // Hide stuff
             if (this.instance[0]) {
                 document.getElementById("content").style.display = "none";
@@ -409,7 +418,10 @@ class Editor {
         } else {
             // Update button
             this.promptIt.innerHTML = "Prompt It!";
-            this.promptIt.onclick = submitTeleprompter;
+            this.promptCanSubmitTeleprompter = true;
+            this.promptIt.onclick = function(event) {
+                this.submitTeleprompter(event);
+            }.bind(this);
             // Restore editor
             if (this.instance[0]) {
                 document.getElementById("content").style.display = "";
@@ -489,19 +501,19 @@ class Editor {
         if (override!==undefined && override.speed!==undefined)
             speed = override.speed;
         else
-            speed = slider[0].getValue();
+            speed = teleprompter.controls.slider[0].getValue();
         if (override!==undefined && override.acceleration!==undefined)
             acceleration = override.acceleration;
         else
-            acceleration = slider[1].getValue();
+            acceleration = teleprompter.controls.slider[1].getValue();
         if (override!==undefined && override.fontSize!==undefined)
             fontSize = override.fontSize;
         else
-            fontSize = slider[2].getValue();
+            fontSize = teleprompter.controls.slider[2].getValue();
         if (override!==undefined && override.promptWidth!==undefined)
-            promptWidth = override.promptWidth;
+            this.promptWidth = override.promptWidth;
         else
-            promptWidth = slider[3].getValue();
+            this.promptWidth = teleprompter.controls.slider[3].getValue();
         if (override!==undefined && override.timer!==undefined)
             timer = override.timer;
         else {
@@ -512,7 +524,7 @@ class Editor {
         else
             voice = false;
         // Merge all settings into one.
-        var settings = '{ "quickConfig": '+JSON.stringify(teleprompter.controls.quickConfig)+', "commandsMapping": '+JSON.stringify(teleprompter.commandsMapping.mapping)+', "data": {"primary":'+primary+',"secondary":'+secondary+',"prompterStyle":'+style+',"focusMode":'+focusArea+',"speed":'+speed+',"acceleration":'+acceleration+',"fontSize":'+fontSize+',"promptWidth":'+promptWidth+',"timer":'+timer+',"voice":'+voice+'}}',
+        var settings = '{ "quickConfig": '+JSON.stringify(teleprompter.controls.quickConfig)+', "commandsMapping": '+JSON.stringify(teleprompter.commandsMapping.mapping)+', "data": {"primary":'+primary+',"secondary":'+secondary+',"prompterStyle":'+style+',"focusMode":'+focusArea+',"speed":'+speed+',"acceleration":'+acceleration+',"fontSize":'+fontSize+',"promptWidth":'+this.promptWidth+',"timer":'+timer+',"voice":'+voice+'}}',
         session = '{ "html":"' + encodeURIComponent(this.htmldata) + '" }';
 
         // Store data locally for prompter to use
@@ -524,19 +536,19 @@ class Editor {
     }
 
     restoreEditor(event) {
-        if (this.promptIt.onclick === this.restoreEditor) {
+        if (!this.promptCanSubmitTeleprompter) {
             if (debug) console.log("Restoring editor.");
             // Request to close prompters:
             // Close frame.
             if (this.frame.src.indexOf("teleprompter.html") != -1)
                 this.frame.contentWindow.postMessage({
                     'request': teleprompter.commandsMapping.command.close
-                }, getDomain());
+                }, this.getDomain());
             // Close window.
             if (this.prompterWindow)
                 this.prompterWindow.postMessage({
                     'request': teleprompter.commandsMapping.command.close
-                }, getDomain());
+                }, this.getDomain());
             if (this.syncMethod === this.syncMethods.canvas)
                 this.ipcRenderer.send('asynchronous-message', 'closeInstance');
             // Clear contents from frame
@@ -587,7 +599,7 @@ class Editor {
                 currentDisplay = 1;
             // If there are any externalDisplay; then create a new window for the display.
             if (this.instance[1]) {
-                if (secondaryDisplay || forceSecondaryDisplay) {
+                if (secondaryDisplay || this.forceSecondaryDisplay) {
                     // Open external prompter on a display where the editor is not located at.
                     if (currentDisplay===0) {
                         if (debug) console.log("Displaying external on secondary display.");
@@ -632,7 +644,7 @@ class Editor {
             this.frame.focus();
 
         // In case of both instances active and not enough screens...
-        if (!forceSecondaryDisplay && (inElectron() && !secondaryDisplay && this.instance[0] && this.instance[1])) {
+        if (!this.forceSecondaryDisplay && (inElectron() && !secondaryDisplay && this.instance[0] && this.instance[1])) {
             window.alert("You don't have any external Display.");
             this.instance[0] = false;
             this.instance[1] = false;
