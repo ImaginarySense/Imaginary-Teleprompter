@@ -19,7 +19,10 @@
 */
 
 class CommandsMapping {
-    constructor() {
+    constructor(instance) {
+        // From instance
+        this.instance = instance;
+        
         // Global Variables
         this.preventPropagation = false;
 
@@ -72,7 +75,7 @@ class CommandsMapping {
             "incVelocity": {
                 "name": "Increase Velocity",
                 "method": function() {
-                    teleprompter.editor.listener({
+                    this.instance.listener({
                         data: {
                             request: this.command.incVelocity
                         }
@@ -82,7 +85,7 @@ class CommandsMapping {
             "decVelocity": {
                 "name": "Decrease Velocity",
                 "method": function() {
-                    teleprompter.editor.listener({
+                    this.instance.listener({
                         data: {
                             request: this.command.decVelocity
                         }
@@ -92,7 +95,7 @@ class CommandsMapping {
             "incFont": {
                 "name": "Increase Font",
                 "method": function() {
-                    teleprompter.editor.listener({
+                    this.instance.listener({
                         data: {
                             request: this.command.incFont
                         }
@@ -102,7 +105,7 @@ class CommandsMapping {
             "decFont": {
                 "name": "Decrease Font",
                 "method": function() {
-                    teleprompter.editor.listener({
+                    this.instance.listener({
                         data: {
                             request: this.command.decFont
                         }
@@ -112,7 +115,7 @@ class CommandsMapping {
             "togglePlay": {
                 "name": "Toggle Play",
                 "method": function() {
-                    teleprompter.editor.listener({
+                    this.instance.listener({
                         data: {
                             request: this.command.togglePlay
                         }
@@ -122,7 +125,7 @@ class CommandsMapping {
             "sync": {
                 "name": "Sync",
                 "method": function() {
-                    teleprompter.editor.listener({
+                    this.instance.listener({
                         data: {
                             request: this.command.sync
                         }
@@ -132,7 +135,7 @@ class CommandsMapping {
             "resetTimer": {
                 "name": "Reset Timer",
                 "method": function() {
-                    teleprompter.editor.listener({
+                    this.instance.listener({
                         data: {
                             request: this.command.resetTimer
                         }
@@ -142,7 +145,7 @@ class CommandsMapping {
             "previousAnchor": {
                 "name": "Previous Anchor",
                 "method": function() {
-                    teleprompter.editor.listener({
+                    this.instance.listener({
                         data: {
                             request: this.command.previousAnchor
                         }
@@ -152,7 +155,7 @@ class CommandsMapping {
             "nextAnchor": {
                 "name": "Next Anchor",
                 "method": function() {
-                    teleprompter.editor.listener({
+                    this.instance.listener({
                         data: {
                             request: this.command.nextAnchor
                         }
@@ -162,7 +165,7 @@ class CommandsMapping {
             "fastForward": {
                 "name": "Fast Forward",
                 "method": function() {
-                    teleprompter.editor.listener({
+                    this.instance.listener({
                         data: {
                             request: this.command.fastForward
                         }
@@ -172,7 +175,7 @@ class CommandsMapping {
             "rewind": {
                 "name": "Rewind",
                 "method": function() {
-                    teleprompter.editor.listener({
+                    this.instance.listener({
                         data: {
                             request: this.command.rewind
                         }
@@ -182,27 +185,27 @@ class CommandsMapping {
             "clearAllRequest": {
                 "name": "Clear All Request",
                 "method": function() {
-                    teleprompter.editor.clearAllRequest();
+                    this.instance.clearAllRequest();
                 }
             },
             "togglePrompter": {
                 "name": "Toggle Prompter",
                 "method": function() {
-                    teleprompter.editor.togglePrompter();
+                    this.instance.togglePrompter();
                 }
             },
             "toggleFullscreen": {
                 "name": "Toggle Fullscreen",
                 "method": function(event) {
                     event.preventDefault();
-                    teleprompter.editor.toggleFullscreen();
+                    this.instance.toggleFullscreen();
                 }
             },
             "refresh": {
                 "name": "Refresh Screen",
                 "method": function() {
                     if (debug)
-                        teleprompter.editor.refresh();
+                        this.instance.refresh();
                     else
                         console.log("Debug mode must be active to use 'F5' refresh in Electron. 'F10' enters and leaves debug mode.");
                 }
@@ -210,7 +213,7 @@ class CommandsMapping {
             "toggleDebug": {
                 "name": "Toggle Debug",
                 "method": function() {
-                    teleprompter.editor.toggleDebug();
+                    this.instance.toggleDebug();
                 }
             },
     

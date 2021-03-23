@@ -25,172 +25,149 @@ http://stackoverflow.com/questions/18240107/make-background-follow-the-cursor
 https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
 */
 
-// Use JavaScript Strict Mode.
-"use strict";
+// Global constants
+const transitionDelays = 500,
+    timeoutDelay = 250,
+    inputCapDelay = 100,
+    limit = 2600;
 
-// Encapsulate the code in an anonymous self-invoking function.
-(function () {
-    // Global objects
-    var settings, session, prompt, pointer, overlay, overlayFocus, styleSheet, editor, timer, clock, remote;
-    // Global variables
-    var unit, x, velocity, sensitivity, speedMultip, relativeLimit, steps, play, timeoutStatus, invertedWheel, focus, promptStyleOption, customStyle, flipV, flipH, fontSize, promptWidth, focusHeight, promptHeight, previousPromptHeight, screenHeight, previousScreenHeight, screenWidth, previousVerticalDisplacementCorrector, domain, debug, closing, cap, syncDelay, isMobileApp;
-
-    // Enums
-    var command = Object.freeze({
-        "incVelocity":1,
-        "decVelocity":2,
-        "iSync":3,
-        "sync":4,
-        "togglePlay":5,
-        "internalPlay":6,
-        "internalPause":7,
-        "play":8,
-        "pause":9,
-        "stopAll":10,
-        "incFont":11,
-        "decFont":12,
-        "anchor":13,
-        "close":14,
-        "restoreEditor":15,
-        "resetTimer":16,
-        "nextAnchor":17,
-        "previousAnchor":18,
-        "fastForward":19,
-        "rewind":20
-    });
-
-    // Global constants
-    const transitionDelays = 500,
-        timeoutDelay = 250,
-        inputCapDelay = 100,
-        limit = 2600;
-    
-    // Import Electron libraries.
-    if (inElectron() && !inIframe()) {
-        var {ipcRenderer} = require('electron');
-        window.jQuery = require('./app/assets/jquery/jquery.min.js');
-        window.$ = window.jQuery;
-        // Manually import jQuery from javascript when running in a CommonsJS environment.
-        // Ref: https://github.com/electron/electron/issues/254 
-        remote = require('@electron/remote'); // Allow IPC with main process in Electron.
+class Prompter {
+    constructor() {
+        // Import Electron libraries.
+        if (inElectron() && !inIframe()) {
+            const electron = require('electron');
+            this.remote = require('@electron/remote'); // Allow IPC with main process in Electron.
+            this.ipcRenderer = electron.ipcRenderer;
+        }
     }
-    
-    function initCSS() {
+
+    initCSS() {
         // Create style elements.
         var styleElement = document.createElement('style');
         // Append style elements to head.
         document.head.appendChild(styleElement);
         // Grab element's style sheet.
-        styleSheet = styleElement.sheet;
+        this.styleSheet = styleElement.sheet;
     }
 
-    function init() {
-        // Local variables
-        var flip;
+    get prompt() {
+        return document.getElementsByClassName("prompt")[0];
+    }
+
+    get overlay() {
+        return document.getElementById("overlay");
+    }
+
+    get overlayFocus() {
+        return document.getElementById("overlayFocus");
+    }
+
+    get clock() {
+        return document.getElementsByClassName("clock")[0];
+    }
+
+    init() {
+        // Initialize commands mapping
+        teleprompter.commandsMapping = new CommandsMapping(this);
 
         // Initialize objects
-        prompt = document.getElementsByClassName("prompt")[0];
-        overlay = document.getElementById("overlay");
-        overlayFocus = document.getElementById("overlayFocus");
-        clock = document.getElementsByClassName("clock")[0];
-
-        pointer = {};
-
+        this.pointer = {};
+    
         // Initialize variables
         // HTTP GET debug option...
-        debug = getUrlVars()["debug"];
+        this.debug = this.getUrlVars()["debug"];
         // Evaluate it to boolean expresion.
-        debug = debug>0||debug=="true";
+        this.debug = this.debug > 0 || this.debug == "true";
         // Load debug tools if debug is enabled.
-        if (debug) {
-            debug = false;
-            toggleDebug();
+        if (this.debug) {
+            this.debug = false;
+            this.toggleDebug();
         }
-
+    
         // Init variables. Do not change these unless you know what you are doing.
-        x = 0;
-        velocity = 0;
-        closing = false;
-        cap = false;
-        syncDelay = 12;
-        isMobileApp = false;
+        this.x = 0;
+        this.velocity = 0;
+        this.closing = false;
+        this.cap = false;
+        this.syncDelay = 12;
+        this.resetSteps();
         
         // Local Storage and Session data
-        updateDatamanager();
-
+        this.updateDatamanager();
+    
         // Set initial relative values.
-        setFocusHeight();
-        setScreenHeight();
-        setScreenWidth();
-        updateUnit();
+        this.setFocusHeight();
+        this.setScreenHeight();
+        this.setScreenWidth();
+        this.updateUnit();
         
         // Initialize domain for interprocess communication
-        setDomain();
-
+        this.setDomain();
+    
         // Initialize CSS
-        initCSS();
-
+        this.initCSS();
+    
         // Locate and set editor
         if (window.opener)
-            editor = window.opener;
+            this.editor = window.opener;
         else if (window.top)
-            editor = window.top;
+            this.editor = window.top;
         else if (ipcRenderer!==undefined) {
             // Untested code
-            editor = {};
-            editor.postMessage = function(event, domain) {
-                ipcRenderer.send('asynchronous-message', event);
-            }
+            this.editor = {};
+            this.editor.postMessage = function(event, domain) {
+                this.ipcRenderer.send('asynchronous-message', event);
+            }.bind(this);
         }
-        resetSteps();
+        this.resetSteps();
         // Animation settings
-        play = true;
+        this.play = true;
         // Get focus mode
-        focus = settings.data.focusMode;
-
-        timer = $('.clock').timer({
+        this.focus = this.settings.data.focusMode;
+    
+        this.timer = $('.clock').timer({
             stopVal: 10000,
             direction: 'ccw'
         });
         // Get and set prompter text
-        updateContents();
-        setPromptHeight();
+        this.updateContents();
+        this.setPromptHeight();
         
         // Get prompter style
-        promptStyleOption = settings.data.prompterStyle;
-        customStyle = { "background": settings.data.background, "color": settings.data.color, "overlayBg": settings.data.overlayBg };
+        this.promptStyleOption = this.settings.data.prompterStyle;
+        this.customStyle = { "background": this.settings.data.background, "color": this.settings.data.color, "overlayBg": this.settings.data.overlayBg };
         // Get flip settings
-        if (inIframe())
-            flip = settings.data.primary;
+        if (this.inIframe())
+            this.flip = this.settings.data.primary;
         else
-            flip = settings.data.secondary;
+            this.flip = this.settings.data.secondary;
         
         // Initialize flip values
-        flipH = false;
-        flipV = false;
+        this.flipH = false;
+        this.flipV = false;
         // Set flip values to prompter settings
-        switch (flip) {
+        switch (this.flip) {
             case 2:
-                flipH = true;
+                this.flipH = true;
                 break;
             case 3:
-                flipV = true;
+                this.flipV = true;
                 break;
             case 4:
-                flipH = true;
-                flipV = true;
+                this.flipH = true;
+                this.flipV = true;
                 break;
         }
         // Set focus area according to settings.
-        switch (focus) {
+        switch (this.focus) {
             case 1:
-                if (flipV)
+                if (this.flipV)
                     document.querySelector("#overlayBottom").classList.add("disable");
                 else
                     document.querySelector("#overlayTop").classList.add("disable");
                 break;
             case 2:
-                if (flipV)
+                if (this.flipV)
                     document.querySelector("#overlayTop").classList.add("disable");
                 else
                     document.querySelector("#overlayBottom").classList.add("disable");
@@ -202,385 +179,437 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                 break;
         }
         // Set flip and styles to values from settings.
-        setFlips();
-
+        this.setFlips();
+    
         // Initialize themes
         teleprompter.themes = new Themes();
-
+    
         teleprompter.themes.styleInit();
-        teleprompter.themes.setStyle( promptStyleOption );
-
+        teleprompter.themes.setStyle(this.promptStyleOption);
+    
         // Wheel settings
-        invertedWheel = false;//settings.data.invertedWheel;
-
+        this.invertedWheel = false; //settings.data.invertedWheel;
+    
         // Add pointer controls
         // Stop animation while pressing on the screen, resume on letting go.
         var touchOverlay = document.getElementById("touchOverlay");
-        touchOverlay.addEventListener( "pointerdown", pointerActive );
-        touchOverlay.addEventListener( "pointerup", pointerInactive );
-        touchOverlay.addEventListener( "pointerleave", pointerInactive );
-        touchOverlay.addEventListener( "pointermove", pointerMove );
+        touchOverlay.addEventListener("pointerdown", function(event) {
+            this.pointerActive(event);
+        }.bind(this));
+        touchOverlay.addEventListener("pointerup", function(event) {
+            this.pointerInactive(event);
+        }.bind(this));
+        touchOverlay.addEventListener("pointerleave", function(event) {
+            this.pointerInactive(event);
+        }.bind(this));
+        touchOverlay.addEventListener("pointermove", function(event) {
+            this.pointerMove(event);
+        }.bind(this));
 
+        console.log("promptHeight", this.promptHeight);
+    
         // Wait a moment to prevent possible asynchronic CSS issues.
-        window.setTimeout( function() {
-            setScreenHeight();
-            setPromptHeight();
+        window.setTimeout(function() {
+            this.setScreenHeight();
+            this.setPromptHeight();
             // If flipped vertically, set start at inverted top.
-            if (flipV) {
-                animate(0,-promptHeight+screenHeight);
+            if (this.flipV) {
+                this.animate(0,-this.promptHeight+this.screenHeight);
             }
-
+    
             // Save current screen position related settings for when resize and screen rotation ocurrs.
-            previousPromptHeight = promptHeight;
-            previousScreenHeight = screenHeight;
-            previousScreenHeight = screenHeight;
-            previousVerticalDisplacementCorrector = focusVerticalDisplacementCorrector();
+            this.previousPromptHeight = this.promptHeight;
+            this.previousScreenHeight = this.screenHeight;
+            this.previousScreenHeight = this.screenHeight;
+            this.previousVerticalDisplacementCorrector = this.focusVerticalDisplacementCorrector();
             
             // Sync prompter positions to smallest at start.
-            syncPrompters();
-
+            this.syncPrompters();
+    
             window.setTimeout( function() {
                 // Begin animation at i speed.
                 for (var i=0; i<2; i++)
-                    increaseVelocity();
-                instaSync();
-            },transitionDelays*4.2);
-
-            //Init Remote Controllers
-            if (isMobileApp)
-                remoteControls();
+                    this.increaseVelocity();
+                this.instaSync();
+            }.bind(this), transitionDelays*4.2);
             
-        }, 750);
+        }.bind(this), 750);
+
+        // On close
+        window.addEventListener("beforeunload", function() {
+            this.restoreRequest()
+        }.bind(this));
+
+        document.addEventListener( 'transitionend', function() {
+            if(this.atStart() || this.atEnd()) {
+                this.stopAll();
+                this.timer.stopTimer();
+            }
+            if (this.debug) console.log("Reached end") && false;
+        }.bind(this), false);
+
+        window.addEventListener("resize", function() {
+            this.onResize();
+        }.bind(this), false);
+
+        window.addEventListener("orientationchange", function() {
+            //http://stackoverflow.com/questions/5284878/how-do-i-correctly-detect-orientation-change-using-javascript-and-phonegap-in-io
+            if (this.debug) console.log("Orientation Change") && false;
+            this.updateUnit();
+            this.correctVerticalDisplacement();
+        }.bind(this), false);
+
+        window.addEventListener("wheel", function(event) {
+            if (this.debug) console.log(event);
+            if (this.invertedWheel) {
+                if (event.deltaY > 0)
+                    this.increaseVelocity();
+                else
+                    this.decreaseVelocity();
+            }
+            else {
+                if (event.deltaY > 0)
+                    this.decreaseVelocity();
+                else
+                    this.increaseVelocity();
+            }
+            event.preventDefault();
+        }.bind(this), false);
+
+        // Initialize postMessage event listener.
+        addEventListener("message", function(event) {
+            this.listener(event);
+        }.bind(this), false);
+
+        // When calling from main process, run function to...
+        if (this.ipcRenderer !== undefined)
+            this.ipcRenderer.on('asynchronous-reply', function(event, arg) {
+                if (arg.option === "message") {
+                    this.listener({
+                        data: arg.data, 
+                        domain: this.getDomain()
+                    });
+                }
+            }.bind(this));
+        
+        document.addEventListener('keydown', function(event) {
+            this.commandsListener(event);
+        }.bind(this));
     }
 
-    function updateDatamanager() {
-        dataManager.getItem('IFTeleprompterSettings',function(data){
-            settings = JSON.parse(data);
-        },1,false);
+    updateDatamanager() {
+        dataManager.getItem('IFTeleprompterSettings', function(data){
+            this.settings = JSON.parse(data);
+        }.bind(this), 1, false);
         
-        dataManager.getItem('IFTeleprompterSession',function(data){
-            session = JSON.parse(data);
-        },1,false);
+        dataManager.getItem('IFTeleprompterSession', function(data){
+            this.session = JSON.parse(data);
+        }.bind(this), 1, false);
         // Ensure content is being passed
         // console.log(session);
     }
 
-    function updateContents() {
+    updateContents() {
         // 
         // prompt = document.getElementsByClassName("prompt")[0];
         // overlay = document.getElementById("overlay");
         // overlayFocus = document.getElementById("overlayFocus");
         // 
-        if (debug) console.log("Updating prompter");
-        updateDatamanager();
-        var oldFontSize = fontSize,
-            oldPromptWidth = promptWidth;
-        fontSize = settings.data.fontSize/100;
-        speedMultip = settings.data.speed;
-        sensitivity = settings.data.acceleration;
-        promptWidth = settings.data.promptWidth;
+        if (this.debug) console.log("Updating prompter");
+        this.updateDatamanager();
+
+        var oldFontSize = this.fontSize,
+            oldPromptWidth = this.promptWidth;
+        this.fontSize = this.settings.data.fontSize/100;
+        this.speedMultip = this.settings.data.speed;
+        this.sensitivity = this.settings.data.acceleration;
+        this.promptWidth = this.settings.data.promptWidth;
         // If updating font, update it and resync
-        if (oldFontSize !== fontSize)
-            updateFont();
-        if (oldPromptWidth !== promptWidth)
-            updateWidth();
+        if (oldFontSize !== this.fontSize)
+            this.updateFont();
+        if (oldPromptWidth !== this.promptWidth)
+            this.updateWidth();
         // If screen is vertically flipped, resync
-        else if (flipV) {
-            onResize();
-            window.setTimeout(onResize, transitionDelays*1.1);
+        else if (this.flipV) {
+            this.onResize();
+            window.setTimeout(function() {
+                this.onResize();
+            }.bind(this), transitionDelays*1.1);
         }
-        prompt.innerHTML = decodeURIComponent(session.html);
-        updateVelocity();
+        this.prompt.innerHTML = decodeURIComponent(this.session.html);
+        this.updateVelocity();
         
         // Enable timer
-        if (settings.data.timer===true) {
-            if (timer.data().timer.currentVal===0)
-            timer.startTimer();
-            clock.style.opacity = '1';
+        if (this.settings.data.timer===true) {
+            if (this.timer.data().timer.currentVal===0)
+            this.timer.startTimer();
+            this.clock.style.opacity = '1';
         }
         else {
-            clock.style.opacity = '0';
+            this.clock.style.opacity = '0';
             setTimeout(function() {
-                timer.resetTimer();
-                timer.stopTimer();
-            }, 800);
+                this.timer.resetTimer();
+                this.timer.stopTimer();
+            }.bind(this), 800);
         }
     }
 
-    function pointerActive(event) {
-        if (!pointer.active) {
-            if (debug) console.log("Pointer active") && false;
-            internalPauseAnimation();
-            pointer.prompterstart = getCurrPos();
-            pointer.startposition = event.clientY;
-            pointer.previousposition = pointer.startposition;
-            pointer.active = true;
+    pointerActive(event) {
+        if (!this.pointer.active) {
+            if (this.debug) console.log("Pointer active") && false;
+            this.internalPauseAnimation();
+            this.pointer.prompterstart = this.getCurrPos();
+            this.pointer.startposition = event.clientY;
+            this.pointer.previousposition = this.pointer.startposition;
+            this.pointer.active = true;
         }
     }
-
-    function pointerInactive() {
-        if (pointer.active) {
-            if ( !pointer.moved )
-                toggleTouchControls();
-            if (debug) console.log("Pointer inactive") && false;
-            pointer.moved = false;
-            pointer.active = false;
+    
+    pointerInactive() {
+        if (this.pointer.active) {
+            if (!this.pointer.moved)
+                this.toggleTouchControls();
+            if (this.debug) console.log("Pointer inactive") && false;
+            this.pointer.moved = false;
+            this.pointer.active = false;
             //letGoAnimation();
-            timeout(0, syncPrompters);
-            internalPlayAnimation();
+            this.timeout(0, function() {
+                this.syncPrompters();
+            }.bind(this));
+            this.internalPlayAnimation();
         }
     }
 
-    function letGoAnimation() {
-        var fallPosition = getCurrPos()+pointer.delta*9,
-            fallDelay = pointer.delta*1000;
-        animate(fallDelay, fallPosition, "ease-out");
+    letGoAnimation() {
+        var fallPosition = this.getCurrPos()+this.pointer.delta * 9,
+            fallDelay = this.pointer.delta * 1000;
+        this.animate(fallDelay, fallPosition, "ease-out");
     }
-
-    function pointerMove(event) {
-        if (pointer.active) {
+    
+    pointerMove(event) {
+        if (this.pointer.active) {
             // Get current point location
             var argument,
                 pointerCurrPos = event.clientY,
-                distance = pointerCurrPos-pointer.startposition;
-            pointer.moved = true;
-            pointer.delta = pointerCurrPos-pointer.previousposition;
-            pointer.deltaTime = pointer.deltaTime;
-            argument = pointer.prompterstart+distance;
+                distance = pointerCurrPos - this.pointer.startposition;
+            this.pointer.moved = true;
+            this.pointer.delta = pointerCurrPos - this.pointer.previousposition;
+            this.pointer.deltaTime = this.pointer.deltaTime;
+            argument = this.pointer.prompterstart + distance;
             // Update previous position value.
-            pointer.previousposition = pointerCurrPos;
+            this.pointer.previousposition = pointerCurrPos;
             // Debug info
-            if (debug) console.log("Pointer start: "+pointer.startposition+"\nPointer at: "+pointerCurrPos+"\nDistance: "+distance+"\nDelta: "+pointer.delta) && false;
+            if (debug) console.log("Pointer start: "+this.pointer.startposition+"\nPointer at: "+this.pointerCurrPos+"\nDistance: "+distance+"\nDelta: "+this.pointer.delta) && false;
             // Move to pointed position.
-            setCurrPosStill(argument);
+            this.setCurrPosStill(argument);
         }
     }
-
-    /*
-    function atRest() {
-        if (debug) console.log("At rest") && false;
-        requestAnimationFrame(restorePointer);
-        syncPrompters();
-        internalPlayAnimation();
-    }
-
-    function restorePointer() {
-        if (debug) console.log("Restoring pointer position") && false;
-        setCurrPosStill( getCurrPos()-getCurrPos( document.getElementById("prompt") ) );
-        setCurrPosStill( 0, document.getElementById("prompt") );
-    }
-    */
-
-    function toggleDebug() {
+    
+    toggleDebug() {
         // I do these the long way because debug could also be a numeric.
-        if (debug) {
-            debug = false;
+        if (this.debug) {
+            this.debug = false;
             console.log("Leaving debug mode.");
         }
         else {
-            debug = true;
-            if (inElectron() && !inIframe())
-                remote.getCurrentWindow().toggleDevTools();
+            this.debug = true;
+            if (inElectron() && !this.inIframe())
+                this.remote.getCurrentWindow().toggleDevTools();
             console.log("Entering debug mode.");
         }
     }
-
-    function restoreRequest() {
+    
+    restoreRequest() {
         // "closing" mutex prevents infinite loop.
-        if (debug) console.log("Restore request.") && false;
+        if (this.debug) console.log("Restore request.") && false;
         // If we have normal access to the editor, request it to restore the prompters.
-        if (editor)
-            editor.postMessage( {'request':command.restoreEditor}, getDomain() );
-        else if (!inIframe() && ipcRenderer!==undefined)
-            ipcRenderer.send('asynchronous-message', 'restoreEditor');
+        if (this.editor)
+            this.editor.postMessage( {'request': teleprompter.commandsMapping.command.restoreEditor}, this.getDomain() );
+        else if (!this.inIframe() && this.ipcRenderer!==undefined)
+            this.ipcRenderer.send('asynchronous-message', 'restoreEditor');
         // In all cases, clean emulated session storage before leaving.
         dataManager.removeItem('IFTeleprompterSession',1);
     }
 
-    function closeInstance() {
-        if (!closing) {
-            closing = true;
+    closeInstance() {
+        if (!this.closing) {
+            this.closing = true;
             // Finally, close this window or clear iFrame. The editor must not be the one who closes cause it could cause an infinite loop.
-            if ( inIframe() ) {
-                if (debug) console.log("Closing iFrame prompter.") && false;
+            if (this.inIframe()) {
+                if (this.debug) console.log("Closing iFrame prompter.") && false;
                 document.location = "about:blank";//"blank.html";
             }
             else {
-                if (debug) console.log("Closing window prompter.") && false;
+                if (this.debug) console.log("Closing window prompter.") && false;
                 window.close();
             }
         }
     }
 
-    // On close
-    window.addEventListener("beforeunload", restoreRequest);
-
-    function setDomain() {  
+    setDomain() {  
         // Get current domain from browser
-        domain = document.domain;
+        this.domain = document.domain;
         // If site not running on a server, set as catchall.
-        if ( domain.indexOf("http://")!=0 || domain.indexOf("https://")!=0 )
-            domain = "*";
-    }
-
-    function getDomain() {
-        return domain;
-    }
-
-    function setFlips() {
-        //dev@javi: Add support for real-time flipping.
-        // Both flips
-        if (flipH&&flipV) {
-            prompt.classList.add("flipHV");
-            clock.classList.add("flipHV");
-        }
-        // Vertical flip
-        else if (flipV) {
-            prompt.classList.add("flipV");
-            clock.classList.add("flipV");
-        }
-        // Horizontal flip
-        else if (flipH) {
-            prompt.classList.add("flipH");
-            clock.classList.add("flipH");
-        }
-    }
-
-    function syncPrompters() {
-        editor.postMessage( {'request':command.sync,'data':getProgress()}, getDomain() );
-    }
-
-    function instaSync() {
-        if (steps>syncDelay)
-            editor.postMessage( {'request':command.iSync,'data':getProgress()}, getDomain() );
-    }
-
-    function updateVelocity() {
-        // (|x|^sensitivity) * (+|-)
-        velocity = speedMultip*Math.pow(Math.abs(x),sensitivity)*(x>=0?1:-1);
-        if (debug) setTimeout( function(){ console.log("Velocity: "+velocity); }), 0;
+        if (this.domain.indexOf("http://") != 0 || this.domain.indexOf("https://") != 0)
+            this.domain = "*";
     }
     
-    function atEnd() {
-        var flag;
-        if (flipV)
-            flag = getCurrPos() >= 0;
-        else
-            flag = getCurrPos() <= -(promptHeight-screenHeight);
-        if (debug&&flag) console.log("At top") && false;
-        return flag;
+    getDomain() {
+        return this.domain;
     }
-
-    function atStart() {
-        var flag;
-        if (flipV)
-            flag = getCurrPos() <= -(promptHeight-screenHeight);
-        else
-            flag = getCurrPos() >= 0;
-        if (debug&&flag) console.log("At bottom") && false;
-        return flag;
-    }
-
-    function stopAll() {
-        editor.postMessage( {'request':command.stopAll}, getDomain() );
-    }
-
-    function stopInstance() {
-        x=0;
-        updateVelocity();
-        resumeAnimation();
-        timer.stopTimer();
-    }
-
-    document.addEventListener( 'transitionend', function() {
-        if(atStart()||atEnd()) {
-            stopAll();
-            timer.stopTimer();
+    
+    setFlips() {
+        //dev@javi: Add support for real-time flipping.
+        // Both flips
+        if (this.flipH && this.flipV) {
+            this.prompt.classList.add("flipHV");
+            this.clock.classList.add("flipHV");
         }
-        if (debug) console.log("Reached end") && false;
-    }, false);
+        // Vertical flip
+        else if (this.flipV) {
+            this.prompt.classList.add("flipV");
+            this.clock.classList.add("flipV");
+        }
+        // Horizontal flip
+        else if (this.flipH) {
+            this.prompt.classList.add("flipH");
+            this.clock.classList.add("flipH");
+        }
+    }
+    
+    syncPrompters() {
+        this.editor.postMessage({
+            'request':teleprompter.commandsMapping.command.sync,
+            'data': this.getProgress()
+        }, this.getDomain());
+    }
+
+    instaSync() {
+        if (this.steps > this.syncDelay)
+            this.editor.postMessage({
+                'request': teleprompter.commandsMapping.command.iSync,
+                'data': this.getProgress()
+            }, this.getDomain());
+    }
+    
+    updateVelocity() {
+        this.velocity = this.speedMultip * Math.pow(Math.abs(this.x), this.sensitivity) * (this.x>=0 ? 1 : -1);
+        if (this.debug) setTimeout(function(){
+            console.log("Velocity: " + this.velocity);
+        }.bind(this)), 0;
+    }
+    
+    atEnd() {
+        var flag;
+        if (this.flipV)
+            flag = this.getCurrPos() >= 0;
+        else
+            flag = this.getCurrPos() <= -(this.promptHeight-this.screenHeight);
+        if (this.debug && flag) console.log("At top") && false;
+        return flag;
+    }
+    
+    atStart() {
+        var flag;
+        if (this.flipV)
+            flag = this.getCurrPos() <= -(this.promptHeight-this.screenHeight);
+        else
+            flag = this.getCurrPos() >= 0;
+        if (this.debug && flag) console.log("At bottom") && false;
+        return flag;
+    }
+
+    stopAll() {
+        this.editor.postMessage({
+            'request': teleprompter.commandsMapping.command.stopAll
+        }, this.getDomain());
+    }
+    
+    stopInstance() {
+        this.x = 0;
+        this.updateVelocity();
+        this.resumeAnimation();
+        this.timer.stopTimer();
+    }
 
     // Gets variables from HTTP GET.
-    function getUrlVars() {
+    getUrlVars() {
         var vars = {};
         var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
             vars[key] = value;
         });
         return vars;
     }
-/*
-    function getAspectRatio() {
-        return screenWidth/screenHeight;
-    }
-*/
+
     // Solve for time to reach end.
-    function getRemainingTime( destination, currPos ) {
-        return (velocity ? Math.abs(1000*(destination-currPos)/(velocity*unit)) : 0 );
+    getRemainingTime(destination, currPos) {
+        return (this.velocity ? Math.abs(1000*(destination - currPos) / (this.velocity * this.unit)) : 0);
     }
 
-    function setScreenHeight( ) {
-        screenHeight = overlay.clientHeight;
+    setScreenHeight( ) {
+        this.screenHeight = overlay.clientHeight;
     }
 
-    function setScreenWidth( ) {
-        screenWidth = overlay.clientWidth;
+    setScreenWidth( ) {
+        this.screenWidth = overlay.clientWidth;
     }
 
-    function setPromptHeight( ) {
-        promptHeight = prompt.clientHeight;
+    setPromptHeight( ) {
+        this.promptHeight = this.prompt.clientHeight;
     }
 
-    function setFocusHeight( ) {
-        if (overlayFocus!==undefined)
-            focusHeight = overlayFocus.clientHeight;
+    setFocusHeight( ) {
+        if (this.overlayFocus !== undefined)
+            this.focusHeight = this.overlayFocus.clientHeight;
         else
-            focusHeight = 0;
+            this.focusHeight = 0;
     }
-    
-    function getCurrPos(obj) {
+
+    getCurrPos(obj) {
         // There's more than a way to calculate the current position.
         // This is the original method, slower and more reliable. Used only for Intergalactic Style, where the other method fails.
-        if (promptStyleOption===4) {
+        if (this.promptStyleOption===4) {
             if (!obj)
-                obj=prompt;
+                obj = this.prompt;
             var computedStyle = window.getComputedStyle(obj, null),
                 theMatrix = computedStyle.getPropertyValue("transform"),
-            // Reading data from matrix.
-                mat = theMatrix.match(/^matrix3d\((.+)\)$/);
+                // Reading data from matrix.
+                max = theMatrix.match(/^matrix3d\((.+)\)$/);
             if (mat) return parseFloat(mat[1].split(', ')[13]);
                 mat = theMatrix.match(/^matrix\((.+)\)$/);
             return mat ? parseFloat(mat[1].split(', ')[5]) : 0;
         }
         // This method is faster, and it's prefered because it generates less lag. Unfortunatelly it fails to calculate in 3D space.
-        else
-            return prompt.getBoundingClientRect().top;
+        else {
+            return this.prompt.getBoundingClientRect().top;
+        }  
     }
-
-    function setCurrPosStill( theCurrPos ) {
-        if (theCurrPos===undefined)
-            theCurrPos = getCurrPos();
-        prompt.style.transform = 'translateY('+theCurrPos+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+')';
+    
+    setCurrPosStill(theCurrPos) {
+        if (this.theCurrPos===undefined)
+            this.theCurrPos = this.getCurrPos();
+            this.prompt.style.transform = 'translateY('+theCurrPos+'px) scale('+(this.flipH?-1:1)+','+(this.flipV?-1:1)+')';
         // If animation is running...
-        if (prompt.classList.contains("move")) {
+        if (this.prompt.classList.contains("move")) {
             // Stop animation by removing move class.
-            prompt.classList.remove("move");
+            this.prompt.classList.remove("move");
             // Delete animation rules before setting new ones.
-            styleSheet.deleteRule(0);
+            this.styleSheet.deleteRule(0);
         }
     }
-
-    function getDestination( currPos ) {
+    
+    getDestination(currPos) {
         // Set animation destination
         var whereTo;
-        if (velocity>0) {
-            if (flipV)
+        if (this.velocity > 0) {
+            if (this.flipV)
                 whereTo = 0;
             else
-                whereTo = -(promptHeight-screenHeight);
+                whereTo = -(this.promptHeight-this.screenHeight);
         }
-        else if (velocity<0) {
-            if (flipV)
-                whereTo = -(promptHeight-screenHeight);
+        else if (this.velocity < 0) {
+            if (this.flipV)
+                whereTo = -(this.promptHeight-this.screenHeight);
             else
                 whereTo = 0;
         }
@@ -589,121 +618,121 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
             whereTo = currPos;
         return whereTo;
     }
-
-    function resumeAnimation() {
+    
+    resumeAnimation() {
         // Resumes animation with new destination and time values.
-        if (play) {
+        if (this.play) {
             // Restart timer.
-            timer.startTimer();
+            this.timer.startTimer();
             // Get new style variables.
-            var currPos = getCurrPos(),
-                destination = getDestination(currPos),
-                time = getRemainingTime(destination, currPos);
-            animate( time, destination );
+            var currPos = this.getCurrPos(),
+                destination = this.getDestination(currPos),
+                time = this.getRemainingTime(destination, currPos);
+            this.animate(time, destination);
         }
     }
-
-    function animate( time, destination, curve ) {
+    
+    animate(time, destination, curve = undefined) {
         // If no curve parameter, default to linear. This is the equivalent of a function overload.
-        if (curve===undefined)
+        if (curve === undefined)
             curve = 'linear';
         // Retain current position.
-        setCurrPosStill();
+        this.setCurrPosStill();
         // Set new animation rules.
-        styleSheet.insertRule('\
+        this.styleSheet.insertRule('\
             .prompt.move {\
-                transform: translateY('+destination+'px) scale('+(flipH?-1:1)+','+(flipV?-1:1)+') !important;\
+                transform: translateY('+destination+'px) scale('+(this.flipH?-1:1)+','+(this.flipV?-1:1)+') !important;\
                 transition: transform '+time+'ms '+curve+';\
         }', 0);
         // Prevent race condition in Chrome by requesting for current position (not just transform) before resuming animation.
-        hack();
-
+        this.hack();
+    
         // Resume animation by re adding the class.
-        prompt.classList.add("move");
-        if (debug) setTimeout( function(){ console.log(/*"Curr: "+getCurrPos()+"\n*/"Dest: "+destination+"\nRemTime "+time) && false; }, 0);
+        this.prompt.classList.add("move");
+        if (this.debug) setTimeout( function(){ console.log(/*"Curr: "+getCurrPos()+"\n*/"Dest: "+destination+"\nRemTime "+time) && false; }, 0);
     }
     //https://css-tricks.com/controlling-css-animations-transitions-javascript/
-
-    function hack() {
-        return prompt.getBoundingClientRect().top;
+    
+    hack() {
+        return this.prompt.getBoundingClientRect().top;
         // return prompt.offsetTop;
     }
-
-    function focusVerticalDisplacementCorrector() {
+    
+    focusVerticalDisplacementCorrector() {
         var vDisp;
-        switch (focus) {
+        switch (this.focus) {
             // "None" syncs to top.
             case 3:
             // Sync to "Top".
             case 1:
-                vDisp = focusHeight/2;
+                vDisp = this.focusHeight / 2;
                 break;
             // Sync to "Bottom".
             case 2:
-                vDisp = screenHeight-focusHeight/2;
+                vDisp = this.screenHeight - this.focusHeight / 2;
                 break;
             // Sync to "Center" by default
             default:
                 // If center and flip. Take a little above center
-                vDisp = screenHeight/2;
+                vDisp = this.screenHeight / 2;
                 break;
         }
         //if (debug) window.setTimeout( function() { console.log("Vertical displacement: "+vDisp) && false; };
         return vDisp;
     }
-
-    function moveToCSSAnchor( theAnchor ) {
+    
+    moveToCSSAnchor(theAnchor) {
         var jump;
-        if (flipV)
-            jump = -promptHeight+document.getElementById(theAnchor).offsetTop + screenHeight-focusVerticalDisplacementCorrector();
+        if (this.flipV)
+            jump = -this.promptHeight + document.getElementById(theAnchor).offsetTop + this.screenHeight - this.focusVerticalDisplacementCorrector();
         else
-            jump = -document.getElementById(theAnchor).offsetTop + focusVerticalDisplacementCorrector();
-        if (debug) console.log("Jumped to: "+jump) && false;
+            jump = -document.getElementById(theAnchor).offsetTop + this.focusVerticalDisplacementCorrector();
+        if (this.debug) console.log("Jumped to: " + jump) && false;
         // Jump to anchor
-        animate(0, jump);
+        this.animate(0, jump);
         // Resume animation
-        resumeAnimation();
-    }
-
-    function internalMoveToAnchor( theAnchor ) {
-        // Proceed to anchor only if anchor is valid.
-        if ( document.getElementById( theAnchor ) )
-            moveToCSSAnchor( theAnchor );
-        else
-            if (debug) console.log("Invalid Anchor") && false;
+        this.resumeAnimation();
     }
     
-    function moveToAnchor( theAnchor ) {
-        editor.postMessage( {'request':command.anchor,'data':theAnchor}, getDomain() );
+    internalMoveToAnchor(theAnchor) {
+        // Proceed to anchor only if anchor is valid.
+        if (document.getElementById(theAnchor))
+            this.moveToCSSAnchor(theAnchor);
+        else
+            if (this.debug) console.log("Invalid Anchor") && false;
     }
-
-    function moveToNextAnchor( theAnchor ) {
-        editor.postMessage( {'request':command.anchor,'data':theAnchor}, getDomain() );
+    
+    moveToAnchor(theAnchor) {
+        this.editor.postMessage( {'request':teleprompter.commandsMapping.command.anchor,'data':theAnchor}, this.getDomain());
     }
-
-    function internalMoveToNextAnchor(next) {
+    
+    moveToNextAnchor(theAnchor) {
+        this.editor.postMessage( {'request':teleprompter.commandsMapping.command.anchor,'data':theAnchor}, this.getDomain());
+    }
+    
+    internalMoveToNextAnchor(next) {
         const anchors = document.getElementsByTagName("a"),
-              currPos = -getCurrPos(),
-              verticalDisplacement = focusVerticalDisplacementCorrector();
+                currPos = -this.getCurrPos(),
+                verticalDisplacement = this.focusVerticalDisplacementCorrector();
         let jump = 0;
-        if (debug) console.log("currPos", currPos);
+        if (this.debug) console.log("currPos", currPos);
         if (next)
             // Check flipV before loop to reduce cycles.
-            if (flipV) {
-                jump = -promptHeight + screenHeight;
+            if (this.flipV) {
+                jump = -this.promptHeight + this.screenHeight;
                 for (let i=0; i<anchors.length; i++) {
-                    if (debug) console.log("i", i);
-                    if (debug) console.log('offsetTop', anchors[i].offsetTop);
-                    if (promptHeight - anchors[i].offsetTop + verticalDisplacement - screenHeight < currPos) {
-                        jump = -promptHeight + anchors[i].offsetTop + screenHeight - verticalDisplacement;
+                    if (this.debug) console.log("i", i);
+                    if (this.debug) console.log('offsetTop', anchors[i].offsetTop);
+                    if (this.promptHeight - anchors[i].offsetTop + verticalDisplacement - this.screenHeight < currPos) {
+                        jump = -this.promptHeight + anchors[i].offsetTop + this.screenHeight - verticalDisplacement;
                         break;
                     }
                 }
             }
             else
                 for (let i=0; i<anchors.length; i++) {
-                    if (debug) console.log("i", i);
-                    if (debug) console.log('offsetTop', anchors[i].offsetTop);
+                    if (this.debug) console.log("i", i);
+                    if (this.debug) console.log('offsetTop', anchors[i].offsetTop);
                     if (anchors[i].offsetTop - verticalDisplacement > currPos) {
                         jump = -anchors[i].offsetTop + verticalDisplacement;
                         break;
@@ -711,22 +740,22 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                 }
         else {
             // Add width based padding when jumping to previous evaluations.
-            const padding = x&&!next>=0?screenWidth/4.8:0;
-            if (flipV) {
-                jump = -promptHeight + screenHeight;
+            const padding = x && !next >= 0 ? this.screenWidth / 4.8 : 0;
+            if (this.flipV) {
+                jump = -this.promptHeight + this.screenHeight;
                 for (let i=anchors.length-1; i>=0; i--) {
-                    if (debug) console.log("i", i);
-                    if (debug) console.log('offsetTop', anchors[i].offsetTop);
-                    if (promptHeight - anchors[i].offsetTop + verticalDisplacement - screenHeight - padding - 1 > currPos) {
-                        jump = -promptHeight + anchors[i].offsetTop + screenHeight - verticalDisplacement;
+                    if (this.debug) console.log("i", i);
+                    if (this.debug) console.log('offsetTop', anchors[i].offsetTop);
+                    if (this.promptHeight - anchors[i].offsetTop + verticalDisplacement - this.screenHeight - padding - 1 > currPos) {
+                        jump = -this.promptHeight + anchors[i].offsetTop + this.screenHeight - verticalDisplacement;
                         break;
                     }
                 }
             }
             else
                 for (let i=anchors.length-1; i>=0; i--) {
-                    if (debug) console.log("i", i);
-                    if (debug) console.log('offsetTop', anchors[i].offsetTop);
+                    if (this.debug) console.log("i", i);
+                    if (this.debug) console.log('offsetTop', anchors[i].offsetTop);
                     if (anchors[i].offsetTop - verticalDisplacement + padding < currPos) {
                         jump = -anchors[i].offsetTop + verticalDisplacement;
                         break;
@@ -734,331 +763,329 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                 }
         }
         // Move within movable area or from top to start.
-        if (!flipV && jump < 0 || flipV && jump > -promptHeight + screenHeight || !flipV && !next || flipV && !next ) {
-            animate(0, jump);
-            resumeAnimation();
-            timeout(0.5, syncPrompters);
+        if (!this.flipV && jump < 0 || this.flipV && jump > -this.promptHeight + this.screenHeight || !this.flipV && !next || this.flipV && !next) {
+            this.animate(0, jump);
+            this.resumeAnimation();
+            this.timeout(0.5, this.syncPrompters);
         }
     }
-
-    function internalFastForward() {
-        const currPos = getCurrPos();
-        if (flipV) {
-            if (currPos < 0 - screenHeight * 0.5) {
-                const nextPos = currPos + screenHeight/2;
-                animate(0, nextPos);
-                resumeAnimation();
-                timeout(0.5, syncPrompters);
+    
+    internalFastForward() {
+        const currPos = this.getCurrPos();
+        if (this.flipV) {
+            if (currPos < 0 - this.screenHeight * 0.5) {
+                const nextPos = currPos + this.screenHeight / 2;
+                this.animate(0, nextPos);
+                this.resumeAnimation();
+                this.timeout(0.5, this.syncPrompters);
             }
         }
         else
-            if (currPos > -promptHeight + screenHeight*1.5) { // < 0 || flipV && jump > -promptHeight + screenHeight || !flipV && !next || flipV && !next ) {
-                const nextPos = currPos - screenHeight/2;
-                animate(0, nextPos);
-                resumeAnimation();
-                timeout(0.5, syncPrompters);
+            if (currPos > -this.promptHeight + this.screenHeight * 1.5) { // < 0 || flipV && jump > -promptHeight + screenHeight || !flipV && !next || flipV && !next ) {
+                const nextPos = currPos - this.screenHeight / 2;
+                this.animate(0, nextPos);
+                this.resumeAnimation();
+                this.timeout(0.5, this.syncPrompters);
             }
     }
-
-    function internalRewind() {
-        const currPos = getCurrPos();
+    
+    internalRewind() {
+        const currPos = this.getCurrPos();
         if (flipV) {
-            if (currPos > -promptHeight + screenHeight*1.5) { // < 0 || flipV && jump > -promptHeight + screenHeight || !flipV && !next || flipV && !next ) {
-                const nextPos = currPos - screenHeight/2;
-                animate(0, nextPos);
-                resumeAnimation();
-                timeout(0.5, syncPrompters);
+            if (currPos > -this.promptHeight + this.screenHeight*1.5) { // < 0 || flipV && jump > -promptHeight + screenHeight || !flipV && !next || flipV && !next ) {
+                const nextPos = currPos - this.screenHeight / 2;
+                this.animate(0, nextPos);
+                this.resumeAnimation();
+                this.timeout(0.5, this.syncPrompters);
             }
         }
         else 
-            if (currPos < 0 - screenHeight * 0.5) { // < 0 || flipV && jump > -promptHeight + screenHeight || !flipV && !next || flipV && !next ) {
-                const nextPos = currPos + screenHeight/2;
-                animate(0, nextPos);
-                resumeAnimation();
-                timeout(0.5, syncPrompters);
+            if (currPos < 0 - this.screenHeight * 0.5) { // < 0 || flipV && jump > -promptHeight + screenHeight || !flipV && !next || flipV && !next ) {
+                const nextPos = currPos + this.screenHeight / 2;
+                this.animate(0, nextPos);
+                this.resumeAnimation();
+                this.timeout(0.5, this.syncPrompters);
             }
     }
-
+    
     // Update unit and unit related measurements
-    function updateUnit() {
-        unit = focusHeight/80;
-        relativeLimit = limit*unit;
-        if (debug) setTimeout( function(){ console.log("Unit updated: "+unit) && false; });
-        resumeAnimation();
+    updateUnit() {
+        console.log("focusHeight", this.focusHeight);
+        this.unit = this.focusHeight / 80;
+        this.relativeLimit = limit * this.unit;
+        if (this.debug) setTimeout( function(){ console.log("Unit updated: "+this.unit) && false; }.bind(this));
+        this.resumeAnimation();
     }
-
-    function animationTimeout(time, func) {
-        internalPauseAnimation();
-        timeout(time, func);
+    
+    animationTimeout(time, func) {
+        this.internalPauseAnimation();
+        this.timeout(time, func);
     }
-
-    function timeout( time, func ) {
+    
+    timeout( time, func ) {
         // If a timeout is already executing, reset it.
-        if (timeoutStatus)
-            window.clearTimeout(timeoutStatus);
+        if (this.timeoutStatus)
+            window.clearTimeout(this.timeoutStatus);
         // Set: Wait time second before resuming animation
-        timeoutStatus = window.setTimeout(func, time);
+        this.timeoutStatus = window.setTimeout(function() {
+            if (func)
+                func();
+        }.bind(this), time);
     }
 
-    function getProgress() {
+    getProgress() {
         // The "previous" values used in getProgress are consistant values that update only during resize or screen rotate.
         // By using these we are able to recalculate position on correctVerticalDisplacement() and improve performance.
         // Solve for current progress. P = (-(currPos+screenHeight-valToCenterAtFocusArea)) / (promptHeight-screenHeight)
         // If flipV solve for...       P = (-(currPos+screenHeight-valToCenterAtFocusArea)) / (promptHeight-screenHeight)
         var progress,
-            currPos = getCurrPos();
-        if (flipV)
-            progress = (-(previousPromptHeight-previousScreenHeight+currPos)-previousVerticalDisplacementCorrector+previousScreenHeight)/-(previousPromptHeight-previousScreenHeight*2);
+            currPos = this.getCurrPos();
+        if (this.flipV)
+            progress = (-(this.previousPromptHeight-this.previousScreenHeight+currPos)-this.previousVerticalDisplacementCorrector+this.previousScreenHeight)/-(this.previousPromptHeight-this.previousScreenHeight*2);
         else
-            progress = (currPos-previousVerticalDisplacementCorrector+previousScreenHeight)/-(previousPromptHeight-previousScreenHeight*2);
-        if (debug) { console.log("Progress:") && false; console.log(progress) && false; }
+            progress = (currPos-this.previousVerticalDisplacementCorrector+this.previousScreenHeight)/-(this.previousPromptHeight-this.previousScreenHeight*2);
+        if (this.debug) { console.log("Progress:") && false; console.log(progress) && false; }
         return progress;
     }
         
     // Wait timeoutDelay after calling event before continuing.
-    function correctVerticalDisplacement(percentage, transitionDelay) {
+    correctVerticalDisplacement(percentage, transitionDelay) {
         var delay;
-        if (transitionDelay===undefined) {
+        if (transitionDelay === undefined) {
             transitionDelay = transitionDelays;
             delay = timeoutDelay;
         }   
         else
-            delay = transitionDelay/2;
-        setPromptHeight();
+            delay = transitionDelay / 2;
+        this.setPromptHeight();
         // setFocusHeight();
-        setScreenHeight();
+        this.setScreenHeight();
         // internalPauseAnimation();
-        animationTimeout( delay, function() {
+        this.animationTimeout( delay, function() {
             // Get current screen settings. To be used multiple times.
             var updatedPos,
-                valToCenterAtFocusArea = focusVerticalDisplacementCorrector();
-            if (percentage===undefined)
-                percentage = getProgress();
+                valToCenterAtFocusArea = this.focusVerticalDisplacementCorrector();
+            if (percentage === undefined)
+                percentage = this.getProgress();
             // Solve
-            if (flipV)
-                updatedPos = -(-percentage*(promptHeight-screenHeight*2)+valToCenterAtFocusArea-screenHeight)-promptHeight+screenHeight;
+            if (this.flipV)
+                updatedPos = -(-percentage*(this.promptHeight-this.screenHeight*2)+this.valToCenterAtFocusArea-this.screenHeight)-this.promptHeight+this.screenHeight;
             else
-                updatedPos = -percentage*(promptHeight-screenHeight*2)+valToCenterAtFocusArea-screenHeight;
+                updatedPos = -percentage*(this.promptHeight-this.screenHeight*2)+this.valToCenterAtFocusArea-this.screenHeight;
             // Update "previous" values to current ones.
-            previousPromptHeight = promptHeight;
-            previousScreenHeight = screenHeight;
-            previousVerticalDisplacementCorrector = valToCenterAtFocusArea;
+            this.previousPromptHeight = this.promptHeight;
+            this.previousScreenHeight = this.screenHeight;
+            this.previousVerticalDisplacementCorrector = this.valToCenterAtFocusArea;
             // Reset steps
-            resetSteps();
+            this.resetSteps();
             // Correct vertical displacement with a smooth animation.
-            animate( transitionDelay, updatedPos, 'ease' );
+            this.animate(transitionDelay, updatedPos, 'ease');
             // After that animation is done...
             window.setTimeout( function() {
                 // Check if current position is out of bounds and if it is, correct it.
-                var currPos = getCurrPos(),
-                    maxPos = -(promptHeight-screenHeight);
-                if ( currPos>0 ) {
-                    animate( 0, 0 );
-                    syncPrompters();
+                var currPos = this.getCurrPos(),
+                    maxPos = -(this.promptHeight-this.screenHeight);
+                if (currPos > 0) {
+                    this.animate(0, 0);
+                    this.syncPrompters();
                 }
-                else if ( currPos<maxPos ) {
-                    animate( 0, maxPos );
-                    stopAll();
-                    syncPrompters();
+                else if (currPos < maxPos) {
+                    this.animate( 0, maxPos);
+                    this.stopAll();
+                    this.syncPrompters();
                 }
                 // Then resume prompter playback.
-                internalPlayAnimation();
-            }, transitionDelay );
-        });
-    }
-
-    function onResize() {
-        if (debug) console.log("Resize") && false;
-        // In case of resolution change, update density unit.
-        setPromptHeight();
-        setFocusHeight();
-        setScreenHeight();
-        setScreenWidth();
-        updateUnit();
-        // You can guess what the next line does.
-        correctVerticalDisplacement();        
-    }
-    window.addEventListener("resize", onResize, false);
-
-    window.addEventListener("orientationchange", function() {
-        //http://stackoverflow.com/questions/5284878/how-do-i-correctly-detect-orientation-change-using-javascript-and-phonegap-in-io
-        if (debug) console.log("Orientation Change") && false;
-        updateUnit();
-        correctVerticalDisplacement();
-    }, false);
-
-    window.addEventListener("wheel", function(event) {
-        if (debug) console.log(event);
-        if (invertedWheel) {
-            if (event.deltaY>0)
-                increaseVelocity();
-            else
-                decreaseVelocity();
-        }
-        else {
-            if (event.deltaY>0)
-                decreaseVelocity();
-            else
-                increaseVelocity();
-        }
-        event.preventDefault();
-    }, false);
-
-    // CONTROL RELATED FUNCTIONS
-
-    // FONT SIZE
-
-    function increaseFontSize() {
-        editor.postMessage( {'request':11, 'data':getProgress()}, getDomain() );
-    }
-    function decreaseFontSize() {
-        editor.postMessage( {'request':12, 'data':getProgress()}, getDomain() );
-    }
-
-    function internalIncreaseFontSize() {
-        if (debug) console.log("Increasing font size.");
-        if (fontSize<2.5)
-            fontSize+=0.04;
-        updateFont();
-    }
-
-    function internalDecreaseFontSize() {
-        if (debug) console.log("Decreasing font size.");
-        if (fontSize>0.01)
-        fontSize-=0.04;
-        updateFont();
-    }
-
-    function updateFont() {
-        prompt.style.fontSize = fontSize+'em' ;
-        overlayFocus.style.fontSize = fontSize+'em' ;
-        onResize();
-    }
-
-    function updateWidth() {
-        prompt.style.width = promptWidth+"vw";
-        prompt.style.left = 50-promptWidth/2+"vw";
-        // prompt.style.right = 50-promptWidth/2+"%";
-        onResize();
-    }
-
-    function decreaseVelocity() {
-        editor.postMessage( {'request':2,'data':getProgress()}, getDomain() );
-    }
-
-    function increaseVelocity() {
-        editor.postMessage( {'request':1,'data':getProgress()}, getDomain() );
-    }
-
-    function incSteps() {
-        steps++;
-        if (steps>140)
-            instaSync();
-        timeout(250, instaSync);
-    }
-
-    function resetSteps() {
-        steps = 0;
-    }
-
-    function internalDecreaseVelocity() {
-        if (!atStart()) {
-            if (velocity>relativeLimit*-1) {
-                x--;
-                updateVelocity();
-                resumeAnimation();
-                incSteps();
-            }
-        }
-        else
-            stopAll();
-    }
-
-    function internalIncreaseVelocity() {
-        if (!atEnd()) {
-            if (velocity<relativeLimit) {
-                x++;
-                updateVelocity();
-                resumeAnimation();
-                incSteps();
-            }
-        }
-        else
-            stopAll();
-    }
-
-    function toggleAnimation() {
-        if ( play )
-            pauseAnimation();
-        else
-            playAnimation();
-    }
-
-    function pauseAnimation() {
-        editor.postMessage( {'request':command.pause}, getDomain() );
-        if (debug) console.log("Paused") && false;
-    }
-
-    function playAnimation() {
-        editor.postMessage( {'request':command.play}, getDomain() );
-        if (debug) console.log("Playing") && false;
+                this.internalPlayAnimation();
+            }.bind(this), transitionDelay);
+        }.bind(this));
     }
     
-    function internalPauseAnimation() {
-        editor.postMessage( {'request':command.internalPause}, getDomain() );
+    onResize() {
+        if (this.debug) console.log("Resize") && false;
+        // In case of resolution change, update density unit.
+        this.setPromptHeight();
+        this.setFocusHeight();
+        this.setScreenHeight();
+        this.setScreenWidth();
+        this.updateUnit();
+        // You can guess what the next line does.
+        this.correctVerticalDisplacement();        
     }
 
-    function internalPlayAnimation() {
-        editor.postMessage( {'request':command.internalPlay}, getDomain() );
+    // FONT SIZE
+    increaseFontSize() {
+        this.editor.postMessage({
+            'request': 11,
+            'data': this.getProgress()
+        }, this.getDomain());
+    }
+    decreaseFontSize() {
+        this.editor.postMessage({
+            'request': 12,
+            'data': this.getProgress()
+        }, this.getDomain());
     }
 
-    function localPauseAnimation() {
-        animate(0, getCurrPos());
-        timer.stopTimer();
+    internalIncreaseFontSize() {
+        if (this.debug) console.log("Increasing font size.");
+        if (this.fontSize < 2.5)
+            this.fontSize += 0.04;
+        this.updateFont();
     }
 
-    function localPlayAnimation() {
-        resumeAnimation();
+    internalDecreaseFontSize() {
+        if (this.debug) console.log("Decreasing font size.");
+        if (this.fontSize > 0.01)
+            this.fontSize -= 0.04;
+        this.updateFont();
     }
 
-    function resetTimer() {
-        editor.postMessage( {'request':command.resetTimer}, getDomain() );
+    updateFont() {
+        this.prompt.style.fontSize = this.fontSize + 'em';
+        this.overlayFocus.style.fontSize = this.fontSize + 'em';
+        this.onResize();
     }
 
-    function internalResetTimer() {
-        timer.resetTimer();
-        playAnimation();
-        if (debug) console.log("Timer reset.");
+    updateWidth() {
+        this.prompt.style.width = this.promptWidth+"vw";
+        this.prompt.style.left = 50-this.promptWidth/2+"vw";
+        // prompt.style.right = 50-promptWidth/2+"%";
+        this.onResize();
     }
 
-    function launchIntoFullscreen(element) {
+    decreaseVelocity() {
+        this.editor.postMessage({
+            'request': 2,
+            'data': this.getProgress()
+        }, this.getDomain());
+    }
+
+    increaseVelocity() {
+        this.editor.postMessage({
+            'request': 1,
+            'data': this.getProgress()
+        }, this.getDomain());
+    }
+
+    incSteps() {
+        this.steps++;
+        if (this.steps > 140)
+        this.instaSync();
+        this.timeout(250, );
+    }
+
+    resetSteps() {
+        this.steps = 0;
+    }
+
+    internalDecreaseVelocity() {
+        if (!this.atStart()) {
+            if (this.velocity > this.relativeLimit *- 1) {
+                this.x--;
+                this.updateVelocity();
+                this.resumeAnimation();
+                this.incSteps();
+            }
+        }
+        else
+            this.stopAll();
+    }
+
+    internalIncreaseVelocity() {
+        if (!this.atEnd()) {
+            if (this.velocity < this.relativeLimit) {
+                this.x++;
+                this.updateVelocity();
+                this.resumeAnimation();
+                this.incSteps();
+            }
+        }
+        else
+            this.stopAll();
+    }
+
+    toggleAnimation() {
+        if (this.play)
+            this.pauseAnimation();
+        else
+            this.playAnimation();
+    }
+
+    pauseAnimation() {
+        this.editor.postMessage({
+            'request': teleprompter.commandsMapping.command.pause
+        }, this.getDomain());
+        if (this.debug) console.log("Paused") && false;
+    }
+    
+    playAnimation() {
+        this.editor.postMessage({
+            'request': teleprompter.commandsMapping.command.play
+        }, this.getDomain());
+        if (this.debug) console.log("Playing") && false;
+    }
+    
+    internalPauseAnimation() {
+        this.editor.postMessage({
+            'request': teleprompter.commandsMapping.command.internalPause
+        }, this.getDomain());
+    }
+    
+    internalPlayAnimation() {
+        this.editor.postMessage({
+            'request':teleprompter.commandsMapping.command.internalPlay
+        }, this.getDomain());
+    }
+    
+    localPauseAnimation() {
+        this.animate(0, this.getCurrPos());
+        this.timer.stopTimer();
+    }
+    
+    localPlayAnimation() {
+        this.resumeAnimation();
+    }
+    
+    resetTimer() {
+        this.editor.postMessage({
+            'request':teleprompter.commandsMapping.command.resetTimer
+        }, this.getDomain());
+    }
+    
+    internalResetTimer() {
+        this.timer.resetTimer();
+        this.playAnimation();
+        if (this.debug) console.log("Timer reset.");
+    }
+    
+    launchIntoFullscreen(element) {
         var requestFullscreen = element.requestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen || element.msRequestFullscreen;
         if (requestFullscreen!==undefined)
             requestFullscreen.call(element);
     }
-
-    function exitFullscreen() {
+    
+    exitFullscreen() {
         var exitFullscreen = document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen;
         if (exitFullscreen!==undefined)
             exitFullscreen.call(document);
     }
-
-    function toggleFullscreen() {
-        if (debug) console.log("Toggle fullscreen");
+    
+    toggleFullscreen() {
+        if (this.debug) console.log("Toggle fullscreen");
         var fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
         if (fullscreenElement) {
-
-            if (debug) console.log("Entering fullscreen");
-            exitFullscreen();
+    
+            if (this.debug) console.log("Entering fullscreen");
+            this.exitFullscreen();
         }
         else {
-
-            if (debug) console.log("Leaving fullscreen");
-            launchIntoFullscreen(document.documentElement);
+    
+            if (this.debug) console.log("Leaving fullscreen");
+            this.launchIntoFullscreen(document.documentElement);
         }
     }
 
-    function listener(event) {
+    listener(event) {
         // Message data. Uncommenting will give you valuable information and decrease performance dramatically.
         /*
         setTimeout(function() {
@@ -1069,216 +1096,138 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
         }, 0);
         */
         // If the event comes from the same domain...
-        if (!cap&&!event.domain||event.domain===getDomain()) {
+        if (!this.cap && !event.domain || event.domain === this.getDomain()) {
             // Act according to the message.
             var message = event.data;
-            if(message.request==command.increaseVelocity||message.request==command.decreaseVelocity)
-                setCap();
+            var command = teleprompter.commandsMapping.command;
+            if(message.request == command.increaseVelocity || message.request == command.decreaseVelocity)
+                this.setCap();
             switch (message.request) {
                 case 1 :
-                    internalIncreaseVelocity();
+                    this.internalIncreaseVelocity();
                     //requestAnimationFrame(internalIncreaseVelocity);
                     break;
                 case 2 :
-                    internalDecreaseVelocity();
+                    this.internalDecreaseVelocity();
                     //requestAnimationFrame(internalDecreaseVelocity);
                     break;
                 case command.iSync :
                     requestAnimationFrame(function(){
-                        correctVerticalDisplacement(message.data,0);
-                    });
+                        this.correctVerticalDisplacement(message.data,0);
+                    }.bind(this));
                     break;
                 case command.sync :
                     requestAnimationFrame(function(){
-                        correctVerticalDisplacement(message.data);
-                    });
+                        this.correctVerticalDisplacement(message.data);
+                    }.bind(this));
                     break;
                 case command.stopAll :
-                    requestAnimationFrame(stopInstance);
+                    requestAnimationFrame(function() {
+                        this.stopInstance();
+                    }.bind(this));
                     break;
                 case command.play :
-                    play=true;
+                    this.play=true;
                 case command.internalPlay :
-                    requestAnimationFrame(localPlayAnimation);
+                    requestAnimationFrame(function() {
+                        this.localPlayAnimation();
+                    }.bind(this));
                     break;
                 case command.pause :
-                    requestAnimationFrame(localPauseAnimation);
-                    play=false;
-                    syncPrompters();
+                    requestAnimationFrame(function() {
+                        this.localPauseAnimation();
+                    }.bind(this));
+                    this.play=false;
+                    this.syncPrompters();
                     break;
                 case command.internalPause :
-                    requestAnimationFrame(localPauseAnimation);
+                    requestAnimationFrame(function() {
+                        this.localPauseAnimation();
+                    }.bind(this));
                     break;
                 case command.togglePlay :
-                    toggleAnimation();
+                    this.toggleAnimation();
                     break;
                 case command.resetTimer :
-                    internalResetTimer();
+                    this.internalResetTimer();
                     break;
                 case command.anchor :
                     requestAnimationFrame(function(){
-                        internalMoveToAnchor(message.data);
-                    });
+                        this.internalMoveToAnchor(message.data);
+                    }.bind(this));
                     break;
                 case command.incFont :
-                    internalIncreaseFontSize();
+                    this.internalIncreaseFontSize();
                     break;
                 case command.decFont :
-                    internalDecreaseFontSize();
+                    this.internalDecreaseFontSize();
                     break;
                 case command.update :
-                    updateContents();
+                    this.updateContents();
                     break;
                 case command.close :
-                    closeInstance();
+                    this.closeInstance();
                     break;
                 case command.nextAnchor :
-                    internalMoveToNextAnchor(true);
+                    this.internalMoveToNextAnchor(true);
                     break;
                 case command.previousAnchor :
-                    internalMoveToNextAnchor(false);
+                    this.internalMoveToNextAnchor(false);
                     break;
                 case command.fastForward :
-                    internalFastForward();
+                    this.internalFastForward();
                     break;
                 case command.rewind :
-                    internalRewind();
+                    this.internalRewind();
                     break;
                 default :
                     // Notify unknown message received.
-                    if (debug) console.log("Unknown post message received: "+message.request) && false;
+                    if (this.debug) console.log("Unknown post message received: "+message.request) && false;
             }
         }
     }
 
-    // Initialize postMessage event listener.
-    addEventListener("message", listener, false);
-
-    // When calling from main process, run function to...
-    if (ipcRenderer!==undefined)
-        ipcRenderer.on('asynchronous-reply', function(event, arg) {
-            if (arg.option === "message") {
-                listener( {data:arg.data, domain:getDomain()} );
-            }
-        });
-
-    addEventListener("message", listener, false);
-
-    function resetCap() {
-        cap = false;
+    resetCap() {
+        this.cap = false;
+    }
+    
+    setCap() {
+        this.cap = true;
+        setTimeout(function() {
+            this.resetCap();
+        }.bind(this), this.inputCapDelay);
+    }
+    
+    toggleTouchControls() {
+    
     }
 
-    function setCap() {
-        cap = true;
-        setTimeout(resetCap, inputCapDelay);
-    }
-
-    function toggleTouchControls() {
-
-    }
-
-    document.onkeydown = function( event ) {
-        var key;
-        // keyCode is announced to be deprecated but not all browsers support key as of 2016.
-        if (event.key === undefined)
-            event.key = event.keyCode;
-        if (debug) console.log("Key: "+event.key) && false;
-        switch ( event.key ) {
-            case "s":
-            case "S":
-            case "ArrowDown":
-            case 40: // Down
-            case 68: // S
-                increaseVelocity();
-                break;
-            case "w":
-            case "W":
-            case "ArrowUp":
-            case 38: // Up
-            case 87: // W
-                decreaseVelocity();
-                break;
-            case "d":
-            case "D":
-            case "ArrowRight":
-            case 83: // S
-            case 39: // Right
-                increaseFontSize();
-                break;
-            case "a":
-            case "A":
-            case "ArrowLeft":
-            case 37: // Left
-            case 65: // A
-                decreaseFontSize();
-                break;
-            case " ":           
-            case 32: // Spacebar
-                toggleAnimation();
-                break;
-            case ".":
-            case 110: // Numpad dot
-            case 190: // Dot
-                syncPrompters();
-                break;
-            case "Escape":
-            case 27: // ESC
-                closeInstance();
-                break;
-            case 121:
-            case "F10":
-            case 123:
-            case "F12":
-                if (!inIframe())
-                    toggleDebug();
-                break;
-            case 122:
-            case "F11":
-                if (!inIframe())
-                    toggleFullscreen();
-                break;
-            case 8:
-            case "Backspace":
-            case "backspace":
-                resetTimer();
-                break;
-            case 36:
-            case "Home":
-                editor.postMessage( {'request':command.previousAnchor}, getDomain() );
-                break;
-            case 35:
-            case "End":
-                editor.postMessage( {'request':command.nextAnchor}, getDomain() );
-                break;
-            case 34 :
-            case "PageDown" :
-                editor.postMessage( {'request':command.fastForward}, getDomain() );
-                break;
-            case 33 :
-            case "PageUp" :
-                editor.postMessage( {'request':command.rewind}, getDomain() );
-                break;
-            default: // Move to anchor.
-                // If key is not a string
-                if(!isFunction(event.key.indexOf))
-                    key = String.fromCharCode(event.key);
-                else
-                    key = event.key;
-                //if ( key.indexOf("Key")===0 || key.indexOf("Digit")===0 )
-                //      key = key.charAt(key.length-1);
-                if ( !is_int(key) )
-                    key = key.toLowerCase();
-                if (debug) console.log(key);
-                moveToAnchor( key );
+    commandsListener (event) {
+        var mapping = teleprompter.commandsMapping.mapping;
+        if (mapping[event.code]) {
+            teleprompter.commandsMapping.actions[mapping[event.code]]["method"]();
+        } else if (event.key) {
+            var key;
+            // If key is not a string
+            if (!this.isFunction(event.key.indexOf))
+                key = String.fromCharCode(event.key);
+            else
+                key = event.key;
+            //if ( key.indexOf("Key")===0 || key.indexOf("Digit")===0 )
+            //      key = key.charAt(key.length-1);
+            if (!this.is_int(key))
+                key = key.toLowerCase();
+            if (debug) console.log(key);
+            this.moveToAnchor( key );
         }
         // Prevent arrow and spacebar scroll bug.
         if ([" ","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(event.key) > -1 && event.preventDefault)
-            event.preventDefault();
-    };
+        event.preventDefault();
+    }
 
-    function remoteControls() {
+    remoteControls() {
         var res;
-        dataManager.getItem("IFTeleprompterControl",function(data){
+        dataManager.getItem("IFTeleprompterControl", function(data){
             res = JSON.parse(data);
         },0,false);
         if(typeof res !== "undefined"){
@@ -1286,38 +1235,38 @@ https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/onversionchange
                 document.onkeydown(res);
             }
         }
-        setTimeout(remoteControls, 0);
+        setTimeout(this.remoteControls, 0);
     }
-
-    function isFunction( possibleFunction ) {
-        return typeof(possibleFunction)===typeof(Function)
+    
+    isFunction(possibleFunction) {
+        return typeof(possibleFunction) === typeof(Function)
     }
-
-    function is_int(value){
+    
+    is_int(value) {
         if (parseFloat(value) == parseInt(value) && !isNaN(value))
             return true;
         else
             return false;
     }
 
-    // Initialize objects after DOM is loaded
-    if (document.readyState === "interactive" || document.readyState === "complete")
-        // Call init if the DOM (interactive) or document (complete) is ready.
-        init();
-    else
-        // Set init as a listener for the DOMContentLoaded event.
-        document.addEventListener("DOMContentLoaded", init);
-
-}());
-
-function inIframe() {
-    try {
-        return window.self !== window.top;
-    } catch (e) {
-        return true;
+    inIframe() {
+        try {
+            return window.self !== window.top;
+        } catch (e) {
+            return true;
+        }
     }
 }
 
-function inElectron() {
-    return navigator.userAgent.indexOf("Electron")!=-1;
-}
+teleprompter.prompter = new Prompter()
+
+// Initialize objects after DOM is loaded
+if (document.readyState === "interactive" || document.readyState === "complete")
+    // Call init if the DOM (interactive) or document (complete) is ready.
+    teleprompter.prompter.init();
+else
+    // Set init as a listener for the DOMContentLoaded event.
+    document.addEventListener("DOMContentLoaded", function() {
+        teleprompter.prompter.init();
+    }.bind(this));
+

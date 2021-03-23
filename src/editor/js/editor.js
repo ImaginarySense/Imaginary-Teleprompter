@@ -38,10 +38,6 @@ class Editor {
             this.remote = require('@electron/remote');  // Allows IPC with main process in Electron.
             this.electronScreen = remote.screen; // Allows Smart Fullscreens in Electron.
             this.ipcRenderer = electron.ipcRenderer;
-
-            // window.jQuery = require('./assets/jquery/jquery.min.js');
-            // window.$ = window.jQuery;
-            // window.Slider = require('./assets/bootstrap-slider/js/bootstrap-slider.min.js');
         }
 
         this.syncMethods = {"instance": 0, "canvas": 1, "follow": 2};
@@ -63,7 +59,7 @@ class Editor {
         teleprompter.fileManager = new FileManager();
 
         // Initialize commands mapping
-        teleprompter.commandsMapping = new CommandsMapping();
+        teleprompter.commandsMapping = new CommandsMapping(this);
 
         // Initialize themes
         teleprompter.themes = new Themes();

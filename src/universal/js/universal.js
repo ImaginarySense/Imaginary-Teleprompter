@@ -3,7 +3,8 @@ window.teleprompter = {
     themes: {},
     commandsMapping: {},
     controls: {},
-    fileManager: {}
+    fileManager: {},
+    prompter: {}
 };
 
 function loadScript(url, callback)

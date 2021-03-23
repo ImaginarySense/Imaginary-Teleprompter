@@ -22,7 +22,7 @@ gulp.task('editor:css', function() {
 gulp.task('editor:js', function() {
     return gulp.src(['./src/editor/js/*.js', '!./src/editor/js/editor.js', './src/editor/js/editor.js'])
         .pipe(concat('teleprompter-editor.js'))
-        // .pipe(uglify().on('error', ()=>{}))
+        .pipe(uglify().on('error', ()=>{}))
         .pipe(gulp.dest('./dist/assets/custom/js'));
 });
 
