@@ -90,7 +90,6 @@ class Prompter {
         this.closing = false;
         this.cap = false;
         this.syncDelay = 12;
-        this.resetSteps();
         
         // Local Storage and Session data
         this.updateDatamanager();
@@ -127,7 +126,7 @@ class Prompter {
     
         this.timer = $('.clock').timer({
             stopVal: 10000,
-            direction: 'ccw'
+            direction: 'cw'
         });
         // Get and set prompter text
         this.updateContents();
@@ -205,8 +204,6 @@ class Prompter {
         touchOverlay.addEventListener("pointermove", function(event) {
             this.pointerMove(event);
         }.bind(this));
-
-        console.log("promptHeight", this.promptHeight);
     
         // Wait a moment to prevent possible asynchronic CSS issues.
         window.setTimeout(function() {
@@ -219,7 +216,6 @@ class Prompter {
     
             // Save current screen position related settings for when resize and screen rotation ocurrs.
             this.previousPromptHeight = this.promptHeight;
-            this.previousScreenHeight = this.screenHeight;
             this.previousScreenHeight = this.screenHeight;
             this.previousVerticalDisplacementCorrector = this.focusVerticalDisplacementCorrector();
             
@@ -547,11 +543,11 @@ class Prompter {
     }
 
     setScreenHeight( ) {
-        this.screenHeight = overlay.clientHeight;
+        this.screenHeight = this.overlay.clientHeight;
     }
 
     setScreenWidth( ) {
-        this.screenWidth = overlay.clientWidth;
+        this.screenWidth = this.overlay.clientWidth;
     }
 
     setPromptHeight( ) {
@@ -588,7 +584,7 @@ class Prompter {
     setCurrPosStill(theCurrPos) {
         if (this.theCurrPos===undefined)
             this.theCurrPos = this.getCurrPos();
-            this.prompt.style.transform = 'translateY('+theCurrPos+'px) scale('+(this.flipH?-1:1)+','+(this.flipV?-1:1)+')';
+        this.prompt.style.transform = 'translateY('+theCurrPos+'px) scale('+(this.flipH?-1:1)+','+(this.flipV?-1:1)+')';
         // If animation is running...
         if (this.prompt.classList.contains("move")) {
             // Stop animation by removing move class.
@@ -628,6 +624,7 @@ class Prompter {
             var currPos = this.getCurrPos(),
                 destination = this.getDestination(currPos),
                 time = this.getRemainingTime(destination, currPos);
+
             this.animate(time, destination);
         }
     }
@@ -869,13 +866,13 @@ class Prompter {
                 percentage = this.getProgress();
             // Solve
             if (this.flipV)
-                updatedPos = -(-percentage*(this.promptHeight-this.screenHeight*2)+this.valToCenterAtFocusArea-this.screenHeight)-this.promptHeight+this.screenHeight;
+                updatedPos = -(-percentage*(this.promptHeight-this.screenHeight*2)+valToCenterAtFocusArea-this.screenHeight)-this.promptHeight+this.screenHeight;
             else
-                updatedPos = -percentage*(this.promptHeight-this.screenHeight*2)+this.valToCenterAtFocusArea-this.screenHeight;
+                updatedPos = -percentage*(this.promptHeight-this.screenHeight*2)+valToCenterAtFocusArea-this.screenHeight;
             // Update "previous" values to current ones.
             this.previousPromptHeight = this.promptHeight;
             this.previousScreenHeight = this.screenHeight;
-            this.previousVerticalDisplacementCorrector = this.valToCenterAtFocusArea;
+            this.previousVerticalDisplacementCorrector = valToCenterAtFocusArea;
             // Reset steps
             this.resetSteps();
             // Correct vertical displacement with a smooth animation.
@@ -890,7 +887,7 @@ class Prompter {
                     this.syncPrompters();
                 }
                 else if (currPos < maxPos) {
-                    this.animate( 0, maxPos);
+                    this.animate(0, maxPos);
                     this.stopAll();
                     this.syncPrompters();
                 }
@@ -1195,7 +1192,7 @@ class Prompter {
         this.cap = true;
         setTimeout(function() {
             this.resetCap();
-        }.bind(this), this.inputCapDelay);
+        }.bind(this), inputCapDelay);
     }
     
     toggleTouchControls() {
