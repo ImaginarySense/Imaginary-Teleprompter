@@ -218,6 +218,9 @@ class CommandsMapping {
             },
     
         }
+
+        // Load settings
+        this.mapping = teleprompter.settings.commandsMapping ? teleprompter.settings.commandsMapping : {}
     }
 
     draw() {
@@ -290,6 +293,7 @@ class CommandsMapping {
                 }
 
                 this.mapping[nextKey] = action;
+                teleprompter.settings.commandsMapping = JSON.stringify(this.mapping);
                 e.target.setAttribute("data-key", nextKey);
 
                 let keyName = nextKey.match(/[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+/g).join(' ');

@@ -31,6 +31,7 @@ class Settings {
         } else {
             localStorage[prop] = value;
         }
+        return localStorage[prop];
     }
     clear() {
         localStorage.clear()

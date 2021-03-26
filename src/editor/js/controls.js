@@ -61,32 +61,40 @@ class Controls {
         ];
         // Data binding for advanced options
         this.slider[0].on("change", function(input) {
-            document.getElementById("speedValue").textContent = parseFloat(Math.round(input.newValue * 10) / 10).toFixed(1);
+            teleprompter.settings.speed = parseFloat(Math.round(input.newValue * 10) / 10).toFixed(1);
+            document.getElementById("speedValue").textContent = teleprompter.settings.speed;
         });
         this.slider[1].on("change", function(input) {
-            document.getElementById("accelerationValue").textContent = parseFloat(Math.round(input.newValue * 100) / 100).toFixed(2);
+            teleprompter.settings.acceleration = parseFloat(Math.round(input.newValue * 100) / 100).toFixed(2);
+            document.getElementById("accelerationValue").textContent = teleprompter.settings.acceleration;
         });
         this.slider[2].on("change", function(input) {
-            document.getElementById("fontSizeValue").textContent = input.newValue;
-            updateFont(input.newValue);
+            teleprompter.settings.fontSize = input.newValue;
+            document.getElementById("fontSizeValue").textContent = teleprompter.settings.fontSize;
+            teleprompter.editor.updateFont(teleprompter.settings.fontSize);
         });
         this.slider[3].on("change", function(input) {
-            document.getElementById("promptWidthValue").textContent = input.newValue;
-            updateWidth(input.newValue);
+            teleprompter.settings.promptWidth = input.newValue;
+            document.getElementById("promptWidthValue").textContent = teleprompter.settings.promptWidth;
+            teleprompter.editor.updateWidth(teleprompter.settings.promptWidth);
         });
         this.slider[4].on("change", function(input) {
-            document.getElementById("speedControlValue").textContent = parseFloat(Math.round(input.newValue * 10) / 10).toFixed(1);
+            teleprompter.settings.speed = parseFloat(Math.round(input.newValue * 10) / 10).toFixed(1);
+            document.getElementById("speedControlValue").textContent = teleprompter.settings.speed;
         });
         this.slider[5].on("change", function(input) {
-            document.getElementById("accelerationControlValue").textContent = parseFloat(Math.round(input.newValue * 100) / 100).toFixed(2);
+            teleprompter.settings.acceleration = parseFloat(Math.round(input.newValue * 100) / 100).toFixed(2);
+            document.getElementById("accelerationControlValue").textContent = teleprompter.settings.acceleration;
         });
         this.slider[6].on("change", function(input) {
-            document.getElementById("fontSizeControlValue").textContent = input.newValue;
-            updateFont(input.newValue);
+            teleprompter.settings.fontSize = input.newValue;
+            document.getElementById("fontSizeControlValue").textContent = teleprompter.settings.fontSize;
+            teleprompter.editor.updateFont(teleprompter.settings.fontSize);
         });
         this.slider[7].on("change", function(input) {
-            document.getElementById("promptWidthControlValue").textContent = input.newValue;
-            updateWidth(input.newValue);
+            teleprompter.settings.promptWidth = input.newValue;
+            document.getElementById("promptWidthControlValue").textContent = teleprompter.settings.promptWidth;
+            teleprompter.editor.updateWidth(teleprompter.settings.promptWidth);
         });
 
         var element, elements = [], elementValue, elementChecked, elementSelected;
@@ -179,7 +187,8 @@ class Controls {
         var id = e.target.id.replace("Control", "");
         var element = document.getElementById(id);
         if (element) {
-            element.value = e.target.value;
+            teleprompter.settings[id] = e.target.value;
+            element.value = teleprompter.settings[id];
         }
     }
 
@@ -188,21 +197,25 @@ class Controls {
         var id = e.target.id;
         var element = document.getElementById(id + "Control");
         if (element) {
-            element.value = e.target.value;
+            teleprompter.settings[id] = e.target.value;
+            element.value = teleprompter.settings[id];
         }
     }
 
     updateToggleControl(e) {
         e.preventDefault();
         var id = e.target.name.replace("Control", "");
-        var element = document.querySelector('input[name="' + id + '"][value="' + e.target.value + '"]');
+        teleprompter.settings[id] = e.target.value;
+        var element = document.querySelector('input[name="' + id + '"][value="' + teleprompter.settings[id] + '"]');
+        
         element.checked = true;
     }
 
     updateQuickToggleControl(e) {
         e.preventDefault();
         var id = e.target.name;
-        document.querySelector('input[name="' + id + 'Control"][value="' + e.target.value + '"]').checked = true;
+        teleprompter.settings[id] = e.target.value;
+        document.querySelector('input[name="' + id + 'Control"][value="' + teleprompter.settings[id] + '"]').checked = true;
     }
 
     updateSliderControl(e) {
@@ -242,7 +255,8 @@ class Controls {
     updateQuickControlConfig(e) {
         e.preventDefault();
         var id = e.target.id.replace("Config", "");
-        quickConfig[id] = e.target.checked;
+        teleprompter.settings[id] = e.target.checked;
+        quickConfig[id] = eleprompter.settings[id];
         updatePrompterData();
     }
 }
