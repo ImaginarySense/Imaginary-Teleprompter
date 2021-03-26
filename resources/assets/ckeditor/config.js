@@ -9,7 +9,12 @@ CKEDITOR.editorConfig = function( config ) {
 	// config.uiColor = '#AADC6E';
 
 	// config.filebrowserUploadUrl = 'http://localhost:3001/upload';
-	config.imageUploadUrl = 'http://localhost:3001/upload?command=QuickUpload'; 
+	// config.imageUploadUrl = 'http://localhost:3001/upload?command=QuickUpload'; 
+
+	config.allowedContent = true;
+	config.pasteFromWordPromptCleanup = false;
+	config.pasteFromWordRemoveFontStyles = false; // deprecated
+	// config.pasteFromWordRemoveStyles = false;
 	
 };
 

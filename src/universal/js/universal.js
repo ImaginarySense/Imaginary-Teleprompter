@@ -4,7 +4,8 @@ window.teleprompter = {
     commandsMapping: {},
     controls: {},
     fileManager: {},
-    prompter: {}
+    prompter: {},
+    settings: {}
 };
 
 function loadScript(url, callback)

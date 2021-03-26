@@ -302,7 +302,8 @@ class Prompter {
             this.session = JSON.parse(data);
         }.bind(this), 1, false);
         // Ensure content is being passed
-        // console.log(session);
+        // console.log("settings", this.settings);
+        // console.log("session", this.session);
     }
 
     updateContents() {
@@ -570,7 +571,7 @@ class Prompter {
             var computedStyle = window.getComputedStyle(obj, null),
                 theMatrix = computedStyle.getPropertyValue("transform"),
                 // Reading data from matrix.
-                max = theMatrix.match(/^matrix3d\((.+)\)$/);
+                mat = theMatrix.match(/^matrix3d\((.+)\)$/);
             if (mat) return parseFloat(mat[1].split(', ')[13]);
                 mat = theMatrix.match(/^matrix\((.+)\)$/);
             return mat ? parseFloat(mat[1].split(', ')[5]) : 0;
@@ -582,8 +583,8 @@ class Prompter {
     }
     
     setCurrPosStill(theCurrPos) {
-        if (this.theCurrPos===undefined)
-            this.theCurrPos = this.getCurrPos();
+        if (theCurrPos===undefined)
+            theCurrPos = this.getCurrPos();
         this.prompt.style.transform = 'translateY('+theCurrPos+'px) scale('+(this.flipH?-1:1)+','+(this.flipV?-1:1)+')';
         // If animation is running...
         if (this.prompt.classList.contains("move")) {
@@ -807,7 +808,6 @@ class Prompter {
     
     // Update unit and unit related measurements
     updateUnit() {
-        console.log("focusHeight", this.focusHeight);
         this.unit = this.focusHeight / 80;
         this.relativeLimit = limit * this.unit;
         if (this.debug) setTimeout( function(){ console.log("Unit updated: "+this.unit) && false; }.bind(this));
@@ -977,7 +977,7 @@ class Prompter {
 
     internalDecreaseVelocity() {
         if (!this.atStart()) {
-            if (this.velocity > this.relativeLimit *- 1) {
+            if (this.velocity > this.relativeLimit * -1) {
                 this.x--;
                 this.updateVelocity();
                 this.resumeAnimation();
