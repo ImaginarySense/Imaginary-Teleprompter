@@ -21,17 +21,17 @@
 class Controls {
     constructor() {
         // All controls available
-        this.controls = [
-            'primary',
-            'secondary',
-            'prompterStyle',
-            'focus',
-            'speed',
-            'acceleration',
-            'fontSize',
-            'promptWidth',
-            'timer'
-        ]
+        this.controls = {
+            'primary': 1,
+            'secondary': 0,
+            'prompterStyle': 1,
+            'focus': 0,
+            'speed': 4.0,
+            'acceleration': 1.45,
+            'fontSize': 120,
+            'promptWidth': 84,
+            'timer': true
+        }
 
         // Defaults settings
         this.defaultsQuickConfig = {
@@ -45,7 +45,25 @@ class Controls {
             'promptWidthQuick': true,
             'timerQuick': true
         }
-        this.quickConfig = this.defaultsQuickConfig;
+
+        this.setDefaultValues();
+
+    }
+
+    setDefaultValues() {
+        // Set default controls values
+        for (var key in this.controls) {
+            if (!teleprompter.settings[key]) {
+                teleprompter.settings[key] = this.controls[key];
+            }
+        }
+
+        // Set default QuickConfig values
+        for (var key in this.defaultsQuickConfig) {
+            if (!teleprompter.settings[key]) {
+                teleprompter.settings[key] = this.defaultsQuickConfig[key];
+            }
+        }
     }
 
     draw() {
@@ -59,6 +77,7 @@ class Controls {
             new Slider("#fontSizeControl", {}),
             new Slider("#promptWidthControl", {})
         ];
+
         // Data binding for advanced options
         this.slider[0].on("change", function(input) {
             teleprompter.settings.speed = parseFloat(Math.round(input.newValue * 10) / 10).toFixed(1);
@@ -97,24 +116,35 @@ class Controls {
             teleprompter.editor.updateWidth(teleprompter.settings.promptWidth);
         });
 
-        var element, elements = [], elementValue, elementChecked, elementSelected;
-        for (var i = 0; i < this.controls.length; i++) {
-            element = document.getElementById(this.controls[i]);
+        // Load last sliders setting
+        this.setSliderValue(this.slider[0], teleprompter.settings.speed);
+        this.setSliderValue(this.slider[1], teleprompter.settings.acceleration);
+        this.setSliderValue(this.slider[2], teleprompter.settings.fontSize);
+        this.setSliderValue(this.slider[3], teleprompter.settings.promptWidth);
+        this.setSliderValue(this.slider[4], teleprompter.settings.speed);
+        this.setSliderValue(this.slider[5], teleprompter.settings.acceleration);
+        this.setSliderValue(this.slider[6], teleprompter.settings.fontSize);
+        this.setSliderValue(this.slider[7], teleprompter.settings.promptWidth);
+
+        var element, elements = [], elementValue;
+        for (var key in this.controls) {
+            element = document.getElementById(key);
+            var index = Object.keys(this.controls).indexOf(key);
             if (element && element.value) {
-                elementValue = element.value;
                 if (element.hasAttribute('data-slider-value')) {
-                    element.setAttribute('data-slider-id', i);
+                    element.setAttribute('data-slider-id', index);
                     element.onchange = function(event) {
                         this.updateQuickSliderControl(event);
                     }.bind(this);
                 } else {
+                    element.value = teleprompter.settings[key];
                     element.onchange = function(event) {
                         this.updateQuickControl(event);
                     }.bind(this);
                 }
             } else {
-                elements = document.querySelectorAll('input[name="' + this.controls[i] + '"]');
-                elementValue = document.querySelector('input[name="' + this.controls[i] + '"]:checked').value;
+                elements = document.querySelectorAll('input[name="' + key + '"]');
+                document.querySelector('input[name="' + key + '"]:checked').value = teleprompter.settings[key];
                 for (var j = 0; j < elements.length; j++) {
                     element = elements[j];
                     element.onchange = function(event) {
@@ -124,25 +154,22 @@ class Controls {
             }
 
             elements = [];
-            element = document.getElementById(this.controls[i] + "Control");
+            element = document.getElementById(key + "Control");
             if (element) {
-                element.value = elementValue;
-                elementValue = undefined;
                 if (element.hasAttribute('data-slider-value')) {
-                    element.setAttribute('data-slider-id', i);
+                    element.setAttribute('data-slider-id', index);
                     element.onchange = function(event) {
                         this.updateSliderControl(event);
                     }.bind(this);
                 } else {
+                    element.value = teleprompter.settings[key];
                     element.onchange = function(event) {
                         this.updateControl(event);
                     }.bind(this);
                 }
             } else {
-                elements = document.querySelectorAll('input[name="' + this.controls[i] + 'Control"]');
-                document.querySelector('input[name="' + this.controls[i] + 'Control"][value="' + elementValue + '"]').checked = true;
-                elementValue = undefined;
-
+                elements = document.querySelectorAll('input[name="' + key + 'Control"]');
+                document.querySelector('input[name="' + key + 'Control"][value="' + (teleprompter.settings[key] === "true" ? "on": "off") + '"]').checked = true;
                 for (var j = 0; j < elements.length; j++) {
                     element = elements[j];
                     element.onchange = function(event) {
@@ -151,34 +178,32 @@ class Controls {
                 }
             }
             
-            element = document.getElementById(this.controls[i] + "QuickConfig");
+            element = document.getElementById(key + "QuickConfig");
             if (element) {
                 element.onchange = function(event) {
                     this.updateQuickControlConfig(event);
                 }.bind(this);
             }
         }
+        this.updateQuickConfig();
     }
 
-    updateQuickConfig(settings) {
-        if (settings) {
-            var element;
-            for (var i = 0; i < this.controls.length; i++) {
-                element = document.getElementById(this.controls[i] + "Quick");
-                if (element) {
-                    // Cleaning previous hiddens
-                    element.classList.remove("hidden");
-                    if (!settings[this.controls[i] + "Quick"]) {
-                        element.classList.add("hidden");
-                    }
-                }
-    
-                element = document.getElementById(this.controls[i] + "QuickConfig");
-                if (element) {
-                    element.checked = settings[this.controls[i] + "Quick"];
+    updateQuickConfig() {
+        var element;
+        for (var key in this.controls) {
+            element = document.getElementById(key + "Quick");
+            if (element) {
+                // Cleaning previous hiddens
+                element.classList.remove("hidden");
+                if (teleprompter.settings[key + "Quick"] === "false") {
+                    element.classList.add("hidden");
                 }
             }
-            this.quickConfig = settings;
+
+            element = document.getElementById(key + "QuickConfig");
+            if (element) {
+                element.checked = (teleprompter.settings[key + "Quick"] === "true");
+            }
         }
     }
     
@@ -205,17 +230,17 @@ class Controls {
     updateToggleControl(e) {
         e.preventDefault();
         var id = e.target.name.replace("Control", "");
-        teleprompter.settings[id] = e.target.value;
-        var element = document.querySelector('input[name="' + id + '"][value="' + teleprompter.settings[id] + '"]');
-        
+        teleprompter.settings[id] = e.target.value === "on";
+        var element = document.querySelector('input[name="' + id + '"][value="' + (teleprompter.settings[id] === "true" ? "on" : "off") + '"]');
         element.checked = true;
     }
 
     updateQuickToggleControl(e) {
         e.preventDefault();
         var id = e.target.name;
-        teleprompter.settings[id] = e.target.value;
-        document.querySelector('input[name="' + id + 'Control"][value="' + teleprompter.settings[id] + '"]').checked = true;
+        teleprompter.settings[id] = e.target.value === "on";
+        var element = document.querySelector('input[name="' + id + 'Control"][value="' + (teleprompter.settings[id] === "true" ? "on" : "off") + '"]')
+        element.checked = true;
     }
 
     updateSliderControl(e) {
@@ -256,7 +281,13 @@ class Controls {
         e.preventDefault();
         var id = e.target.id.replace("Config", "");
         teleprompter.settings[id] = e.target.checked;
-        quickConfig[id] = eleprompter.settings[id];
-        updatePrompterData();
+        this.updateQuickConfig();
+    }
+
+    setSliderValue(slider, value) {
+        slider.setValue(value);
+        slider._trigger('change', {
+            newValue: value
+        });
     }
 }

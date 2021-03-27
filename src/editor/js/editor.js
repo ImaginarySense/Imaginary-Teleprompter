@@ -225,9 +225,6 @@ class Editor {
         // Draw controls
         teleprompter.controls.draw();
 
-        // Load latest values
-        this.loadLastUseSettings();
-
         // Draw prompt styles
         teleprompter.themes.draw();
 
@@ -445,7 +442,7 @@ class Editor {
         this.togglePromptIt();
 
         // Set data to send.
-        var settings = '{ "data": {"secondary":0,"primary":1,"prompterStyle":2,"focusMode":3,"background":"#3CC","color":"#333","overlayBg":"#333","speed":"13","acceleration":"1.2","fontSize":"100","promptWidth":"84","timer":"false","voice":"false"}, "quickConfig": {}}',
+        var settings = '{ "data": {"secondary":0,"primary":1,"prompterStyle":2,"focusMode":3,"background":"#3CC","color":"#333","overlayBg":"#333","speed":"13","acceleration":"1.2","fontSize":"100","promptWidth":"84","timer":"false","voice":"false"}}',
             session = '{ "html":"' + encodeURIComponent(htmldata) + '" }';
 
         // Store data locally for prompter to use
@@ -467,68 +464,15 @@ class Editor {
         this.toggleFullscreen();
     }
 
-    updatePrompterData(override) {
+    updatePrompterData() {
         // Get html from editor
-    
         this.htmldata = teleprompter.editor.contentEditor.getEditorContent();
 
-        // Define possible values
-        var primary, secondary, style, focusArea, speed, acceleration, fontSize, timer, voice;
-        // Get form values
-        if (override!==undefined && typeof override==='string' || override instanceof String)
-            override = JSON.parse(override);
-        // Set corresponding values.
-        if (override!==undefined && override.primary!==undefined)
-            primary = override.primary;
-        else
-            primary = document.getElementById("primary").value;
-        if (override!==undefined && override.secondary!==undefined)
-            secondary = override.secondary;
-        else
-            secondary = document.getElementById("secondary").value;
-        if (override!==undefined && override.style!==undefined)
-            style = override.style;
-        else
-            style = document.getElementById("prompterStyle").value;
-        if (override!==undefined && override.focusArea!==undefined)
-            focusArea = override.focusArea;
-        else
-            focusArea = document.getElementById("focus").value;
-        if (override!==undefined && override.speed!==undefined)
-            speed = override.speed;
-        else
-            speed = teleprompter.controls.slider[0].getValue();
-        if (override!==undefined && override.acceleration!==undefined)
-            acceleration = override.acceleration;
-        else
-            acceleration = teleprompter.controls.slider[1].getValue();
-        if (override!==undefined && override.fontSize!==undefined)
-            fontSize = override.fontSize;
-        else
-            fontSize = teleprompter.controls.slider[2].getValue();
-        if (override!==undefined && override.promptWidth!==undefined)
-            this.promptWidth = override.promptWidth;
-        else
-            this.promptWidth = teleprompter.controls.slider[3].getValue();
-        if (override!==undefined && override.timer!==undefined)
-            timer = override.timer;
-        else {
-            timer = document.getElementById("timerOn").checked;
-        }
-        if (override!==undefined && override.voice!==undefined)
-            voice = override.voice;
-        else
-            voice = false;
         // Merge all settings into one.
-        var settings = '{ "quickConfig": '+JSON.stringify(teleprompter.controls.quickConfig)+', "commandsMapping": '+JSON.stringify(teleprompter.commandsMapping.mapping)+', "data": {"primary":'+primary+',"secondary":'+secondary+',"prompterStyle":'+style+',"focusMode":'+focusArea+',"speed":'+speed+',"acceleration":'+acceleration+',"fontSize":'+fontSize+',"promptWidth":'+this.promptWidth+',"timer":'+timer+',"voice":'+voice+'}}',
-        session = '{ "html":"' + encodeURIComponent(this.htmldata) + '" }';
+        var session = '{ "html":"' + encodeURIComponent(this.htmldata) + '" }';
 
-        // Store data locally for prompter to use
-        dataManager.setItem("IFTeleprompterSettings", settings, 1);
         // If we use sessionStorage we wont be able to update the contents.
         dataManager.setItem("IFTeleprompterSession", session, 1);
-
-        teleprompter.controls.updateQuickConfig(teleprompter.controls.quickConfig);
     }
 
     restoreEditor(event) {
@@ -569,9 +513,9 @@ class Editor {
         this.updatePrompterData();
 
         // Determine whether to load "Primary".
-        this.instance[0] = (document.getElementById("primary").value > 0) ? true : false; 
+        this.instance[0] = (teleprompter.settings.primary > 0) ? true : false; 
         // Determine whether to load "Secondary".
-        this.instance[1] = (document.getElementById("secondary").value > 0) ? true : false; 
+        this.instance[1] = (teleprompter.settings.secondary > 0) ? true : false; 
         // Checks if is running on electron app...
         if (inElectron()) {
             // Check display availabillity.
@@ -822,56 +766,6 @@ class Editor {
         const prompt = document.getElementById("prompt");
         prompt.style.width = value+"vw";
         prompt.style.left = "calc("+(50-value/2)+"vw - 14px)";
-    }
-
-    loadLastUseSettings() {
-        // Get last used settings.
-        var settings = (lastSettings) => {
-            if (lastSettings!==undefined && lastSettings!==null) {
-                if (debug) console.log(lastSettings);
-                lastSettings = JSON.parse(lastSettings);
-                document.getElementById("primary").value = lastSettings.data.primary;
-                document.getElementById("secondary").value = lastSettings.data.secondary;
-                // document.getElementById("prompterStyle").value = lastSettings.data.prompterStyle;
-                document.getElementById("focus").value = lastSettings.data.focusMode;
-                // If no last used value, leave default values.
-                if (!isNaN(lastSettings.data.speed))
-                    teleprompter.controls.slider[0].setValue(lastSettings.data.speed);
-                else
-                    lastSettings.data.speed = slider[0].getValue();
-                if (!isNaN(lastSettings.data.acceleration))
-                    teleprompter.controls.slider[1].setValue(lastSettings.data.acceleration);
-                else
-                    lastSettings.data.acceleration = slider[1].getValue();
-                if (!isNaN(lastSettings.data.fontSize))
-                    teleprompter.controls.slider[2].setValue(lastSettings.data.fontSize);
-                else
-                    lastSettings.data.fontSize = slider[2].getValue();
-                if (!isNaN(lastSettings.data.promptWidth))
-                    teleprompter.controls.slider[3].setValue(lastSettings.data.promptWidth);
-                else
-                    lastSettings.data.promptWidth = slider[3].getValue();
-                document.getElementById("speedValue").textContent = parseFloat(Math.round(lastSettings.data.speed * 10) / 10).toFixed(1);
-                document.getElementById("accelerationValue").textContent = parseFloat(Math.round(lastSettings.data.acceleration * 100) / 100).toFixed(2);
-                document.getElementById("fontSizeValue").textContent = lastSettings.data.fontSize;
-                document.getElementById("promptWidthValue").textContent = lastSettings.data.promptWidth;
-                this.updateFont(lastSettings.data.fontSize);
-                this.updateWidth(lastSettings.data.promptWidth);
-                // Set timer value
-                document.getElementById("timerOn").checked = lastSettings.data.timer;
-                document.getElementById("timerOff").checked = !lastSettings.data.timer;
-                // Set voice value
-                // var voice = document.getElementById("voice")
-                // if (lastSettings.data.timer) {
-                //     voice.children[0].classList.toggle("btn-primary");
-                //     voice.children[0].classList.toggle("btn-default");
-                //     voice.children[0].classList.innerHTML("Active");
-                // }
-                teleprompter.controls.updateQuickConfig(lastSettings.quickConfig);
-                teleprompter.commandsMapping.mapping = lastSettings.commandsMapping;
-            }
-        };
-        dataManager.getItem("IFTeleprompterSettings", settings, 1);
     }
 
     isFunction(possibleFunction) {

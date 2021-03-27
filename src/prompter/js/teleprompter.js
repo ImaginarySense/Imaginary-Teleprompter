@@ -122,7 +122,7 @@ class Prompter {
         // Animation settings
         this.play = true;
         // Get focus mode
-        this.focus = this.settings.data.focusMode;
+        this.focus = teleprompter.settings.focusMode;
     
         this.timer = $('.clock').timer({
             stopVal: 10000,
@@ -133,13 +133,12 @@ class Prompter {
         this.setPromptHeight();
         
         // Get prompter style
-        this.promptStyleOption = this.settings.data.prompterStyle;
-        this.customStyle = { "background": this.settings.data.background, "color": this.settings.data.color, "overlayBg": this.settings.data.overlayBg };
+        this.promptStyleOption = teleprompter.settings.prompterStyle;
         // Get flip settings
         if (this.inIframe())
-            this.flip = this.settings.data.primary;
+            this.flip = teleprompter.settings.primary;
         else
-            this.flip = this.settings.data.secondary;
+            this.flip = teleprompter.settings.secondary;
         
         // Initialize flip values
         this.flipH = false;
@@ -293,16 +292,11 @@ class Prompter {
         }.bind(this));
     }
 
-    updateDatamanager() {
-        dataManager.getItem('IFTeleprompterSettings', function(data){
-            this.settings = JSON.parse(data);
-        }.bind(this), 1, false);
-        
+    updateDatamanager() {        
         dataManager.getItem('IFTeleprompterSession', function(data){
             this.session = JSON.parse(data);
         }.bind(this), 1, false);
         // Ensure content is being passed
-        // console.log("settings", this.settings);
         // console.log("session", this.session);
     }
 
@@ -317,10 +311,10 @@ class Prompter {
 
         var oldFontSize = this.fontSize,
             oldPromptWidth = this.promptWidth;
-        this.fontSize = this.settings.data.fontSize/100;
-        this.speedMultip = this.settings.data.speed;
-        this.sensitivity = this.settings.data.acceleration;
-        this.promptWidth = this.settings.data.promptWidth;
+        this.fontSize = teleprompter.settings.fontSize/100;
+        this.speedMultip = teleprompter.settings.speed;
+        this.sensitivity = teleprompter.settings.acceleration;
+        this.promptWidth = teleprompter.settings.promptWidth;
         // If updating font, update it and resync
         if (oldFontSize !== this.fontSize)
             this.updateFont();
@@ -337,7 +331,7 @@ class Prompter {
         this.updateVelocity();
         
         // Enable timer
-        if (this.settings.data.timer===true) {
+        if (teleprompter.settings.timer === "true") {
             if (this.timer.data().timer.currentVal===0)
             this.timer.startTimer();
             this.clock.style.opacity = '1';

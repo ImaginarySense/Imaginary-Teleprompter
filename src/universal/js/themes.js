@@ -98,11 +98,11 @@ class Themes {
         }
         
         this.defaultStyle = 1;
-        dataManager.getItem('IFTeleprompterThemeDefaultStyle',function(data){
-            if(JSON.parse(data) != undefined) {
-                this.defaultStyle = JSON.parse(data);
-            }
-        }.bind(this), 0, false);
+        if (!teleprompter.settings.prompterStyle) {
+            teleprompter.settings.prompterStyle = this.defaultStyle;
+        } else {
+            this.defaultStyle = teleprompter.settings.prompterStyle;
+        }
     
         ///Maybe will need a fix in the future...
         this.setStyle(this.defaultStyle);
@@ -129,7 +129,7 @@ class Themes {
 
     setDefaultStyle() {
         this.defaultStyle = this.themeStyles[this.lastStyleSelected]["id"];
-        dataManager.setItem("IFTeleprompterThemeDefaultStyle", this.defaultStyle);
+        teleprompter.settings.prompterStyle = this.defaultStyle;
         this.refreshAdminPromptStyles();
         this.refreshCurrentItem();
         this.saveStyles();

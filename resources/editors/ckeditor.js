@@ -5,7 +5,7 @@ loadScript('assets/ckeditor/ckeditor.js', () => {
     // Create editor
     CKEDITOR.inline( 'prompt', {
         // To enable source code editing in a dialog window, inline editors require the "sourcedialog" plugin.
-        extraPlugins: 'uploadimage,image2,sharedspace,sourcedialog',
+        extraPlugins: 'image2,sharedspace,sourcedialog', // uploadimage
         removePlugins: 'floatingspace,maximize,resize',
         sharedSpaces: {
         top: 'toolbar',

@@ -220,7 +220,9 @@ class CommandsMapping {
         }
 
         // Load settings
-        this.mapping = teleprompter.settings.commandsMapping ? teleprompter.settings.commandsMapping : {}
+        if (teleprompter.settings.commandsMapping) {
+            this.mapping = JSON.parse(teleprompter.settings.commandsMapping);
+        }
     }
 
     draw() {
@@ -289,7 +291,7 @@ class CommandsMapping {
                 }
 
                 if (this.mapping[key]) {
-                    this.mapping[key] = null;
+                    delete this.mapping[key];
                 }
 
                 this.mapping[nextKey] = action;
@@ -299,8 +301,6 @@ class CommandsMapping {
                 let keyName = nextKey.match(/[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+/g).join(' ');
                 e.target.innerHTML = keyName;
                 document.removeEventListener('keydown', pressKey);
-
-                // updatePrompterData();
             }.bind(this);
 
             button.addEventListener('focusout', (event) => {
