@@ -64,9 +64,13 @@
 			</tbody>
 		</table>
 	</div>
+	<!-- Fixes imported modules on Electron -->
+	<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 	<script src="assets/jquery/jquery.min.js"></script>
 	<script src="assets/jquery/jquery.timer.js"></script>
 	<script src="assets/PEP/pep.min.js"></script>
+	<script>if (window.module) {module = window.module;}</script>
+	<!-- Generated scripts will be load here -->
 	<script src="assets/custom/js/teleprompter-universal.js"></script>
 	<script src="assets/custom/js/teleprompter-prompter.js"></script>	
 </body>

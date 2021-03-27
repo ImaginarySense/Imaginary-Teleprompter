@@ -53,6 +53,16 @@ function hexc(orig) {
 function inElectron() {
     return navigator.userAgent.indexOf("Electron") !== -1;
 }
+
+// Global functions, to be accessed from Electron's main process.
+function enterDebug() {
+    teleprompter.editor.debug = true;
+    console.log("Entering debug mode.");
+}
+function exitDebug() {
+    teleprompter.editor.debug = false;
+    console.log("Leaving debug mode.");
+}
 /*
 	Imaginary Teleprompter
 	Copyright (C) 2015 Imaginary Sense Inc. and contributors

@@ -34,7 +34,7 @@ const transitionDelays = 500,
 class Prompter {
     constructor() {
         // Import Electron libraries.
-        if (inElectron() && !inIframe()) {
+        if (inElectron() && !this.inIframe()) {
             const electron = require('electron');
             this.remote = require('@electron/remote'); // Allow IPC with main process in Electron.
             this.ipcRenderer = electron.ipcRenderer;

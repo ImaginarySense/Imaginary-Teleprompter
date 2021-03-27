@@ -724,10 +724,16 @@
 		</div>
 	</div>
 </body>
+
+<!-- Fixes imported modules on Electron -->
+<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 <script src="assets/jquery/jquery.min.js"></script>
 <script src="assets/bootstrap/js/bootstrap.min.js"></script>
 <script src="assets/bootstrap-slider/js/bootstrap-slider.min.js"></script>
 <script src="assets/jscolor/jscolor.min.js"></script>
+<script>if (window.module) {module = window.module;}</script>
+
+<!-- Generated scripts will be load here -->
 <script src="assets/custom/js/teleprompter-universal.js"></script>
 <script src="assets/custom/js/teleprompter-editor.js"></script>
 <!--<script src="assets/jquery/js/jquery.qrcode.js"></script>-->

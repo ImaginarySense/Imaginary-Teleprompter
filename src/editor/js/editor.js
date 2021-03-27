@@ -36,7 +36,7 @@ class Editor {
         if (inElectron()){
             const electron = require('electron');
             this.remote = require('@electron/remote');  // Allows IPC with main process in Electron.
-            this.electronScreen = remote.screen; // Allows Smart Fullscreens in Electron.
+            this.electronScreen = this.remote.screen; // Allows Smart Fullscreens in Electron.
             this.ipcRenderer = electron.ipcRenderer;
         }
 
@@ -104,7 +104,6 @@ class Editor {
         // If running inside Electron...
         if (inElectron()) {
             var compare = require("deb-version-compare");
-            const remote = require('electron').remote;
 
             //Check, Update and Migrate Teleprompter Data
             dataManager.getItem("IFTeleprompterVersion", function(item) {
@@ -146,7 +145,7 @@ class Editor {
                 } 
             }, 0, 0);
             // When asynchronous reply from main process, run function to...
-            ipcRenderer.on('asynchronous-reply', function(event, arg) {
+            this.ipcRenderer.on('asynchronous-reply', function(event, arg) {
                 // Update Canvas
                 if (arg.option === "c") {
                     // Render picture as is
@@ -217,7 +216,7 @@ class Editor {
                 }
             });
             // Scan network for remote control.
-            ipcRenderer.send('asynchronous-message', 'prepareLinks');
+            this.ipcRenderer.send('asynchronous-message', 'prepareLinks');
             //ipcRenderer.send('asynchronous-message', 'network');
         } // end if
 
@@ -793,26 +792,11 @@ class Editor {
         }
     }
 
-    // Global functions, to be accessed from Electron's main process.
-    enterDebug() {
-        debug = true;
-        console.log("Entering debug mode.");
-        function updateFont() {
-            this.prompt.style.fontSize = fontSize+'em' ;
-            this.overlayFocus.style.fontSize = fontSize+'em' ;
-            this.onResize();
-        }
-    }
-    exitDebug() {
-        this.debug = false;
-        console.log("Leaving debug mode.");
-    }
-
     toggleDebugMode() {
         if (this.debug) 
-            this.exitDebug();
+            exitDebug();
         else
-            this.enterDebug();
+            enterDebug();
     }
 
 }
