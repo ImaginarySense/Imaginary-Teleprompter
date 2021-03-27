@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<!--
+	Imaginary Teleprompter
+	Copyright (C) 2015 Imaginary Sense Inc. and contributors
+
+	This file is part of Imaginary Teleprompter.
+
+	Imaginary Teleprompter is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	Imaginary Teleprompter is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with Imaginary Teleprompter.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Teleprompter Instance</title>
+	<link rel="icon" href="favicon.ico" type="image/x-icon">
+	<style type="text/css">
+html, body {
+	width:  100%;
+	height: 100%;
+	margin: 0px;
+}
+img {
+	width: 100%;
+	height: auto;
+}
+video {
+	bottom: 0;
+	position: fixed;
+	border-top-style: solid;
+	border-top-width: 2pt;
+	border-top-color: #000;
+}
+	</style>
+</head>
+<body>
+		<canvas id="canvas" width="480" height="360"></canvas>
+		<video autoplay width="100%" height="50%"></video> 
+</body>
+<script type="text/javascript">
+(function() {
+	// Use JavaScript Strict Mode.
+	"use strict";
+
+	// VARIABLES
+	// DOM Objects
+	var debug=true, canvas, ctx, promptImage, video,
+	// Global variables
+	prompt, stream, timeoutStatus, DOMURL;
+
+	// FUNCTIONS
+	// Main program
+	function init() {
+		// Get canvas.
+		canvas = document.getElementsByTagName("CANVAS")[0];
+		video = document.getElementsByTagName("VIDEO")[0];
+		if (canvas.getContext)
+			ctx = canvas.getContext('2d');
+		
+		// Get data to display in canvas.
+		var data = '<svg xmlns="http://www.w3.org/2000/svg" width="1366" height="1080" >' + /*width="480" height="360" viewBox="0 0 480 360" preserveAspectRatio="xMinYMax slice"*/
+          	'<foreignObject width="100%" height="100%">' +
+          	'<div xmlns="http://www.w3.org/1999/xhtml" style="font-size:12vw">' +
+          	'Welcome to ' + 
+          	'<span style="color:white; text-shadow:0 0 2px blue;">' +
+            'Teleprompter</span> by <em>Imaginary Sense</em>' +
+          	'Welcome to ' + 
+          	'<span style="color:white; text-shadow:0 0 2px blue;">' +
+            'Teleprompter</span> by <em>Imaginary Sense</em>' +
+          	'Welcome to ' + 
+          	'<span style="color:white; text-shadow:0 0 2px blue;">' +
+            'Teleprompter</span> by <em>Imaginary Sense</em>' +
+          	'Welcome to ' + 
+          	'<span style="color:white; text-shadow:0 0 2px blue;">' +
+            'Teleprompter</span> by <em>Imaginary Sense</em>' +
+          	'Welcome to ' + 
+          	'<span style="color:white; text-shadow:0 0 2px blue;">' +
+            'Teleprompter</span> by <em>Imaginary Sense</em>' +
+          	'Welcome to ' + 
+          	'<span style="color:white; text-shadow:0 0 2px blue;">' +
+            'Teleprompter</span> by <em>Imaginary Sense</em>' +
+          	'Welcome to ' + 
+          	'<span style="color:white; text-shadow:0 0 2px blue;">' +
+            'Teleprompter</span> by <em>Imaginary Sense</em>' +
+          	'Welcome to ' + 
+          	'<span style="color:white; text-shadow:0 0 2px blue;">' +
+            'Teleprompter</span> by <em>Imaginary Sense</em>' +
+          	'</div>' +
+          	'</foreignObject>' +
+          	'</svg>';
+		// Create canvas content's.
+		DOMURL = window.URL || window.webkitURL || window;
+		var promptImageContents = new Blob([data], {type: 'image/svg+xml'}),
+		promptImageURL = DOMURL.createObjectURL(promptImageContents);
+		promptImage = new Image();
+		//promptImage.style.backgroundColor;
+		// Set canvas up.
+		canvasResize();
+
+		// a few minutes later
+		timeout(2000, function() {
+			return 0;
+		});
+
+		// Begin prompting.
+		promptImage.onload = function () {
+			startPrompting();
+			startBroadcast();
+		}
+
+		promptImage.src = promptImageURL;
+		
+	}
+
+	// Operations to execute on window orientation change and resize.
+	function canvasResize() {
+		// Set canvas to window's size.
+		ctx.canvas.width  = window.innerWidth;
+		ctx.canvas.height = window.innerHeight/2;
+
+		// Update canvas contents.
+		updateAnimation();
+	}
+
+	function startPrompting() {
+		updateAnimation();
+	}
+
+	function updateAnimation() {
+		if (promptImage.src!=="")
+			animate();
+			//ctx.drawImage(promptImage, 0, 0);
+		//DOMURL.revokeObjectURL(promptImageURL);
+	}
+
+	function animate() {
+		var interval = setInterval(function() {
+			var x = 0, y = 0;
+
+			return function () {
+				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+				ctx.drawImage(promptImage, x, y);
+				//ctx.fillRect(x, y, 150, 300);
+
+				y -= 1;
+				if (y > ctx.canvas.height) {
+					y = 0;
+				}
+			};
+		}(), 1000/16.66666);
+	}
+
+	function startBroadcast() {
+		// Web RTC
+		stream = canvas.captureStream(29.97);
+		console.log(stream);
+		var source = DOMURL.createObjectURL(stream);
+		console.log(source);
+		video.src = source;
+	}
+
+	function timeout( time, func ) {
+		// If a timeout is already executing, reset it.
+		if (timeoutStatus)
+			window.clearTimeout(timeoutStatus);
+		// Set: Wait time second before resuming animation
+		timeoutStatus = window.setTimeout(func, time);
+	}
+
+	// EVENTS
+	// On window resize or orientation change, resize canvas.
+	window.addEventListener("resize", canvasResize, false);
+	window.addEventListener("orientationchange", canvasResize, false);
+
+	// START PROGRAM
+	// Initialize objects after DOM is loaded
+	if (document.readyState === "interactive" || document.readyState === "complete")
+		// Call init if the DOM (interactive) or document (complete) is ready.
+		init();
+	else
+		// Set init as a listener for the DOMContentLoaded event.
+		document.addEventListener("DOMContentLoaded", init);
+}());
+/*
+		REFERENCE CODE
+Draw HTML into canvas
+	https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Drawing_DOM_objects_into_a_canvas
+Animating images in HTML5 and canvas
+	http://stackoverflow.com/questions/9791904/animating-images-in-html5-and-canvas
+SVG Scaling
+	https://codepen.io/jonitrythall/post/preserveaspectratio-in-svg
+	https://css-tricks.com/scale-svg/
+RTC
+	https://github.com/webrtc/samples/blob/gh-pages/src/content/capture/canvas-pc/js/main.js
+	https://w3c.github.io/mediacapture-fromelement/
+https://cdn.rawgit.com/uysalere/js-demos/master/intro.html
+https://www.html5rocks.com/en/tutorials/streaming/screenshare/
+https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL
+https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/captureStream
+https://codepen.io/jonitrythall/post/preserveaspectratio-in-svg
+http://stackoverflow.com/questions/19484707/how-can-i-make-an-svg-scale-with-its-parent-container
+Alternative
+	https://github.com/rafaelw/mutation-summary
+*/
+</script>
+</html>

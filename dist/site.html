@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<!--
+	Imaginary Teleprompter
+	Copyright (C) 2017 Imaginary Sense Inc. and contributors
+
+	This file is part of Imaginary Teleprompter.
+
+	Imaginary Teleprompter is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	Imaginary Teleprompter is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with Imaginary Teleprompter.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<html>
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap-reboot.min.css" crossorigin="anonymous">
+	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css" crossorigin="anonymous">
+	<link rel="stylesheet" href="assets/custom/css/editor.css" crossorigin="anonymous">
+	<link rel="icon" href="assets/custom/img/logo_17_sm.png" type="image/png-icon">
+	<!-- <link rel="stylesheet" href="css/teleprompter.css" crossorigin="anonymous"> -->
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-12 col-lg-auto col-xl-8">
+				<nav class="navbar navbar-expand-md navbar-light bg-light">
+					<a class="navbar-brand" href="#">
+						<img src="assets/custom/img/logo_17_sm.png" width="30" height="30" class="d-inline-block align-top" alt="">
+						Imaginary <span class="d-none d-sm-inline">Teleprompter</span>	
+					</a>
+					<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">	
+						<span class="navbar-toggler-icon"></span>
+					</button>
+					<li><a id="advConfig" href="#content" data-toggle="collapse"><img style="width:26px;" src="assets/custom/fonts/noto-emoji-master/emoji_u2699.svg"></a></li>	
+					<div class="collapse navbar-collapse" id="navbarNavDropdown">
+						<ul class="navbar-nav">
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">File</a>
+								<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+									<a class="dropdown-item" href="#">New</a>
+									<a class="dropdown-item" href="#">Open</a>
+									<a class="dropdown-item" href="#">Recent document 1</a>
+									<a class="dropdown-item" href="#">Recent document 2</a>
+								</div>
+							</li>
+							<!-- <li class="nav-item">
+								<a class="nav-link" href="#">Insert</a>
+							</li> -->
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Remote</a>
+								<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+									<a class="dropdown-item" href="#">Scan for Bluetooth Remotes</a>
+									<a class="dropdown-item" href="#">Map Keys</a>
+								</div>
+							</li>
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Preferences</a>
+								<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+									<a class="dropdown-item" href="#">Custom Styles</a>
+									<a class="dropdown-item" href="#">Enable Saving Within Teleprompter</a>
+									<a class="dropdown-item disabled" href="#">Disable Saving Within Teleprompter</a>
+								</div>
+							</li>
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Help</a>
+								<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+									<a class="dropdown-item" href="#">Documentation</a>
+									<a class="dropdown-item" href="#">Changelog</a>
+									<a class="dropdown-item" href="#">GPL v3 License</a>
+									<div class="dropdown-divider"></div>
+									<a class="dropdown-item" target="_blank" href="http://imaginary.tech/">Visit Imaginary Sense's Website</a>
+									<a class="dropdown-item" target="_blank" href="http://imaginary.tech/teleprompter/">Visit Teleprompter's Website</a>
+									<div class="dropdown-divider"></div>
+									<a class="dropdown-item" href="#about">About Imaginary Teleprompter</a>
+									<a class="dropdown-item" href="#credits">Play Credits</a>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</nav>
+			</div>
+			<div class="col-lg-auto col-xl-4 mr-auto">
+				<ul class="nav mr-auto nav-tabs ml-auto tab-bottom" id="setupTabs" role="tablist">
+					<li class="nav-item">
+						<a class="nav-link" data-toggle="tab" role="tab" href="#settings" aria-controls="settings" aria-selected="false">S</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" data-toggle="tab" role="tab" href="#emojis" aria-controls="emojis" aria-selected="false">E</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" data-toggle="tab" role="tab" href="#images" aria-controls="images" aria-selected="false">I</a>
+					</li>
+					<li class="nav-item /*d-none*/">
+						<a class="nav-link" data-toggle="tab" role="tab" href="#update">
+							<span class="d-none d-sm-inline d-lg-none d-xl-inline">Update</span>
+							<span class="d-inline d-sm-none d-lg-inline d-xl-none">U</span>
+						</a>
+					</li>
+					<li class="nav-item active">
+						<a class="nav-link" data-toggle="tab" role="tab" href="#prompt">
+							<span class="d-none d-sm-inline d-lg-none d-xl-inline">Close</span>
+							<span class="d-inline d-sm-none d-lg-inline d-xl-none">C</span>
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-12">
+			
+		</div>
+	</div>
+	<script src="assets/jquery/jquery.slim.min.js" crossorigin="anonymous"></script>
+	<script src="assets/bootstrap/js/bootstrap.min.js" crossorigin="anonymous"></script>
+</body>
+</html>
