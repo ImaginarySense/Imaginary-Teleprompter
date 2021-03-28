@@ -114,8 +114,8 @@
 								<option value="4" title="Dissable touch to enable interaction with HTML contents.">Interactive mode (interact with HTML contents)</option>
 							</select>
 						</div>
-						<div class='col-md-3 col-sm-6' id="textAtFocusAreaQuick">
-							<label for="textAtFocusArea">Start prompt at</label>
+						<div class='col-md-3 col-sm-6 hidden' id="textAtFocusAreaQuick">
+							<label for="textAtFocusArea">Start prompting from</label>
 							<select class="form-control" id="textAtFocusArea" name="textAtFocusArea">
 								<option value="0" selected="selected">Beggining</option>
 								<option value="1">Focus area</option>
@@ -149,6 +149,13 @@
 								<label for="promptWidth" id="promptWidthValue">84</label><label for="promptWidth">%</label>
 							</small>
 							<input type="range" id="promptWidth" name="promptWidth" data-slider-value="84" data-slider-min="5" data-slider-max="100" data-slider-step="1" data-slider-ticks="[5,16,84,100]" data-slider-ticks-snap-bounds="0">
+						</div>
+						<div class='col-md-3 col-sm-6 hidden' id="focusAreaHeightQuick">
+							<small>
+								<label for="focusAreaHeight">Focus height:</label>
+								<label for="focusAreaHeight" id="focusAreaHeightValue">84</label><label for="focusAreaHeight">%</label>
+							</small>
+							<input type="range" id="focusAreaHeight" name="focusAreaHeight" data-slider-value="50" data-slider-min="5" data-slider-max="100" data-slider-step="1" data-slider-ticks="[5,20,50,80]" data-slider-ticks-snap-bounds="0">
 						</div>
 						<div class='col-md-2 col-sm-2' id="timerQuick">
 							<small>
@@ -534,7 +541,7 @@
 											<tr>
 												<th>
 													<div class="row">
-														<span style="padding: .375rem .75rem;">Start prompt at</span>
+														<span style="padding: .375rem .75rem;">Start prompting from</span>
 													</div>
 												</th>
 												<th>
@@ -637,6 +644,28 @@
 														<span class="input-group-text">Quick</span>
 														<div class="input-group-text">
 															<input class="form-check-input mt-0" type="checkbox" value="" id="promptWidthQuickConfig">
+														</div>
+													</div>
+												</th>
+											</tr>
+											<tr>
+												<th>
+													<div class="row">
+														<span style="padding: .375rem .75rem;">Focus height: <span id="focusAreaHeightControlValue">50</span>%</span>
+													</div>
+												</th>
+												<th>
+													<div class="row">
+														<div style="padding: .375rem .75rem;">
+															<input class="w-100" type="range" id="focusAreaHeightControl" name="focusAreaHeightControl" data-slider-value="50" data-slider-min="5" data-slider-max="100" data-slider-step="1" data-slider-ticks="[5,20,50,80]" data-slider-ticks-snap-bounds="0">
+														</div>
+													</div>
+												</th>
+												<th>
+													<div class="input-group">
+														<span class="input-group-text">Quick</span>
+														<div class="input-group-text">
+															<input class="form-check-input mt-0" type="checkbox" value="" id="focusAreaHeightQuickConfig">
 														</div>
 													</div>
 												</th>

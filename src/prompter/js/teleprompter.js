@@ -99,6 +99,8 @@ class Prompter {
         this.setScreenHeight();
         this.setScreenWidth();
         this.updateUnit();
+
+        this.setFocusAreaHeight();
         
         // Initialize domain for interprocess communication
         this.setDomain();
@@ -333,6 +335,14 @@ class Prompter {
             if (textAtFocusArea > 0) {
                 this.animate(0, -this.screenHeight + (offsetToFocusArea + -promptStartPosition));
             }
+        }
+    }
+
+    setFocusAreaHeight() {
+        if (teleprompter.settings.focusAreaHeight) {
+            this.overlayFocus.style.height = 3.6 * (teleprompter.settings.focusAreaHeight / 100) + 'em';
+        } else {
+            this.overlayFocus.style.height = '1.8em';
         }
     }
 

@@ -31,7 +31,8 @@ class Controls {
             'fontSize': 120,
             'promptWidth': 84,
             'timer': true,
-            'textAtFocusArea': 0
+            'textAtFocusArea': 0,
+            'focusAreaHeight': 50
         }
 
         // Defaults settings
@@ -44,7 +45,9 @@ class Controls {
             'accelerationQuick': false,
             'fontSizeQuick': true,
             'promptWidthQuick': true,
-            'timerQuick': true
+            'timerQuick': true,
+            'textAtFocusAreaQuick': false,
+            'focusAreaHeightQuick': false
         }
 
         this.setDefaultValues();
@@ -73,10 +76,12 @@ class Controls {
             new Slider("#acceleration", {}),
             new Slider("#fontSize", {}),
             new Slider("#promptWidth", {}),
+            new Slider("#focusAreaHeight", {}),
             new Slider("#speedControl", {}),
             new Slider("#accelerationControl", {}),
             new Slider("#fontSizeControl", {}),
-            new Slider("#promptWidthControl", {})
+            new Slider("#promptWidthControl", {}),
+            new Slider("#focusAreaHeightControl", {})
         ];
 
         // Data binding for advanced options
@@ -99,22 +104,30 @@ class Controls {
             teleprompter.editor.updateWidth(teleprompter.settings.promptWidth);
         });
         this.slider[4].on("change", function(input) {
+            teleprompter.settings.focusAreaHeight = input.newValue;
+            document.getElementById("focusAreaHeightValue").textContent = teleprompter.settings.focusAreaHeight;
+        });
+        this.slider[5].on("change", function(input) {
             teleprompter.settings.speed = parseFloat(Math.round(input.newValue * 10) / 10).toFixed(1);
             document.getElementById("speedControlValue").textContent = teleprompter.settings.speed;
         });
-        this.slider[5].on("change", function(input) {
+        this.slider[6].on("change", function(input) {
             teleprompter.settings.acceleration = parseFloat(Math.round(input.newValue * 100) / 100).toFixed(2);
             document.getElementById("accelerationControlValue").textContent = teleprompter.settings.acceleration;
         });
-        this.slider[6].on("change", function(input) {
+        this.slider[7].on("change", function(input) {
             teleprompter.settings.fontSize = input.newValue;
             document.getElementById("fontSizeControlValue").textContent = teleprompter.settings.fontSize;
             teleprompter.editor.updateFont(teleprompter.settings.fontSize);
         });
-        this.slider[7].on("change", function(input) {
+        this.slider[8].on("change", function(input) {
             teleprompter.settings.promptWidth = input.newValue;
             document.getElementById("promptWidthControlValue").textContent = teleprompter.settings.promptWidth;
             teleprompter.editor.updateWidth(teleprompter.settings.promptWidth);
+        });
+        this.slider[9].on("change", function(input) {
+            teleprompter.settings.focusAreaHeight = input.newValue;
+            document.getElementById("focusAreaHeightControlValue").textContent = teleprompter.settings.focusAreaHeight;
         });
 
         // Load last sliders setting
@@ -122,21 +135,23 @@ class Controls {
         this.setSliderValue(this.slider[1], teleprompter.settings.acceleration);
         this.setSliderValue(this.slider[2], teleprompter.settings.fontSize);
         this.setSliderValue(this.slider[3], teleprompter.settings.promptWidth);
-        this.setSliderValue(this.slider[4], teleprompter.settings.speed);
-        this.setSliderValue(this.slider[5], teleprompter.settings.acceleration);
-        this.setSliderValue(this.slider[6], teleprompter.settings.fontSize);
-        this.setSliderValue(this.slider[7], teleprompter.settings.promptWidth);
+        this.setSliderValue(this.slider[4], teleprompter.settings.focusAreaHeight);
+        this.setSliderValue(this.slider[5], teleprompter.settings.speed);
+        this.setSliderValue(this.slider[6], teleprompter.settings.acceleration);
+        this.setSliderValue(this.slider[7], teleprompter.settings.fontSize);
+        this.setSliderValue(this.slider[8], teleprompter.settings.promptWidth);
+        this.setSliderValue(this.slider[9], teleprompter.settings.focusAreaHeight);
 
-        var element, elements = [], elementValue;
+        var element, elements = [], sliderIndex = 0, sliderOffset = this.slider.length / 2, hasSlide = false;
         for (var key in this.controls) {
             element = document.getElementById(key);
-            var index = Object.keys(this.controls).indexOf(key);
             if (element && element.value) {
                 if (element.hasAttribute('data-slider-value')) {
-                    element.setAttribute('data-slider-id', index);
+                    element.setAttribute('data-slider-id', sliderIndex);
                     element.onchange = function(event) {
                         this.updateQuickSliderControl(event);
                     }.bind(this);
+                    hasSlide = true;
                 } else {
                     element.value = teleprompter.settings[key];
                     element.onchange = function(event) {
@@ -158,10 +173,11 @@ class Controls {
             element = document.getElementById(key + "Control");
             if (element) {
                 if (element.hasAttribute('data-slider-value')) {
-                    element.setAttribute('data-slider-id', index);
+                    element.setAttribute('data-slider-id', sliderIndex + sliderOffset);
                     element.onchange = function(event) {
                         this.updateSliderControl(event);
                     }.bind(this);
+                    hasSlide = true;
                 } else {
                     element.value = teleprompter.settings[key];
                     element.onchange = function(event) {
@@ -184,6 +200,11 @@ class Controls {
                 element.onchange = function(event) {
                     this.updateQuickControlConfig(event);
                 }.bind(this);
+            }
+            
+            if (hasSlide) {
+                hasSlide = false;
+                sliderIndex++;
             }
         }
         this.updateQuickConfig();
@@ -254,7 +275,7 @@ class Controls {
         }
         // Assuming the order is right
         var index = e.target.getAttribute('data-slider-id');
-        var slide = this.slider[parseInt(index) - 4];
+        var slide = this.slider[parseInt(index) - (this.slider.length/2)];
         slide.setValue(this.slider[parseInt(index)].getValue());
         slide._trigger('change', {
             newValue: this.slider[parseInt(index)].getValue()
@@ -271,8 +292,8 @@ class Controls {
         }
         // Assuming the order is right
         var index = e.target.getAttribute('data-slider-id');
-        var slide = this.slider[parseInt(index)];
-        slide.setValue(this.slider[parseInt(index) - 4].getValue());
+        var slide = this.slider[parseInt(index) + (this.slider.length/2)];
+        slide.setValue(this.slider[parseInt(index)].getValue());
         slide._trigger('change', {
             newValue: this.slider[parseInt(index)].getValue()
         });
