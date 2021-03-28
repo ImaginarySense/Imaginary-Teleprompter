@@ -1055,9 +1055,9 @@ class Prompter {
             this.stopAll();
     }
 
-    setVelocity(velocity) {
+    setSpeed(speed) {
         // Need validation
-        this.speedMultip = velocity;
+        this.speedMultip = speed;
         this.updateVelocity();
         this.resumeAnimation();
     }
@@ -1240,9 +1240,9 @@ class Prompter {
                     break;
                 // Custom commands with options
                 // Velocity option
-                // case 21:
-                //     this.setVelocity(message.data);
-                //     break;
+                case 21:
+                    this.setSpeed(message.data);
+                    break;
                 default :
                     // Notify unknown message received.
                     if (this.debug) console.log("Unknown post message received: "+message.request) && false;
@@ -1267,8 +1267,12 @@ class Prompter {
 
     commandsListener (event) {
         var mapping = teleprompter.commandsMapping.mapping;
-        if (mapping[event.code]) {
-            teleprompter.commandsMapping.actions[mapping[event.code]]["method"]();
+        if (mapping[event.code] && mapping[event.code]["command"]) {
+            if (mapping[event.code]["data"]) {
+                teleprompter.commandsMapping.customActions[mapping[event.code]["command"]]["method"](mapping[event.code]["data"]);
+            } else {
+                teleprompter.commandsMapping.actions[mapping[event.code]["command"]]["method"]();
+            }
         } else if (event.key) {
             var key;
             // If key is not a string

@@ -52,22 +52,54 @@ class CommandsMapping {
 
         // Commands Mapping
         this.mapping = {
-            "ArrowDown": "incVelocity",
-            "ArrowUp": "decVelocity",
-            "ArrowRight": "incFont",
-            "ArrowLeft": "decFont",
-            "Space": "togglePlay",
-            "Period": "sync",
-            "Backspace": "resetTimer",
-            "Home": "previousAnchor",
-            "End": "nextAnchor",
-            "PageDown": "fastForward",
-            "PageUp": "rewind",
-            "F6": "clearAllRequest",
-            "F5": "refresh",
-            "F8": "togglePrompter",
-            "F10": "toggleDebug",
-            "F11": "toggleFullscreen"
+            "ArrowDown": {
+                command: "incVelocity",
+            },
+            "ArrowUp": {
+                command: "decVelocity",
+            },
+            "ArrowRight": {
+                command: "incFont",
+            },
+            "ArrowLeft": {
+                command: "decFont",
+            },
+            "Space": {
+                command: "togglePlay",
+            },
+            "Period": {
+                command: "sync",
+            },
+            "Backspace": {
+                command: "resetTimer",
+            },
+            "Home": {
+                command: "previousAnchor",
+            },
+            "End": {
+                command: "nextAnchor",
+            },
+            "PageDown": {
+                command: "fastForward",
+            },
+            "PageUp": {
+                command: "rewind",
+            },
+            "F6": {
+                command: "clearAllRequest",
+            },
+            "F5": {
+                command: "refresh",
+            },
+            "F8": {
+                command: "togglePrompter",
+            },
+            "F10": {
+                command: "toggleDebug",
+            },
+            "F11": {
+                command: "toggleFullscreen",
+            }
         }
 
         // Prompter actions
@@ -215,133 +247,182 @@ class CommandsMapping {
                     this.instance.toggleDebug();
                 }.bind(this)
             },
-            // Custom commands with options
-            // "customVelocity1": {
-            //     "name": "Custom Velocity",
-            //     "method": function() {
-            //         this.instance.listener({
-            //             data: {
-            //                 request: 21,
-            //                 data: 20
-            //             }
-            //         });
-            //     }.bind(this)
-            // },
+        }
+
+        // Custom commands with options
+        this.customActions = {
+            "customSpeed": {
+                "name": "Custom Speed",
+                "method": function(speed) {
+                    this.instance.listener({
+                        data: {
+                            request: 21,
+                            data: speed
+                        }
+                    });
+                }.bind(this)
+            },
         }
 
         // Load settings
         if (teleprompter.settings.commandsMapping) {
             this.mapping = JSON.parse(teleprompter.settings.commandsMapping);
         }
+
+        this.userActions = [
+            {
+                "name": "Speed 20",
+                "value": 20,
+                "action": "customSpeed"
+            }
+        ];
+        if (teleprompter.settings.userActions) {
+            this.userActions = JSON.parse(teleprompter.settings.userActions);
+        }
+    }
+
+    get table() {
+        return document.getElementById("v-pills-commandsMappingContent");
     }
 
     draw() {
-        var table = document.getElementById("v-pills-commandsMappingContent");
+        // Removing all previous elements
+        while (this.table.firstChild) {
+            this.table.removeChild(this.table.lastChild);
+        }
+
+        // Add system actions
+        this.createSystemCommandsMappingButtons();
+
+        // Add user custom actions
+        // this.createUserCommandsMappingButtons();
+    }
+
+    createSystemCommandsMappingButtons () {
         var keys = Object.keys(this.actions);
         for (var i = 0; i < keys.length; i++) {
-            var tr = document.createElement("tr");
-            var th = document.createElement("th");
-            th.classList = "col-6";
-
-            var div = document.createElement("div");
-            div.classList = "row text-center";
-
-            var span = document.createElement("span");
-            span.style = "padding: .375rem .75rem;";
-            span.innerHTML = this.actions[keys[i]]["name"];
-
-            div.appendChild(span);
-            th.appendChild(div);
-            tr.appendChild(th);
-
-            th = document.createElement("th");
-            th.classList = "col-6";
-
-            div = document.createElement("div");
-            div.classList = "row justify-content-center";
-
-            var col = document.createElement("div");
-            col.classList = "col-6 text-center";
-
-            var button = document.createElement("button");
-            button.classList = "btn btn-outline-primary w-100";
-            button.type = "button";
-            button.id = "getKey";
-
-            button.setAttribute("data-action", keys[i]);
-
-            for (var key in this.mapping) {
-                if (this.mapping.hasOwnProperty(key)) {
-                    if (this.mapping[key] === keys[i]) {
-                        button.setAttribute("data-key", key);
-                        let keyName = key.match(/[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+/g).join(' ');
-                        button.innerHTML = keyName
-                        break;
-                    }
-                }
-            }
-
-            if (button.innerHTML === "") {
-                button.innerHTML = "None";
-                button.setAttribute("data-key", 'none');
-            }
-
-            var pressKey = function(e){
-                var key = e.target.getAttribute("data-key");
-                console.log("key", key);
-                var action = e.target.getAttribute("data-action");
-                console.log("action", action);
-                var nextKey = e.code;
-                if (this.mapping[e.code] && this.mapping[e.code] !== action) {
-                    console.log("Already on another action");
-                    e.target.classList = "btn btn-outline-danger w-100 commandsButtonTransition";
-                    setInterval(function() {
-                        e.target.classList = "btn btn-outline-primary w-100";
-                        e.target.style = "";
-                    }, 500);
-                    nextKey = key;
-                }
-
-                if (this.mapping[key]) {
-                    delete this.mapping[key];
-                }
-
-                console.log("nextKey", nextKey);
-                this.mapping[nextKey] = action;
-                teleprompter.settings.commandsMapping = JSON.stringify(this.mapping);
-                e.target.setAttribute("data-key", nextKey);
-
-                let keyName = nextKey.match(/[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+/g).join(' ');
-                e.target.innerHTML = keyName;
-                table.onkeyup = null;
-            }.bind(this);
-
-            button.addEventListener('focusout', (event) => {
-                var key = event.target.getAttribute("data-key");
-                let keyName = key.match(/[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+/g).join(' ');
-                event.target.innerHTML = keyName;
-                table.onkeyup = null;
-            });
-
-            button.onclick = function(event) {
-                event.preventDefault();
-                event.target.focus();
-                event.target.innerHTML = "Press any key";  
-                table.onkeyup = function(e) {
-                    e.preventDefault();
-                    pressKey({
-                        target: event.target,
-                        code: e.code
-                    });
-                }.bind(this);
-            }.bind(this);
-            
-            col.appendChild(button);
-            div.appendChild(col);
-            th.appendChild(div);
-            tr.appendChild(th);
-
-            table.appendChild(tr);
+            this.createCommandMappingButton(keys[i], this.actions[keys[i]]);
         }
     }
+
+    createUserCommandsMappingButtons () {
+        for (var i = 0; i < this.userActions.length; i++) {
+            this.createCommandMappingButton(this.userActions[i]['action'], this.userActions[i]);
+        }
+    }
+
+    createCommandMappingButton(action_key, action) {
+        var tr = document.createElement("tr");
+        var th = document.createElement("th");
+        th.classList = "col-6";
+
+        var div = document.createElement("div");
+        div.classList = "row text-center";
+
+        var span = document.createElement("span");
+        span.style = "padding: .375rem .75rem;";
+        span.innerHTML = action["name"];
+
+        div.appendChild(span);
+        th.appendChild(div);
+        tr.appendChild(th);
+
+        th = document.createElement("th");
+        th.classList = "col-6";
+
+        div = document.createElement("div");
+        div.classList = "row justify-content-center";
+
+        var col = document.createElement("div");
+        col.classList = "col-6 text-center";
+
+        var button = document.createElement("button");
+        button.classList = "btn btn-outline-primary w-100";
+        button.type = "button";
+        button.id = "getKey";
+
+        button.setAttribute("data-action", action_key);
+
+        for (var key in this.mapping) {
+            if (this.mapping.hasOwnProperty(key)) {
+                if (this.mapping[key] && this.mapping[key]['command'] === action_key) {
+                    button.setAttribute("data-key", key);
+                    let keyName = key.match(/[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+/g).join(' ');
+                    button.innerHTML = keyName
+                    break;
+                }
+            }
+        }
+
+        if (button.innerHTML === "") {
+            button.innerHTML = "None";
+            button.setAttribute("data-key", 'none');
+        }
+
+        var pressKey = function(e){
+            var key = e.target.getAttribute("data-key");
+            var current_action = e.target.getAttribute("data-action");
+            var nextKey = e.code;
+            if (this.mapping[e.code] && this.mapping[e.code] !== current_action) {
+                console.log("Already on another action");
+                e.target.classList = "btn btn-outline-danger w-100 commandsButtonTransition";
+                setInterval(function() {
+                    e.target.classList = "btn btn-outline-primary w-100";
+                    e.target.style = "";
+                }, 500);
+                nextKey = key;
+            }
+
+            if (this.mapping[key]) {
+                delete this.mapping[key];
+            }
+
+            if (action['value']) {
+                this.mapping[nextKey] = {
+                    command: current_action,
+                    data: action['value']
+                };
+            } else {
+                this.mapping[nextKey] = {
+                    command: current_action
+                };
+            }
+            
+
+            teleprompter.settings.commandsMapping = JSON.stringify(this.mapping);
+            e.target.setAttribute("data-key", nextKey);
+
+            let keyName = nextKey.match(/[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+/g).join(' ');
+            e.target.innerHTML = keyName;
+            this.table.onkeyup = null;
+        }.bind(this);
+
+        button.addEventListener('focusout', (event) => {
+            var key = event.target.getAttribute("data-key");
+            let keyName = key.match(/[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+/g).join(' ');
+            event.target.innerHTML = keyName;
+            this.table.onkeyup = null;
+        });
+
+        button.onclick = function(event) {
+            event.preventDefault();
+            event.target.focus();
+            event.target.innerHTML = "Press any key";  
+            this.table.onkeyup = function(e) {
+                e.preventDefault();
+                pressKey({
+                    target: event.target,
+                    code: e.code
+                });
+            }.bind(this);
+        }.bind(this);
+        
+        col.appendChild(button);
+        div.appendChild(col);
+        th.appendChild(div);
+        tr.appendChild(th);
+
+        this.table.appendChild(tr);
+    }
+
 }

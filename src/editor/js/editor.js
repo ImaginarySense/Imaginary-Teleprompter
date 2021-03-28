@@ -722,8 +722,12 @@ class Editor {
             return;
         }
         var mapping = teleprompter.commandsMapping.mapping;
-        if (mapping[event.code]) {
-            teleprompter.commandsMapping.actions[mapping[event.code]]["method"]();
+        if (mapping[event.code] && mapping[event.code]["command"]) {
+            if (mapping[event.code]["data"]) {
+                teleprompter.commandsMapping.customActions[mapping[event.code]["command"]]["method"]();
+            } else {
+                teleprompter.commandsMapping.actions[mapping[event.code]["command"]]["method"]();
+            }
         } else if (event.key) {
             var key;
             // If key is not a string
