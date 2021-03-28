@@ -236,6 +236,17 @@ class Editor {
         // Initialize commands mapping editor
         teleprompter.commandsMapping.draw();
 
+        var promptcontainer = document.getElementById("promptcontainer");
+        promptcontainer.onscroll = function(event) {
+            teleprompter.settings.promptStartPosition = event.target.scrollTop;
+        }
+        if (teleprompter.settings.promptStartPosition) {
+            promptcontainer.scrollTop = teleprompter.settings.promptStartPosition;
+        } else {
+            teleprompter.settings.promptStartPosition = 0;
+        }
+        
+
         // Maybe we need to move the listener to prompter
         // Initialize postMessage event listener.
         addEventListener("message", function(event) {
@@ -497,6 +508,7 @@ class Editor {
                 event.preventDefault();
             this.togglePromptIt();
         }
+        promptcontainer.scrollTop = teleprompter.settings.promptStartPosition;
     }
 
     // On "Prompt It!" clicked

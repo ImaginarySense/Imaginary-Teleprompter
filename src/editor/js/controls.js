@@ -30,7 +30,8 @@ class Controls {
             'acceleration': 1.45,
             'fontSize': 120,
             'promptWidth': 84,
-            'timer': true
+            'timer': true,
+            'textAtFocusArea': 0
         }
 
         // Defaults settings

@@ -122,7 +122,7 @@ class Prompter {
         // Animation settings
         this.play = true;
         // Get focus mode
-        this.focus = teleprompter.settings.focusMode;
+        this.focus = parseInt(teleprompter.settings.focus);
     
         this.timer = $('.clock').timer({
             stopVal: 10000,
@@ -136,9 +136,9 @@ class Prompter {
         this.promptStyleOption = teleprompter.settings.prompterStyle;
         // Get flip settings
         if (this.inIframe())
-            this.flip = teleprompter.settings.primary;
+            this.flip = parseInt(teleprompter.settings.primary);
         else
-            this.flip = teleprompter.settings.secondary;
+            this.flip = parseInt(teleprompter.settings.secondary);
         
         // Initialize flip values
         this.flipH = false;
@@ -203,15 +203,25 @@ class Prompter {
         touchOverlay.addEventListener("pointermove", function(event) {
             this.pointerMove(event);
         }.bind(this));
+
+        
+        
+        // // For visual purpose
+        this.startPrompterAt();
+        // console.log(values)
+        // console.log(this.screenHeight);
+        // console.log(this.screenHeight - values.y);
     
         // Wait a moment to prevent possible asynchronic CSS issues.
         window.setTimeout(function() {
             this.setScreenHeight();
             this.setPromptHeight();
             // If flipped vertically, set start at inverted top.
-            if (this.flipV) {
-                this.animate(0,-this.promptHeight+this.screenHeight);
-            }
+            // also start point
+            this.startPrompterAt();
+            // if (this.flipV) {
+            //     this.animate(0, -this.promptHeight+this.screenHeight);
+            // }
     
             // Save current screen position related settings for when resize and screen rotation ocurrs.
             this.previousPromptHeight = this.promptHeight;
@@ -221,18 +231,28 @@ class Prompter {
             // Sync prompter positions to smallest at start.
             this.syncPrompters();
     
-            window.setTimeout( function() {
+            // window.setTimeout( function() {
                 // Begin animation at i speed.
                 for (var i=0; i<2; i++)
                     this.increaseVelocity();
                 this.instaSync();
-            }.bind(this), transitionDelays*4.2);
+            // }.bind(this), transitionDelays*4.2);
             
         }.bind(this), 750);
 
         // On close
         window.addEventListener("beforeunload", function() {
-            this.restoreRequest()
+            var textAtFocusArea = parseInt(teleprompter.settings.textAtFocusArea);
+            if (textAtFocusArea > 1) {
+                var offsetToFocusArea = this.overlayFocus.getBoundingClientRect().top,
+                    promptValues = this.getTranslateValues(this.prompt);
+                
+                teleprompter.settings.promptStartPosition = -(promptValues.y - offsetToFocusArea + this.screenHeight);
+
+            } else {
+                teleprompter.settings.promptStartPosition = 0;
+            }
+            this.restoreRequest();
         }.bind(this));
 
         document.addEventListener( 'transitionend', function() {
@@ -290,6 +310,30 @@ class Prompter {
         document.addEventListener('keydown', function(event) {
             this.commandsListener(event);
         }.bind(this));
+    }
+
+    startPrompterAt() {
+        // Calculate where to start
+        var offsetToFocusArea = 0,
+            promptStartPosition = 0,
+            textAtFocusArea = parseInt(teleprompter.settings.textAtFocusArea);
+
+        if (textAtFocusArea > 0) {
+            offsetToFocusArea = this.overlayFocus.getBoundingClientRect().bottom;
+        }
+
+        if (textAtFocusArea > 1) {
+            promptStartPosition = teleprompter.settings.promptStartPosition;
+        }
+    
+        // If flipped vertically, set start at inverted top.
+        if (this.flipV) {
+            this.animate(0, -this.promptHeight+this.screenHeight + (offsetToFocusArea + -promptStartPosition));
+        } else {
+            if (textAtFocusArea > 0) {
+                this.animate(0, -this.screenHeight + (offsetToFocusArea + -promptStartPosition));
+            }
+        }
     }
 
     updateDatamanager() {        
@@ -1247,6 +1291,45 @@ class Prompter {
             return true;
         }
     }
+
+    getTranslateValues (element) {
+        const style = window.getComputedStyle(element)
+        const matrix = style['transform'] || style.webkitTransform || style.mozTransform
+      
+        // No transform property. Simply return 0 values.
+        if (matrix === 'none' || typeof matrix === 'undefined') {
+          return {
+            x: 0,
+            y: 0,
+            z: 0
+          }
+        }
+      
+        // Can either be 2d or 3d transform
+        const matrixType = matrix.includes('3d') ? '3d' : '2d'
+        const matrixValues = matrix.match(/matrix.*\((.+)\)/)[1].split(', ')
+      
+        // 2d matrices have 6 values
+        // Last 2 values are X and Y.
+        // 2d matrices does not have Z value.
+        if (matrixType === '2d') {
+          return {
+            x: matrixValues[4],
+            y: matrixValues[5],
+            z: 0
+          }
+        }
+      
+        // 3d matrices have 16 values
+        // The 13th, 14th, and 15th values are X, Y, and Z
+        if (matrixType === '3d') {
+          return {
+            x: matrixValues[12],
+            y: matrixValues[13],
+            z: matrixValues[14]
+          }
+        }
+      }
 }
 
 teleprompter.prompter = new Prompter()

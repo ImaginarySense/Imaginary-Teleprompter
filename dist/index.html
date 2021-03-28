@@ -114,6 +114,14 @@
 								<option value="4" title="Dissable touch to enable interaction with HTML contents.">Interactive mode (interact with HTML contents)</option>
 							</select>
 						</div>
+						<div class='col-md-3 col-sm-6' id="textAtFocusAreaQuick">
+							<label for="textAtFocusArea">Start prompt at</label>
+							<select class="form-control" id="textAtFocusArea" name="textAtFocusArea">
+								<option value="0" selected="selected">Beggining</option>
+								<option value="1">Focus area</option>
+								<option value="2">Last state</option>
+							</select>
+						</div>
 						<div class='col-md-3 col-sm-6' id="speedQuick">
 							<small>
 								<label for="speed">Speed:</label>
@@ -519,6 +527,28 @@
 														<span class="input-group-text">Quick</span>
 														<div class="input-group-text">
 															<input class="form-check-input mt-0" type="checkbox" value="" id="focusQuickConfig">
+														</div>
+													</div>
+												</th>
+											</tr>
+											<tr>
+												<th>
+													<div class="row">
+														<span style="padding: .375rem .75rem;">Start prompt at</span>
+													</div>
+												</th>
+												<th>
+													<select class="form-control" id="textAtFocusAreaControl" name="textAtFocusAreaControl">
+														<option value="0" selected="selected">Beggining</option>
+														<option value="1">Focus area</option>
+														<option value="2">Last state</option>
+													</select>
+												</th>
+												<th>
+													<div class="input-group">
+														<span class="input-group-text">Quick</span>
+														<div class="input-group-text">
+															<input class="form-check-input mt-0" type="checkbox" value="" id="textAtFocusAreaQuickConfig">
 														</div>
 													</div>
 												</th>
