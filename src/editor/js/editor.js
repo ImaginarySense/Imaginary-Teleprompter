@@ -715,8 +715,9 @@ class Editor {
         }
     }
 
+    // This need to be 
     commandsListener (event) {
-        // Temporal Solution, until descomposition
+        // Temporal Solution, until advanced descomposition
         if (event.target.hasAttribute("data-key")) {
             return;
         }

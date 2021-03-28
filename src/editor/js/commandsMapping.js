@@ -186,20 +186,19 @@ class CommandsMapping {
                 "name": "Clear All Request",
                 "method": function() {
                     this.instance.clearAllRequest();
-                }
+                }.bind(this)
             },
             "togglePrompter": {
                 "name": "Toggle Prompter",
                 "method": function() {
                     this.instance.togglePrompter();
-                }
+                }.bind(this)
             },
             "toggleFullscreen": {
                 "name": "Toggle Fullscreen",
-                "method": function(event) {
-                    event.preventDefault();
+                "method": function() {
                     this.instance.toggleFullscreen();
-                }
+                }.bind(this)
             },
             "refresh": {
                 "name": "Refresh Screen",
@@ -208,15 +207,26 @@ class CommandsMapping {
                         this.instance.refresh();
                     else
                         console.log("Debug mode must be active to use 'F5' refresh in Electron. 'F10' enters and leaves debug mode.");
-                }
+                }.bind(this)
             },
             "toggleDebug": {
                 "name": "Toggle Debug",
                 "method": function() {
                     this.instance.toggleDebug();
-                }
+                }.bind(this)
             },
-    
+            // Custom commands with options
+            // "customVelocity1": {
+            //     "name": "Custom Velocity",
+            //     "method": function() {
+            //         this.instance.listener({
+            //             data: {
+            //                 request: 21,
+            //                 data: 20
+            //             }
+            //         });
+            //     }.bind(this)
+            // },
         }
 
         // Load settings
@@ -278,7 +288,9 @@ class CommandsMapping {
 
             var pressKey = function(e){
                 var key = e.target.getAttribute("data-key");
+                console.log("key", key);
                 var action = e.target.getAttribute("data-action");
+                console.log("action", action);
                 var nextKey = e.code;
                 if (this.mapping[e.code] && this.mapping[e.code] !== action) {
                     console.log("Already on another action");
@@ -294,34 +306,35 @@ class CommandsMapping {
                     delete this.mapping[key];
                 }
 
+                console.log("nextKey", nextKey);
                 this.mapping[nextKey] = action;
                 teleprompter.settings.commandsMapping = JSON.stringify(this.mapping);
                 e.target.setAttribute("data-key", nextKey);
 
                 let keyName = nextKey.match(/[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+/g).join(' ');
                 e.target.innerHTML = keyName;
-                document.removeEventListener('keydown', pressKey);
+                table.onkeyup = null;
             }.bind(this);
 
             button.addEventListener('focusout', (event) => {
                 var key = event.target.getAttribute("data-key");
                 let keyName = key.match(/[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+/g).join(' ');
                 event.target.innerHTML = keyName;
-                document.removeEventListener('keydown', pressKey);
+                table.onkeyup = null;
             });
 
-            button.onclick  = function(event) {
+            button.onclick = function(event) {
                 event.preventDefault();
                 event.target.focus();
                 event.target.innerHTML = "Press any key";  
-                document.addEventListener('keydown', (e) => {
+                table.onkeyup = function(e) {
                     e.preventDefault();
                     pressKey({
                         target: event.target,
                         code: e.code
                     });
-                });
-            }
+                }.bind(this);
+            }.bind(this);
             
             col.appendChild(button);
             div.appendChild(col);

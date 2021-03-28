@@ -985,6 +985,12 @@ class Prompter {
         this.updateFont();
     }
 
+    setFontSize(size) {
+        // Need validation 
+        this.fontSize = size;
+        this.updateFont();
+    }
+
     updateFont() {
         this.prompt.style.fontSize = this.fontSize + 'em';
         this.overlayFocus.style.fontSize = this.fontSize + 'em';
@@ -1047,6 +1053,13 @@ class Prompter {
         }
         else
             this.stopAll();
+    }
+
+    setVelocity(velocity) {
+        // Need validation
+        this.speedMultip = velocity;
+        this.updateVelocity();
+        this.resumeAnimation();
     }
 
     toggleAnimation() {
@@ -1225,6 +1238,11 @@ class Prompter {
                 case command.rewind :
                     this.internalRewind();
                     break;
+                // Custom commands with options
+                // Velocity option
+                // case 21:
+                //     this.setVelocity(message.data);
+                //     break;
                 default :
                     // Notify unknown message received.
                     if (this.debug) console.log("Unknown post message received: "+message.request) && false;
