@@ -36,7 +36,7 @@ gulp.task('prompter:css', function() {
 gulp.task('prompter:js', function() {
     return gulp.src(['./src/editor/js/commandsMapping.js', './src/prompter/js/*.js'])
         .pipe(concat('teleprompter-prompter.js'))
-        // .pipe(uglify().on('error', ()=>{}))
+        .pipe(uglify().on('error', ()=>{}))
         .pipe(gulp.dest('./dist/assets/custom/js'));
 });
 

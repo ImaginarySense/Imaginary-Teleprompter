@@ -400,7 +400,6 @@ class Editor {
             if (this.instance[0]) {
                 document.getElementById("content").style.display = "none";
                 document.getElementById("editorcontainer").style.display = "none";
-                document.getElementById("footer").style.display = "none";
                 // Show prompter instance
                 document.getElementById("framecontainer").style.display = "block";
                 if (this.instance[1] && this.syncMethod === this.syncMethods.canvas) {
@@ -426,7 +425,6 @@ class Editor {
             if (this.instance[0]) {
                 document.getElementById("content").style.display = "";
                 document.getElementById("editorcontainer").style.display = "";
-                document.getElementById("footer").style.display = "";
                 // Hide prompter frame
                 document.getElementById("framecontainer").style.display = "none";
                 if (this.instance[1] && this.syncMethod === this.syncMethods.canvas)
