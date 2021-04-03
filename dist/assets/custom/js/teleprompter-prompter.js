@@ -51,7 +51,7 @@ class CommandsMapping {
         });
 
         // Commands Mapping
-        this.mapping = {
+        this.defaultsMapping = {
             "ArrowDown": {
                 command: "incVelocity",
             },
@@ -101,6 +101,7 @@ class CommandsMapping {
                 command: "toggleFullscreen",
             }
         }
+        this.mapping = { ...this.defaultsMapping };
 
         // Prompter actions
         this.actions = {
@@ -296,6 +297,38 @@ class CommandsMapping {
 
         // Add user custom actions
         // this.createUserCommandsMappingButtons();
+        
+        // Add reset defaults commands settings
+        this.createResetButton();
+    }
+
+    resetDefaultsSettings() {
+        console.log(this.defaultsMapping);
+        this.mapping = { ...this.defaultsMapping }
+        teleprompter.settings.commandsMapping = JSON.stringify(this.mapping);
+    }
+
+    createResetButton() {
+        var tr = document.createElement("tr");
+        var th = document.createElement("th");
+        th.colSpan = 2;
+        th.classList = "text-center";
+
+        var button = document.createElement("button");
+        button.type = "button";
+        button.classList = "btn btn-danger";
+        button.innerHTML = "Reset to defaults";
+        button.onclick = function(event) {
+            console.log("Clicked");
+            event.preventDefault();
+            this.resetDefaultsSettings();
+            this.draw();
+        }.bind(this);
+
+        th.appendChild(button);
+        tr.appendChild(th);
+
+        this.table.appendChild(tr);
     }
 
     createSystemCommandsMappingButtons () {
