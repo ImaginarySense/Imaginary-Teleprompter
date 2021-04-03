@@ -95,9 +95,6 @@ class Editor {
         // Set initial configuration to prompter style
         teleprompter.themes.styleInit(document.getElementById("prompterStyle"));
 
-        // Set credits button
-        document.getElementById("credits-link").onclick = this.credits;
-
         // Set domain to current domain.
         this.setDomain();
 

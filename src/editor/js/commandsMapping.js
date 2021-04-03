@@ -251,17 +251,17 @@ class CommandsMapping {
 
         // Custom commands with options
         this.customActions = {
-            "customSpeed": {
-                "name": "Custom Speed",
-                "method": function(speed) {
-                    this.instance.listener({
-                        data: {
-                            request: 21,
-                            data: speed
-                        }
-                    });
-                }.bind(this)
-            },
+            // "customSpeed": {
+            //     "name": "Custom Speed",
+            //     "method": function(speed) {
+            //         this.instance.listener({
+            //             data: {
+            //                 request: 21,
+            //                 data: speed
+            //             }
+            //         });
+            //     }.bind(this)
+            // },
         }
 
         // Load settings
@@ -270,11 +270,11 @@ class CommandsMapping {
         }
 
         this.userActions = [
-            {
-                "name": "Speed 20",
-                "value": 20,
-                "action": "customSpeed"
-            }
+            // {
+            //     "name": "Speed 20",
+            //     "value": 20,
+            //     "action": "customSpeed"
+            // }
         ];
         if (teleprompter.settings.userActions) {
             this.userActions = JSON.parse(teleprompter.settings.userActions);

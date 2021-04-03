@@ -1361,7 +1361,7 @@ class Prompter {
             z: matrixValues[14]
           }
         }
-      }
+    }
 }
 
 teleprompter.prompter = new Prompter()
@@ -1376,3 +1376,83 @@ else
         teleprompter.prompter.init();
     }.bind(this));
 
+// var haveEvents = 'ongamepadconnected' in window;
+// var controllers = {};
+
+// function connecthandler(e) {
+//     addgamepad(e.gamepad);
+// }
+
+// function addgamepad(gamepad) {
+//     controllers[gamepad.index] = gamepad;
+//     console.log("Controller Connected")
+//     requestAnimationFrame(updateStatus);
+// }
+
+// function disconnecthandler(e) {
+//     removegamepad(e.gamepad);
+//     console.log("Controller Disconnected")
+// }
+
+// function removegamepad(gamepad) {
+//     delete controllers[gamepad.index];
+// }
+
+// function updateStatus() {
+//     if (!haveEvents) {
+//     scangamepads();
+//     }
+
+//     var i = 0;
+//     var j;
+
+//     for (j in controllers) {
+//     var controller = controllers[j];
+
+//     for (i = 0; i < controller.buttons.length; i++) {
+//         var val = controller.buttons[i];
+//         var pressed = val == 1.0;
+//         if (typeof(val) == "object") {
+//         pressed = val.pressed;
+//         val = val.value;
+//         if (pressed) {
+//             if (i == 0) {
+//                 teleprompter.prompter.internalIncreaseVelocity()
+//             } else if (i == 1) {
+//                 teleprompter.prompter.internalDecreaseVelocity()
+//             }
+//         }
+//             // console.log("controller", controller.index, "button", i,"pressed", pressed);
+//         }
+//     }
+
+//     // var axes = d.getElementsByClassName("axis");
+//     // for (i = 0; i < controller.axes.length; i++) {
+//     //   var a = axes[i];
+//     //   a.innerHTML = i + ": " + controller.axes[i].toFixed(4);
+//     //   a.setAttribute("value", controller.axes[i] + 1);
+//     // }
+//     }
+
+//     requestAnimationFrame(updateStatus);
+// }
+
+// function scangamepads() {
+//     var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
+//     for (var i = 0; i < gamepads.length; i++) {
+//     if (gamepads[i]) {
+//         if (gamepads[i].index in controllers) {
+//         controllers[gamepads[i].index] = gamepads[i];
+//         } else {
+//         addgamepad(gamepads[i]);
+//         }
+//     }
+//     }
+// }
+
+// window.addEventListener("gamepadconnected", connecthandler);
+// window.addEventListener("gamepaddisconnected", disconnecthandler);
+
+// if (!haveEvents) {
+//     setInterval(scangamepads, 500);
+// }

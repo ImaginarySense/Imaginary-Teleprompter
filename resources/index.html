@@ -192,7 +192,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="row">
+		<div class="row editor">
 		<!-- Editor Container -->
 			<div id="editorcontainer" class="p-0">
 				<div id="toolbar"></div>
@@ -266,31 +266,6 @@
 				</div>
 				<div id="statusbar"></div>
 			</div>
-		</div>
-		<div class="row">
-			<!-- Footer -->
-			<footer id="footer" class="bs-docs-footer" role="contentinfo">
-				<div class="container">
-					<p style="color:#FFF;">&copy; <a id="imaginary" class="external" href="https://imaginary.tech/teleprompter/" target="_blank">Imaginary Sense Inc.</a></p>
-					<p>Authors: <a class="external" href="https://www.linkedin.com/in/javier-oscar-cordero-p%25C3%25A9rez-70658033" target="_blank">Javier Cordero</a> &amp;
-						<a class="external" href="https://twitter.com/Va2ron1" target="_blank">Victor Ortiz</a><br>Contributors: <a class="external" href="https://www.facebook.com/rafael.jose.7737">Rafael Sierra</a> &amp; <a class="external" href="https://github.com/keyvanp">Keyvan P&eacute;rez</a>.
-					</p>
-					<ul class="bs-docs-footer-links">
-						<li>Version 2.5.0 beta</li>
-						<li>&middot;</li>
-						<li>Licensed under <a rel="license" href="LICENSE" target="_blank">GPL3</a>, assets under <a class="external" rel="license" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a></li>
-						<br>
-						<li>&middot;</li>
-						<li><a id="credits-link" href="#">Full Credits</a></li>
-						<li>&middot;</li>
-						<li><a class="external" target="_blank" href="https://github.com/ImaginarySense/Teleprompter-Core">Source Code</a></li>
-						<li>&middot;</li>
-						<li><a class="external" target="_blank" href="https://imaginary.tech/teleprompter/#download">Downloads</a></li>
-						<li>&middot;</li>
-					</ul>
-					<!--<li><a class="external" target="_blank" href="https://imaginary.tech/teleprompter/">About</a></li>-->
-				</div>
-			</footer>
 		</div>
 		<div class="row">
 			<div id="framecontainer">
@@ -422,361 +397,413 @@
 						<button type="button" class="btn-close" id="settingsClose" aria-label="Close"></button>
 					</div>
 					<div class="modal-body">
-						<div class="d-flex align-items-start">
-							<div class="nav flex-column nav-pills col-3 me-3" id="v-pills-menu" role="tablist" aria-orientation="vertical">
-								<button class="nav-link active" id="v-pills-controls-tab" data-bs-toggle="pill" data-bs-target="#v-pills-controls" type="button" role="tab" aria-controls="v-pills-controls" aria-selected="true">
-									<i class="bi bi-circle-half"></i> 
-									Controls
-								</button>
-							  	<button class="nav-link" id="v-pills-styles-tab" data-bs-toggle="pill" data-bs-target="#v-pills-styles" type="button" role="tab" aria-controls="v-pills-styles" aria-selected="false">
-									<i class="bi bi-columns"></i>
-									Styles
-								</button>
-								<button class="nav-link" id="v-pills-commandsMapping-tab" data-bs-toggle="pill" data-bs-target="#v-pills-commandsMapping" type="button" role="tab" aria-controls="v-pills-commandsMapping" aria-selected="false">
-									<i class="bi bi-hand-index"></i>
-									Commands Mapping
-								</button>
-							</div>
-							<div class="tab-content w-100" id="v-pills-menuContent">
-							  	<div class="tab-pane fade show active" id="v-pills-controls" role="tabpanel" aria-labelledby="v-pills-controls-tab">
-									<table class="table table-hover">
-										<tbody id="v-pills-controlsContent">
-											<tr>
-												<th>
-													<div class="row">
-														<span style="padding: .375rem .75rem;">In-frame prompter</span>
-													</div>
-												</th>
-												<th>
-													<select class="form-control" id="primaryControl" name="primaryControl">
-														<option value="0" title="Don't prompt on this window">Disabled (Don't prompt on this window)</option>
-														<option value="1" title="Normal screen" selected="selected">No Flip (Normal screen)</option>
-														<option value="2" title="Normal mirror">Horizontal Flip (Mirror)</option>
-														<option value="3" title="Miror plus 180&deg; rotation">Vertical Flip (Miror plus 180&deg; rotation)</option>
-														<option value="4" title="180&deg; screen rotation">Double Flip (180&deg; screen rotation)</option>
-													</select>
-												</th>
-												<th>
-													<div class="input-group">
-														<span class="input-group-text">Quick</span>
-														<div class="input-group-text">
-															<input class="form-check-input mt-0" type="checkbox" value="" id="primaryQuickConfig">
-														</div>
-													</div>
-												</th>
-											</tr>
-											<tr>
-												<th>
-													<div class="row">
-														<span style="padding: .375rem .75rem;">External prompter</span>
-													</div>
-												</th>
-												<th>
-													<select class="form-control" id="secondaryControl" name="secondaryControl">
-														<option value="0" title="Don't prompt to a second window" selected="selected">Disabled (Don't prompt to a second window)</option>
-														<option value="1" title="Normal screen">No Flip (Normal screen)</option>
-														<option value="2" title="Normal mirror">Horizontal Flip (Mirror)</option>
-														<option value="3" title="Miror plus 180&deg; rotation">Vertical Flip (Miror plus 180&deg; rotation)</option>
-														<option value="4" title="180&deg; screen rotation">Double Flip  (180&deg; screen rotation)</option>
-													</select>
-												</th>
-												<th>
-													<div class="input-group">
-														<span class="input-group-text">Quick</span>
-														<div class="input-group-text">
-															<input class="form-check-input mt-0" type="checkbox" value="" id="secondaryQuickConfig">
-														</div>
-													</div>
-												</th>
-											</tr>
-											<tr>
-												<th>
-													<div class="row">
-														<span style="padding: .375rem .75rem;">Prompter style</span>
-													</div>
-												</th>
-												<th>
-													<select class="form-control" id="prompterStyleControl" name="prompterStyleControl">
-														<option value="0">Azure Light</option>
-														<option value="1" selected="selected">Blackboard</option>
-														<option value="2">Classic Yellow</option>
-														<option value="3">Dark Matter</option>
-														<!-- <option value="4">Intergalactic</option> -->
-														<option value="4">Whiteboard</option>
-													</select>
-												</th>
-												<th>
-													<div class="input-group">
-														<span class="input-group-text">Quick</span>
-														<div class="input-group-text">
-															<input class="form-check-input mt-0" type="checkbox" value="" id="prompterStyleQuickConfig">
-														</div>
-													</div>
-												</th>
-											</tr>
-											<tr>
-												<th>
-													<div class="row">
-														<span style="padding: .375rem .75rem;">Focus area</span>
-													</div>
-												</th>
-												<th>
-													<select class="form-control" id="focusControl" name="focusControl">
-														<option value="3" title="No focus area for increased efficiency.">None</option>
-														<option value="1">Top Focus (for Webcams)</option>
-														<option value="0" selected="selected">Middle Focus (for Professional prompters)</option>
-														<option value="2">Bottom Focus (for Screens over cameras)</option>
-														<option value="4" title="Dissable touch to enable interaction with HTML contents.">Interactive mode (interact with HTML contents)</option>
-													</select>
-												</th>
-												<th>
-													<div class="input-group">
-														<span class="input-group-text">Quick</span>
-														<div class="input-group-text">
-															<input class="form-check-input mt-0" type="checkbox" value="" id="focusQuickConfig">
-														</div>
-													</div>
-												</th>
-											</tr>
-											<tr>
-												<th>
-													<div class="row">
-														<span style="padding: .375rem .75rem;">Start prompting from</span>
-													</div>
-												</th>
-												<th>
-													<select class="form-control" id="textAtFocusAreaControl" name="textAtFocusAreaControl">
-														<option value="0" selected="selected">Beggining</option>
-														<option value="1">Focus area</option>
-														<option value="2">Last state</option>
-													</select>
-												</th>
-												<th>
-													<div class="input-group">
-														<span class="input-group-text">Quick</span>
-														<div class="input-group-text">
-															<input class="form-check-input mt-0" type="checkbox" value="" id="textAtFocusAreaQuickConfig">
-														</div>
-													</div>
-												</th>
-											</tr>
-											<tr>
-												<th>
-													<div class="row">
-														<span style="padding: .375rem .75rem;">Speed: <span id="speedControlValue">4.0</span></span>
-													</div>
-												</th>
-												<th>
-													<div class="row">
-														<div style="padding: .375rem .75rem;">
-															<input class="w-100" type="range" id="speedControl" name="speedControl" data-slider-value="4.0" data-slider-step="0.5" data-slider-min="1" data-slider-max="20" data-slider-ticks="[1,4,20]" data-slider-ticks-snap-bounds="0">
-														</div>
-													</div>
-												</th>
-												<th>
-													<div class="input-group">
-														<span class="input-group-text">Quick</span>
-														<div class="input-group-text">
-															<input class="form-check-input mt-0" type="checkbox" value="" id="speedQuickConfig">
-														</div>
-													</div>
-												</th>
-											</tr>
-											<tr>
-												<th>
-													<div class="row">
-														<span style="padding: .375rem .75rem;">Acceleration: <span id="accelerationControlValue">1.45</span></span>
-													</div>
-												</th>
-												<th>
-													<div class="row">
-														<div style="padding: .375rem .75rem;">
-															<input class="w-100" type="range" id="accelerationControl" name="accelerationControl" data-slider-value="1.45" data-slider-min="0.5" data-slider-max="1.8" data-slider-step="0.05" data-slider-ticks="[0.5,1.45,1.8]" data-slider-ticks-snap-bounds="0">
-														</div>
-													</div>
-												</th>
-												<th>
-													<div class="input-group">
-														<span class="input-group-text">Quick</span>
-														<div class="input-group-text">
-															<input class="form-check-input mt-0" type="checkbox" value="" id="accelerationQuickConfig">
-														</div>
-													</div>
-												</th>
-											</tr>
-											<tr>
-												<th>
-													<div class="row">
-														<span style="padding: .375rem .75rem;">Font size: <span id="fontSizeControlValue">120</span>%</span>
-													</div>
-												</th>
-												<th>
-													<div class="row">
-														<div style="padding: .375rem .75rem;">
-															<input class="w-100" type="range" id="fontSizeControl" name="fontSizeControl" data-slider-value="120" data-slider-min="10" data-slider-max="250" data-slider-step="1" data-slider-ticks="[10,25,120,250]" data-slider-ticks-snap-bounds="0">
-														</div>
-													</div>
-												</th>
-												<th>
-													<div class="input-group">
-														<span class="input-group-text">Quick</span>
-														<div class="input-group-text">
-															<input class="form-check-input mt-0" type="checkbox" value="" id="fontSizeQuickConfig">
-														</div>
-													</div>
-												</th>
-											</tr>
-											<tr>
-												<th>
-													<div class="row">
-														<span style="padding: .375rem .75rem;">Width: <span id="promptWidthControlValue">84</span>%</span>
-													</div>
-												</th>
-												<th>
-													<div class="row">
-														<div style="padding: .375rem .75rem;">
-															<input class="w-100" type="range" id="promptWidthControl" name="promptWidthControl" data-slider-value="84" data-slider-min="5" data-slider-max="100" data-slider-step="1" data-slider-ticks="[5,16,84,100]" data-slider-ticks-snap-bounds="0">
-														</div>
-													</div>
-												</th>
-												<th>
-													<div class="input-group">
-														<span class="input-group-text">Quick</span>
-														<div class="input-group-text">
-															<input class="form-check-input mt-0" type="checkbox" value="" id="promptWidthQuickConfig">
-														</div>
-													</div>
-												</th>
-											</tr>
-											<tr>
-												<th>
-													<div class="row">
-														<span style="padding: .375rem .75rem;">Focus height: <span id="focusAreaHeightControlValue">50</span>%</span>
-													</div>
-												</th>
-												<th>
-													<div class="row">
-														<div style="padding: .375rem .75rem;">
-															<input class="w-100" type="range" id="focusAreaHeightControl" name="focusAreaHeightControl" data-slider-value="50" data-slider-min="5" data-slider-max="100" data-slider-step="1" data-slider-ticks="[5,20,50,80]" data-slider-ticks-snap-bounds="0">
-														</div>
-													</div>
-												</th>
-												<th>
-													<div class="input-group">
-														<span class="input-group-text">Quick</span>
-														<div class="input-group-text">
-															<input class="form-check-input mt-0" type="checkbox" value="" id="focusAreaHeightQuickConfig">
-														</div>
-													</div>
-												</th>
-											</tr>
-											<tr>
-												<th>
-													<div class="row">
-														<span style="padding: .375rem .75rem;">Timer</span>
-													</div>
-												</th>
-												<th>
-													<div class="btn-group" role="group"> 
-														<input type="radio" class="btn-check" name="timerControl" id="timerOnControl" value="on" autocomplete="on">
-														<label class="btn btn-outline-dark" for="timerOnControl">On</label>
-													
-														<input type="radio" class="btn-check" name="timerControl" id="timerOffControl" value="off" autocomplete="off">
-														<label class="btn btn-outline-dark" for="timerOffControl">Off</label>
-													</div>
-												</th>
-												<th>
-													<div class="input-group">
-														<span class="input-group-text">Quick</span>
-														<div class="input-group-text">
-															<input class="form-check-input mt-0" type="checkbox" value="" id="timerQuickConfig">
-														</div>
-													</div>
-												</th>
-											</tr>
-										</tbody>
-									</table>
-							  	</div>
-							  	<div class="tab-pane fade" id="v-pills-styles" role="tabpanel" aria-labelledby="v-pills-styles-tab">
-									<div class="row">
-										<div class="col-md-3">
-											<h4>Styles</h4>
-											<div id="stylesContainer">
-												<table class="table" id="stylesTable" >
-													<tbody>
-														<tr>
-															<th class="table-item"><span>No Styles</span></th>
-														</tr>
-													</tbody>
-												</table>
-											</div>
-										</div>
-										<div class="col-md-9">
-											<h4>Properties</h4>
-											<div class='row'>
-												<div class='col-md-4'>
-													<label>Body</label>
-													<input type="text" data-jscolor="{}" class="form-control" id="bodyColor" value="" >
-												</div>
-												<div class='col-md-4'>
-													<label>Overlay</label>
-													<input type="text" data-jscolor="{}" class="form-control" id="overlayColor" value="" >
-												</div>
-												<div class='col-md-4'>
-													<label>Text Color</label>
-													<input type="text" data-jscolor="{}" class="form-control" id="textColor" value="" >
-												</div>
-											</div>
-											<h1><small>Preview</small></h1>
-											<div id="promptPreviewColor">
-												<!-- #overlay layers focus area on top of the prompt. -->
-												<table cellpadding="0" cellspacing="0" id="overlayPreview" >
-													<tbody>
-														<tr id="overlayTop" style = "background-color:#000;opacity:0.5;">
-															<td>Text</td>
-														</tr>
-														<tr id="overlayFocus" >
-															<td>Text</td>
-														</tr>
-														<tr id="overlayBottom" class="overlayBg" style = "background-color:#000;opacity:0.5;">
-															<td>Text</td>
-														</tr>
-													</tbody>
-												</table>
-											</div>
-											</br>
-										</div>
-									</div>
-									<div class='row'>
-										<div class='col-md-4'>
-											<div class="input-group">
-												<span class="input-group-text" id="style-addon">Style Name</span>
-												<input type="text" class="form-control" placeholder="name" aria-describedby="style-addon" id="nameStyle">
-											</div>
-										</div>
-										<div class='col-md-8'>
-											<button class="btn btn-default" id="editStyleButton" disabled>Update Style</button>
-											<button class="btn btn-default" id="addStyleButton" disabled>New Style</button>
-											<button class="btn btn-default" id="removeStyleButton" disabled>Delete Style</button>
-											<button class="btn btn-default" id="defaultStyleButton">Set As Default</button>
-										</div>
-									</div>
-							  	</div>
-							  	<div class="tab-pane fade" id="v-pills-commandsMapping" role="tabpanel" aria-labelledby="v-pills-commandsMapping-tab">
-									<div class="row">
-										<div class="col-12">
-											<div class="commandsContainer">
-												<table class="table">
-													<tbody id="v-pills-commandsMappingContent">
-														<!-- Commands will be load here -->
-													</tbody>
-												</table>
-											</div>
-										</div>
-									</div>
+						<div class="row">
+							<div class="col-3 d-flex flex-wrap">
+								<div class="nav flex-column nav-pills w-100" id="v-pills-menu" role="tablist" aria-orientation="vertical">
+									<button class="nav-link active" id="v-pills-controls-tab" data-bs-toggle="pill" data-bs-target="#v-pills-controls" type="button" role="tab" aria-controls="v-pills-controls" aria-selected="true">
+										<i class="bi bi-circle-half float-start"></i> 
+										Controls
+									</button>
+									  <button class="nav-link" id="v-pills-styles-tab" data-bs-toggle="pill" data-bs-target="#v-pills-styles" type="button" role="tab" aria-controls="v-pills-styles" aria-selected="false">
+										<i class="bi bi-columns float-start"></i>
+										Styles
+									</button>
+									<button class="nav-link" id="v-pills-commandsMapping-tab" data-bs-toggle="pill" data-bs-target="#v-pills-commandsMapping" type="button" role="tab" aria-controls="v-pills-commandsMapping" aria-selected="false">
+										<i class="bi bi-hand-index float-start"></i>
+										Commands Mapping
+									</button>
+									<hr />
+									<button class="nav-link" id="v-pills-credits-tab" data-bs-toggle="pill" data-bs-target="#v-pills-credits" type="button" role="tab" aria-controls="v-pills-credits" aria-selected="false">
+										<i class="bi bi-cup float-start"></i>
+										Credits
+									</button>
+								</div>
+								<div class="align-self-end text-center w-100">
+									<span><b>Version:</b> 2.5.0 beta</span>
 								</div>
 							</div>
-						  </div>
+							<div class="col-9">
+								<div class="tab-content w-100" id="v-pills-menuContent">
+									<div class="tab-pane fade show active" id="v-pills-controls" role="tabpanel" aria-labelledby="v-pills-controls-tab">
+									  <div class="settingsContainer">
+										  <table class="table table-hover">
+											  <tbody id="v-pills-controlsContent">
+												  <tr>
+													  <th>
+														  <div class="row">
+															  <span style="padding: .375rem .75rem;">In-frame prompter</span>
+														  </div>
+													  </th>
+													  <th>
+														  <select class="form-control" id="primaryControl" name="primaryControl">
+															  <option value="0" title="Don't prompt on this window">Disabled (Don't prompt on this window)</option>
+															  <option value="1" title="Normal screen" selected="selected">No Flip (Normal screen)</option>
+															  <option value="2" title="Normal mirror">Horizontal Flip (Mirror)</option>
+															  <option value="3" title="Miror plus 180&deg; rotation">Vertical Flip (Miror plus 180&deg; rotation)</option>
+															  <option value="4" title="180&deg; screen rotation">Double Flip (180&deg; screen rotation)</option>
+														  </select>
+													  </th>
+													  <th>
+														  <div class="input-group">
+															  <span class="input-group-text">Quick</span>
+															  <div class="input-group-text">
+																  <input class="form-check-input mt-0" type="checkbox" value="" id="primaryQuickConfig">
+															  </div>
+														  </div>
+													  </th>
+												  </tr>
+												  <tr>
+													  <th>
+														  <div class="row">
+															  <span style="padding: .375rem .75rem;">External prompter</span>
+														  </div>
+													  </th>
+													  <th>
+														  <select class="form-control" id="secondaryControl" name="secondaryControl">
+															  <option value="0" title="Don't prompt to a second window" selected="selected">Disabled (Don't prompt to a second window)</option>
+															  <option value="1" title="Normal screen">No Flip (Normal screen)</option>
+															  <option value="2" title="Normal mirror">Horizontal Flip (Mirror)</option>
+															  <option value="3" title="Miror plus 180&deg; rotation">Vertical Flip (Miror plus 180&deg; rotation)</option>
+															  <option value="4" title="180&deg; screen rotation">Double Flip  (180&deg; screen rotation)</option>
+														  </select>
+													  </th>
+													  <th>
+														  <div class="input-group">
+															  <span class="input-group-text">Quick</span>
+															  <div class="input-group-text">
+																  <input class="form-check-input mt-0" type="checkbox" value="" id="secondaryQuickConfig">
+															  </div>
+														  </div>
+													  </th>
+												  </tr>
+												  <tr>
+													  <th>
+														  <div class="row">
+															  <span style="padding: .375rem .75rem;">Prompter style</span>
+														  </div>
+													  </th>
+													  <th>
+														  <select class="form-control" id="prompterStyleControl" name="prompterStyleControl">
+															  <option value="0">Azure Light</option>
+															  <option value="1" selected="selected">Blackboard</option>
+															  <option value="2">Classic Yellow</option>
+															  <option value="3">Dark Matter</option>
+															  <!-- <option value="4">Intergalactic</option> -->
+															  <option value="4">Whiteboard</option>
+														  </select>
+													  </th>
+													  <th>
+														  <div class="input-group">
+															  <span class="input-group-text">Quick</span>
+															  <div class="input-group-text">
+																  <input class="form-check-input mt-0" type="checkbox" value="" id="prompterStyleQuickConfig">
+															  </div>
+														  </div>
+													  </th>
+												  </tr>
+												  <tr>
+													  <th>
+														  <div class="row">
+															  <span style="padding: .375rem .75rem;">Focus area</span>
+														  </div>
+													  </th>
+													  <th>
+														  <select class="form-control" id="focusControl" name="focusControl">
+															  <option value="3" title="No focus area for increased efficiency.">None</option>
+															  <option value="1">Top Focus (for Webcams)</option>
+															  <option value="0" selected="selected">Middle Focus (for Professional prompters)</option>
+															  <option value="2">Bottom Focus (for Screens over cameras)</option>
+															  <option value="4" title="Dissable touch to enable interaction with HTML contents.">Interactive mode (interact with HTML contents)</option>
+														  </select>
+													  </th>
+													  <th>
+														  <div class="input-group">
+															  <span class="input-group-text">Quick</span>
+															  <div class="input-group-text">
+																  <input class="form-check-input mt-0" type="checkbox" value="" id="focusQuickConfig">
+															  </div>
+														  </div>
+													  </th>
+												  </tr>
+												  <tr>
+													  <th>
+														  <div class="row">
+															  <span style="padding: .375rem .75rem;">Start prompting from</span>
+														  </div>
+													  </th>
+													  <th>
+														  <select class="form-control" id="textAtFocusAreaControl" name="textAtFocusAreaControl">
+															  <option value="0" selected="selected">Beggining</option>
+															  <option value="1">Focus area</option>
+															  <option value="2">Last state</option>
+														  </select>
+													  </th>
+													  <th>
+														  <div class="input-group">
+															  <span class="input-group-text">Quick</span>
+															  <div class="input-group-text">
+																  <input class="form-check-input mt-0" type="checkbox" value="" id="textAtFocusAreaQuickConfig">
+															  </div>
+														  </div>
+													  </th>
+												  </tr>
+												  <tr>
+													  <th>
+														  <div class="row">
+															  <span style="padding: .375rem .75rem;">Speed: <span id="speedControlValue">4.0</span></span>
+														  </div>
+													  </th>
+													  <th>
+														  <div class="row">
+															  <div style="padding: .375rem .75rem;">
+																  <input class="w-100" type="range" id="speedControl" name="speedControl" data-slider-value="4.0" data-slider-step="0.5" data-slider-min="1" data-slider-max="20" data-slider-ticks="[1,4,20]" data-slider-ticks-snap-bounds="0">
+															  </div>
+														  </div>
+													  </th>
+													  <th>
+														  <div class="input-group">
+															  <span class="input-group-text">Quick</span>
+															  <div class="input-group-text">
+																  <input class="form-check-input mt-0" type="checkbox" value="" id="speedQuickConfig">
+															  </div>
+														  </div>
+													  </th>
+												  </tr>
+												  <tr>
+													  <th>
+														  <div class="row">
+															  <span style="padding: .375rem .75rem;">Acceleration: <span id="accelerationControlValue">1.45</span></span>
+														  </div>
+													  </th>
+													  <th>
+														  <div class="row">
+															  <div style="padding: .375rem .75rem;">
+																  <input class="w-100" type="range" id="accelerationControl" name="accelerationControl" data-slider-value="1.45" data-slider-min="0.5" data-slider-max="1.8" data-slider-step="0.05" data-slider-ticks="[0.5,1.45,1.8]" data-slider-ticks-snap-bounds="0">
+															  </div>
+														  </div>
+													  </th>
+													  <th>
+														  <div class="input-group">
+															  <span class="input-group-text">Quick</span>
+															  <div class="input-group-text">
+																  <input class="form-check-input mt-0" type="checkbox" value="" id="accelerationQuickConfig">
+															  </div>
+														  </div>
+													  </th>
+												  </tr>
+												  <tr>
+													  <th>
+														  <div class="row">
+															  <span style="padding: .375rem .75rem;">Font size: <span id="fontSizeControlValue">120</span>%</span>
+														  </div>
+													  </th>
+													  <th>
+														  <div class="row">
+															  <div style="padding: .375rem .75rem;">
+																  <input class="w-100" type="range" id="fontSizeControl" name="fontSizeControl" data-slider-value="120" data-slider-min="10" data-slider-max="250" data-slider-step="1" data-slider-ticks="[10,25,120,250]" data-slider-ticks-snap-bounds="0">
+															  </div>
+														  </div>
+													  </th>
+													  <th>
+														  <div class="input-group">
+															  <span class="input-group-text">Quick</span>
+															  <div class="input-group-text">
+																  <input class="form-check-input mt-0" type="checkbox" value="" id="fontSizeQuickConfig">
+															  </div>
+														  </div>
+													  </th>
+												  </tr>
+												  <tr>
+													  <th>
+														  <div class="row">
+															  <span style="padding: .375rem .75rem;">Width: <span id="promptWidthControlValue">84</span>%</span>
+														  </div>
+													  </th>
+													  <th>
+														  <div class="row">
+															  <div style="padding: .375rem .75rem;">
+																  <input class="w-100" type="range" id="promptWidthControl" name="promptWidthControl" data-slider-value="84" data-slider-min="5" data-slider-max="100" data-slider-step="1" data-slider-ticks="[5,16,84,100]" data-slider-ticks-snap-bounds="0">
+															  </div>
+														  </div>
+													  </th>
+													  <th>
+														  <div class="input-group">
+															  <span class="input-group-text">Quick</span>
+															  <div class="input-group-text">
+																  <input class="form-check-input mt-0" type="checkbox" value="" id="promptWidthQuickConfig">
+															  </div>
+														  </div>
+													  </th>
+												  </tr>
+												  <tr>
+													  <th>
+														  <div class="row">
+															  <span style="padding: .375rem .75rem;">Focus height: <span id="focusAreaHeightControlValue">50</span>%</span>
+														  </div>
+													  </th>
+													  <th>
+														  <div class="row">
+															  <div style="padding: .375rem .75rem;">
+																  <input class="w-100" type="range" id="focusAreaHeightControl" name="focusAreaHeightControl" data-slider-value="50" data-slider-min="5" data-slider-max="100" data-slider-step="1" data-slider-ticks="[5,20,50,80]" data-slider-ticks-snap-bounds="0">
+															  </div>
+														  </div>
+													  </th>
+													  <th>
+														  <div class="input-group">
+															  <span class="input-group-text">Quick</span>
+															  <div class="input-group-text">
+																  <input class="form-check-input mt-0" type="checkbox" value="" id="focusAreaHeightQuickConfig">
+															  </div>
+														  </div>
+													  </th>
+												  </tr>
+												  <tr>
+													  <th>
+														  <div class="row">
+															  <span style="padding: .375rem .75rem;">Timer</span>
+														  </div>
+													  </th>
+													  <th>
+														  <div class="btn-group" role="group"> 
+															  <input type="radio" class="btn-check" name="timerControl" id="timerOnControl" value="on" autocomplete="on">
+															  <label class="btn btn-outline-dark" for="timerOnControl">On</label>
+														  
+															  <input type="radio" class="btn-check" name="timerControl" id="timerOffControl" value="off" autocomplete="off">
+															  <label class="btn btn-outline-dark" for="timerOffControl">Off</label>
+														  </div>
+													  </th>
+													  <th>
+														  <div class="input-group">
+															  <span class="input-group-text">Quick</span>
+															  <div class="input-group-text">
+																  <input class="form-check-input mt-0" type="checkbox" value="" id="timerQuickConfig">
+															  </div>
+														  </div>
+													  </th>
+												  </tr>
+											  </tbody>
+										  </table>
+									  </div>
+									</div>
+									<div class="tab-pane fade" id="v-pills-styles" role="tabpanel" aria-labelledby="v-pills-styles-tab">
+									  <div class="settingsContainer">
+										  <div class="row">
+											  <div class="col-12">
+												  <div class="row">
+													  <div class="col-md-3">
+														  <h4>Styles</h4>
+														  <div id="stylesContainer">
+															  <table class="table" id="stylesTable" >
+																  <tbody>
+																	  <tr>
+																		  <th class="table-item"><span>No Styles</span></th>
+																	  </tr>
+																  </tbody>
+															  </table>
+														  </div>
+													  </div>
+													  <div class="col-md-9">
+														  <h4>Properties</h4>
+														  <div class='row'>
+															  <div class='col-md-4'>
+																  <label>Body</label>
+																  <input type="text" data-jscolor="{}" class="form-control" id="bodyColor" value="" >
+															  </div>
+															  <div class='col-md-4'>
+																  <label>Overlay</label>
+																  <input type="text" data-jscolor="{}" class="form-control" id="overlayColor" value="" >
+															  </div>
+															  <div class='col-md-4'>
+																  <label>Text Color</label>
+																  <input type="text" data-jscolor="{}" class="form-control" id="textColor" value="" >
+															  </div>
+														  </div>
+														  <h1><small>Preview</small></h1>
+														  <div id="promptPreviewColor">
+															  <!-- #overlay layers focus area on top of the prompt. -->
+															  <table cellpadding="0" cellspacing="0" id="overlayPreview" >
+																  <tbody>
+																	  <tr id="overlayTop" style = "background-color:#000;opacity:0.5;">
+																		  <td>Text</td>
+																	  </tr>
+																	  <tr id="overlayFocus" >
+																		  <td>Text</td>
+																	  </tr>
+																	  <tr id="overlayBottom" class="overlayBg" style = "background-color:#000;opacity:0.5;">
+																		  <td>Text</td>
+																	  </tr>
+																  </tbody>
+															  </table>
+														  </div>
+														  </br>
+														  <div class='col-12'>
+															  <div class="row p-2">
+																  <div class="col-auto">
+																	  <div class="input-group">
+																		  <span class="input-group-text" id="style-addon">Style Name</span>
+																		  <input type="text" class="form-control" placeholder="name" aria-describedby="style-addon" id="nameStyle">
+																	  </div>
+																  </div>
+																  <div class="col-auto">
+																	  <button class="btn btn-secondary" id="defaultStyleButton">Set As Default</button>
+																  </div>
+															  </div>
+															  <div class="d-flex p-2 gap-2">
+																  <button class="btn btn-secondary" id="editStyleButton" disabled>Update Style</button>
+																  <button class="btn btn-secondary" id="addStyleButton" disabled>New Style</button>
+																  <button class="btn btn-secondary" id="removeStyleButton" disabled>Delete Style</button>
+															  </div>
+														  </div>
+													  </div>
+												  </div>
+											  </div>
+										  </div>
+									  </div>
+									</div>
+									<div class="tab-pane fade" id="v-pills-commandsMapping" role="tabpanel" aria-labelledby="v-pills-commandsMapping-tab">
+									  <div class="row">
+										  <div class="col-12">
+											  <div class="settingsContainer">
+												  <table class="table">
+													  <tbody id="v-pills-commandsMappingContent">
+														  <!-- Commands will be load here -->
+													  </tbody>
+												  </table>
+											  </div>
+										  </div>
+									  </div>
+								  </div>
+								  <div class="tab-pane fade" id="v-pills-credits" role="tabpanel" aria-labelledby="v-pills-credits-tab">
+									  <div class="row">
+										  <div class="col-12">
+											  <div class="settingsContainer credits">
+												<h2 class="display-6">Authors</h2>
+												<ul class="lead">
+													<li>
+														Javier Cordero <a class="external" href="https://www.linkedin.com/in/javier-oscar-cordero-p%25C3%25A9rez-70658033" target="_blank"><i class="bi bi-linkedin"></i></a> 
+													</li>
+													<li>
+														Victor Ortiz <a class="external" href="https://twitter.com/Va2ron1" target="_blank"><i class="bi bi-twitter"></i></a>
+													</li>
+												</ul>
+												<h2 class="display-6">Contributors</h2>
+												<ul class="lead">
+													<li>
+														Rafael Sierra <a class="external" href="https://www.facebook.com/rafael.jose.7737" target="_blank"><i class="bi bi-facebook"></i></a> 
+													</li>
+													<li>
+														Keyvan P&eacute;rez <a class="external" href="https://github.com/keyvanp" target="_blank"><i class="bi bi-github"></i></a>
+													</li>
+												</ul>
+												<p>Licensed under <a rel="license" href="LICENSE" target="_blank">GPL3</a>, assets under <a class="external" rel="license" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a></p>
+												<p><a class="external" target="_blank" href="https://github.com/ImaginarySense/Teleprompter-Core"><i class="bi bi-github pe-1"></i>Source Code</a> • <a class="external" target="_blank" href="https://imaginary.tech/teleprompter/#download"><i class="bi bi-link-45deg pe-1"></i>Downloads</a></p>
+											  </div>
+										  </div>
+									  </div>
+								  </div>
+							  </div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

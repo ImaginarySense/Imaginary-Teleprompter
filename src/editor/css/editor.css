@@ -67,7 +67,7 @@ a#updateIt {
 #editorcontainer {
 	position: relative;
 	background: #EEE;
-	min-height: 320px;
+	/* min-height: 320px; */
 	height: auto;
 }
 
@@ -85,7 +85,7 @@ footer #imaginary {
 	top: 0px;
 	bottom: 0px;
 	width: 100%;
-	min-height: 78vh;
+	/* min-height: 78vh; */
 	height: calc(100% - 69px);	
 	/* Cancel 3D transform from intergalactic theme. */
 	transform: rotateX(0deg) translate3d(0px,0px,0px) !important;
@@ -181,6 +181,18 @@ a:visited {
 }
 
 a:active {
+	color: #CCF;
+}
+
+.credits a:link {
+	color: #000;
+}
+
+.credits a:visited {
+	color: #000;
+}
+
+.credits a:active {
 	color: #CCF;
 }
 
@@ -452,7 +464,7 @@ img.cke_anchor {
 	margin-left: 10px;
 }
 
-.commandsContainer {
+.settingsContainer {
 	height: 60vh;
 	left: 0px;
 	right: 0px;
@@ -461,10 +473,14 @@ img.cke_anchor {
 	scrollbar-width: none;
 }
 
-.commandsContainer::-webkit-scrollbar {
+.settingsContainer::-webkit-scrollbar {
 	display: none;
 }
 
 .commandsButtonTransition {
 	transition: border-color 2s cubic-bezier(1, 1, 1, 1), color 2s cubic-bezier(1, 1, 1, 1); transition-delay: 0s;
+}
+
+.editor {
+	height: calc(100vh - 50px);
 }
