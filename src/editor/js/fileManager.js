@@ -54,6 +54,9 @@ class FileManager {
                 document.getElementById("prompt").innerHTML = scriptsData[this.currentElement]['data'];
             else
                 document.getElementById("prompt").innerHTML = "";
+
+            document.getElementById('promptOptions').innerHTML = scriptsData[this.currentElement]['name'];
+
             this.closeModal()
         }.bind(this);
 
