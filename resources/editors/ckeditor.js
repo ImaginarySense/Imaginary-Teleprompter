@@ -85,12 +85,15 @@ loadScript('assets/ckeditor/ckeditor.js', () => {
         else
             document.getElementById("prompt").innerHTML = "";
 
+        teleprompter.editor.updateAnchors();
+
         editor.on('dialogDefinition', function(event) {
             teleprompter.editor.contentEditor.save();
         });
 
         editor.on('change', function(event) {
             teleprompter.editor.contentEditor.save();
+            teleprompter.editor.updateAnchors();
         });
 
         editor.on('paste', function(event) {
