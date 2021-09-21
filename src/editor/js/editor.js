@@ -861,3 +861,35 @@ else
     document.addEventListener("DOMContentLoaded", function() {
         teleprompter.editor.init();
     }.bind(this));
+
+if (inElectron()) {
+    const remote = require('@electron/remote');
+    
+    function initWindowControls() { 
+        document.getElementById("win-controls-min").addEventListener("click", function (e) {
+            const window = remote.getCurrentWindow();
+            window.minimize(); 
+        });
+        
+        document.getElementById("win-controls-max").addEventListener("click", function (e) {
+        const window = remote.getCurrentWindow();
+        if (!window.isMaximized()) {
+            window.maximize();
+        } else {
+            window.unmaximize();
+        }	 
+        });
+        
+        document.getElementById("win-controls-close").addEventListener("click", function (e) {
+            // const window = remote.getCurrentWindow();
+            // window.close();
+            remote.app.exit();
+        }); 
+    }; 
+    
+    document.onreadystatechange = function () {
+        if (document.readyState == "complete") {
+            initWindowControls(); 
+        }
+    };
+}
