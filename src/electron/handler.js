@@ -50,25 +50,15 @@ function policyExist(name) {
 
 function bodyParser(req, res) {
   return new Promise(next => {
+    // For now only JSON
+    // Check if theres any data on POST
+    // Because we are looking for a JSON, we only expect for on element.
+    if (req['uploadData'] && req['uploadData'][0]) {
+      // Grab and convert data from bytes to JSON
+      let data = req['uploadData'][0]['bytes'];
+      req.body = JSON.parse(data);
+    }
     next();
-    // let data = [];
-    // req.on("data", chunk => {
-    //   data.push(chunk);
-    // });
-    // req.on("end", () => {
-    //   if (req.headers['content-type'] === 'application/x-www-form-urlencoded') {
-    //     req.body = parse(data.concat().toString());
-    //   } else if (req.headers['content-type'] === 'application/json') {
-    //     req.body = JSON.parse(data.toString());
-    //   } else {
-    //     req.body = {};
-    //   }
-    //   next();
-    // });
-    // req.on("error", err => {
-    //   res.json(400);
-    //   next();
-    // });
   });
 }
 
