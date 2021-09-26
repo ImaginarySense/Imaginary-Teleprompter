@@ -266,8 +266,13 @@ class CommandsMapping {
         }
 
         // Load settings
-        if (teleprompter.settings.commandsMapping) {
-            this.mapping = JSON.parse(teleprompter.settings.commandsMapping);
+        this.loadSettings();
+    }
+
+    async loadSettings() { 
+        // Load settings
+        if (await teleprompter.settings.commandsMapping) {
+            this.mapping = JSON.parse(await teleprompter.settings.commandsMapping);
         }
 
         this.userActions = [
@@ -277,8 +282,8 @@ class CommandsMapping {
             //     "action": "customSpeed"
             // }
         ];
-        if (teleprompter.settings.userActions) {
-            this.userActions = JSON.parse(teleprompter.settings.userActions);
+        if (await teleprompter.settings.userActions) {
+            this.userActions = JSON.parse(await teleprompter.settings.userActions);
         }
     }
 
@@ -421,7 +426,6 @@ class CommandsMapping {
                 };
             }
             
-
             teleprompter.settings.commandsMapping = JSON.stringify(this.mapping);
             e.target.setAttribute("data-key", nextKey);
 
@@ -515,23 +519,23 @@ class Controls {
 
     }
 
-    setDefaultValues() {
+    async setDefaultValues() {
         // Set default controls values
         for (var key in this.controls) {
-            if (!teleprompter.settings[key]) {
+            if (!await teleprompter.settings[key]) {
                 teleprompter.settings[key] = this.controls[key];
             }
         }
 
         // Set default QuickConfig values
         for (var key in this.defaultsQuickConfig) {
-            if (!teleprompter.settings[key]) {
+            if (!await teleprompter.settings[key]) {
                 teleprompter.settings[key] = this.defaultsQuickConfig[key];
             }
         }
     }
 
-    draw() {
+    async draw() {
         this.slider = [
             new Slider("#speed", {}),
             new Slider("#acceleration", {}),
@@ -546,62 +550,62 @@ class Controls {
         ];
 
         // Data binding for advanced options
-        this.slider[0].on("change", function(input) {
+        this.slider[0].on("change", async (input) => {
             teleprompter.settings.speed = parseFloat(Math.round(input.newValue * 10) / 10).toFixed(1);
-            document.getElementById("speedValue").textContent = teleprompter.settings.speed;
+            document.getElementById("speedValue").textContent = await teleprompter.settings.speed;
         });
-        this.slider[1].on("change", function(input) {
+        this.slider[1].on("change", async (input) => {
             teleprompter.settings.acceleration = parseFloat(Math.round(input.newValue * 100) / 100).toFixed(2);
-            document.getElementById("accelerationValue").textContent = teleprompter.settings.acceleration;
+            document.getElementById("accelerationValue").textContent = await teleprompter.settings.acceleration;
         });
-        this.slider[2].on("change", function(input) {
+        this.slider[2].on("change", async (input) => {
             teleprompter.settings.fontSize = input.newValue;
-            document.getElementById("fontSizeValue").textContent = teleprompter.settings.fontSize;
-            teleprompter.editor.updateFont(teleprompter.settings.fontSize);
+            document.getElementById("fontSizeValue").textContent = await teleprompter.settings.fontSize;
+            teleprompter.editor.updateFont(await teleprompter.settings.fontSize);
         });
-        this.slider[3].on("change", function(input) {
+        this.slider[3].on("change", async (input) => {
             teleprompter.settings.promptWidth = input.newValue;
-            document.getElementById("promptWidthValue").textContent = teleprompter.settings.promptWidth;
-            teleprompter.editor.updateWidth(teleprompter.settings.promptWidth);
+            document.getElementById("promptWidthValue").textContent = await teleprompter.settings.promptWidth;
+            teleprompter.editor.updateWidth(await teleprompter.settings.promptWidth);
         });
-        this.slider[4].on("change", function(input) {
+        this.slider[4].on("change", async (input) => {
             teleprompter.settings.focusAreaHeight = input.newValue;
-            document.getElementById("focusAreaHeightValue").textContent = teleprompter.settings.focusAreaHeight;
+            document.getElementById("focusAreaHeightValue").textContent = await teleprompter.settings.focusAreaHeight;
         });
-        this.slider[5].on("change", function(input) {
+        this.slider[5].on("change", async (input) => {
             teleprompter.settings.speed = parseFloat(Math.round(input.newValue * 10) / 10).toFixed(1);
-            document.getElementById("speedControlValue").textContent = teleprompter.settings.speed;
+            document.getElementById("speedControlValue").textContent = await teleprompter.settings.speed;
         });
-        this.slider[6].on("change", function(input) {
+        this.slider[6].on("change", async (input) => {
             teleprompter.settings.acceleration = parseFloat(Math.round(input.newValue * 100) / 100).toFixed(2);
-            document.getElementById("accelerationControlValue").textContent = teleprompter.settings.acceleration;
+            document.getElementById("accelerationControlValue").textContent = await teleprompter.settings.acceleration;
         });
-        this.slider[7].on("change", function(input) {
+        this.slider[7].on("change", async (input) => {
             teleprompter.settings.fontSize = input.newValue;
-            document.getElementById("fontSizeControlValue").textContent = teleprompter.settings.fontSize;
-            teleprompter.editor.updateFont(teleprompter.settings.fontSize);
+            document.getElementById("fontSizeControlValue").textContent = await teleprompter.settings.fontSize;
+            teleprompter.editor.updateFont(await teleprompter.settings.fontSize);
         });
-        this.slider[8].on("change", function(input) {
+        this.slider[8].on("change", async (input) => {
             teleprompter.settings.promptWidth = input.newValue;
-            document.getElementById("promptWidthControlValue").textContent = teleprompter.settings.promptWidth;
-            teleprompter.editor.updateWidth(teleprompter.settings.promptWidth);
+            document.getElementById("promptWidthControlValue").textContent = await teleprompter.settings.promptWidth;
+            teleprompter.editor.updateWidth(await teleprompter.settings.promptWidth);
         });
-        this.slider[9].on("change", function(input) {
+        this.slider[9].on("change", async (input) => {
             teleprompter.settings.focusAreaHeight = input.newValue;
-            document.getElementById("focusAreaHeightControlValue").textContent = teleprompter.settings.focusAreaHeight;
+            document.getElementById("focusAreaHeightControlValue").textContent = await teleprompter.settings.focusAreaHeight;
         });
 
         // Load last sliders setting
-        this.setSliderValue(this.slider[0], teleprompter.settings.speed);
-        this.setSliderValue(this.slider[1], teleprompter.settings.acceleration);
-        this.setSliderValue(this.slider[2], teleprompter.settings.fontSize);
-        this.setSliderValue(this.slider[3], teleprompter.settings.promptWidth);
-        this.setSliderValue(this.slider[4], teleprompter.settings.focusAreaHeight);
-        this.setSliderValue(this.slider[5], teleprompter.settings.speed);
-        this.setSliderValue(this.slider[6], teleprompter.settings.acceleration);
-        this.setSliderValue(this.slider[7], teleprompter.settings.fontSize);
-        this.setSliderValue(this.slider[8], teleprompter.settings.promptWidth);
-        this.setSliderValue(this.slider[9], teleprompter.settings.focusAreaHeight);
+        this.setSliderValue(this.slider[0], await teleprompter.settings.speed);
+        this.setSliderValue(this.slider[1], await teleprompter.settings.acceleration);
+        this.setSliderValue(this.slider[2], await teleprompter.settings.fontSize);
+        this.setSliderValue(this.slider[3], await teleprompter.settings.promptWidth);
+        this.setSliderValue(this.slider[4], await teleprompter.settings.focusAreaHeight);
+        this.setSliderValue(this.slider[5], await teleprompter.settings.speed);
+        this.setSliderValue(this.slider[6], await teleprompter.settings.acceleration);
+        this.setSliderValue(this.slider[7], await teleprompter.settings.fontSize);
+        this.setSliderValue(this.slider[8], await teleprompter.settings.promptWidth);
+        this.setSliderValue(this.slider[9], await teleprompter.settings.focusAreaHeight);
 
         var element, elements = [], sliderIndex = 0, sliderOffset = this.slider.length / 2, hasSlide = false;
         for (var key in this.controls) {
@@ -614,14 +618,14 @@ class Controls {
                     }.bind(this);
                     hasSlide = true;
                 } else {
-                    element.value = teleprompter.settings[key];
+                    element.value = await teleprompter.settings[key];
                     element.onchange = function(event) {
                         this.updateQuickControl(event);
                     }.bind(this);
                 }
             } else {
                 elements = document.querySelectorAll('input[name="' + key + '"]');
-                document.querySelector('input[name="' + key + '"]:checked').value = teleprompter.settings[key];
+                document.querySelector('input[name="' + key + '"]:checked').value = await teleprompter.settings[key];
                 for (var j = 0; j < elements.length; j++) {
                     element = elements[j];
                     element.onchange = function(event) {
@@ -640,14 +644,14 @@ class Controls {
                     }.bind(this);
                     hasSlide = true;
                 } else {
-                    element.value = teleprompter.settings[key];
+                    element.value = await teleprompter.settings[key];
                     element.onchange = function(event) {
                         this.updateControl(event);
                     }.bind(this);
                 }
             } else {
                 elements = document.querySelectorAll('input[name="' + key + 'Control"]');
-                document.querySelector('input[name="' + key + 'Control"][value="' + (teleprompter.settings[key] === "true" ? "on": "off") + '"]').checked = true;
+                document.querySelector('input[name="' + key + 'Control"][value="' + (await teleprompter.settings[key] === "true" ? "on": "off") + '"]').checked = true;
                 for (var j = 0; j < elements.length; j++) {
                     element = elements[j];
                     element.onchange = function(event) {
@@ -671,58 +675,58 @@ class Controls {
         this.updateQuickConfig();
     }
 
-    updateQuickConfig() {
+    async updateQuickConfig() {
         var element;
         for (var key in this.controls) {
             element = document.getElementById(key + "Quick");
             if (element) {
                 // Cleaning previous hiddens
                 element.classList.remove("hidden");
-                if (teleprompter.settings[key + "Quick"] === "false") {
+                if (await teleprompter.settings[key + "Quick"] === "false") {
                     element.classList.add("hidden");
                 }
             }
 
             element = document.getElementById(key + "QuickConfig");
             if (element) {
-                element.checked = (teleprompter.settings[key + "Quick"] === "true");
+                element.checked = (await teleprompter.settings[key + "Quick"] === "true");
             }
         }
     }
     
-    updateControl(e) {
+    async updateControl(e) {
         e.preventDefault();
         var id = e.target.id.replace("Control", "");
         var element = document.getElementById(id);
         if (element) {
             teleprompter.settings[id] = e.target.value;
-            element.value = teleprompter.settings[id];
+            element.value = await teleprompter.settings[id];
         }
     }
 
-    updateQuickControl(e) {
+    async updateQuickControl(e) {
         e.preventDefault();
         var id = e.target.id;
         var element = document.getElementById(id + "Control");
         if (element) {
             teleprompter.settings[id] = e.target.value;
-            element.value = teleprompter.settings[id];
+            element.value = await teleprompter.settings[id];
         }
     }
 
-    updateToggleControl(e) {
+    async updateToggleControl(e) {
         e.preventDefault();
         var id = e.target.name.replace("Control", "");
         teleprompter.settings[id] = e.target.value === "on";
-        var element = document.querySelector('input[name="' + id + '"][value="' + (teleprompter.settings[id] === "true" ? "on" : "off") + '"]');
+        var element = document.querySelector('input[name="' + id + '"][value="' + (await teleprompter.settings[id] === "true" ? "on" : "off") + '"]');
         element.checked = true;
     }
 
-    updateQuickToggleControl(e) {
+    async updateQuickToggleControl(e) {
         e.preventDefault();
         var id = e.target.name;
         teleprompter.settings[id] = e.target.value === "on";
-        var element = document.querySelector('input[name="' + id + 'Control"][value="' + (teleprompter.settings[id] === "true" ? "on" : "off") + '"]')
+        var element = document.querySelector('input[name="' + id + 'Control"][value="' + (await teleprompter.settings[id] === "true" ? "on" : "off") + '"]')
         element.checked = true;
     }
 
@@ -1654,7 +1658,7 @@ class Editor {
         }
     }
 
-    init() {
+    async init() {
         // Set globals
         this.tic = false;
 
@@ -1723,37 +1727,37 @@ class Editor {
             var compare = require("deb-version-compare");
 
             //Check, Update and Migrate Teleprompter Data
-            var item = teleprompter.settings.IFTeleprompterVersion;
-            if (item == null || compare(teleprompter.settings.currentVersion, item) == 1) {
+            var item = await teleprompter.settings.IFTeleprompterVersion;
+            if (item == null || compare(await teleprompter.settings.currentVersion, item) == 1) {
                 //fix 
                 item = "0";
                 console.log("item", item)
-                console.log(teleprompter.settings)
-                console.log("currentVersion", teleprompter.settings["currentVersion"])
+                console.log(await teleprompter.settings)
+                console.log("currentVersion", await teleprompter.settings["currentVersion"])
                 //check if is going to use a develoment version 
-                if (!this.isADevVersion(item) && this.isADevVersion(teleprompter.settings.currentVersion)) {
+                if (!this.isADevVersion(item) && this.isADevVersion(await teleprompter.settings.currentVersion)) {
                     //migrarate from official version to a development version
                     window.location = "#devWarning";
                     var agreeButton = document.getElementById("agreeWarningButton");
-                    agreeButton.onclick = function(e) {
+                    agreeButton.onclick = async (e) => {
                         this.applyMigration(item);
-                        teleprompter.settings.IFTeleprompterVersion = teleprompter.settings.currentVersion;
+                        teleprompter.settings.IFTeleprompterVersion = await teleprompter.settings.currentVersion;
                         this.closeModal();
-                    }.bind(this);
+                    };
                     document.getElementById("cancelWarningButton").onclick = this.closeWindow;
                     document.getElementById("closeWarning").onclick = this.closeWindow;
                     agreeButton.focus();
                 } else {
                     //migrate from previous versions 
                     this.applyMigration(item);
-                    teleprompter.settings.IFTeleprompterVersion = teleprompter.settings.currentVersion;
+                    teleprompter.settings.IFTeleprompterVersion = await teleprompter.settings.currentVersion;
 
                     //make sure all modal closes after reload the page
                     //place this here to avoid problems with the warning and the newest modal
                     this.closeModal();
                 }
                 
-            } else if(compare(item, teleprompter.settings.currentVersion) == 1) {
+            } else if(compare(item, await teleprompter.settings.currentVersion) == 1) {
                 window.location = "#devNewestVersion";
                 var cancelButton = document.getElementById("cancelNewestButton");
                 cancelButton.onclick = function(e){
@@ -1858,8 +1862,8 @@ class Editor {
         promptcontainer.onscroll = function(event) {
             teleprompter.settings.promptStartPosition = event.target.scrollTop;
         }
-        if (teleprompter.settings.promptStartPosition) {
-            promptcontainer.scrollTop = teleprompter.settings.promptStartPosition;
+        if (await teleprompter.settings.promptStartPosition) {
+            promptcontainer.scrollTop = await teleprompter.settings.promptStartPosition;
         } else {
             teleprompter.settings.promptStartPosition = 0;
         }
@@ -1932,7 +1936,7 @@ class Editor {
     }
 
     //Apply migration by versions
-    applyMigration(version) {
+    async applyMigration(version) {
         switch (version) {
             // "default" at top for unnacaunted developer versions. I didn't thought this was possible! xD
             default:
@@ -1940,7 +1944,7 @@ class Editor {
             case null:
             case "0":
             case "2.2.0":
-                var dataToMigrate = teleprompter.settings.IFTeleprompterSideBar;
+                var dataToMigrate = await teleprompter.settings.IFTeleprompterSideBar;
                 if (dataToMigrate) {
                     // Convert Data
                     dataToMigrate = JSON.parse(dataToMigrate);
@@ -2118,7 +2122,7 @@ class Editor {
         }
     }
 
-    restoreEditor(event) {
+    async restoreEditor(event) {
         if (!this.promptCanSubmitTeleprompter) {
             if (this.debug) console.log("Restoring editor.");
             // Request to close prompters:
@@ -2141,11 +2145,11 @@ class Editor {
                 event.preventDefault();
             this.togglePromptIt();
         }
-        promptcontainer.scrollTop = teleprompter.settings.promptStartPosition;
+        promptcontainer.scrollTop = await teleprompter.settings.promptStartPosition;
     }
 
     // On "Prompt It!" clicked
-    submitTeleprompter(event) {
+    async submitTeleprompter(event) {
         if (this.debug) console.log("Submitting to prompter");
 
         // Stops the event but continues executing the code.
@@ -2157,9 +2161,9 @@ class Editor {
         this.updatePrompterData();
 
         // Determine whether to load "Primary".
-        this.instance[0] = (teleprompter.settings.primary > 0) ? true : false; 
+        this.instance[0] = (await teleprompter.settings.primary > 0) ? true : false; 
         // Determine whether to load "Secondary".
-        this.instance[1] = (teleprompter.settings.secondary > 0) ? true : false; 
+        this.instance[1] = (await teleprompter.settings.secondary > 0) ? true : false; 
         // Checks if is running on electron app...
         if (inElectron()) {
             // Check display availabillity.
@@ -2277,9 +2281,9 @@ class Editor {
         location.reload();
     }
 
-    clearAllRequest() {
+    async clearAllRequest() {
         if (confirm("You've pressed F6. Do you wish to perform a factory reset of Teleprompter? You will loose all saved scripts and custom styles.") ) {
-            teleprompter.settings.clear();
+            await teleprompter.settings.clear();
             window.removeEventListener("beforeunload", function() {
                 this.updatePrompterData();
             }.bind(this));
@@ -2384,18 +2388,18 @@ class Editor {
         }
     }
 
-    closeModal() {
+    async closeModal() {
         if (window.location.hash.slice(1) === "openCustomStyles")
             this.closePromptStyles();
         else if (window.location.hash.slice(1) === "devWarning") {
-            var version = function(thisVersion) {
-                console.log(thisVersion);
-                if (thisVersion === teleprompter.settings.currentVersion)
-                    window.location = "#close";
-                else
-                    window.close();
-            };
-            // teleprompter.settings.get("IFTeleprompterVersion", version);
+            // var version = function(thisVersion) {
+            //     console.log(thisVersion);
+            //     if (thisVersion === await teleprompter.settings.currentVersion)
+            //         window.location = "#close";
+            //     else
+            //         window.close();
+            // };
+            // await teleprompter.settings.get("IFTeleprompterVersion", version);
         }
         else
             window.location = "#close";

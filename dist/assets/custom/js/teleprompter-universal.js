@@ -139,50 +139,48 @@ class ElectronSettings {
     constructor(){
         return new Proxy(Storage, this);
     }
-    get(target, prop) {
+    async get(target, prop) {
         ipcRenderer.send('settings-get', {
             key: prop
         });
-
-        let value = null
-        ipcRenderer.on('settings-reply', (event, arg) => {
-            if (arg.key === prop) {
-                console.log(prop, value)
-                value = arg.value;
-            }
-        });
-        return value
+        return new Promise((resolve, _) => {
+            ipcRenderer.once(`settings-reply-${prop}`, (event, arg) => {
+                if (arg.key === prop) {
+                    resolve(arg.value);
+                }
+            });
+        })
     }
-    set(target, prop, value) {
+    async set(target, prop, value) {
         ipcRenderer.send('settings-set', {
             key: prop,
             value: value
         });
         return Object.assign({}, value);
     }
-    remove(target, key) {
+    async remove(target, key) {
         localStorage.removeItem(key);
     }
-    clear() {
+    async clear() {
         localStorage.clear()
     }
 }
 
 
-// if (inElectron()) {
-//     electron = require('electron');
-//     ipcRenderer = electron.ipcRenderer;
+if (inElectron()) {
+    electron = require('electron');
+    ipcRenderer = electron.ipcRenderer;
     
-//     window.teleprompter.settings = new ElectronSettings();
-// } else {
-//     window.teleprompter.settings = new BrowserSettings();
-// }
+    window.teleprompter.settings = new ElectronSettings();
+} else {
+    window.teleprompter.settings = new BrowserSettings();
+}
 
-window.teleprompter.settings = new BrowserSettings();
+// window.teleprompter.settings = new BrowserSettings();
 
 // Example
-// teleprompter.settings.test_variable = 'value';
-// teleprompter.settings["test_variable"] = 'value';
+// await teleprompter.settings.test_variable = 'value';
+// await teleprompter.settings["test_variable"] = 'value';
 /*
     Imaginary Teleprompter
     Copyright (C) 2015-2021 Imaginary Sense Inc. and contributors
@@ -214,8 +212,8 @@ class Themes {
         document.getElementsByTagName('head')[0].appendChild(this.themeSheet);
     }
 
-    styleInit(prompterStyleElement) {
-        var data = teleprompter.settings.IFTeleprompterThemeStyles;
+    async styleInit(prompterStyleElement) {
+        var data = await teleprompter.settings.IFTeleprompterThemeStyles;
 
         if (data)
             this.themeStyles = JSON.parse(data);
@@ -284,10 +282,10 @@ class Themes {
         }
         
         this.defaultStyle = 1;
-        if (!teleprompter.settings.prompterStyle) {
+        if (!await teleprompter.settings.prompterStyle) {
             teleprompter.settings.prompterStyle = this.defaultStyle;
         } else {
-            this.defaultStyle = teleprompter.settings.prompterStyle;
+            this.defaultStyle = await teleprompter.settings.prompterStyle;
         }
     
         ///Maybe will need a fix in the future...

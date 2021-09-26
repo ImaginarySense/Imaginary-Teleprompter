@@ -124,7 +124,7 @@ class Prompter {
         // Animation settings
         this.play = true;
         // Get focus mode
-        this.focus = parseInt(teleprompter.settings.focus);
+        this.focus = parseInt(await teleprompter.settings.focus);
     
         this.timer = $('.clock').timer({
             stopVal: 10000,
@@ -135,12 +135,12 @@ class Prompter {
         this.setPromptHeight();
         
         // Get prompter style
-        this.promptStyleOption = teleprompter.settings.prompterStyle;
+        this.promptStyleOption = await teleprompter.settings.prompterStyle;
         // Get flip settings
         if (this.inIframe())
-            this.flip = parseInt(teleprompter.settings.primary);
+            this.flip = parseInt(await teleprompter.settings.primary);
         else
-            this.flip = parseInt(teleprompter.settings.secondary);
+            this.flip = parseInt(await teleprompter.settings.secondary);
         
         // Initialize flip values
         this.flipH = false;
@@ -244,15 +244,15 @@ class Prompter {
 
         // On close
         window.addEventListener("beforeunload", function() {
-            var textAtFocusArea = parseInt(teleprompter.settings.textAtFocusArea);
+            var textAtFocusArea = parseInt(await teleprompter.settings.textAtFocusArea);
             if (textAtFocusArea > 1) {
                 var offsetToFocusArea = this.overlayFocus.getBoundingClientRect().top,
                     promptValues = this.getTranslateValues(this.prompt);
                 
-                teleprompter.settings.promptStartPosition = -(promptValues.y - offsetToFocusArea + this.screenHeight);
+                await teleprompter.settings.promptStartPosition = -(promptValues.y - offsetToFocusArea + this.screenHeight);
 
             } else {
-                teleprompter.settings.promptStartPosition = 0;
+                await teleprompter.settings.promptStartPosition = 0;
             }
             this.restoreRequest();
         }.bind(this));
@@ -318,14 +318,14 @@ class Prompter {
         // Calculate where to start
         var offsetToFocusArea = 0,
             promptStartPosition = 0,
-            textAtFocusArea = parseInt(teleprompter.settings.textAtFocusArea);
+            textAtFocusArea = parseInt(await teleprompter.settings.textAtFocusArea);
 
         if (textAtFocusArea > 0) {
             offsetToFocusArea = this.overlayFocus.getBoundingClientRect().bottom;
         }
 
         if (textAtFocusArea > 1) {
-            promptStartPosition = teleprompter.settings.promptStartPosition;
+            promptStartPosition = await teleprompter.settings.promptStartPosition;
         }
     
         // If flipped vertically, set start at inverted top.
@@ -339,15 +339,15 @@ class Prompter {
     }
 
     setFocusAreaHeight() {
-        if (teleprompter.settings.focusAreaHeight) {
-            this.overlayFocus.style.height = 3.6 * (teleprompter.settings.focusAreaHeight / 100) + 'em';
+        if (await teleprompter.settings.focusAreaHeight) {
+            this.overlayFocus.style.height = 3.6 * (await teleprompter.settings.focusAreaHeight / 100) + 'em';
         } else {
             this.overlayFocus.style.height = '1.8em';
         }
     }
 
     updateSettings() {        
-        var data = teleprompter.settings.IFTeleprompterSession;
+        var data = await teleprompter.settings.IFTeleprompterSession;
         this.session = JSON.parse(data);
         // Ensure content is being passed
         // console.log("session", this.session);
@@ -364,10 +364,10 @@ class Prompter {
 
         var oldFontSize = this.fontSize,
             oldPromptWidth = this.promptWidth;
-        this.fontSize = teleprompter.settings.fontSize/100;
-        this.speedMultip = teleprompter.settings.speed;
-        this.sensitivity = teleprompter.settings.acceleration;
-        this.promptWidth = teleprompter.settings.promptWidth;
+        this.fontSize = await teleprompter.settings.fontSize/100;
+        this.speedMultip = await teleprompter.settings.speed;
+        this.sensitivity = await teleprompter.settings.acceleration;
+        this.promptWidth = await teleprompter.settings.promptWidth;
         // If updating font, update it and resync
         if (oldFontSize !== this.fontSize)
             this.updateFont();
@@ -384,7 +384,7 @@ class Prompter {
         this.updateVelocity();
         
         // Enable timer
-        if (teleprompter.settings.timer === "true") {
+        if (await teleprompter.settings.timer === "true") {
             if (this.timer.data().timer.currentVal===0)
             this.timer.startTimer();
             this.clock.style.opacity = '1';
@@ -472,7 +472,7 @@ class Prompter {
         else if (!this.inIframe() && this.ipcRenderer!==undefined)
             this.ipcRenderer.send('asynchronous-message', 'restoreEditor');
         // In all cases, clean emulated session storage before leaving.
-        teleprompter.settings.remove("IFTeleprompterSession");
+        await teleprompter.settings.remove("IFTeleprompterSession");
     }
 
     closeInstance() {
@@ -1292,7 +1292,7 @@ class Prompter {
     }
 
     remoteControls() {
-        teleprompter.settings.get("IFTeleprompterControl");
+        await teleprompter.settings.get("IFTeleprompterControl");
         var res = JSON.parse(data);
         if(typeof res !== "undefined"){
             if(res.hasOwnProperty('key') > 0){

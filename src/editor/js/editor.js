@@ -51,7 +51,7 @@ class Editor {
         }
     }
 
-    init() {
+    async init() {
         // Set globals
         this.tic = false;
 
@@ -120,37 +120,37 @@ class Editor {
             var compare = require("deb-version-compare");
 
             //Check, Update and Migrate Teleprompter Data
-            var item = teleprompter.settings.IFTeleprompterVersion;
-            if (item == null || compare(teleprompter.settings.currentVersion, item) == 1) {
+            var item = await teleprompter.settings.IFTeleprompterVersion;
+            if (item == null || compare(await teleprompter.settings.currentVersion, item) == 1) {
                 //fix 
                 item = "0";
                 console.log("item", item)
-                console.log(teleprompter.settings)
-                console.log("currentVersion", teleprompter.settings["currentVersion"])
+                console.log(await teleprompter.settings)
+                console.log("currentVersion", await teleprompter.settings["currentVersion"])
                 //check if is going to use a develoment version 
-                if (!this.isADevVersion(item) && this.isADevVersion(teleprompter.settings.currentVersion)) {
+                if (!this.isADevVersion(item) && this.isADevVersion(await teleprompter.settings.currentVersion)) {
                     //migrarate from official version to a development version
                     window.location = "#devWarning";
                     var agreeButton = document.getElementById("agreeWarningButton");
-                    agreeButton.onclick = function(e) {
+                    agreeButton.onclick = async (e) => {
                         this.applyMigration(item);
-                        teleprompter.settings.IFTeleprompterVersion = teleprompter.settings.currentVersion;
+                        teleprompter.settings.IFTeleprompterVersion = await teleprompter.settings.currentVersion;
                         this.closeModal();
-                    }.bind(this);
+                    };
                     document.getElementById("cancelWarningButton").onclick = this.closeWindow;
                     document.getElementById("closeWarning").onclick = this.closeWindow;
                     agreeButton.focus();
                 } else {
                     //migrate from previous versions 
                     this.applyMigration(item);
-                    teleprompter.settings.IFTeleprompterVersion = teleprompter.settings.currentVersion;
+                    teleprompter.settings.IFTeleprompterVersion = await teleprompter.settings.currentVersion;
 
                     //make sure all modal closes after reload the page
                     //place this here to avoid problems with the warning and the newest modal
                     this.closeModal();
                 }
                 
-            } else if(compare(item, teleprompter.settings.currentVersion) == 1) {
+            } else if(compare(item, await teleprompter.settings.currentVersion) == 1) {
                 window.location = "#devNewestVersion";
                 var cancelButton = document.getElementById("cancelNewestButton");
                 cancelButton.onclick = function(e){
@@ -255,8 +255,8 @@ class Editor {
         promptcontainer.onscroll = function(event) {
             teleprompter.settings.promptStartPosition = event.target.scrollTop;
         }
-        if (teleprompter.settings.promptStartPosition) {
-            promptcontainer.scrollTop = teleprompter.settings.promptStartPosition;
+        if (await teleprompter.settings.promptStartPosition) {
+            promptcontainer.scrollTop = await teleprompter.settings.promptStartPosition;
         } else {
             teleprompter.settings.promptStartPosition = 0;
         }
@@ -329,7 +329,7 @@ class Editor {
     }
 
     //Apply migration by versions
-    applyMigration(version) {
+    async applyMigration(version) {
         switch (version) {
             // "default" at top for unnacaunted developer versions. I didn't thought this was possible! xD
             default:
@@ -337,7 +337,7 @@ class Editor {
             case null:
             case "0":
             case "2.2.0":
-                var dataToMigrate = teleprompter.settings.IFTeleprompterSideBar;
+                var dataToMigrate = await teleprompter.settings.IFTeleprompterSideBar;
                 if (dataToMigrate) {
                     // Convert Data
                     dataToMigrate = JSON.parse(dataToMigrate);
@@ -515,7 +515,7 @@ class Editor {
         }
     }
 
-    restoreEditor(event) {
+    async restoreEditor(event) {
         if (!this.promptCanSubmitTeleprompter) {
             if (this.debug) console.log("Restoring editor.");
             // Request to close prompters:
@@ -538,11 +538,11 @@ class Editor {
                 event.preventDefault();
             this.togglePromptIt();
         }
-        promptcontainer.scrollTop = teleprompter.settings.promptStartPosition;
+        promptcontainer.scrollTop = await teleprompter.settings.promptStartPosition;
     }
 
     // On "Prompt It!" clicked
-    submitTeleprompter(event) {
+    async submitTeleprompter(event) {
         if (this.debug) console.log("Submitting to prompter");
 
         // Stops the event but continues executing the code.
@@ -554,9 +554,9 @@ class Editor {
         this.updatePrompterData();
 
         // Determine whether to load "Primary".
-        this.instance[0] = (teleprompter.settings.primary > 0) ? true : false; 
+        this.instance[0] = (await teleprompter.settings.primary > 0) ? true : false; 
         // Determine whether to load "Secondary".
-        this.instance[1] = (teleprompter.settings.secondary > 0) ? true : false; 
+        this.instance[1] = (await teleprompter.settings.secondary > 0) ? true : false; 
         // Checks if is running on electron app...
         if (inElectron()) {
             // Check display availabillity.
@@ -674,9 +674,9 @@ class Editor {
         location.reload();
     }
 
-    clearAllRequest() {
+    async clearAllRequest() {
         if (confirm("You've pressed F6. Do you wish to perform a factory reset of Teleprompter? You will loose all saved scripts and custom styles.") ) {
-            teleprompter.settings.clear();
+            await teleprompter.settings.clear();
             window.removeEventListener("beforeunload", function() {
                 this.updatePrompterData();
             }.bind(this));
@@ -781,18 +781,18 @@ class Editor {
         }
     }
 
-    closeModal() {
+    async closeModal() {
         if (window.location.hash.slice(1) === "openCustomStyles")
             this.closePromptStyles();
         else if (window.location.hash.slice(1) === "devWarning") {
-            var version = function(thisVersion) {
-                console.log(thisVersion);
-                if (thisVersion === teleprompter.settings.currentVersion)
-                    window.location = "#close";
-                else
-                    window.close();
-            };
-            // teleprompter.settings.get("IFTeleprompterVersion", version);
+            // var version = function(thisVersion) {
+            //     console.log(thisVersion);
+            //     if (thisVersion === await teleprompter.settings.currentVersion)
+            //         window.location = "#close";
+            //     else
+            //         window.close();
+            // };
+            // await teleprompter.settings.get("IFTeleprompterVersion", version);
         }
         else
             window.location = "#close";

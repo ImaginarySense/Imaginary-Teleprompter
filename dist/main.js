@@ -45,9 +45,6 @@ const teleprompter = require('./teleprompter');
 // Setup settings
 const settings = new Settings(app);
 
-// Limited to 100 simultaneous calls
-ipcMain.setMaxListeners(100);
-
 // 
 protocol.registerSchemesAsPrivileged([
 	{ scheme: 'teleprompter', privileges: { supportFetchAPI: true } }
@@ -290,7 +287,7 @@ ipcMain.on('asynchronous-message', (event, arg) => {
 
 ipcMain.on('settings-get', (event, arg) => {
 	let value = settings.getItem(arg.key)
-	event.sender.send('settings-reply', {
+	event.sender.send(`settings-reply-${arg.key}`, {
 		key: arg.key,
 		value: value
 	});

@@ -266,8 +266,13 @@ class CommandsMapping {
         }
 
         // Load settings
-        if (teleprompter.settings.commandsMapping) {
-            this.mapping = JSON.parse(teleprompter.settings.commandsMapping);
+        this.loadSettings();
+    }
+
+    async loadSettings() { 
+        // Load settings
+        if (await teleprompter.settings.commandsMapping) {
+            this.mapping = JSON.parse(await teleprompter.settings.commandsMapping);
         }
 
         this.userActions = [
@@ -277,8 +282,8 @@ class CommandsMapping {
             //     "action": "customSpeed"
             // }
         ];
-        if (teleprompter.settings.userActions) {
-            this.userActions = JSON.parse(teleprompter.settings.userActions);
+        if (await teleprompter.settings.userActions) {
+            this.userActions = JSON.parse(await teleprompter.settings.userActions);
         }
     }
 
@@ -421,7 +426,6 @@ class CommandsMapping {
                 };
             }
             
-
             teleprompter.settings.commandsMapping = JSON.stringify(this.mapping);
             e.target.setAttribute("data-key", nextKey);
 

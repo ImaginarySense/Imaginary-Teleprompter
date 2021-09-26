@@ -54,23 +54,23 @@ class Controls {
 
     }
 
-    setDefaultValues() {
+    async setDefaultValues() {
         // Set default controls values
         for (var key in this.controls) {
-            if (!teleprompter.settings[key]) {
+            if (!await teleprompter.settings[key]) {
                 teleprompter.settings[key] = this.controls[key];
             }
         }
 
         // Set default QuickConfig values
         for (var key in this.defaultsQuickConfig) {
-            if (!teleprompter.settings[key]) {
+            if (!await teleprompter.settings[key]) {
                 teleprompter.settings[key] = this.defaultsQuickConfig[key];
             }
         }
     }
 
-    draw() {
+    async draw() {
         this.slider = [
             new Slider("#speed", {}),
             new Slider("#acceleration", {}),
@@ -85,62 +85,62 @@ class Controls {
         ];
 
         // Data binding for advanced options
-        this.slider[0].on("change", function(input) {
+        this.slider[0].on("change", async (input) => {
             teleprompter.settings.speed = parseFloat(Math.round(input.newValue * 10) / 10).toFixed(1);
-            document.getElementById("speedValue").textContent = teleprompter.settings.speed;
+            document.getElementById("speedValue").textContent = await teleprompter.settings.speed;
         });
-        this.slider[1].on("change", function(input) {
+        this.slider[1].on("change", async (input) => {
             teleprompter.settings.acceleration = parseFloat(Math.round(input.newValue * 100) / 100).toFixed(2);
-            document.getElementById("accelerationValue").textContent = teleprompter.settings.acceleration;
+            document.getElementById("accelerationValue").textContent = await teleprompter.settings.acceleration;
         });
-        this.slider[2].on("change", function(input) {
+        this.slider[2].on("change", async (input) => {
             teleprompter.settings.fontSize = input.newValue;
-            document.getElementById("fontSizeValue").textContent = teleprompter.settings.fontSize;
-            teleprompter.editor.updateFont(teleprompter.settings.fontSize);
+            document.getElementById("fontSizeValue").textContent = await teleprompter.settings.fontSize;
+            teleprompter.editor.updateFont(await teleprompter.settings.fontSize);
         });
-        this.slider[3].on("change", function(input) {
+        this.slider[3].on("change", async (input) => {
             teleprompter.settings.promptWidth = input.newValue;
-            document.getElementById("promptWidthValue").textContent = teleprompter.settings.promptWidth;
-            teleprompter.editor.updateWidth(teleprompter.settings.promptWidth);
+            document.getElementById("promptWidthValue").textContent = await teleprompter.settings.promptWidth;
+            teleprompter.editor.updateWidth(await teleprompter.settings.promptWidth);
         });
-        this.slider[4].on("change", function(input) {
+        this.slider[4].on("change", async (input) => {
             teleprompter.settings.focusAreaHeight = input.newValue;
-            document.getElementById("focusAreaHeightValue").textContent = teleprompter.settings.focusAreaHeight;
+            document.getElementById("focusAreaHeightValue").textContent = await teleprompter.settings.focusAreaHeight;
         });
-        this.slider[5].on("change", function(input) {
+        this.slider[5].on("change", async (input) => {
             teleprompter.settings.speed = parseFloat(Math.round(input.newValue * 10) / 10).toFixed(1);
-            document.getElementById("speedControlValue").textContent = teleprompter.settings.speed;
+            document.getElementById("speedControlValue").textContent = await teleprompter.settings.speed;
         });
-        this.slider[6].on("change", function(input) {
+        this.slider[6].on("change", async (input) => {
             teleprompter.settings.acceleration = parseFloat(Math.round(input.newValue * 100) / 100).toFixed(2);
-            document.getElementById("accelerationControlValue").textContent = teleprompter.settings.acceleration;
+            document.getElementById("accelerationControlValue").textContent = await teleprompter.settings.acceleration;
         });
-        this.slider[7].on("change", function(input) {
+        this.slider[7].on("change", async (input) => {
             teleprompter.settings.fontSize = input.newValue;
-            document.getElementById("fontSizeControlValue").textContent = teleprompter.settings.fontSize;
-            teleprompter.editor.updateFont(teleprompter.settings.fontSize);
+            document.getElementById("fontSizeControlValue").textContent = await teleprompter.settings.fontSize;
+            teleprompter.editor.updateFont(await teleprompter.settings.fontSize);
         });
-        this.slider[8].on("change", function(input) {
+        this.slider[8].on("change", async (input) => {
             teleprompter.settings.promptWidth = input.newValue;
-            document.getElementById("promptWidthControlValue").textContent = teleprompter.settings.promptWidth;
-            teleprompter.editor.updateWidth(teleprompter.settings.promptWidth);
+            document.getElementById("promptWidthControlValue").textContent = await teleprompter.settings.promptWidth;
+            teleprompter.editor.updateWidth(await teleprompter.settings.promptWidth);
         });
-        this.slider[9].on("change", function(input) {
+        this.slider[9].on("change", async (input) => {
             teleprompter.settings.focusAreaHeight = input.newValue;
-            document.getElementById("focusAreaHeightControlValue").textContent = teleprompter.settings.focusAreaHeight;
+            document.getElementById("focusAreaHeightControlValue").textContent = await teleprompter.settings.focusAreaHeight;
         });
 
         // Load last sliders setting
-        this.setSliderValue(this.slider[0], teleprompter.settings.speed);
-        this.setSliderValue(this.slider[1], teleprompter.settings.acceleration);
-        this.setSliderValue(this.slider[2], teleprompter.settings.fontSize);
-        this.setSliderValue(this.slider[3], teleprompter.settings.promptWidth);
-        this.setSliderValue(this.slider[4], teleprompter.settings.focusAreaHeight);
-        this.setSliderValue(this.slider[5], teleprompter.settings.speed);
-        this.setSliderValue(this.slider[6], teleprompter.settings.acceleration);
-        this.setSliderValue(this.slider[7], teleprompter.settings.fontSize);
-        this.setSliderValue(this.slider[8], teleprompter.settings.promptWidth);
-        this.setSliderValue(this.slider[9], teleprompter.settings.focusAreaHeight);
+        this.setSliderValue(this.slider[0], await teleprompter.settings.speed);
+        this.setSliderValue(this.slider[1], await teleprompter.settings.acceleration);
+        this.setSliderValue(this.slider[2], await teleprompter.settings.fontSize);
+        this.setSliderValue(this.slider[3], await teleprompter.settings.promptWidth);
+        this.setSliderValue(this.slider[4], await teleprompter.settings.focusAreaHeight);
+        this.setSliderValue(this.slider[5], await teleprompter.settings.speed);
+        this.setSliderValue(this.slider[6], await teleprompter.settings.acceleration);
+        this.setSliderValue(this.slider[7], await teleprompter.settings.fontSize);
+        this.setSliderValue(this.slider[8], await teleprompter.settings.promptWidth);
+        this.setSliderValue(this.slider[9], await teleprompter.settings.focusAreaHeight);
 
         var element, elements = [], sliderIndex = 0, sliderOffset = this.slider.length / 2, hasSlide = false;
         for (var key in this.controls) {
@@ -153,14 +153,14 @@ class Controls {
                     }.bind(this);
                     hasSlide = true;
                 } else {
-                    element.value = teleprompter.settings[key];
+                    element.value = await teleprompter.settings[key];
                     element.onchange = function(event) {
                         this.updateQuickControl(event);
                     }.bind(this);
                 }
             } else {
                 elements = document.querySelectorAll('input[name="' + key + '"]');
-                document.querySelector('input[name="' + key + '"]:checked').value = teleprompter.settings[key];
+                document.querySelector('input[name="' + key + '"]:checked').value = await teleprompter.settings[key];
                 for (var j = 0; j < elements.length; j++) {
                     element = elements[j];
                     element.onchange = function(event) {
@@ -179,14 +179,14 @@ class Controls {
                     }.bind(this);
                     hasSlide = true;
                 } else {
-                    element.value = teleprompter.settings[key];
+                    element.value = await teleprompter.settings[key];
                     element.onchange = function(event) {
                         this.updateControl(event);
                     }.bind(this);
                 }
             } else {
                 elements = document.querySelectorAll('input[name="' + key + 'Control"]');
-                document.querySelector('input[name="' + key + 'Control"][value="' + (teleprompter.settings[key] === "true" ? "on": "off") + '"]').checked = true;
+                document.querySelector('input[name="' + key + 'Control"][value="' + (await teleprompter.settings[key] === "true" ? "on": "off") + '"]').checked = true;
                 for (var j = 0; j < elements.length; j++) {
                     element = elements[j];
                     element.onchange = function(event) {
@@ -210,58 +210,58 @@ class Controls {
         this.updateQuickConfig();
     }
 
-    updateQuickConfig() {
+    async updateQuickConfig() {
         var element;
         for (var key in this.controls) {
             element = document.getElementById(key + "Quick");
             if (element) {
                 // Cleaning previous hiddens
                 element.classList.remove("hidden");
-                if (teleprompter.settings[key + "Quick"] === "false") {
+                if (await teleprompter.settings[key + "Quick"] === "false") {
                     element.classList.add("hidden");
                 }
             }
 
             element = document.getElementById(key + "QuickConfig");
             if (element) {
-                element.checked = (teleprompter.settings[key + "Quick"] === "true");
+                element.checked = (await teleprompter.settings[key + "Quick"] === "true");
             }
         }
     }
     
-    updateControl(e) {
+    async updateControl(e) {
         e.preventDefault();
         var id = e.target.id.replace("Control", "");
         var element = document.getElementById(id);
         if (element) {
             teleprompter.settings[id] = e.target.value;
-            element.value = teleprompter.settings[id];
+            element.value = await teleprompter.settings[id];
         }
     }
 
-    updateQuickControl(e) {
+    async updateQuickControl(e) {
         e.preventDefault();
         var id = e.target.id;
         var element = document.getElementById(id + "Control");
         if (element) {
             teleprompter.settings[id] = e.target.value;
-            element.value = teleprompter.settings[id];
+            element.value = await teleprompter.settings[id];
         }
     }
 
-    updateToggleControl(e) {
+    async updateToggleControl(e) {
         e.preventDefault();
         var id = e.target.name.replace("Control", "");
         teleprompter.settings[id] = e.target.value === "on";
-        var element = document.querySelector('input[name="' + id + '"][value="' + (teleprompter.settings[id] === "true" ? "on" : "off") + '"]');
+        var element = document.querySelector('input[name="' + id + '"][value="' + (await teleprompter.settings[id] === "true" ? "on" : "off") + '"]');
         element.checked = true;
     }
 
-    updateQuickToggleControl(e) {
+    async updateQuickToggleControl(e) {
         e.preventDefault();
         var id = e.target.name;
         teleprompter.settings[id] = e.target.value === "on";
-        var element = document.querySelector('input[name="' + id + 'Control"][value="' + (teleprompter.settings[id] === "true" ? "on" : "off") + '"]')
+        var element = document.querySelector('input[name="' + id + 'Control"][value="' + (await teleprompter.settings[id] === "true" ? "on" : "off") + '"]')
         element.checked = true;
     }
 

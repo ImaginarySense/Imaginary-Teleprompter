@@ -29,8 +29,8 @@ class Themes {
         document.getElementsByTagName('head')[0].appendChild(this.themeSheet);
     }
 
-    styleInit(prompterStyleElement) {
-        var data = teleprompter.settings.IFTeleprompterThemeStyles;
+    async styleInit(prompterStyleElement) {
+        var data = await teleprompter.settings.IFTeleprompterThemeStyles;
 
         if (data)
             this.themeStyles = JSON.parse(data);
@@ -99,10 +99,10 @@ class Themes {
         }
         
         this.defaultStyle = 1;
-        if (!teleprompter.settings.prompterStyle) {
+        if (!await teleprompter.settings.prompterStyle) {
             teleprompter.settings.prompterStyle = this.defaultStyle;
         } else {
-            this.defaultStyle = teleprompter.settings.prompterStyle;
+            this.defaultStyle = await teleprompter.settings.prompterStyle;
         }
     
         ///Maybe will need a fix in the future...
