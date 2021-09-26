@@ -39,7 +39,16 @@ const path = require('path');
 const url = require('url');
 const router = require('./router');
 const Teleprompter = require('./teleprompter');
+const Settings = require('./settings');
+const teleprompter = require('./teleprompter');
 
+// Setup settings
+const settings = new Settings(app);
+
+// Limited to 100 simultaneous calls
+ipcMain.setMaxListeners(100);
+
+// 
 protocol.registerSchemesAsPrivileged([
 	{ scheme: 'teleprompter', privileges: { supportFetchAPI: true } }
 ]);
@@ -117,7 +126,6 @@ function handleSquirrelEvent() {
 let mainWindow = null,
 	externalPrompt = null,
 	licenseWindow = null,
-	teleprompterSettings = {},
 	tic = 0,
 	toc = 1;
 
@@ -161,12 +169,6 @@ function createMainWindow () {
 
 	mainWindow.once('ready-to-show', () => {
 		mainWindow.show();
-
-		contents.executeJavaScript('({...teleprompter.settings});', true)
-		.then(settings => {
-			teleprompterSettings = settings;
-		});
-
 	});
 	// Close Window
 	mainWindow.on('closed', () =>{
@@ -279,8 +281,25 @@ ipcMain.on('asynchronous-message', (event, arg) => {
 	}
 });
 
-// Multiplatform menu configurations
+//
+ipcMain.on('asynchronous-message', (event, arg) => {
+	if (arg === "prepareLinks")
+		event.sender.send('asynchronous-reply',{'option':'prepareLinks'});
+});
 
+
+ipcMain.on('settings-get', (event, arg) => {
+	let value = settings.getItem(arg.key)
+	event.sender.send('settings-reply', {
+		key: arg.key,
+		value: value
+	});
+});
+ipcMain.on('settings-set', (event, arg) => {
+	settings.setItem(arg.key, arg.value);
+});
+
+// Multiplatform menu configurations
 function setupMenu() {
 	// Create our menu entries so that we can use MAC shortcuts
 	const {app, Menu} = require('electron');
@@ -377,10 +396,11 @@ function setupMenu() {
 function setupProtocol() {
 
 	router.register('GET /prompt/script', Teleprompter.getPromptingScript);
+	router.register('POST /prompt/script', Teleprompter.getPromptingScript);
 
 	protocol.registerHttpProtocol('teleprompter', async (request, callback) => {
 		// Make settings accessible to all requests
-		request.settings = teleprompterSettings;
+		request.settings = settings;
 
 		const handler = router.route(request);
   		await handler.process(request, callback);

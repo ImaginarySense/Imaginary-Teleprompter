@@ -64,88 +64,6 @@ function exitDebug() {
     console.log("Leaving debug mode.");
 }
 /*
-	Imaginary Teleprompter
-	Copyright (C) 2015 Imaginary Sense Inc. and contributors
-
-	This file is part of Imaginary Teleprompter.
-
-	Imaginary Teleprompter is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-
-	Imaginary Teleprompter is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with Imaginary Teleprompter.  If not, see <https://www.gnu.org/licenses/>.
-*/
-
-// Global variables
-var debug;
-var currentVersion = "2.3.4"
-function inElectron() {
-    return navigator.userAgent.indexOf("Electron")!=-1;
-}
-
-var dataManager = {
-	getItem: function(key,item,local,force){
-		if (local === 'undefined')
-		    local = 0;
-		if (inElectron() && local == 2)
-		    httpRequest("GET", key, item,force);
-		else if (inElectron() || local == 1)
-		    item(localStorage.getItem(key));
-		else
-		    item(sessionStorage.getItem(key));
-    },
-    setItem: function (key,item,local) {
-		if (local === 'undefined')
-		    local = 0;
-		if (inElectron() && local == 2)
-		    httpRequest("POST",key,item,true);
-		else if (inElectron() || local == 1)
-		    localStorage.setItem(key, item);
-		else
-		    sessionStorage.setItem(key, item);
-    },
-    removeItem: function (key,local) {
-		if (local === 'undefined')
-		    local = 0;
-		if (inElectron() && local == 2)
-		    httpRequest("POST",key,item,true);
-		else if (inElectron() || local == 1)
-		    localStorage.removeItem(key);
-		else
-		    sessionStorage.removeItem(key);
-    },
-    clearAll: function () {
-    	sessionStorage.clear();
-    	localStorage.clear();
-    }
-};
-
-
-function httpRequest(type,theUrl,data,force) {
-    if (data === 'undefined')
-	    data = "";
-    var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
-    xmlhttp.open(type, theUrl, force);
-    xmlhttp.setRequestHeader("Content-Type", "application/json");
-    
-    xmlhttp.onreadystatechange = function() {
-		if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-		    if (type == "GET") {
-				data(xmlhttp.responseText);
-		    }
-		}
-    }
-    xmlhttp.send(data);
-}
-
-/*
     Imaginary Teleprompter
     Copyright (C) 2015 Imaginary Sense Inc. and contributors
 
@@ -191,14 +109,17 @@ window.mobileAndTabletcheck = function() {
     along with Imaginary Teleprompter.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-class Settings {
+let electron, ipcRenderer;
+
+class BrowserSettings {
     constructor(){
+        localStorage["currentVersion"] = "4.0";
         return new Proxy(localStorage, this); // Note: Proxy ES6 for ES5 @rauschma https://gist.github.com/rauschma/b29fbd27d7fea63b9b19
     }
-    get(target, prop) {
+    async get(target, prop) {
         return localStorage[prop];
     }
-    set(target, prop, value) {
+    async set(target, prop, value) {
         if (value === null) {
             delete localStorage[prop];
         } else {
@@ -206,12 +127,58 @@ class Settings {
         }
         return localStorage[prop];
     }
+    async remove(target, key) {
+        localStorage.removeItem(key);
+    }
+    async clear() {
+        localStorage.clear()
+    }
+}
+
+class ElectronSettings {
+    constructor(){
+        return new Proxy(Storage, this);
+    }
+    get(target, prop) {
+        ipcRenderer.send('settings-get', {
+            key: prop
+        });
+
+        let value = null
+        ipcRenderer.on('settings-reply', (event, arg) => {
+            if (arg.key === prop) {
+                console.log(prop, value)
+                value = arg.value;
+            }
+        });
+        return value
+    }
+    set(target, prop, value) {
+        ipcRenderer.send('settings-set', {
+            key: prop,
+            value: value
+        });
+        return Object.assign({}, value);
+    }
+    remove(target, key) {
+        localStorage.removeItem(key);
+    }
     clear() {
         localStorage.clear()
     }
 }
 
-window.teleprompter.settings = new Settings();
+
+// if (inElectron()) {
+//     electron = require('electron');
+//     ipcRenderer = electron.ipcRenderer;
+    
+//     window.teleprompter.settings = new ElectronSettings();
+// } else {
+//     window.teleprompter.settings = new BrowserSettings();
+// }
+
+window.teleprompter.settings = new BrowserSettings();
 
 // Example
 // teleprompter.settings.test_variable = 'value';
@@ -248,9 +215,10 @@ class Themes {
     }
 
     styleInit(prompterStyleElement) {
-        dataManager.getItem('IFTeleprompterThemeStyles', function(data){
+        var data = teleprompter.settings.IFTeleprompterThemeStyles;
+
+        if (data)
             this.themeStyles = JSON.parse(data);
-        }.bind(this), 0, false);
     
         if (!this.themeStyles) {
             this.themeStyles = [
@@ -332,17 +300,26 @@ class Themes {
     }
 
     setColorPicker() {
-        document.getElementById('bodyColor').onchange = function(event) {
-            this.updateColorOnPreview(event.target);
-        }.bind(this);
+        var bodyColor = document.getElementById('bodyColor');
+        if  (bodyColor){
+            bodyColor.onchange = function(event) {
+                this.updateColorOnPreview(event.target);
+            }.bind(this);
+        }
 
-        document.getElementById('overlayColor').onchange = function(event) {
-            this.updateColorOnPreview(event.target);
-        }.bind(this);
+        var overlayColor = document.getElementById('overlayColor');
+        if (overlayColor) {
+            overlayColor.onchange = function(event) {
+                this.updateColorOnPreview(event.target);
+            }.bind(this);
+        }
 
-        document.getElementById('textColor').onchange = function(event) {
-            this.updateColorOnPreview(event.target);
-        }.bind(this);
+        var textColor = document.getElementById('textColor');
+        if (textColor) {
+            textColor.onchange = function(event) {
+                this.updateColorOnPreview(event.target);
+            }.bind(this);
+        }
     }
 
     setDefaultStyle() {
@@ -422,7 +399,7 @@ class Themes {
     }
 
     saveStyles() {
-        dataManager.setItem("IFTeleprompterThemeStyles", JSON.stringify(this.themeStyles));
+        teleprompter.settings.set("IFTeleprompterThemeStyles", JSON.stringify(this.themeStyles));
         this.refreshPromptStyles(document.getElementById("prompterStyle"));
     }
     

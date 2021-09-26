@@ -30,9 +30,10 @@ class Themes {
     }
 
     styleInit(prompterStyleElement) {
-        dataManager.getItem('IFTeleprompterThemeStyles', function(data){
+        var data = teleprompter.settings.IFTeleprompterThemeStyles;
+
+        if (data)
             this.themeStyles = JSON.parse(data);
-        }.bind(this), 0, false);
     
         if (!this.themeStyles) {
             this.themeStyles = [
@@ -213,7 +214,7 @@ class Themes {
     }
 
     saveStyles() {
-        dataManager.setItem("IFTeleprompterThemeStyles", JSON.stringify(this.themeStyles));
+        teleprompter.settings.set("IFTeleprompterThemeStyles", JSON.stringify(this.themeStyles));
         this.refreshPromptStyles(document.getElementById("prompterStyle"));
     }
     

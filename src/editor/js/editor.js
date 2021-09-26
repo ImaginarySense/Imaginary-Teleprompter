@@ -120,44 +120,45 @@ class Editor {
             var compare = require("deb-version-compare");
 
             //Check, Update and Migrate Teleprompter Data
-            dataManager.getItem("IFTeleprompterVersion", (item) => {
-                if (item == null || compare(currentVersion, item) == 1) {
-                    //fix 
-                    item = "0";
-
-                    //check if is going to use a develoment version 
-                    if (!this.isADevVersion(item) && this.isADevVersion(currentVersion)) {
-                        //migrarate from official version to a development version
-                        window.location = "#devWarning";
-                        var agreeButton = document.getElementById("agreeWarningButton");
-                        agreeButton.onclick = function(e) {
-                            this.applyMigration(item);
-                            dataManager.setItem("IFTeleprompterVersion", currentVersion);
-                            this.closeModal();
-                        }.bind(this);
-                        document.getElementById("cancelWarningButton").onclick = this.closeWindow;
-                        document.getElementById("closeWarning").onclick = this.closeWindow;
-                        agreeButton.focus();
-                    } else {
-                        //migrate from previous versions 
+            var item = teleprompter.settings.IFTeleprompterVersion;
+            if (item == null || compare(teleprompter.settings.currentVersion, item) == 1) {
+                //fix 
+                item = "0";
+                console.log("item", item)
+                console.log(teleprompter.settings)
+                console.log("currentVersion", teleprompter.settings["currentVersion"])
+                //check if is going to use a develoment version 
+                if (!this.isADevVersion(item) && this.isADevVersion(teleprompter.settings.currentVersion)) {
+                    //migrarate from official version to a development version
+                    window.location = "#devWarning";
+                    var agreeButton = document.getElementById("agreeWarningButton");
+                    agreeButton.onclick = function(e) {
                         this.applyMigration(item);
-                        dataManager.setItem("IFTeleprompterVersion",currentVersion);
-
-                        //make sure all modal closes after reload the page
-                        //place this here to avoid problems with the warning and the newest modal
+                        teleprompter.settings.IFTeleprompterVersion = teleprompter.settings.currentVersion;
                         this.closeModal();
-                    }
-                    
-                } else if(compare(item, currentVersion) == 1) {
-                    window.location = "#devNewestVersion";
-                    var cancelButton = document.getElementById("cancelNewestButton");
-                    cancelButton.onclick = function(e){
-                        var window = this.remote.getCurrentWindow();
-                        window.close();
                     }.bind(this);
-                    cancelButton.focus();
-                } 
-            }, 0, 0);
+                    document.getElementById("cancelWarningButton").onclick = this.closeWindow;
+                    document.getElementById("closeWarning").onclick = this.closeWindow;
+                    agreeButton.focus();
+                } else {
+                    //migrate from previous versions 
+                    this.applyMigration(item);
+                    teleprompter.settings.IFTeleprompterVersion = teleprompter.settings.currentVersion;
+
+                    //make sure all modal closes after reload the page
+                    //place this here to avoid problems with the warning and the newest modal
+                    this.closeModal();
+                }
+                
+            } else if(compare(item, teleprompter.settings.currentVersion) == 1) {
+                window.location = "#devNewestVersion";
+                var cancelButton = document.getElementById("cancelNewestButton");
+                cancelButton.onclick = function(e){
+                    var window = this.remote.getCurrentWindow();
+                    window.close();
+                }.bind(this);
+                cancelButton.focus();
+            }
             // When asynchronous reply from main process, run function to...
             this.ipcRenderer.on('asynchronous-reply', function(event, arg) {
                 // Update Canvas
@@ -321,6 +322,7 @@ class Editor {
     }
 
     isADevVersion(version) {
+        console.log(version)
         if(version.includes("rc") || version.includes("alpha") || version.includes("beta"))
             return true;
         return false;
@@ -335,23 +337,22 @@ class Editor {
             case null:
             case "0":
             case "2.2.0":
-                dataManager.getItem("IFTeleprompterSideBar", function(dataToMigrate) {
-                    if (dataToMigrate) {
-                        // Convert Data
-                        dataToMigrate = JSON.parse(dataToMigrate);
-                        if (dataToMigrate.length > 0) {
-                            // Fix to not do more dirty work
-                            dataToMigrate[0]["id"] = teleprompter.fileManager.createIDTag(dataToMigrate[0].name, true);
+                var dataToMigrate = teleprompter.settings.IFTeleprompterSideBar;
+                if (dataToMigrate) {
+                    // Convert Data
+                    dataToMigrate = JSON.parse(dataToMigrate);
+                    if (dataToMigrate.length > 0) {
+                        // Fix to not do more dirty work
+                        dataToMigrate[0]["id"] = teleprompter.fileManager.createIDTag(dataToMigrate[0].name, true);
+                        teleprompter.fileManager.getSaveMode().setItem(teleprompter.fileManager.getDataKey(), JSON.stringify(dataToMigrate));
+                    }
+                    // Continue with rest of the data
+                    for (var i = 1; i < dataToMigrate.length; i++)
+                        if (dataToMigrate[i].hasOwnProperty("name")) {
+                            dataToMigrate[i]["id"] = teleprompter.fileManager.createIDTag(dataToMigrate[i].name);
                             teleprompter.fileManager.getSaveMode().setItem(teleprompter.fileManager.getDataKey(), JSON.stringify(dataToMigrate));
                         }
-                        // Continue with rest of the data
-                        for (var i = 1; i < dataToMigrate.length; i++)
-                            if (dataToMigrate[i].hasOwnProperty("name")) {
-                                dataToMigrate[i]["id"] = teleprompter.fileManager.createIDTag(dataToMigrate[i].name);
-                                teleprompter.fileManager.getSaveMode().setItem(teleprompter.fileManager.getDataKey(), JSON.stringify(dataToMigrate));
-                            }
-                    }
-                }, 0, 0);
+                }
             case "2.3.0": // Nothing to do here, issues solved elsewhere.
             // Next itteration
             case "2.4.0":
@@ -467,8 +468,8 @@ class Editor {
             session = '{ "html":"' + encodeURIComponent(htmldata) + '" }';
 
         // Store data locally for prompter to use
-        dataManager.setItem("IFTeleprompterSettings", settings, 1);
-        dataManager.setItem("IFTeleprompterSession", session);
+        teleprompter.settings.IFTeleprompterSettings = settings;
+        teleprompter.settings.IFTeleprompterSession = session;
 
         // Update frame and focus on it.
         //this.frame.src = "teleprompter.html";
@@ -493,7 +494,7 @@ class Editor {
         var session = '{ "html":"' + encodeURIComponent(this.htmldata) + '" }';
 
         // If we use sessionStorage we wont be able to update the contents.
-        dataManager.setItem("IFTeleprompterSession", session, 1);
+        teleprompter.settings.IFTeleprompterSession = session;
 
         // Update list of anchors
         if (typeof this.updateAnchors == 'function') {
@@ -675,7 +676,7 @@ class Editor {
 
     clearAllRequest() {
         if (confirm("You've pressed F6. Do you wish to perform a factory reset of Teleprompter? You will loose all saved scripts and custom styles.") ) {
-            dataManager.clearAll();
+            teleprompter.settings.clear();
             window.removeEventListener("beforeunload", function() {
                 this.updatePrompterData();
             }.bind(this));
@@ -786,12 +787,12 @@ class Editor {
         else if (window.location.hash.slice(1) === "devWarning") {
             var version = function(thisVersion) {
                 console.log(thisVersion);
-                if (thisVersion === currentVersion)
+                if (thisVersion === teleprompter.settings.currentVersion)
                     window.location = "#close";
                 else
                     window.close();
             };
-            dataManager.getItem("IFTeleprompterVersion",version,1);
+            // teleprompter.settings.get("IFTeleprompterVersion", version);
         }
         else
             window.location = "#close";

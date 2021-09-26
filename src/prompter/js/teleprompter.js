@@ -92,7 +92,7 @@ class Prompter {
         this.syncDelay = 12;
         
         // Local Storage and Session data
-        this.updateDatamanager();
+        this.updateSettings();
     
         // Set initial relative values.
         this.setFocusHeight();
@@ -346,10 +346,9 @@ class Prompter {
         }
     }
 
-    updateDatamanager() {        
-        dataManager.getItem('IFTeleprompterSession', function(data){
-            this.session = JSON.parse(data);
-        }.bind(this), 1, false);
+    updateSettings() {        
+        var data = teleprompter.settings.IFTeleprompterSession;
+        this.session = JSON.parse(data);
         // Ensure content is being passed
         // console.log("session", this.session);
     }
@@ -361,7 +360,7 @@ class Prompter {
         // overlayFocus = document.getElementById("overlayFocus");
         // 
         if (this.debug) console.log("Updating prompter");
-        this.updateDatamanager();
+        this.updateSettings();
 
         var oldFontSize = this.fontSize,
             oldPromptWidth = this.promptWidth;
@@ -473,7 +472,7 @@ class Prompter {
         else if (!this.inIframe() && this.ipcRenderer!==undefined)
             this.ipcRenderer.send('asynchronous-message', 'restoreEditor');
         // In all cases, clean emulated session storage before leaving.
-        dataManager.removeItem('IFTeleprompterSession',1);
+        teleprompter.settings.remove("IFTeleprompterSession");
     }
 
     closeInstance() {
@@ -1293,10 +1292,8 @@ class Prompter {
     }
 
     remoteControls() {
-        var res;
-        dataManager.getItem("IFTeleprompterControl", function(data){
-            res = JSON.parse(data);
-        },0,false);
+        teleprompter.settings.get("IFTeleprompterControl");
+        var res = JSON.parse(data);
         if(typeof res !== "undefined"){
             if(res.hasOwnProperty('key') > 0){
                 document.onkeydown(res);

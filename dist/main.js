@@ -30,14 +30,29 @@ const { electron,
 	Menu, // The menu class is used to create native menus that can be used as application menus and context menus.
 	ipcMain, // The ipcMain module, when used in the main process, handles asynchronous and synchronous messages sent from a renderer process (web page).
 	shell, // Module that provides functions related to desktop integration.
-	globalShortcut // Module can register/unregister a global keyboard shortcut with the operating system so that you can customize the operations for various shortcuts.
+	globalShortcut, // Module can register/unregister a global keyboard shortcut with the operating system so that you can customize the operations for various shortcuts.
+	protocol // Module
 	// Keep a global reference of the window object, if you don't, the window will be closed automatically when the JavaScript object is garbage collected.
 } = require('electron');
 
-const nativeImage = require('electron').nativeImage;
 const path = require('path');
 const url = require('url');
-const appDataFolder = app.getPath('appData') + '/ImaginarySense/Teleprompter';
+const router = require('./router');
+const Teleprompter = require('./teleprompter');
+const Settings = require('./settings');
+const teleprompter = require('./teleprompter');
+
+// Setup settings
+const settings = new Settings(app);
+
+// Limited to 100 simultaneous calls
+ipcMain.setMaxListeners(100);
+
+// 
+protocol.registerSchemesAsPrivileged([
+	{ scheme: 'teleprompter', privileges: { supportFetchAPI: true } }
+]);
+
 // This should be placed at top of main.js to handle setup events quickly
 if (handleSquirrelEvent()) {
   // squirrel event handled and app will exit in 1000ms, so don't do anything else
@@ -128,7 +143,8 @@ function createMainWindow () {
 			javascript: true,
 			title: 'Teleprompter by Imaginary Sense',
 			useContentSize: true,
-			icon: __dirname + '/icon.ico'
+			icon: __dirname + '/icon.ico',
+			frame: false
 		});
 	else
 		mainWindow = new BrowserWindow({
@@ -144,9 +160,13 @@ function createMainWindow () {
 			javascript: true,
 			title: 'Teleprompter by Imaginary Sense',
 			useContentSize: true,
-			icon: __dirname + '/icon.ico'
+			icon: __dirname + '/icon.ico',
+			frame: false
 		});
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
+
+	let contents = mainWindow.webContents;
+
 	mainWindow.once('ready-to-show', () => {
 		mainWindow.show();
 	});
@@ -163,13 +183,14 @@ function createMainWindow () {
 	});
 
 	// Debug tools
-	let contents = mainWindow.webContents;
 	contents.on('devtools-opened', () => {
 		contents.executeJavaScript('enterDebug()');
 	});
 	contents.on('devtools-closed', () => {
 		contents.executeJavaScript('exitDebug()');
 	});
+
+	contents.openDevTools()
 }
 
 app.on('activate', () => {
@@ -186,8 +207,8 @@ app.on('ready', () => {
 	// Setup menu
 	setupMenu();
 
-	// Image Server
-	imageServer();
+	// Setup Protocol
+	setupProtocol();
 });
 
 // Frame skip forlternative sync
@@ -260,8 +281,25 @@ ipcMain.on('asynchronous-message', (event, arg) => {
 	}
 });
 
-// Multiplatform menu configurations
+//
+ipcMain.on('asynchronous-message', (event, arg) => {
+	if (arg === "prepareLinks")
+		event.sender.send('asynchronous-reply',{'option':'prepareLinks'});
+});
 
+
+ipcMain.on('settings-get', (event, arg) => {
+	let value = settings.getItem(arg.key)
+	event.sender.send('settings-reply', {
+		key: arg.key,
+		value: value
+	});
+});
+ipcMain.on('settings-set', (event, arg) => {
+	settings.setItem(arg.key, arg.value);
+});
+
+// Multiplatform menu configurations
 function setupMenu() {
 	// Create our menu entries so that we can use MAC shortcuts
 	const {app, Menu} = require('electron');
@@ -355,117 +393,18 @@ function setupMenu() {
 	}
 }
 
-function imageServer() {
-	/*
-	//express server for image upload
-	var express = require('express');
-	var cors = require('cors') 
-	var app = express();
+function setupProtocol() {
 
-	var multipart = require('connect-multiparty');
-	var multipartMiddleware = multipart();
+	router.register('GET /prompt/script', Teleprompter.getPromptingScript);
+	router.register('POST /prompt/script', Teleprompter.getPromptingScript);
 
-	var fs = require('fs'); 
-	var shell = require('shelljs');
+	protocol.registerHttpProtocol('teleprompter', async (request, callback) => {
+		// Make settings accessible to all requests
+		request.settings = settings;
 
-	var uploadPath = appDataFolder + '/uploads/';
-	var imageServerPort = 3001;
-	var imageServerURL = 'http://localhost:' + imageServerPort + '/image/';
-
-	//Make sure directories exist
-	shell.mkdir('-p', uploadPath);
-
-	app.use(cors()); 
-	app.post('/upload', multipartMiddleware, function(req, res) {
-			fs.readFile(req.files.upload.path, function (err, data) {
-					var newPath = uploadPath + req.files.upload.name;
-					fs.writeFile(newPath, data, function (err) { 
-						if (err) console.log({err: err});
-							else {  
-								if(req.query.command == "QuickUpload"){
-									res.send({
-										"uploaded": 1,
-										"fileName": req.files.upload.name,
-										"url": newPath
-						});
-								}else{
-									var html;
-										html = "";
-										html += "<script type='text/javascript'>";
-										html += "    var funcNum = " + req.query.CKEditorFuncNum + ";";
-										html += "    var url     = \" " + imageServerURL + req.files.upload.name + "\";";
-										html += "    var message = \"Uploaded file successfully\";";
-										html += "";
-										html += "    window.parent.CKEDITOR.tools.callFunction(funcNum, url, message);";
-										html += "</script>";
-
-						res.send(html);
-								} 
-							}
-					});
-			});
+		const handler = router.route(request);
+  		await handler.process(request, callback);
+		// const url = request.url.substr(7)
+		// callback({ path: path.normalize(`${__dirname}/${url}`) })
 	});
-
-	app.use('/image', express.static(uploadPath));
-
-	//If port changes from 3000, need to be also change in the ckeditor config.js
-	app.listen(imageServerPort, function () {
-		console.log('Image Upload Server running at port ' + imageServerPort + '!');
-		console.log('Image Upload Path: '+ uploadPath);
-	});
-	*/
 }
-
-// REMOTE CONTROL BEGINS
-
-// Get computer IPs for remote control
-function getIP() {
-	var os = require('os');
-	var nets = os.networkInterfaces();
-	for ( var a in nets) {
-		var ifaces = nets[a];
-		for ( var o in ifaces) {
-		if (ifaces[o].family == "IPv4" && !ifaces[o].internal) {
-			return ifaces[o].address;
-		}
-		}
-	}
-	return null;
-}
-
-// Remote control server
-// function runSocket(event) {
-// 	var ip = getIP();
-// 	if(ip){
-// 	  var app2 = require('express')();
-// 	  var http = require('http').Server(app2);
-// 	  var bonjour = require('bonjour')();
-// 	  var io = require('socket.io')(http);
-
-// 	  io.sockets.on('connection', function (socket) {
-// 		socket.on('command',function(res){
-// 			if(res.hasOwnProperty('key') > 0){
-// 			  event.sender.send('asynchronous-reply',{'option':'command','data':res});
-// 			}
-// 		});
-// 		socket.on('disconnect', function () {});
-// 	  });
-
-// 	  http.listen(3000, function(){
-// 		event.sender.send('asynchronous-reply',{'option':'qr','data':ip});
-// 		//console.log('http://' + ip + ':3000/');
-// 	  });
-
-// 	  bonjour.publish({ name: 'Teleprompter', type: 'http', port: 3000 });
-// 	  bonjour.find({ type: 'http' }, function (service) {
-// 		//console.log('Found an HTTP server:'+ service);
-// 		event.sender.send('asynchronous-reply',{'option':'qr','data':service.host});
-// 	  });
-// 	}else{
-// 	  setTimeout(function(){
-// 		runSocket(event);
-// 	  }, 1000);
-// 	}
-// }
-
-// REMOTE CONTROL ENDS
