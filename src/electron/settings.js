@@ -1,5 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
+const package = require('./package.json');
 
 class Settings {
     constructor(app) {
@@ -27,24 +28,29 @@ class Settings {
 
         try {
             this.config = await fs.readJson(this.configFile);
-            this.settingsFile = this.config["settingPath"];
+            this.settingsFile = path.join(this.config["rootPath"], this.settingsFileName);
             this.data = await fs.readJson(this.settingsFile);
+            // Update version number
+            this.data["currentVersion"] = `${package.version}.${package.revision}`;
+            this.saveSettings();
         } catch (err) {
-            this.settingsFile = path.join(this.documentsPath, this.rootName, this.settingsFileName);
+            this.config = {
+                "rootPath": path.join(this.documentsPath, this.rootName)
+            }
+            this.settingsFile = path.join(this.config["rootPath"], this.settingsFileName);
             
             try {
                 await fs.ensureFile(this.settingsFile);
             } catch (err) {
                 console.error(err);
             }
-            this.data = {
-                "currentVersion": "4.0"
-            } // defaults
-            this.saveSettings();
 
-            this.config = {
-                "settingPath": this.settingsFile
-            }
+            // defaults
+            this.data = {
+                "currentVersion": `${package.version}.${package.revision}`
+            } 
+            // save settings and config
+            this.saveSettings();
             this.saveConfig();
         }
     }

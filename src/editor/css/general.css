@@ -10,6 +10,8 @@
     --color-seconday: #fbfbfe;
     --font-color-primary: #fff;
     --font-color-secondary: #000;
+    --border-color: var(--color-primary);
+    --background-color: #3f3f41;
 }
 
 .hll {
@@ -1702,4 +1704,5 @@ html, body {
 .modal-content {
     top: 32px;
     height: calc(100% - 32px) !important;
+    background-color: var(--background-color, #fff);
 }

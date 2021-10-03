@@ -393,7 +393,7 @@ function setupMenu() {
 function setupProtocol() {
 
 	router.register('GET /prompt/script', Teleprompter.getPromptingScript);
-	router.register('POST /prompt/script', Teleprompter.getPromptingScript);
+	// router.register('POST /prompt/script', Teleprompter.getPromptingScript);
 
 	protocol.registerHttpProtocol('teleprompter', async (request, callback) => {
 		// Make settings accessible to all requests

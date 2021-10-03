@@ -2,7 +2,46 @@ const gulp = require('gulp');
 const concat = require('gulp-concat');
 const uglify = require('gulp-uglify');
 const uglifycss = require('gulp-uglifycss');
-var del = require('del');
+const del = require('del');
+const fs = require('fs');
+
+// Example code taken from
+// build-number-generator from Ferdinand Prantl
+// https://github.com/prantlf/build-number-generator
+///////////////////////////////////////////////////
+function getBuildStamp () {
+    const now = new Date()
+    const year = now.getFullYear() % 100
+    const month = now.getMonth() + 1
+    const day = now.getDate()
+    // Count 2-minute intervals elapsed since midnight:(HH * 60 + MM) / 2
+    const counter = parseInt((now.getHours() * 60 + now.getMinutes()) / 2)
+    // Format the stamp as YYMMDDCCC
+    return `${pad2(year)}${pad2(month)}${pad2(day)}${pad3(counter)}`
+}
+function pad2 (value) {
+    return value > 9 ? `${value}` : `0${value}`
+}
+function pad3 (value) {
+    return value > 99 ? `${value}` : value > 9 ? `0${value}` : `00${value}`
+} 
+///////////////////////////////////////////////////
+gulp.task('revision', function() {
+    return new Promise((resolve, reject) => {
+        fs.readFile('./package.json', (err, data) => {
+            if (err) throw err;
+        
+            var package = JSON.parse(data);
+            package.revision = getBuildStamp();
+            package = JSON.stringify(package, null, 2);
+        
+            fs.writeFile('./package.json', package, (err) => {
+                if (err) throw err;
+                resolve();
+            });
+        });
+    });
+});
 
 gulp.task('clean', function() {
     return del(['./dist']);
@@ -61,6 +100,7 @@ gulp.task('electron:js', function() {
 
 gulp.task('default', 
     gulp.series(
+        'revision',
         'clean',
         'copy:files',
         'editor:css',
