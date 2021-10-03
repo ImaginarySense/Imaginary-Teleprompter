@@ -4,7 +4,8 @@
   "homepage": "https://imaginary.tech/teleprompter/",
   "description": "The most complete and professional free software teleprompter application.",
   "license": "GPL-3.0+",
-  "version": "2.5.0",
+  "version": "4.0.0",
+  "revision": "211003345",
   "keywords": [
     "teleprompter",
     "television",

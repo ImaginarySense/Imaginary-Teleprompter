@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
-const package = require('./package.json');
+const _package = require('./package.json');
 
 class Settings {
     constructor(app) {
@@ -31,7 +31,7 @@ class Settings {
             this.settingsFile = path.join(this.config["rootPath"], this.settingsFileName);
             this.data = await fs.readJson(this.settingsFile);
             // Update version number
-            this.data["currentVersion"] = `${package.version}.${package.revision}`;
+            this.data["currentVersion"] = `${_package.version}.${_package.revision}`;
             this.saveSettings();
         } catch (err) {
             this.config = {
@@ -47,7 +47,7 @@ class Settings {
 
             // defaults
             this.data = {
-                "currentVersion": `${package.version}.${package.revision}`
+                "currentVersion": `${_package.version}.${_package.revision}`
             } 
             // save settings and config
             this.saveSettings();
@@ -73,7 +73,7 @@ class Settings {
 
     async saveData(file, data, callback) {
         try {
-            await fs.outputJson(file, data);
+            await fs.outputJson(file, data, {spaces: 2});
             // Making sure
             callback(await fs.readJson(file), undefined);
         } catch (err) {
