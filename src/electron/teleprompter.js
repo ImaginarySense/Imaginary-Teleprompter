@@ -1,15 +1,12 @@
-
+const fs = require('fs-extra');
+const path = require('path')
 
 module.exports = {
-    setPromptingScript: function (req, res) {
-    //   console.log(req.mainWindow.await teleprompter.settings);
-      
-    },
-    getPromptingScript: function (req, res) {
-        // console.log(req.mainWindow.await teleprompter.settings);
-        console.log("request", req.settings)
-
-        // req.settings['ElectronTesting'] = "Coolest";
+    getPromptScriptFile: function (req, res) {
+        const url = req.url.substr(15);
+        const path = url.replace('prompt/', '');
+        const rootPath = req.settings.config['rootPath'].replaceAll('\\', '/');
+		res({ path: `${rootPath}/${path}` })
     }
   };
   

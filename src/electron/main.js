@@ -392,16 +392,13 @@ function setupMenu() {
 
 function setupProtocol() {
 
-	router.register('GET /prompt/script', Teleprompter.getPromptingScript);
-	// router.register('POST /prompt/script', Teleprompter.getPromptingScript);
+	router.register('GET /prompt/:script*', Teleprompter.getPromptScriptFile);
 
-	protocol.registerHttpProtocol('teleprompter', async (request, callback) => {
+	protocol.registerFileProtocol('teleprompter', async (request, callback) => {
 		// Make settings accessible to all requests
 		request.settings = settings;
 
 		const handler = router.route(request);
   		await handler.process(request, callback);
-		// const url = request.url.substr(7)
-		// callback({ path: path.normalize(`${__dirname}/${url}`) })
 	});
 }

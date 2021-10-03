@@ -30,6 +30,6 @@ exports.route = function(req) {
 
 exports.notFound = function(req) {
   return handlerFactory.createHandler(function(req, res) {
-    res.json(404);
+    res();
   });
 };
