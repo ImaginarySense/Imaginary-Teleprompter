@@ -292,8 +292,17 @@ ipcMain.on('settings-get', (event, arg) => {
 		value: value
 	});
 });
+
 ipcMain.on('settings-set', (event, arg) => {
 	settings.setItem(arg.key, arg.value);
+});
+
+ipcMain.on('config-get', (event, arg) => {
+	let value = settings.getConfigItem(arg.key)
+	event.sender.send(`config-reply-${arg.key}`, {
+		key: arg.key,
+		value: value
+	});
 });
 
 // Multiplatform menu configurations

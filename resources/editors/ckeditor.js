@@ -77,9 +77,9 @@ loadScript('assets/ckeditor/ckeditor.js', () => {
         }
     });
 
-    CKEDITOR.on('instanceReady', function(event) {
+    CKEDITOR.on('instanceReady', async function(event) {
         var editor = event.editor,
-        scriptsData = teleprompter.fileManager.getElements();
+        scriptsData = await teleprompter.fileManager.getElements();
         if (scriptsData[teleprompter.fileManager.currentElement].hasOwnProperty('data'))
             document.getElementById("prompt").innerHTML = scriptsData[teleprompter.fileManager.currentElement]['data'];
         else
@@ -104,7 +104,7 @@ loadScript('assets/ckeditor/ckeditor.js', () => {
         editor.on('key', function(event) {
             if (event.key === undefined)
                 event.key = event.data.keyCode;
-            if (debug) console.log(event.key);
+            if (teleprompter.editor.debug) console.log(event.key);
             if (teleprompter.fileManager.instructionsAreLoaded() && -1===[1114129,1114177,1114179,1114121,5570578,1114337,4456466,2228240,91,225,27,112,113,114,115,116,117,118,119,120,121,122,123,45,20,33,34,35,36,37,38,39,40].indexOf(event.key)) {
                 window.location = '#sidebarAddElement';
                 document.getElementById("inputName").focus();
@@ -118,13 +118,13 @@ loadScript('assets/ckeditor/ckeditor.js', () => {
 
         editor.on('focus', function() {
             editorFocused = true;
-            if (debug) console.log('Editor focused.');
+            if (teleprompter.editor.debug) console.log('Editor focused.');
             // save();
         });
 
         editor.on('blur', function() {
             editorFocused = false;
-            if (debug) console.log('Editor out of focus.');
+            if (teleprompter.editor.debug) console.log('Editor out of focus.');
             teleprompter.editor.contentEditor.save();
         });
     });

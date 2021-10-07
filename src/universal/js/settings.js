@@ -75,12 +75,30 @@ class ElectronSettings {
     }
 }
 
+class ElectronConfiguration {
+    constructor(){
+        return new Proxy(Storage, this);
+    }
+    async get(target, prop) {
+        ipcRenderer.send('config-get', {
+            key: prop
+        });
+        return new Promise((resolve, _) => {
+            ipcRenderer.once(`config-reply-${prop}`, (event, arg) => {
+                if (arg.key === prop) {
+                    resolve(arg.value);
+                }
+            });
+        })
+    }
+}
 
 if (inElectron()) {
     electron = require('electron');
     ipcRenderer = electron.ipcRenderer;
     
     window.teleprompter.settings = new ElectronSettings();
+    window.teleprompter.config = new ElectronConfiguration();
 } else {
     window.teleprompter.settings = new BrowserSettings();
 }

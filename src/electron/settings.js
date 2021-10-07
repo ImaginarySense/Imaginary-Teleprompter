@@ -89,6 +89,10 @@ class Settings {
         this.data[key] = value || defaults;
         this.saveSettings();
     }
+
+    getConfigItem(key, defaults = undefined) {
+        return this.config[key] || defaults;
+    }
 };
 
 module.exports = Settings;

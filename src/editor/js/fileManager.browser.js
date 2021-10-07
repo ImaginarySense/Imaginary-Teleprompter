@@ -18,7 +18,7 @@
     along with Imaginary Teleprompter.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-class FileManager {
+class BrowserFileManager {
     constructor() {
         this.instructionsLoaded = true;
         this.modal = undefined;
@@ -40,13 +40,13 @@ class FileManager {
 
         });
 
-        teleprompter.editor.contentEditor.save = function() {
+        teleprompter.editor.contentEditor.save = async () => {
             if (this.currentElement != 0) {
                 var scriptsData = this.getElements();
                 scriptsData[this.currentElement]["data"] = document.getElementById("prompt").innerHTML;
-                this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(scriptsData));
+                teleprompter.settings[this.getDataKey()] = JSON.stringify(scriptsData);
             }
-        }.bind(this);
+        };
 
         this.selectedElement = function(element) {
             var scriptsData = this.getElements();
@@ -136,7 +136,7 @@ class FileManager {
         document.body.removeChild(element);
     };
 
-    addScript(evt) {
+    async addScript(evt) {
         if (evt.preventDefault!==undefined)
             evt.preventDefault();
         if (debug) console.log(evt);
@@ -162,7 +162,7 @@ class FileManager {
         inputName.value = "";
         inputID.value = "";
         // Save
-        this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
+        teleprompter.settings[this.getDataKey()] = JSON.stringify(elementsData);
         this.refreshElements();
 
         var scripts = new bootstrap.Tab(document.getElementById("v-pills-scripts-tab"));
@@ -452,19 +452,6 @@ class FileManager {
         }.bind(this));
     }
 
-    setSaveMode(saveMode){
-        if(saveMode === "sessionStorage")
-            this.saveMode = sessionStorage;
-        else
-            this.saveMode = localStorage;
-    };
-
-    getSaveMode(){
-        if (typeof this.saveMode !== 'undefined' && this.saveMode !== null)
-            return this.saveMode;
-        return localStorage;
-    };
-
     setName(name) {
         this.name = name;
     };
@@ -502,8 +489,8 @@ class FileManager {
         return "New " + this.getName();
     };
 
-    getElements() {
-        var elementsData = this.getSaveMode().getItem(this.getDataKey());
+    async getElements() {
+        var elementsData = await teleprompter.settings[this.getDataKey()];
         if (typeof elementsData !== 'undefined' && elementsData !== null) {
             if(JSON.parse(elementsData).length == 0){
                 return this.getPreloadData();
@@ -610,7 +597,7 @@ class FileManager {
             this.openModal();
         }.bind(this);
 
-        document.getElementById("fileManagerDeleteModalDelete").onclick = function(e) {
+        document.getElementById("fileManagerDeleteModalDelete").onclick = (e) => {
             var elementsData = this.getElements();
             
             elementsData.splice(this.getElementIndexByID(id), 1);
@@ -619,13 +606,13 @@ class FileManager {
             this.currentElement = elementsData.length-1;
 
             //Saving Elements
-            this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData)); 
+            teleprompter.settings[this.getDataKey()] = JSON.stringify(elementsData); 
             this.refreshElements();
             this.selectedElement(null);
             
             this.fileManagerDeleteModal.hide();
             this.openModal();
-        }.bind(this);
+        };
     };
     
     getElementIndexByID(id) {
@@ -735,7 +722,7 @@ class FileManager {
                     var textBlock = e.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector("#textBlock");
                     textBlock.disabled = false;
 
-                    textBlock.onkeydown = function(e) {
+                    textBlock.onkeydown = async (e) => {
                         if (e.keyCode == 13) {
                             e.stopImmediatePropagation();
                             
@@ -748,7 +735,7 @@ class FileManager {
                                 e.target.value = text;
 
                                 elementsData[this.getElementIndexByID(e.target.parentNode.parentNode.parentNode.parentNode.id)]['name'] = text;
-                                this.getSaveMode().setItem(this.getDataKey(), JSON.stringify(elementsData));
+                                teleprompter.settings[this.getDataKey()] = JSON.stringify(elementsData);
                                 e.target.parentNode.parentNode.parentNode.parentNode.querySelector("#editMode").style.display = "";
                                 e.target.parentNode.parentNode.parentNode.parentNode.querySelector("#deleteMode").style.display = "none";
                                 e.target.disabled = true;
@@ -764,7 +751,7 @@ class FileManager {
                         }
 
                         return true;
-                    }.bind(this);
+                    };
 
                     return false;
                 }.bind(this);
