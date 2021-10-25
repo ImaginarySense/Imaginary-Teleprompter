@@ -5,25 +5,33 @@ loadScript('assets/ckeditor/ckeditor.js', () => {
     // Create editor
     CKEDITOR.inline( 'prompt', {
         // To enable source code editing in a dialog window, inline editors require the "sourcedialog" plugin.
-        extraPlugins: 'image2,sharedspace,sourcedialog', // uploadimage
+        extraPlugins: `uploadimage,image2,sharedspace,sourcedialog`, // uploadimage
         removePlugins: 'floatingspace,maximize,resize',
+        filebrowserBrowseUrl: '#',
+        filebrowserImageBrowseUrl: '#',
+        filebrowserUploadUrl: '/apps/ckfinder/3.4.5/core/connector/php/connector.php?command=QuickUpload&type=Files',
+        filebrowserImageUploadUrl: '/apps/ckfinder/3.4.5/core/connector/php/connector.php?command=QuickUpload&type=Images',
+  
+        // Upload dropped or pasted images to the CKFinder connector (note that the response type is set to JSON).
+        uploadUrl: '/apps/ckfinder/3.4.5/core/connector/php/connector.php?command=QuickUpload&type=Files&responseType=json',
+  
         sharedSpaces: {
-        top: 'toolbar',
-        bottom: 'statusbar'
+            top: 'toolbar',
+            bottom: 'statusbar'
         },
         toolbarGroups: [
-        { name: 'document',    groups: [ 'document', 'print', 'mode', 'tools' ] },
-        { name: 'clipboard',   groups: [ 'clipboard', 'undo' ] },
-        { name: 'editing',     groups: [ 'find', 'selection' ] },
-        { name: 'insert' },
-        { name: 'others' },
-        { name: 'colors' },
-        { name: 'about' },
-        '/',
-        { name: 'links' },
-        { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
-        { name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
-        { name: 'styles' }
+            { name: 'document',    groups: [ 'document', 'print', 'mode', 'tools' ] },
+            { name: 'clipboard',   groups: [ 'clipboard', 'undo' ] },
+            { name: 'editing',     groups: [ 'find', 'selection' ] },
+            { name: 'insert' },
+            { name: 'others' },
+            { name: 'colors' },
+            { name: 'about' },
+            '/',
+            { name: 'links' },
+            { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+            { name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
+            { name: 'styles' }
         ],
 
         // Remove the redundant buttons from toolbar groups defined above.
@@ -78,13 +86,9 @@ loadScript('assets/ckeditor/ckeditor.js', () => {
     });
 
     CKEDITOR.on('instanceReady', async function(event) {
-        var editor = event.editor,
-        scriptsData = await teleprompter.fileManager.getElements();
-        if (scriptsData[teleprompter.fileManager.currentElement].hasOwnProperty('data'))
-            document.getElementById("prompt").innerHTML = scriptsData[teleprompter.fileManager.currentElement]['data'];
-        else
-            document.getElementById("prompt").innerHTML = "";
-
+        var editor = event.editor;
+        
+        teleprompter.fileManager.setCurrentElement();
         teleprompter.editor.updateAnchors();
 
         editor.on('dialogDefinition', function(event) {

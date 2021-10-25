@@ -8,9 +8,6 @@ CKEDITOR.editorConfig = function( config ) {
 	// config.language = 'fr';
 	// config.uiColor = '#AADC6E';
 
-	// config.filebrowserUploadUrl = 'http://localhost:3001/upload';
-	// config.imageUploadUrl = 'http://localhost:3001/upload?command=QuickUpload'; 
-
 	config.allowedContent = true;
 	config.pasteFromWordPromptCleanup = false;
 	config.pasteFromWordRemoveFontStyles = false; // deprecated
@@ -26,6 +23,7 @@ CKEDITOR.editorConfig = function( config ) {
 // 	console.info('Current status', fontFace.status);
 // 	console.log(fontFace.family, 'loaded successfully.');
 // 	// Throw an error if loading wasn't successful
+
 // }, (fontFace) => {
 // 	console.error('Current status', fontFace.status);
 // });
