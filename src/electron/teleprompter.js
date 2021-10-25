@@ -32,10 +32,10 @@ module.exports = {
     res(fs.createReadStream(`${rootPath}/${path}`));
   },
   getPromptScript: async (req, res) => {
-    const rootPath = req.settings.config['rootPath'].replaceAll('\\', '/');
-    let scriptFile;
+    const scriptPath = req.body['path'].replaceAll('\\', '/');
+    let scriptData;
     try {
-      scriptFile = await fs.readJson(`${rootPath}/script.json`);
+      scriptData = await fs.readJson(`${scriptPath}/script.json`);
       // some validator of the data
     } catch (err) {
       res({
@@ -44,8 +44,64 @@ module.exports = {
       });
       return;
     }
-    await createScriptStructure(rootPath);
-    res(createStream(scriptFile));
+    await createScriptStructure(scriptPath);
+    res({
+      statusCode: 200,
+      data: createStream(JSON.stringify(scriptData))
+    });
+  },
+  newPromptScript: async (req, res) => {
+    const rootPath = req.settings.config['rootPath'].replaceAll('\\', '/');
+    // Cleaning script file name to just permit alphabet
+    let scriptFileName = req.body['name'].replace(/[^A-Za-z ]/gi,'');
+    scriptFileName = scriptFileName.toLowerCase();
+    scriptFileName = scriptFileName.match(/[a-z]+/gi).join('_');
+
+    const scriptPath = `${rootPath}/${scriptFileName}`;
+
+    let scriptData;
+    try {
+      let scriptFile = `${scriptPath}/script.json`;
+      await fs.ensureFile(scriptFile)
+      // Maybe in future add some initialization settings, for now empty
+      await fs.outputJson(scriptFile, {
+        version: 1.0,
+        name: req.body['name'],
+        data: ''
+      })
+      scriptData = await fs.readJson(scriptFile);
+    } catch (err) {
+      // Maybe an error if the script creation fails
+    }
+    await createScriptStructure(scriptPath);
+    res({
+      statusCode: 200,
+      data: createStream(JSON.stringify({
+        path: scriptPath,
+        script: scriptData
+      }))
+    });
+  },
+  updatePromptScript: async (req, res) => {
+    const scriptPath = req.body['path'].replaceAll('\\', '/');
+    const scriptFile = `${scriptPath}/script.json`;
+    let scriptData;
+    try {
+      scriptData = await fs.readJson(scriptFile);
+      // some validator of the data
+      scriptData['data'] = req.body['script'];
+      await fs.outputJson(scriptFile, scriptData);
+    } catch (err) {
+      res({
+        statusCode: 404,
+        data: createStream('')
+      });
+      return;
+    }
+    res({
+      statusCode: 200,
+      data: createStream('{}')
+    });
   }
 };
   

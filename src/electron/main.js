@@ -400,8 +400,10 @@ function setupMenu() {
 }
 
 function setupProtocol() {
-	router.register('POST /prompt', Teleprompter.getPromptScript)
+	router.register('POST /prompt', Teleprompter.getPromptScript);
+	router.register('PATCH /prompt', Teleprompter.updatePromptScript);
 	router.register('GET /prompt/:script*', Teleprompter.getPromptFileFromScript);
+	router.register('POST /prompt/new', Teleprompter.newPromptScript);
 	
 	protocol.registerStreamProtocol('teleprompter', async (request, callback) => {
 		// Make settings accessible to all requests
