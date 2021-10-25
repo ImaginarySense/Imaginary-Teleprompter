@@ -1705,6 +1705,21 @@ html, body {
     top: 32px;
     height: calc(100% - 32px) !important;
     background-color: var(--background-color, #fff);
+    color: var(--font-color-primary, #000);
+}
+
+.modal-content .nav-link{
+    background-color: var(--background-color, #fff);
+    color: var(--font-color-primary, #000);
+}
+
+.modal-content .nav-link.active{
+    background-color: var(--color-seconday, #fff);
+    color: var(--font-color-secondary, #000);
+}
+
+.table.table-hover .row span{
+    color: var(--font-color-primary, #000);
 }
 
 .cke_dialog_background_cover {
