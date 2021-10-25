@@ -1,0 +1,17 @@
+.hexagon {
+    background-image: url('../img/hexagon.svg');
+    background-size: 80px;
+    height: 80px;
+    width: 80px;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hexagon span {
+    font-size: 3em;
+    color: #fff;
+    text-shadow: 0 0 30px black;
+}
