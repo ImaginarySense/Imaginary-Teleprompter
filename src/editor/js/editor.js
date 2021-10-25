@@ -121,12 +121,12 @@ class Editor {
 
             //Check, Update and Migrate Teleprompter Data
             var item = await teleprompter.settings.IFTeleprompterVersion;
+
+            document.getElementById("version").innerHTML = item;
+
             if (item == null || compare(await teleprompter.settings.currentVersion, item) == 1) {
                 //fix 
                 item = "0";
-                console.log("item", item)
-                console.log(await teleprompter.settings)
-                console.log("currentVersion", await teleprompter.settings["currentVersion"])
                 //check if is going to use a develoment version 
                 if (!this.isADevVersion(item) && this.isADevVersion(await teleprompter.settings.currentVersion)) {
                     //migrarate from official version to a development version

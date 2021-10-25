@@ -45,18 +45,20 @@ class ElectronFileManager {
     };
 
     syncFile() {
-        fetch(`teleprompter://prompt`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                path: this.scriptPath,
-                script: document.getElementById("prompt").innerHTML
+        if (this.scriptPath) {
+            fetch(`teleprompter://prompt`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    path: this.scriptPath,
+                    script: document.getElementById("prompt").innerHTML
+                })
             })
-        })
-        .then(response => response.json())
-        .catch(_ => {})
+            .then(response => response.json())
+            .catch(_ => {})
+        }
     }
 
     save() {
