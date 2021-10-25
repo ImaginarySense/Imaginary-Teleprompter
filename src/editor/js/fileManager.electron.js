@@ -20,53 +20,59 @@
 
 class ElectronFileManager {
     constructor() {
+        this.load();
+    }
+
+    async load() {
         this.instructionsLoaded = true;
         this.modal = undefined;
         this.settingsModal = undefined;
         this.menu = "v-pills-scriptsContent";
+
+        this.remote = require('@electron/remote');
+        this.rootPath = await teleprompter.config['rootPath'];
+
+        this.scriptPath = '';
+        // Empty Script
+        this.script = {
+            version: 0,
+            name: '',
+            data: ''
+        }
+
+        this.refreshElements();
+        this.loadDialog();
+    };
+
+    syncFile() {
+        fetch(`teleprompter://prompt`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                path: this.scriptPath,
+                script: document.getElementById("prompt").innerHTML
+            })
+        })
+        .then(response => response.json())
+        .catch(_ => {})
+    }
+
+    save() {
+        if (this.saveTimeout) {
+            clearTimeout(this.saveTimeout);
+        }
+        this.saveTimeout = setTimeout(() => {
+            this.syncFile();
+        }, 5000);
     }
 
     draw() {
-        // if (typeof config !== 'undefined' && config !== null) {
-        //     if (config.hasOwnProperty('name'))
-        //         this.setName(config['name']);
-
-        //     if (config.hasOwnProperty('dataKey'))
-        //         this.setDataKey(config['dataKey']);
-
-        //     if (config.hasOwnProperty('saveMode'))
-        //         this.setSaveMode(config['saveMode']);
-
-        //     if (config.hasOwnProperty('addElementName'))
-        //         this.setAddElementName(config['addElementName']);
-
-        //     if (config.hasOwnProperty('elementName'))
-        //         this.setNewElementName(config['elementName']);
-
-        //     if (config.hasOwnProperty('preloadData') && config['preloadData'].constructor === Array)
-        //         this.setPreloadData(config['preloadData']);
-        // }
-        this.load();
-
         teleprompter.editor.contentEditor.save = async () => {
-            if (this.currentElement != 0) {
-                var scriptsData = this.getElements();
-                scriptsData[this.currentElement]["data"] = document.getElementById("prompt").innerHTML;
-                teleprompter.settings[this.getDataKey()] = JSON.stringify(scriptsData);
-            }
+            // Need validation to skip instructions
+            this.save();
         };
-
-        this.selectedElement = function(element) {
-            var scriptsData = this.getElements();
-            if (scriptsData[this.currentElement].hasOwnProperty('data'))
-                document.getElementById("prompt").innerHTML = scriptsData[this.currentElement]['data'];
-            else
-                document.getElementById("prompt").innerHTML = "";
-
-            document.getElementById('promptOptions').innerHTML = scriptsData[this.currentElement]['name'];
-
-            this.closeModal()
-        }.bind(this);
 
         this.addElementEnded = function(element) {
             if (teleprompter.editor.debug) console.log(element);
@@ -125,31 +131,21 @@ class ElectronFileManager {
         return Math.floor(255/2-5); // Return 122. Could be increased depending on the Filesystem and the charset encoding.
     }
 
-    download(currentDocument, index) {
-        if (teleprompter.editor.debug) {
-            console.log("Downloading:");
-            console.log(currentDocument);
-        }
-        var filename = currentDocument.name+"_"+index+".html",
-            contents = currentDocument.data,
-            element = document.createElement("a");
-        element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(contents));
-        element.setAttribute("download", filename);
-
-        element.style.display = "none";
-        document.body.appendChild(element);
-
-        element.click();
-
-        document.body.removeChild(element);
+    selectedElement() {
+        this.setCurrentElement();
+        this.closeModal();
     };
+
+    setCurrentElement() {
+        document.getElementById("prompt").innerHTML = this.script['data'];
+        document.getElementById('promptOptions').innerHTML = this.script['name'];
+    }
 
     async addScript(evt) {
         if (evt.preventDefault!==undefined)
             evt.preventDefault();
         if (teleprompter.editor.debug) console.log(evt);
-        var elementsData = this.getElements(),
-            inputName = document.getElementById("inputName"),
+        var inputName = document.getElementById("inputName"),
             inputID = document.getElementById("inputID");
         if (inputName.value.length===0) {
             window.alert("Every script needs a title.");
@@ -160,28 +156,29 @@ class ElectronFileManager {
             inputName.focus();
             return;
         }
-        elementsData.push({
-            "id": inputID.value,
-            "name": inputName.value,
-            "data": "",
-            "editable": true
-        });
-        // Clean Input
-        inputName.value = "";
-        inputID.value = "";
-        // Save
-        teleprompter.settings[this.getDataKey()] = JSON.stringify(elementsData);
-        this.refreshElements();
+        
+        const script = await fetch(`teleprompter://prompt/new`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: inputName.value
+            })
+        })
+        .then(response => response.json())
+        .catch(_ => {})
+        if (script) {
+            this.scriptPath = script['path'];
+            this.script = script['script'];
+            this.selectedElement();
 
-        var scripts = new bootstrap.Tab(document.getElementById("v-pills-scripts-tab"));
-        scripts.show();
+            // Clean Input
+            inputName.value = "";
+            inputID.value = "";
 
-        this.currentElement = elementsData.length-1;
-
-        if (typeof this.addElementEnded === "function") {
-            this.addElementEnded(elementsData[elementsData.length]);
+            this.closeModal();
         }
-        this.closeModal();
     };
 
     handleFileSelect(filePaths) {
@@ -367,17 +364,9 @@ class ElectronFileManager {
             alert("Import failed. No supported file found.");
     }
 
-    load() {
-        this.refreshElements();
-        this.loadDialog();
-    };
-
     async loadDialog(){
-        const remote = require('@electron/remote');
-        const rootPath = await teleprompter.config['rootPath'];
-
         document.getElementById("v-pills-import-tab").onclick = async (e) => {
-            const scriptFile = await remote.dialog.showOpenDialog({ defaultPath: rootPath, properties: ['openFile'], filters: [
+            const scriptFile = await this.remote.dialog.showOpenDialog({ defaultPath: this.rootPath, properties: ['openFile'], filters: [
                 { name: 'Plain Text', extensions: ['txt', 'text'] },
                 { name: 'HyperText Markup Language', extensions: ['html', 'htm'] },
                 { name: 'Rich Text Format', extensions: ['rtf'] },
@@ -387,8 +376,25 @@ class ElectronFileManager {
             this.handleFileSelect(scriptFile.filePaths);
         };
         document.getElementById("v-pills-openScript-tab").onclick = async (e) => {
-            const scriptFolder = await remote.dialog.showOpenDialog({ defaultPath: rootPath, properties: ['openDirectory'] });
-            console.log(scriptFolder);
+            const scriptFolder = await this.remote.dialog.showOpenDialog({ defaultPath: this.rootPath, properties: ['openDirectory'] });
+            if (scriptFolder.filePaths.length > 0) {
+                const script = await fetch(`teleprompter://prompt`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        path: scriptFolder.filePaths[0]
+                    })
+                })
+                .then(response => response.json())
+                .catch(error => {})
+                if (script) {
+                    this.scriptPath = scriptFolder.filePaths[0];
+                    this.script = script;
+                    this.selectedElement();
+                }
+            }
         };
         //Script Add Input Event
         document.getElementById("inputName").oninput = function(e){
@@ -469,18 +475,6 @@ class ElectronFileManager {
         return "New " + this.getName();
     };
 
-    async getElements() {
-        // var elementsData = await teleprompter.settings[this.getDataKey()];
-        // if (typeof elementsData !== 'undefined' && elementsData !== null) {
-        //     if(JSON.parse(elementsData).length == 0){
-        //         return this.getPreloadData();
-        //     }
-        //     return JSON.parse(elementsData);
-        // }
-        // return this.getPreloadData();
-        return [];
-    };
-
     setDataKey(key) {
         this.dataKey = key;
     };
@@ -532,9 +526,7 @@ class ElectronFileManager {
 
                     this.preloadData.push(currentPreloadData);
                 }
-
             }
-            
         }
     };
 
@@ -568,20 +560,20 @@ class ElectronFileManager {
         }.bind(this);
 
         document.getElementById("fileManagerDeleteModalDelete").onclick = (e) => {
-            var elementsData = this.getElements();
+            // var elementsData = this.getElements();
             
-            elementsData.splice(this.getElementIndexByID(id), 1);
+            // elementsData.splice(this.getElementIndexByID(id), 1);
 
-            //Set Current Element
-            this.currentElement = elementsData.length-1;
+            // //Set Current Element
+            // this.currentElement = elementsData.length-1;
 
-            //Saving Elements
-            teleprompter.settings[this.getDataKey()] = JSON.stringify(elementsData); 
-            this.refreshElements();
-            this.selectedElement(null);
+            // //Saving Elements
+            // teleprompter.settings[this.getDataKey()] = JSON.stringify(elementsData); 
+            // this.refreshElements();
+            // this.selectedElement();
             
-            this.fileManagerDeleteModal.hide();
-            this.openModal();
+            // this.fileManagerDeleteModal.hide();
+            // this.openModal();
         };
     };
     
@@ -601,183 +593,163 @@ class ElectronFileManager {
     }
 
     addElements() {
-        var elementsData = this.getElements();
-        var menuNode = document.getElementById(this.menu);
-        this.setInstructions();
-        for (var i = 0; i < elementsData.length; i++) {
-            var tr = document.createElement("tr");
-            tr.id = elementsData[i].id;
+        // var elementsData = this.getElements();
+        // var menuNode = document.getElementById(this.menu);
+        // this.setInstructions();
+        // for (var i = 0; i < elementsData.length; i++) {
+        //     var tr = document.createElement("tr");
+        //     tr.id = elementsData[i].id;
 
-            // Title
-            var th = document.createElement("th");
-            th.onclick = function(e) {
-                e.stopImmediatePropagation();
-                var pass = false, topElement, textBlock, id = undefined;
-                if (e.target.id === "textBlock") {
-                    topElement = e.target.parentNode.parentNode.parentNode.parentNode;
-                    textBlock = e.target;
-                } else if (e.target.nodeName === "I") {
-                    topElement = e.target.parentNode.parentNode.parentNode.parentNode;
-                    textBlock = topElement.querySelector("#textBlock");
-                } else if (e.target.nodeName === "DIV") {
-                    topElement = e.target.parentNode.parentNode;
-                    textBlock = topElement.querySelector("#textBlock");
-                }
+        //     // Title
+        //     var th = document.createElement("th");
+        //     th.onclick = function(e) {
+        //         e.stopImmediatePropagation();
+        //         var pass = false, topElement, textBlock, id = undefined;
+        //         if (e.target.id === "textBlock") {
+        //             topElement = e.target.parentNode.parentNode.parentNode.parentNode;
+        //             textBlock = e.target;
+        //         } else if (e.target.nodeName === "I") {
+        //             topElement = e.target.parentNode.parentNode.parentNode.parentNode;
+        //             textBlock = topElement.querySelector("#textBlock");
+        //         } else if (e.target.nodeName === "DIV") {
+        //             topElement = e.target.parentNode.parentNode;
+        //             textBlock = topElement.querySelector("#textBlock");
+        //         }
 
-                if (topElement) {
-                    id = topElement.id;
-                    pass = textBlock.disabled;
-                }
+        //         if (topElement) {
+        //             id = topElement.id;
+        //             pass = textBlock.disabled;
+        //         }
                 
-                if (pass) {
-                    this.currentElement = this.getElementIndexByID(id);
-                    this.setInstructions();
-                    elementsData = this.getElements();
-                    if (typeof this.selectedElement === "function") {
-                        this.selectedElement(elementsData[this.currentElement]);
-                    }
-                }
-            }.bind(this);
+        //         if (pass) {
+        //             this.currentElement = this.getElementIndexByID(id);
+        //             this.setInstructions();
+        //             elementsData = this.getElements();
+        //             if (typeof this.selectedElement === "function") {
+        //                 this.selectedElement();
+        //             }
+        //         }
+        //     }.bind(this);
 
-            var row = document.createElement("div");
-            row.classList = "row align-items-center";
+        //     var row = document.createElement("div");
+        //     row.classList = "row align-items-center";
 
-            var div = document.createElement("div");
-            div.classList = "col-auto";
-            var icon = document.createElement("i");
-            icon.classList = "bi bi-file-earmark-easel-fill";
-            div.appendChild(icon);
-            row.appendChild(div)
+        //     var div = document.createElement("div");
+        //     div.classList = "col-auto";
+        //     var icon = document.createElement("i");
+        //     icon.classList = "bi bi-file-earmark-easel-fill";
+        //     div.appendChild(icon);
+        //     row.appendChild(div)
 
-            div = document.createElement("div");
-            div.classList = "col-auto";
-            var input = document.createElement("input");
-            input.id = "textBlock";
-            input.classList = "form-control"
+        //     div = document.createElement("div");
+        //     div.classList = "col-auto";
+        //     var input = document.createElement("input");
+        //     input.id = "textBlock";
+        //     input.classList = "form-control"
 
-            input.value = elementsData[i].name;
-            input.disabled = true;
+        //     input.value = elementsData[i].name;
+        //     input.disabled = true;
 
-            div.appendChild(input);
-            row.appendChild(div);
-            th.appendChild(row);
-            tr.appendChild(th);
+        //     div.appendChild(input);
+        //     row.appendChild(div);
+        //     th.appendChild(row);
+        //     tr.appendChild(th);
 
-            if (i !== 0) {
-                // Add Tools
-                th = document.createElement("th");
+        //     if (i !== 0) {
+        //         // Add Tools
+        //         th = document.createElement("th");
 
-                row = document.createElement("div");
-                row.classList = "row align-items-center";
+        //         row = document.createElement("div");
+        //         row.classList = "row align-items-center";
 
-                div = document.createElement("div");
-                div.classList = "col-auto";
-                div.style = "padding: .375rem .75rem;";
+        //         div = document.createElement("div");
+        //         div.classList = "col-auto";
+        //         div.style = "padding: .375rem .75rem;";
 
-                var span = document.createElement("span");
-                span.id = "editMode";
-                span.setAttribute("tabindex", "0");
+        //         var span = document.createElement("span");
+        //         span.id = "editMode";
+        //         span.setAttribute("tabindex", "0");
 
-                icon = document.createElement("i");
-                icon.classList = "bi bi-pencil";
-                span.appendChild(icon);
+        //         icon = document.createElement("i");
+        //         icon.classList = "bi bi-pencil";
+        //         span.appendChild(icon);
 
-                span.onclick = function(e) {
-                    e.stopImmediatePropagation();
+        //         span.onclick = function(e) {
+        //             e.stopImmediatePropagation();
 
-                    this.exitEditMode();
+        //             this.exitEditMode();
 
-                    e.target.parentNode.style.display = "none";
-                    e.target.parentNode.parentNode.querySelector("#deleteMode").style.display = "";
-                    var textBlock = e.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector("#textBlock");
-                    textBlock.disabled = false;
+        //             e.target.parentNode.style.display = "none";
+        //             e.target.parentNode.parentNode.querySelector("#deleteMode").style.display = "";
+        //             var textBlock = e.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector("#textBlock");
+        //             textBlock.disabled = false;
 
-                    textBlock.onkeydown = async (e) => {
-                        if (e.keyCode == 13) {
-                            e.stopImmediatePropagation();
+        //             textBlock.onkeydown = async (e) => {
+        //                 if (e.keyCode == 13) {
+        //                     e.stopImmediatePropagation();
                             
-                            if (e.target.value.length>this.maxFileSize())
-                                return false;
+        //                     if (e.target.value.length>this.maxFileSize())
+        //                         return false;
 
-                            var text = e.target.value.replace("&nbsp;", '');
-                            text = text.replace("<br>", '');
-                            if (text.length > 0) {
-                                e.target.value = text;
+        //                     var text = e.target.value.replace("&nbsp;", '');
+        //                     text = text.replace("<br>", '');
+        //                     if (text.length > 0) {
+        //                         e.target.value = text;
 
-                                elementsData[this.getElementIndexByID(e.target.parentNode.parentNode.parentNode.parentNode.id)]['name'] = text;
-                                teleprompter.settings[this.getDataKey()] = JSON.stringify(elementsData);
-                                e.target.parentNode.parentNode.parentNode.parentNode.querySelector("#editMode").style.display = "";
-                                e.target.parentNode.parentNode.parentNode.parentNode.querySelector("#deleteMode").style.display = "none";
-                                e.target.disabled = true;
+        //                         elementsData[this.getElementIndexByID(e.target.parentNode.parentNode.parentNode.parentNode.id)]['name'] = text;
+        //                         teleprompter.settings[this.getDataKey()] = JSON.stringify(elementsData);
+        //                         e.target.parentNode.parentNode.parentNode.parentNode.querySelector("#editMode").style.display = "";
+        //                         e.target.parentNode.parentNode.parentNode.parentNode.querySelector("#deleteMode").style.display = "none";
+        //                         e.target.disabled = true;
 
-                                return true;
-                            } else {
-                                return false;
-                            }
-                        } else if (e.keyCode == 8) {
-                            if (e.target.value.length - 1 === 0) {
-                                e.target.value = "&nbsp;";
-                            }
-                        }
+        //                         return true;
+        //                     } else {
+        //                         return false;
+        //                     }
+        //                 } else if (e.keyCode == 8) {
+        //                     if (e.target.value.length - 1 === 0) {
+        //                         e.target.value = "&nbsp;";
+        //                     }
+        //                 }
 
-                        return true;
-                    };
+        //                 return true;
+        //             };
 
-                    return false;
-                }.bind(this);
+        //             return false;
+        //         }.bind(this);
 
-                div.appendChild(span);
+        //         div.appendChild(span);
 
-                span = document.createElement("span");
-                span.id = "deleteMode";
-                span.setAttribute("tabindex", "0");
+        //         span = document.createElement("span");
+        //         span.id = "deleteMode";
+        //         span.setAttribute("tabindex", "0");
 
-                icon = document.createElement("i");
-                icon.classList = "bi bi-file-earmark-minus";
-                span.appendChild(icon);
+        //         icon = document.createElement("i");
+        //         icon.classList = "bi bi-file-earmark-minus";
+        //         span.appendChild(icon);
 
-                span.onclick = function(e) {
-                    e.stopImmediatePropagation();
-                    this.deleteElement(e.target.parentNode.parentNode.parentNode.parentNode.parentNode.id);
-                    window.setTimeout(function() {
-                        this.refreshElements();
-                    }.bind(this), 1);
-                }.bind(this);
-                span.style.display = "none";
+        //         span.onclick = function(e) {
+        //             e.stopImmediatePropagation();
+        //             this.deleteElement(e.target.parentNode.parentNode.parentNode.parentNode.parentNode.id);
+        //             window.setTimeout(function() {
+        //                 this.refreshElements();
+        //             }.bind(this), 1);
+        //         }.bind(this);
+        //         span.style.display = "none";
 
-                div.appendChild(span);
+        //         div.appendChild(span);
 
-                span = document.createElement("span");
-                span.id = "download";
-                span.setAttribute("tabindex", "0");
+        //         row.appendChild(div);
+        //         th.appendChild(row);
 
-                icon = document.createElement("i");
-                icon.classList = "bi bi-cloud-download";
-                span.appendChild(icon);
-
-                span.onclick = function(e) {
-                    e.stopImmediatePropagation();
-                    this.currentElement = this.getElementIndexByID(e.target.parentNode.parentNode.parentNode.parentNode.parentNode.id);
-                    elementsData = this.getElements();
-                    if (typeof this.selectedElement === "function") {
-                        // Download document
-                        this.download(elementsData[this.currentElement], this.currentElement);
-                    }
-                }.bind(this);
-
-                div.appendChild(span);
-
-                row.appendChild(div);
-                th.appendChild(row);
-
-                tr.appendChild(th);
-            } else {
-                th = document.createElement("th");
-                tr.appendChild(th);
-            }
+        //         tr.appendChild(th);
+        //     } else {
+        //         th = document.createElement("th");
+        //         tr.appendChild(th);
+        //     }
             
-            menuNode.appendChild(tr);
-        }
+        //     menuNode.appendChild(tr);
+        // }
         document.getElementById("addScriptSidebarButton").onclick = this.addScript.bind(this);
     };
 };

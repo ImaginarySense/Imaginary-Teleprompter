@@ -1706,3 +1706,7 @@ html, body {
     height: calc(100% - 32px) !important;
     background-color: var(--background-color, #fff);
 }
+
+.cke_dialog_background_cover {
+    top: 32px !important;
+}

@@ -48,21 +48,9 @@ class BrowserFileManager {
             }
         };
 
-        this.selectedElement = function(element) {
-            var scriptsData = this.getElements();
-            if (scriptsData[this.currentElement].hasOwnProperty('data'))
-                document.getElementById("prompt").innerHTML = scriptsData[this.currentElement]['data'];
-            else
-                document.getElementById("prompt").innerHTML = "";
-
-            document.getElementById('promptOptions').innerHTML = scriptsData[this.currentElement]['name'];
-
-            this.closeModal()
-        }.bind(this);
-
         this.addElementEnded = function(element) {
             if (debug) console.log(element);
-            this.selectedElement(element);
+            this.selectedElement();
         }.bind(this);
 
         this.setEvent('input','prompt',function() {
@@ -135,6 +123,21 @@ class BrowserFileManager {
 
         document.body.removeChild(element);
     };
+
+    selectedElement() {
+        this.setCurrentElement();
+        this.closeModal();
+    };
+
+    setCurrentElement() {
+        var scriptsData = this.getElements();
+        if (scriptsData[this.currentElement].hasOwnProperty('data'))
+            document.getElementById("prompt").innerHTML = scriptsData[this.currentElement]['data'];
+        else
+            document.getElementById("prompt").innerHTML = "";
+
+        document.getElementById('promptOptions').innerHTML = scriptsData[this.currentElement]['name'];
+    }
 
     async addScript(evt) {
         if (evt.preventDefault!==undefined)
@@ -608,7 +611,7 @@ class BrowserFileManager {
             //Saving Elements
             teleprompter.settings[this.getDataKey()] = JSON.stringify(elementsData); 
             this.refreshElements();
-            this.selectedElement(null);
+            this.selectedElement();
             
             this.fileManagerDeleteModal.hide();
             this.openModal();
@@ -664,7 +667,7 @@ class BrowserFileManager {
                     this.setInstructions();
                     elementsData = this.getElements();
                     if (typeof this.selectedElement === "function") {
-                        this.selectedElement(elementsData[this.currentElement]);
+                        this.selectedElement();
                     }
                 }
             }.bind(this);

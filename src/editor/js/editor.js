@@ -57,7 +57,6 @@ class Editor {
 
         // Initialize file Manager
         teleprompter.fileManager = inElectron() ? new ElectronFileManager() : new BrowserFileManager();
-        // teleprompter.fileManager = new BrowserFileManager();
 
         // Initialize commands mapping
         teleprompter.commandsMapping = new CommandsMapping(this);
