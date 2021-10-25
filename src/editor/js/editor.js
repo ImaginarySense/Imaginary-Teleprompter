@@ -589,7 +589,7 @@ class Editor {
                             this.openCanvasPrompter();
                         // Otherwise run perfect sync painter.
                         else
-                            this.prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + (secondaryDisplay.workArea.height-50) + ',width=' + (secondaryDisplay.workArea.width-50) + ',top='+ (secondaryDisplay.workArea.y+50) +',left=' + (secondaryDisplay.workArea.x+50) + ',fullscreen=0,status=0,location=0,menubar=0,toolbar=0,frame=true' );
+                            this.prompterWindow = window.open("teleprompter.html" + (this.debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + (secondaryDisplay.workArea.height-50) + ',width=' + (secondaryDisplay.workArea.width-50) + ',top='+ (secondaryDisplay.workArea.y+50) +',left=' + (secondaryDisplay.workArea.x+50) + ',fullscreen=0,status=0,location=0,menubar=0,toolbar=0,frame=true' );
                     }
                     else if (currentDisplay>0) {
                         if (this.debug) console.log("Displaying external on primary display.");
@@ -598,23 +598,23 @@ class Editor {
                             this.openCanvasPrompter();
                         // Otherwise run perfect sync painter.
                         else
-                            this.prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + (primaryDisplay.workArea.height-50) + ',width=' + (primaryDisplay.workArea.width-50) + ',top='+ (primaryDisplay.workArea.y+25) +',left=' + (primaryDisplay.workArea.x+25) + ',fullscreen=0,status=0,location=0,menubar=0,toolbar=0,frame=true');
+                            this.prompterWindow = window.open("teleprompter.html" + (this.debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + (primaryDisplay.workArea.height-50) + ',width=' + (primaryDisplay.workArea.width-50) + ',top='+ (primaryDisplay.workArea.y+25) +',left=' + (primaryDisplay.workArea.x+25) + ',fullscreen=0,status=0,location=0,menubar=0,toolbar=0,frame=true');
                     }
                 }
                 // If currentDisplay isn't the primaryDisplay or if there is no secondaryDisplay and the primary is unnocupied... Display on primaryDisplay.
                 else if (!this.instance[0]) {
                     if (this.debug) console.log("Displaying on primary display.");
-                    this.prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + (primaryDisplay.workArea.height-50) + ',width=' + (primaryDisplay.workArea.width-50) + ',top='+ (primaryDisplay.workArea.y+25) +',left=' + (primaryDisplay.workArea.x+25) + ',fullscreen=0,status=0,location=0,menubar=0,toolbar=0,frame=true');
+                    this.prompterWindow = window.open("teleprompter.html" + (this.debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + (primaryDisplay.workArea.height-50) + ',width=' + (primaryDisplay.workArea.width-50) + ',top='+ (primaryDisplay.workArea.y+25) +',left=' + (primaryDisplay.workArea.x+25) + ',fullscreen=0,status=0,location=0,menubar=0,toolbar=0,frame=true');
                 }
             }
             // Load InFrame prompter only if there's more than one screen or if the only screen available is free.
             if (this.instance[0] && (!this.instance[1] || secondaryDisplay))
-                this.frame.src = "teleprompter.html" + (debug ? "?debug=1" : "");
+                this.frame.src = "teleprompter.html" + (this.debug ? "?debug=1" : "");
         } else {
             if (this.instance[0])
-                this.frame.src = "teleprompter.html" + (debug ? "?debug=1" : "");
+                this.frame.src = "teleprompter.html" + (this.debug ? "?debug=1" : "");
             if (this.instance[1])
-                this.prompterWindow = window.open("teleprompter.html" + (debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + screen.availHeight + ',width=' + screen.width + ',top=0,left=' + screen.width + ',fullscreen=0,status=0,location=0,menubar=0,toolbar=0');
+                this.prompterWindow = window.open("teleprompter.html" + (this.debug ? "?debug=1" : ""), 'TelePrompter Output', 'height=' + screen.availHeight + ',width=' + screen.width + ',top=0,left=' + screen.width + ',fullscreen=0,status=0,location=0,menubar=0,toolbar=0');
         }
         
         // If an external prompt is openned, focus on it.        
@@ -862,6 +862,15 @@ else
     document.addEventListener("DOMContentLoaded", function() {
         teleprompter.editor.init();
     }.bind(this));
+
+document.getElementById("site-link").onclick = (event) => {
+    const url = 'https://imaginary.tech/teleprompter';
+    if (inElectron()) {
+        require('electron').shell.openExternal(url);
+    } else {
+        window.location = url;
+    }
+}
 
 if (inElectron()) {
     const remote = require('@electron/remote');

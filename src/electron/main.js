@@ -133,7 +133,8 @@ function createMainWindow () {
 				nodeIntegration: true,
 				contextIsolation: false,
       			enableRemoteModule: true,
-				nativeWindowOpen: true
+				nativeWindowOpen: true,
+				nodeIntegrationInSubFrames: true
 			},
 			width: 1280,
 			height: 800,
@@ -149,7 +150,8 @@ function createMainWindow () {
 				nodeIntegration: true,
 				contextIsolation: false,
       			enableRemoteModule: true,
-				nativeWindowOpen: true
+				nativeWindowOpen: true,
+				nodeIntegrationInSubFrames: true
 			},
 			show: false,
 			width: 1280,

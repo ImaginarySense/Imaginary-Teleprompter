@@ -66,7 +66,7 @@ class Prompter {
         return document.getElementsByClassName("clock")[0];
     }
 
-    init() {
+    async init() {
         // Initialize commands mapping
         teleprompter.commandsMapping = new CommandsMapping(this);
 
@@ -184,7 +184,7 @@ class Prompter {
         // Initialize themes
         teleprompter.themes = new Themes();
     
-        teleprompter.themes.styleInit();
+        await teleprompter.themes.styleInit(null);
         teleprompter.themes.setStyle(this.promptStyleOption);
     
         // Wheel settings
@@ -243,21 +243,21 @@ class Prompter {
         }.bind(this), 750);
 
         // On close
-        window.addEventListener("beforeunload", function() {
+        window.addEventListener("beforeunload", async () => {
             var textAtFocusArea = parseInt(await teleprompter.settings.textAtFocusArea);
             if (textAtFocusArea > 1) {
                 var offsetToFocusArea = this.overlayFocus.getBoundingClientRect().top,
                     promptValues = this.getTranslateValues(this.prompt);
                 
-                await teleprompter.settings.promptStartPosition = -(promptValues.y - offsetToFocusArea + this.screenHeight);
+                teleprompter.settings.promptStartPosition = -(promptValues.y - offsetToFocusArea + this.screenHeight);
 
             } else {
-                await teleprompter.settings.promptStartPosition = 0;
+                teleprompter.settings.promptStartPosition = 0;
             }
             this.restoreRequest();
-        }.bind(this));
+        });
 
-        document.addEventListener( 'transitionend', function() {
+        document.addEventListener('transitionend', function() {
             if(this.atStart() || this.atEnd()) {
                 this.stopAll();
                 this.timer.stopTimer();
@@ -314,7 +314,7 @@ class Prompter {
         }.bind(this));
     }
 
-    startPrompterAt() {
+    async startPrompterAt() {
         // Calculate where to start
         var offsetToFocusArea = 0,
             promptStartPosition = 0,
@@ -338,7 +338,7 @@ class Prompter {
         }
     }
 
-    setFocusAreaHeight() {
+    async setFocusAreaHeight() {
         if (await teleprompter.settings.focusAreaHeight) {
             this.overlayFocus.style.height = 3.6 * (await teleprompter.settings.focusAreaHeight / 100) + 'em';
         } else {
@@ -346,14 +346,14 @@ class Prompter {
         }
     }
 
-    updateSettings() {        
+    async updateSettings() {        
         var data = await teleprompter.settings.IFTeleprompterSession;
         this.session = JSON.parse(data);
         // Ensure content is being passed
-        // console.log("session", this.session);
+        console.log("session", this.session);
     }
 
-    updateContents() {
+    async updateContents() {
         // 
         // prompt = document.getElementsByClassName("prompt")[0];
         // overlay = document.getElementById("overlay");
@@ -463,7 +463,7 @@ class Prompter {
         }
     }
     
-    restoreRequest() {
+    async restoreRequest() {
         // "closing" mutex prevents infinite loop.
         if (this.debug) console.log("Restore request.") && false;
         // If we have normal access to the editor, request it to restore the prompters.
@@ -1291,7 +1291,7 @@ class Prompter {
         event.preventDefault();
     }
 
-    remoteControls() {
+    async remoteControls() {
         await teleprompter.settings.get("IFTeleprompterControl");
         var res = JSON.parse(data);
         if(typeof res !== "undefined"){
@@ -1361,7 +1361,7 @@ class Prompter {
     }
 }
 
-teleprompter.prompter = new Prompter()
+teleprompter.prompter = new Prompter();
 
 // Initialize objects after DOM is loaded
 if (document.readyState === "interactive" || document.readyState === "complete")
