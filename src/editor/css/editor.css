@@ -130,7 +130,7 @@ footer #imaginary {
 	position: fixed;
 	margin: 0px;
 	padding: 0px;
-	top: 105px;
+	top: 0px;
 	bottom: 0px;
 	width: 100%;
 	z-index:10;
@@ -143,11 +143,11 @@ footer #imaginary {
 	position: absolute;
 }
 
-@media only screen and (min-width: 768px) {
+/*@media only screen and (min-width: 768px) {
 	#framecontainer {
-		top: 48px;
+		top: 0px;
 	}
-}
+}*/
 
 #footer {
 	margin: 0px;
