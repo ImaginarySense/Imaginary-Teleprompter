@@ -332,17 +332,26 @@ class Themes {
     }
 
     setColorPicker() {
-        document.getElementById('bodyColor').onchange = function(event) {
-            this.updateColorOnPreview(event.target);
-        }.bind(this);
+        var bodyColor = document.getElementById('bodyColor');
+        if  (bodyColor){
+            bodyColor.onchange = function(event) {
+                this.updateColorOnPreview(event.target);
+            }.bind(this);
+        }
 
-        document.getElementById('overlayColor').onchange = function(event) {
-            this.updateColorOnPreview(event.target);
-        }.bind(this);
+        var overlayColor = document.getElementById('overlayColor');
+        if (overlayColor) {
+            overlayColor.onchange = function(event) {
+                this.updateColorOnPreview(event.target);
+            }.bind(this);
+        }
 
-        document.getElementById('textColor').onchange = function(event) {
-            this.updateColorOnPreview(event.target);
-        }.bind(this);
+        var textColor = document.getElementById('textColor');
+        if (textColor) {
+            textColor.onchange = function(event) {
+                this.updateColorOnPreview(event.target);
+            }.bind(this);
+        }
     }
 
     setDefaultStyle() {
