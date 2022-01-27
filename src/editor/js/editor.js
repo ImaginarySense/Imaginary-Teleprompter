@@ -255,7 +255,7 @@ class Editor {
             teleprompter.settings.promptStartPosition = event.target.scrollTop;
         }
         if (teleprompter.settings.promptStartPosition) {
-            promptcontainer.scrollTop = teleprompter.settings.promptStartPosition;
+            promptcontainer.scrollTop = teleprompter.settings.promptStartPosition * document.getElementById("prompt").clientHeight;
         } else {
             teleprompter.settings.promptStartPosition = 0;
         }
@@ -537,7 +537,7 @@ class Editor {
                 event.preventDefault();
             this.togglePromptIt();
         }
-        promptcontainer.scrollTop = teleprompter.settings.promptStartPosition;
+        promptcontainer.scrollTop = teleprompter.settings.promptStartPosition * document.getElementById("prompt").clientHeight;
     }
 
     // On "Prompt It!" clicked

@@ -249,7 +249,7 @@ class Prompter {
                 var offsetToFocusArea = this.overlayFocus.getBoundingClientRect().top,
                     promptValues = this.getTranslateValues(this.prompt);
                 
-                teleprompter.settings.promptStartPosition = -(promptValues.y - offsetToFocusArea + this.screenHeight);
+                teleprompter.settings.promptStartPosition = -(promptValues.y - offsetToFocusArea + this.screenHeight) / this.prompt.getBoundingClientRect().height;
 
             } else {
                 teleprompter.settings.promptStartPosition = 0;
@@ -330,11 +330,11 @@ class Prompter {
     
         // If flipped vertically, set start at inverted top.
         if (this.flipV) {
-            this.animate(0, -this.promptHeight+this.screenHeight + (offsetToFocusArea + -promptStartPosition));
-        } else {
-            if (textAtFocusArea > 0) {
-                this.animate(0, -this.screenHeight + (offsetToFocusArea + -promptStartPosition));
-            }
+            // this.animate(0, -this.promptHeight+this.screenHeight + (offsetToFocusArea + -promptStartPosition));
+            this.animate(0, -this.promptHeight+this.screenHeight+(-promptStartPosition+offsetToFocusArea-this.screenHeight));
+        } else if (textAtFocusArea > 0) {
+            // this.animate(0, -this.screenHeight + (offsetToFocusArea + -promptStartPosition));
+            this.animate(0, -promptStartPosition+offsetToFocusArea-this.screenHeight);
         }
     }
 
