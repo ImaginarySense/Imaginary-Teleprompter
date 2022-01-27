@@ -128,7 +128,8 @@ function createMainWindow () {
 			javascript: true,
 			title: 'Teleprompter by Imaginary Sense',
 			useContentSize: true,
-			icon: __dirname + '/icon.ico'
+			icon: __dirname + '/icon.ico',
+			frame: false
 		});
 	else
 		mainWindow = new BrowserWindow({
@@ -144,7 +145,8 @@ function createMainWindow () {
 			javascript: true,
 			title: 'Teleprompter by Imaginary Sense',
 			useContentSize: true,
-			icon: __dirname + '/icon.ico'
+			icon: __dirname + '/icon.ico',
+			frame: false
 		});
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
 	mainWindow.once('ready-to-show', () => {

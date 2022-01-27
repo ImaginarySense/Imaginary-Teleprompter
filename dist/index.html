@@ -22,12 +22,11 @@
 <head>
 	<meta charset="utf-8">
 	<meta property="og:title" content="Imaginary Teleprompter">
-	<meta property="og:site_name" content="Imaginary Sense">
+	<meta property="og:site_name" content="Imaginary Tech">
 	<meta property="og:url" content="https://imaginary.tech/teleprompter/">
-	<meta property="og:description" content="Imaginary Teleprompter is a professional grade, multi-platform, free software teleprompter for everyone to use. It's built on web technologies so it can run in any device.">
+	<meta property="og:description" content="Imaginary Teleprompter is a free software teleprompter for everyone to use. It's built on web technologies so it can run in any device.">
 	<meta property="og:image" content="https://imaginary.tech/teleprompter/img/if-teleprompter-web-fb.jpg">
-	<meta property="fb:app_id" content="196769633992905">
-	<title>Imaginary Teleprompter by Imaginary Sense</title>
+	<title>Imaginary Teleprompter</title>
 	<link rel="icon" href="favicon.ico" type="image/x-icon">
 	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap-reboot.min.css">
 	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
@@ -41,10 +40,11 @@
 		<div class="row">
 			<div class="col-12" id="win">
 				<div class="d-flex justify-content-between">
-					<a class="navbar-brand m-0 p-0" href="https://imaginary.tech/teleprompter/" target="_blank">
+					<span class="navbar-brand m-0 p-0">
 						<!-- <img class="p-1 pl-3" src="assets/custom/img/logo.png" alt="Teleprompter"> -->
-						Teleprompter
-					</a>
+						Imaginary Teleprompter
+					</span>
+					<span id="current-script-name" class="text-white" style="color:#DEDEDE; left:0; right:0; margin: auto; position: relative;">Instructions</span>
 					<div id="win-controls">
 						<button id="win-controls-min"><i class="bi bi-dash-lg"></i></button>
 						<button id="win-controls-max"><i class="bi bi-window"></i></button>
@@ -52,28 +52,29 @@
 					   </div>
 				</div>
 			</div>
-			<div class="col-1" id="win-shortcuts">
+			<!-- <div class="col-1" id="win-shortcuts">
 				<div class="row">
 					<div class="col-12 mb-2">
 						<img class="w-100 p-2 rounded-circle" src="assets/custom/img/Logo-QR2.png">
 					</div>
 				</div>
-			</div>
-			<div class="col-11" id="win-container">
+			</div> -->
+			<div class="col-12" id="win-container">
 				<div class="row">
 					<div class="col-3 p-0" id="win-tags">
 						<nav class="navbar navbar-light px-2">
 							<div class="dropdown">
-								<button class="btn btn-secondary dropdown-toggle" type="button" id="promptOptions" data-bs-toggle="dropdown" aria-expanded="false">
-								  <!-- will load current script name -->
-								  <span id="current-script-name">Instructions</span>
-								  <span class="drop-close"></span>
-								</button>
-								<ul class="dropdown-menu" aria-labelledby="promptOptions">
-								  <li><a class="dropdown-item" href="#">Action</a></li>
-								  <li><a class="dropdown-item" href="#">Another action</a></li>
-								  <li><a class="dropdown-item" href="#">Something else here</a></li>
-								</ul>
+								<!-- dropdown-toggle   data-bs-toggle="dropdown"  aria-expanded="false"-->
+								<div id="promptOptions">
+									<!-- will load current script name -->
+								  	<span style="color:#DEDEDE; padding-left: 3pt;">Markers</span>
+									<!-- <span class="drop-close"></span> -->
+								</div>
+								<!-- <ul class="dropdown-menu" aria-labelledby="promptOptions">
+									<li><a class="dropdown-item" href="#">Action</a></li>
+									<li><a class="dropdown-item" href="#">Another action</a></li>
+									<li><a class="dropdown-item" href="#">Something else here</a></li>
+								</ul> -->
 							</div>
 						</nav>
 						<ul class="list-group list-group-flush" id="anchors">
@@ -86,23 +87,17 @@
 							<nav id="prompter-options" class="navbar navbar-expand-lg navbar-light">
 								<div class="container">
 									<div class="d-flex justify-content-between align-items-center w-100">
-										<ul class="navbar-nav">
-											<li class="nav-item">
-												<a class="nav-link" id="fileManagerToggle" href="#fileManagerToggle">
+										<div class="btn-group">
+												<a class="btn" id="fileManagerToggle" href="#fileManagerToggle">
 													<img style="width:26px;" src="assets/custom/fonts/noto-emoji-master/emoji_u1f4d3.svg">
 												</a>
-											</li>
-											<li class="nav-item">
-												<a class="nav-link" id="settingsToggle" href="#settingsModal">
+												<a class="btn" id="settingsToggle" href="#settingsModal">
 													<img style="width:26px;" src="assets/custom/fonts/noto-emoji-master/emoji_u2699.svg">
 												</a>
-											</li>
-											<li class="nav-item">
-												<a class="nav-link" id="quickConfig" href="#content" data-bs-toggle="collapse" aria-expanded="false" aria-controls="content">
+												<a class="btn" id="quickConfig" href="#content" data-bs-toggle="collapse" aria-expanded="false" aria-controls="content">
 													<img style="width:26px;" src="assets/custom/fonts/noto-emoji-master/emoji_u1f517.svg">
 												</a>
-											</li>
-										</ul>
+										</div>
 										<div class="prompt-controls">
 											<button type="button" id="updateIt" class="btn btn-purple hidden">Update</button>
 											<button type="button" id="promptIt" class="btn btn-purple">Prompt It!</button>
@@ -725,7 +720,7 @@
 																				  </div>
 																			  </div>
 																			  <div class="d-flex p-2 gap-2">
-																				  <button class="btn btn-secondary" id="editStyleButton" disabled>Update Style</button>
+																				  <button class="btn btn-secondary" id="editStyleButton" disabled>Save Changes</button>
 																				  <button class="btn btn-secondary" id="addStyleButton" disabled>New Style</button>
 																				  <button class="btn btn-secondary" id="removeStyleButton" disabled>Delete Style</button>
 																			  </div>
@@ -756,7 +751,7 @@
 																<h2 class="display-6">Authors</h2>
 																<ul class="lead">
 																	<li>
-																		Javier Cordero <a class="external" href="https://www.linkedin.com/in/javier-oscar-cordero-p%25C3%25A9rez-70658033" target="_blank"><i class="bi bi-linkedin"></i></a> 
+																		Javier Cordero <a class="external" href="https://twitter.com/JCuperino" target="_blank"><i class="bi bi-twitter"></i></a> <a class="external" href="https://www.linkedin.com/in/javier-oscar-cordero-p%25C3%25A9rez-70658033" target="_blank"><i class="bi bi-linkedin"></i></a> <a class="external" href="https://github.com/Cuperino" target="_blank"><i class="bi bi-github"></i></a>
 																	</li>
 																	<li>
 																		Victor Ortiz <a class="external" href="https://twitter.com/Va2ron1" target="_blank"><i class="bi bi-twitter"></i></a>
@@ -772,7 +767,7 @@
 																	</li>
 																</ul>
 																<p>Licensed under <a rel="license" href="LICENSE" target="_blank">GPL3</a>, assets under <a class="external" rel="license" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a></p>
-																<p><a class="external" target="_blank" href="https://github.com/ImaginarySense/Teleprompter-Core"><i class="bi bi-github pe-1"></i>Source Code</a> • <a class="external" target="_blank" href="https://imaginary.tech/teleprompter/#download"><i class="bi bi-link-45deg pe-1"></i>Downloads</a></p>
+																<p><a class="external" target="_blank" href="https://github.com/ImaginarySense/Imaginary-Teleprompter"><i class="bi bi-github pe-1"></i>Source Code</a> • <a class="external" target="_blank" href="https://imaginary.tech/teleprompter/#download"><i class="bi bi-link-45deg pe-1"></i>Downloads</a></p>
 															  </div>
 														  </div>
 													  </div>
